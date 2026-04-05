@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="1080" prefWidth="1920" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.auctionsystem.LoginController">
+    <children>
+        <Label alignment="CENTER" layoutX="701.0" layoutY="228.0" styleClass="my-font" stylesheets="@../../CSS/style.css" text="Đăng nhập vào tài khoản của bạn">
+            <font>
+                <Font name="System Bold" size="33.0" />
+            </font>
+        </Label>
+
+        <TextField fx:id="username" layoutX="770.0" layoutY="355.0" prefHeight="41.0" prefWidth="379.0" promptText="Email hoặc tên đăng nhập" style="-fx-border-color: #000000; -fx-background-radius: 7; -fx-background-color: f7f7f7; -fx-border-radius: 7;" styleClass="my-font2" stylesheets="@../../CSS/style.css" />
+
+        <StackPane layoutX="770.0" layoutY="412.0" prefHeight="41.0" prefWidth="379.0">
+            <children>
+                <TextField fx:id="mkShow" prefHeight="41.0" prefWidth="379.0" style="-fx-border-color: #000000; -fx-background-radius: 7; -fx-background-color: f7f7f7; -fx-border-radius: 7; -fx-padding: 0 45 0 10;" styleClass="my-font2" stylesheets="@../../CSS/style.css" />
+                <PasswordField fx:id="mkHide" prefHeight="41.0" prefWidth="379.0" promptText="Mật khẩu" style="-fx-background-color: f7f7f7; -fx-background-radius: 7; -fx-border-radius: 7; -fx-border-color: #000000; -fx-padding: 0 45 0 10;" styleClass="my-font2" stylesheets="@../../CSS/style.css" />
+                <Button mnemonicParsing="false" onMousePressed="#showPassword" onMouseReleased="#hidePassword" style="-fx-background-color: transparent; -fx-cursor: hand;" text="👁" StackPane.alignment="CENTER_RIGHT">
+                    <font>
+                        <Font size="18.0" />
+                    </font>
+                    <StackPane.margin>
+                        <Insets right="5.0" />
+                    </StackPane.margin>
+                </Button>
+            </children>
+        </StackPane>
+
+        <Button fx:id="loginButton" layoutX="770.0" layoutY="472.0" onAction="#handleLogin" prefHeight="41.0" prefWidth="379.0" style="-fx-background-color: #426ded; -fx-border-radius: 20; -fx-background-radius: 20; -fx-cursor: hand;" stylesheets="@../../CSS/style.css" text="Tiếp tục" textFill="WHITE">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Button>
+
+        <Rectangle arcHeight="20.0" arcWidth="20.0" fill="#f7f7f7" height="41.0" layoutX="770.0" layoutY="292.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="379.0" />
+        <Label layoutX="785.0" layoutY="302.0" style="-fx-font-size: 15;" styleClass="my-font2" stylesheets="@../../CSS/style.css" text="Chưa có tài khoản?">
+            <font>
+                <Font size="15.0" />
+            </font>
+        </Label>
+        <Button layoutX="1018.0" layoutY="296.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="127.0" style="-fx-background-color: f7f7f7; -fx-background-radius: 17; -fx-border-radius: 17; -fx-border-color: #000000; -fx-cursor: hand;" styleClass="my-font" stylesheets="@../../CSS/style.css" text="Tạo tài khoản">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Button>
+    </children>
+</AnchorPane>

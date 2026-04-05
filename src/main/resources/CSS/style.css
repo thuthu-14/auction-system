@@ -1,0 +1,30 @@
+@font-face {
+    font-family: 'Darley Sans Custom';
+    src: url('DarleySans-Regular.otf');
+}
+.root {
+    -fx-font-family: 'Darley Sans Custom';
+}
+.my-font {
+    -fx-font-family: "Darley Sans";
+}
+@font-face {
+    font-family: "Mulish";
+    src: url("Mulish-VariableFont_wght.ttf");
+}
+
+.font-mulish {
+    -fx-font-family: "Mulish";
+}
+
+.my-font2 {
+    -fx-font-family: "Mulish";
+    -fx-font-size: 13px;
+}
+.eye-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+.eye-button:hover {
+    -fx-opacity: 0.7;
+}

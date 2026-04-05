@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="1080" prefWidth="1920" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.auctionsystem.SignupController">
+    <children>
+        <Label alignment="CENTER" layoutX="789.0" layoutY="94.0" styleClass="my-font" stylesheets="@../../CSS/style.css" text="Tạo tài khoản của bạn">
+            <font>
+                <Font name="System Bold" size="33.0" />
+            </font>
+        </Label>
+      <TextField fx:id="Ho" layoutX="795.0" layoutY="176.0" prefHeight="41.0" prefWidth="159.0" promptText="Họ" style="-fx-background-color: #ffffff; -fx-border-color: #1a1a1a; -fx-background-radius: 7; -fx-border-radius: 7;" />
+      <TextField fx:id="Ten" layoutX="966.0" layoutY="176.0" prefHeight="41.0" prefWidth="159.0" promptText="Tên" style="-fx-background-color: #ffffff; -fx-border-color: #1a1a1a; -fx-background-radius: 7; -fx-border-radius: 7;" />
+      <TextField fx:id="Email" layoutX="796.0" layoutY="239.0" prefHeight="41.0" prefWidth="328.0" promptText="Email" style="-fx-background-color: #ffffff; -fx-border-color: #1a1a1a; -fx-background-radius: 7; -fx-border-radius: 7;" />
+      <TextField fx:id="mk" layoutX="795.0" layoutY="299.0" prefHeight="41.0" prefWidth="328.0" promptText="Mật khẩu mới" style="-fx-background-color: #ffffff; -fx-border-color: #1a1a1a; -fx-background-radius: 7; -fx-border-radius: 7;" />
+        <Button fx:id="loginButton" layoutX="794.0" layoutY="362.0" prefHeight="41.0" prefWidth="328.0" style="-fx-background-color: #426ded; -fx-border-radius: 20; -fx-background-radius: 20; -fx-cursor: hand;" stylesheets="@../../CSS/style.css" text="TIẾP TỤC" textFill="WHITE">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Button>
+      <TextArea layoutX="850.0" layoutY="413.0" prefHeight="37.0" prefWidth="137.0" style="-fx-background-color: #fffff; -fx-border-color: #fffff;" styleClass="font-mulish" stylesheets="@../../CSS/style.css" text="Bạn đã có tài khoản? " />
+      <Button layoutX="984.0" layoutY="413.0" mnemonicParsing="false" style="-fx-background-color: #fffff; -fx-border-color: #fffff;" styleClass="font-mulish" stylesheets="@../../CSS/style.css" text="Đăng nhập" />
+
+    </children>
+</AnchorPane>

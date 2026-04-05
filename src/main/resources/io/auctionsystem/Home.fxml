@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #fffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+   <left>
+      <VBox prefHeight="1080.0" prefWidth="267.0" style="-fx-background-color: #000000;" BorderPane.alignment="CENTER">
+         <children>
+            <Group />
+         </children></VBox>
+   </left>
+   <top>
+      <Line endX="100.0" startX="-100.0" BorderPane.alignment="CENTER" />
+   </top>
+</BorderPane>
