@@ -21,25 +21,27 @@ public class HomeController {
     private List<HBox> allMenus;
 
     @FXML private StackPane rootPane;
-    @FXML private StackPane searchOverlay;
-    @FXML private TextField searchInput;
     @FXML private StackPane contentArea;
+
+    @FXML private TextField productSearchInput;
+    @FXML private Button clearSearchBtn;
 
     @FXML
     public void initialize() {
         allMenus = Arrays.asList(menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings);
         updateMenuSelection(menuHome);
 
-        Platform.runLater(() -> {
-            KeyCombination ctrlK = new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN);
+        productSearchInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            clearSearchBtn.setVisible(!newValue.trim().isEmpty());
+        });
 
-            if (rootPane.getScene() != null) {
+        Platform.runLater(() -> {
+            if (rootPane != null && rootPane.getScene() != null) {
+                KeyCombination ctrlK = new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN);
                 rootPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                     if (ctrlK.match(event)) {
-                        openSearchOverlay();
+                        productSearchInput.requestFocus();
                         event.consume();
-                    } else if (event.getCode() == KeyCode.ESCAPE) {
-                        closeSearchOverlay();
                     }
                 });
             }
@@ -54,14 +56,14 @@ public class HomeController {
 
     private void updateMenuSelection(HBox selectedMenu) {
         for (HBox menu : allMenus) {
+            if (menu == null) continue;
+
+            Button btn = (Button) menu.getChildren().get(0);
             if (menu == selectedMenu) {
                 menu.setStyle("-fx-background-color: #edf2f7; -fx-background-radius: 8; -fx-cursor: hand;");
-                Button btn = (Button) menu.getChildren().get(0);
                 btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0; -fx-font-weight: bold;");
             } else {
                 menu.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-cursor: hand;");
-                Button btn = (Button) menu.getChildren().get(0);
-
                 if (menu == menuUpgrade) {
                     btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e; -fx-font-weight: bold;");
                 } else {
@@ -72,14 +74,16 @@ public class HomeController {
     }
 
     @FXML
-    private void openSearchOverlay() {
-        searchOverlay.setVisible(true);
-        Platform.runLater(() -> searchInput.requestFocus());
+    private void handleProductSearch() {
+        String keyword = productSearchInput.getText().trim();
+        if (!keyword.isEmpty()) {
+            System.out.println("Searching for: " + keyword);
+        }
     }
 
     @FXML
-    private void closeSearchOverlay() {
-        searchOverlay.setVisible(false);
-        searchInput.clear();
+    private void clearSearch() {
+        productSearchInput.clear();
+        productSearchInput.requestFocus();
     }
 }
