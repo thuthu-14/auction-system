@@ -3,6 +3,7 @@ package io.auctionsystem;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
@@ -69,5 +70,11 @@ public class LoginController implements Initializable {
 
         mkShow.setVisible(false);
         mkShow.setManaged(false);
+    }
+    @FXML
+    private void switchToSignup(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("signup.fxml"));
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.getScene().setRoot(root);
     }
 }
