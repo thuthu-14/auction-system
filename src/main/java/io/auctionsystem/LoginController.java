@@ -38,10 +38,14 @@ public class LoginController implements Initializable {
         if (user.equals("admin") && pass.equals("123")) {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Home.fxml"));
-                Scene scene = new Scene(fxmlLoader.load());
+                Parent root = fxmlLoader.load();
+                Scene scene = new Scene(root);
+
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(scene);
                 stage.setTitle("Trang chủ hệ thống đấu giá");
+                stage.setMaximized(true);
+
                 stage.show();
             } catch (IOException e) {
                 e.printStackTrace();
