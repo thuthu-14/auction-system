@@ -1,17 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" style="-fx-background-color: #fffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
-   <left>
-      <VBox prefHeight="1080.0" prefWidth="267.0" style="-fx-background-color: #000000;" BorderPane.alignment="CENTER">
+<HBox prefHeight="900.0" prefWidth="1440.0" style="-fx-background-color: #ffffff;" stylesheets="@../../CSS/Home.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.auctionsystem.HomeController">
+   <children>
+      <VBox prefWidth="260.0" spacing="5.0" style="-fx-background-color: #ffffff; -fx-border-color: #f0f0f0; -fx-border-width: 0 1 0 0; -fx-padding: 20 15 20 15;">
          <children>
-            <Group />
-         </children></VBox>
-   </left>
-   <top>
-      <Line endX="100.0" startX="-100.0" BorderPane.alignment="CENTER" />
-   </top>
-</BorderPane>
+            <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="10.0">
+               <children>
+                  <Label style="-fx-font-size: 26;" styleClass="my-darley" stylesheets="@../../CSS/style.css" text="☁️ BubblyBid" textFill="#2e384d">
+                     <font><Font name="System Bold" size="24.0" /></font>
+                  </Label>
+               </children>
+               <VBox.margin><Insets bottom="25.0" left="10.0" /></VBox.margin>
+            </HBox>
+
+            <HBox id="menuHome" fx:id="menuHome" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" styleClass="menu-item">
+               <children><Button alignment="TOP_LEFT" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="🏠 Home" /></children>
+            </HBox>
+
+            <HBox id="menuAI" fx:id="menuAI" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" styleClass="menu-item">
+               <children><Button alignment="TOP_LEFT" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="☁️ Ask Bubbly AI" /></children>
+            </HBox>
+
+            <Label text="BIDDING" textFill="#a0aec0">
+               <VBox.margin><Insets bottom="5.0" left="15.0" top="20.0" /></VBox.margin>
+               <font><Font name="System Bold" size="11.0" /></font>
+            </Label>
+
+            <HBox id="menuQB" fx:id="menuQB" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" styleClass="menu-item">
+               <children><Button alignment="TOP_LEFT" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="📝 Question Bank" /></children>
+            </HBox>
+
+            <HBox id="menuFlash" fx:id="menuFlash" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" styleClass="menu-item">
+               <children><Button alignment="TOP_LEFT" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="⚡ Flash Bid" /></children>
+            </HBox>
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <HBox id="menuUpgrade" fx:id="menuUpgrade" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" styleClass="menu-item">
+               <children><Button mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="👨‍🏫 Become a Seller" textFill="#e53e3e" /></children>
+            </HBox>
+         </children>
+      </VBox>
+
+      <VBox HBox.hgrow="ALWAYS">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="80.0" style="-fx-padding: 0 40 0 40; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+               <children>
+                  <TextField prefHeight="40.0" prefWidth="350.0" promptText="Search..." style="-fx-background-color: #f4f6f8; -fx-background-radius: 12;" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button style="-fx-background-color: transparent;" text="🌙" />
+                  <Button prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e2e8f0; -fx-background-radius: 20;" text="👤" />
+               </children>
+            </HBox>
+            <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+   </children>
+</HBox>

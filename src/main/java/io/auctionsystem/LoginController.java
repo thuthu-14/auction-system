@@ -37,7 +37,7 @@ public class LoginController implements Initializable {
 
         if (user.equals("admin") && pass.equals("123")) {
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("home.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Home.fxml"));
                 Scene scene = new Scene(fxmlLoader.load());
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(scene);
@@ -45,7 +45,7 @@ public class LoginController implements Initializable {
                 stage.show();
             } catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("Không tìm thấy file home.fxml!");
+                System.out.println("Không tìm thấy file Home.fxml!");
             }
         } else {
             System.out.println("Sai tài khoản hoặc mật khẩu!");
@@ -71,6 +71,7 @@ public class LoginController implements Initializable {
         mkShow.setVisible(false);
         mkShow.setManaged(false);
     }
+
     @FXML
     private void switchToSignup(ActionEvent event) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("signup.fxml"));

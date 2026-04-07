@@ -14,7 +14,7 @@
                 <VBox alignment="CENTER_LEFT" maxWidth="440.0" spacing="25.0">
                     <children>
 
-                        <Label styleClass="my-darley" stylesheets="@../../CSS/style.css" text="Đăng nhập vào tài khoản">
+                        <Label alignment="CENTER" prefHeight="55.0" prefWidth="443.0" styleClass="my-darley" stylesheets="@../../CSS/style.css" text="Đăng nhập vào tài khoản">
                             <font>
                                 <Font name="System Bold" size="36.0" />
                             </font>
