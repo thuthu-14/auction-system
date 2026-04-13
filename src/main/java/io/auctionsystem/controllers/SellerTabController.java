@@ -1,24 +1,21 @@
 package io.auctionsystem.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.fxml.Initializable;
 
-public class SellerTabController {
+import java.net.URL;
+import java.util.ResourceBundle;
 
-    @FXML
-    private Label titleLabel;
+public class SellerTabController implements Initializable {
 
-    @FXML
-    private Label messageLabel;
-
-    @FXML
-    public void initialize() {
-        titleLabel.setText("Seller Management");
-        messageLabel.setText("Welcome to Seller Tab");
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("SellerTab loaded");
     }
 
     @FXML
-    private void handleButtonClick() {
-        messageLabel.setText("Button clicked!");
+    private void handleAddProduct(ActionEvent event) {
+        System.out.println("Nhấn thêm sản phẩm");
     }
 }
