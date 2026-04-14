@@ -5,6 +5,10 @@ import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.network.MessageHandler;
 import common.*;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import server.model.User;
 import util.LoggerUtil;
 import javafx.application.Platform;
@@ -18,6 +22,13 @@ import java.util.Map;
  * LoginController - Xử lý màn hình Login
  * MVC Pattern: Controller
  */
+// imports
+import javafx.scene.input.MouseEvent;
+
+
+
+
+
 public class LoginController {
 
     @FXML private TextField usernameField;
@@ -31,19 +42,68 @@ public class LoginController {
     private ClientSocket clientSocket;
     private User currentUser;
     private Runnable onLoginSuccess;
+    private Runnable onAdminLoginSuccess;
 
-    /**
-     * Initialize controller
-     */
+
+    @FXML private TextField mkShow;
+
+    @FXML
+    private void showPassword() {
+        mkShow.setText(passwordField.getText());
+        mkShow.setVisible(true);
+        mkShow.setManaged(true);
+        passwordField.setVisible(false);
+        passwordField.setManaged(false);
+    }
+
+    @FXML
+    private void hidePassword() {
+        passwordField.setText(mkShow.getText());
+        passwordField.setVisible(true);
+        passwordField.setManaged(true);
+        mkShow.setVisible(false);
+        mkShow.setManaged(false);
+    }
+
+
+    @FXML
+    private void switchToSignup() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/signup.fxml"));
+            Scene scene = new Scene(loader.load(), 1300, 800);
+
+            Stage stage = (Stage) registerButton.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Tạo tài khoản");
+            stage.show();
+
+            LoggerUtil.info("Switched to signup screen");
+        } catch (IOException e) {
+            LoggerUtil.error("Error switching to signup screen: " + e.getMessage());
+            showError("❌ Không mở được màn hình đăng ký: " + e.getMessage());
+        }
+    }
+
+
+
+
+
+
+
+
     @FXML
     public void initialize() {
         progressIndicator.setVisible(false);
         messageLabel.setText("");
 
         loginButton.setOnAction(e -> handleLogin());
-        registerButton.setOnAction(e -> handleRegister());
+        registerButton.setOnAction(e -> switchToSignup());
 
         LoggerUtil.info("✓ LoginController initialized");
+
+        mkShow.setVisible(false);
+        mkShow.setManaged(false);
+
     }
 
     /**
@@ -52,6 +112,10 @@ public class LoginController {
     public void setOnLoginSuccess(Runnable callback) {
         this.onLoginSuccess = callback;
     }
+    public void setOnAdminLoginSuccess(Runnable callback) {
+        this.onAdminLoginSuccess = callback;
+    }
+
 
     /**
      * Xử lý login
@@ -96,20 +160,26 @@ public class LoginController {
                 // Chờ response
                 Message response = clientSocket.receiveMessage();
 
-                if (response != null && response.getStatus().equals("SUCCESS")) {
+                if (response != null && "SUCCESS".equals(response.getStatus())) {
                     currentUser = (User) response.getData();
                     LoggerUtil.info("✓ Login successful: " + currentUser.getUsername());
 
                     Platform.runLater(() -> {
                         showSuccess("✓ Đăng nhập thành công!");
-                        if (onLoginSuccess != null) {
-                            onLoginSuccess.run();
+
+                        // ← Route dựa vào role
+                        if (currentUser.getRole() == UserRole.ADMIN) {
+                            if (onAdminLoginSuccess != null) {
+                                onAdminLoginSuccess.run();  // Vào admin panel
+                            }
+                        } else {
+                            if (onLoginSuccess != null) {
+                                onLoginSuccess.run();  // Vào home screen
+                            }
                         }
                     });
-                } else {
-                    String errorMsg = response != null ? response.getMessage() : "Lỗi không xác định";
-                    showError("❌ " + errorMsg);
                 }
+
 
             } catch (IOException e) {
                 LoggerUtil.error("Login IO error: " + e.getMessage());
