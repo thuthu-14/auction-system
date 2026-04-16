@@ -1,4 +1,4 @@
-// src/main/java/client/controller/LoginController.java
+
 package client.controller;
 
 import client.network.ClientSocket;
@@ -80,7 +80,7 @@ public class LoginController {
             LoggerUtil.info("Switched to signup screen");
         } catch (IOException e) {
             LoggerUtil.error("Error switching to signup screen: " + e.getMessage());
-            showError("❌ Không mở được màn hình đăng ký: " + e.getMessage());
+            showError(" Không mở được màn hình đăng ký: " + e.getMessage());
         }
     }
 
@@ -106,9 +106,7 @@ public class LoginController {
 
     }
 
-    /**
-     * Set callback khi login thành công
-     */
+
     public void setOnLoginSuccess(Runnable callback) {
         this.onLoginSuccess = callback;
     }
@@ -117,9 +115,14 @@ public class LoginController {
     }
 
 
-    /**
-     * Xử lý login
-     */
+    public void setClientSocket(ClientSocket socket) {
+        this.clientSocket = socket;
+
+    }
+
+
+
+
     @FXML
     private void handleLogin() {
         String username = usernameField.getText().trim();
@@ -136,28 +139,33 @@ public class LoginController {
         registerButton.setDisable(true);
         progressIndicator.setVisible(true);
 
-        // Chạy trên thread riêng
+
         new Thread(() -> {
             try {
-                // Kết nối tới server
-                connectionManager = ConnectionManager.getInstance();
-                if (!connectionManager.isConnected()) {
-                    if (!connectionManager.connect()) {
-                        showError("❌ Không thể kết nối tới server!");
-                        return;
+
+                if (clientSocket == null) {
+                    // Tạo connection mới
+                    connectionManager = ConnectionManager.getInstance();
+                    if (!connectionManager.isConnected()) {
+                        if (!connectionManager.connect()) {
+                            showError("❌ Không thể kết nối tới server!");
+                            return;
+                        }
                     }
+                    clientSocket = connectionManager.getClientSocket();
                 }
 
-                clientSocket = connectionManager.getClientSocket();
 
-                // Tạo login request
+
+
+
                 LoginRequest loginRequest = new LoginRequest(username, password);
                 Message message = new Message(MessageType.LOGIN, loginRequest, username);
 
-                // Gửi tới server
+
                 clientSocket.sendMessage(message);
 
-                // Chờ response
+
                 Message response = clientSocket.receiveMessage();
 
                 if (response != null && "SUCCESS".equals(response.getStatus())) {
@@ -167,17 +175,24 @@ public class LoginController {
                     Platform.runLater(() -> {
                         showSuccess("✓ Đăng nhập thành công!");
 
-                        // ← Route dựa vào role
+
                         if (currentUser.getRole() == UserRole.ADMIN) {
                             if (onAdminLoginSuccess != null) {
+                                LoggerUtil.info("DEBUG: Calling onAdminLoginSuccess callback");
                                 onAdminLoginSuccess.run();  // Vào admin panel
+                            } else {
+                                LoggerUtil.error("ERROR: onAdminLoginSuccess callback is NULL!");
                             }
                         } else {
                             if (onLoginSuccess != null) {
+                                LoggerUtil.info("DEBUG: Calling onLoginSuccess callback");
                                 onLoginSuccess.run();  // Vào home screen
+                            } else {
+                                LoggerUtil.error("ERROR: onLoginSuccess callback is NULL!");
                             }
                         }
                     });
+
                 }
 
 
@@ -197,9 +212,7 @@ public class LoginController {
         }).start();
     }
 
-    /**
-     * Xử lý register
-     */
+
     @FXML
     private void handleRegister() {
         String username = usernameField.getText().trim();
@@ -207,17 +220,17 @@ public class LoginController {
 
         // Validation
         if (username.isEmpty() || password.isEmpty()) {
-            showError("❌ Username và password không được rỗng!");
+            showError(" Username và password không được rỗng!");
             return;
         }
 
         if (username.length() < 3) {
-            showError("❌ Username phải có ít nhất 3 ký tự!");
+            showError(" Username phải có ít nhất 3 ký tự!");
             return;
         }
 
         if (password.length() < 6) {
-            showError("❌ Password phải có ít nhất 6 ký tự!");
+            showError(" Password phải có ít nhất 6 ký tự!");
             return;
         }
 
@@ -226,10 +239,10 @@ public class LoginController {
         registerButton.setDisable(true);
         progressIndicator.setVisible(true);
 
-        // Chạy trên thread riêng
+
         new Thread(() -> {
             try {
-                // Kết nối tới server
+
                 connectionManager = ConnectionManager.getInstance();
                 if (!connectionManager.isConnected()) {
                     if (!connectionManager.connect()) {
@@ -240,7 +253,7 @@ public class LoginController {
 
                 clientSocket = connectionManager.getClientSocket();
 
-                // Tạo register request
+
                 Map<String, String> registerData = new HashMap<>();
                 registerData.put("username", username);
                 registerData.put("password", password);
@@ -248,10 +261,10 @@ public class LoginController {
 
                 Message message = new Message(MessageType.REGISTER, registerData, username);
 
-                // Gửi tới server
+
                 clientSocket.sendMessage(message);
 
-                // Chờ response
+
                 Message response = clientSocket.receiveMessage();
 
                 if (response != null && response.getStatus().equals("SUCCESS")) {
@@ -285,9 +298,7 @@ public class LoginController {
         }).start();
     }
 
-    /**
-     * Hiển thị error message
-     */
+
     private void showError(String message) {
         Platform.runLater(() -> {
             messageLabel.setStyle("-fx-text-fill: red;");
@@ -295,9 +306,7 @@ public class LoginController {
         });
     }
 
-    /**
-     * Hiển thị success message
-     */
+
     private void showSuccess(String message) {
         Platform.runLater(() -> {
             messageLabel.setStyle("-fx-text-fill: green;");
@@ -305,16 +314,12 @@ public class LoginController {
         });
     }
 
-    /**
-     * Lấy current user
-     */
+
     public User getCurrentUser() {
         return currentUser;
     }
 
-    /**
-     * Lấy ClientSocket
-     */
+
     public ClientSocket getClientSocket() {
         return clientSocket;
     }
