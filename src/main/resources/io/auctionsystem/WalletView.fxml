@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+    </padding>
+    <children>
+        <VBox spacing="5.0">
+            <children>
+                <Label text="Ví &amp; Thanh toán" textFill="#1a1a1a">
+                    <font>
+                        <Font name="System Bold" size="28.0" />
+                    </font>
+                </Label>
+                <Label text="Quản lý số dư, nạp/rút tiền và các phương thức thanh toán của bạn" textFill="#718096">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+
+        <Separator prefWidth="200.0" style="-fx-opacity: 0.3;" />
+
+        <HBox spacing="30.0">
+            <children>
+                <VBox spacing="15.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 15; -fx-padding: 25;" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Số dư hiện tại" textFill="#718096">
+                            <font><Font size="15.0" /></font>
+                        </Label>
+                        <Label prefHeight="53.0" prefWidth="69.0" text=" 0 đ" textFill="#1a1a1a">
+                            <font><Font name="System Bold" size="36.0" /></font>
+                        </Label>
+
+                        <Region VBox.vgrow="ALWAYS" />
+
+                        <HBox spacing="15.0">
+                            <children>
+                                <Button prefHeight="45.0" prefWidth="133.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Nạp tiền" textFill="white">
+                                    <font><Font name="System Bold" size="14.0" /></font>
+                                    <padding><Insets left="30.0" right="30.0" /></padding>
+                                </Button>
+                                <Button prefHeight="45.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 22.5; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Rút tiền" textFill="#1a1a1a">
+                                    <font><Font name="System Bold" size="14.0" /></font>
+                                    <padding><Insets left="30.0" right="30.0" /></padding>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <VBox spacing="15.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 15; -fx-padding: 25;" HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Tài khoản ngân hàng" textFill="#718096">
+                                <font><Font size="15.0" /></font>
+                            </Label>
+                        </HBox>
+
+                        <Region VBox.vgrow="ALWAYS" />
+
+                        <VBox alignment="CENTER" prefHeight="80.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-radius: 10; -fx-border-width: 2; -fx-cursor: hand;">
+                            <children>
+                                <Label text="+ Thêm tài khoản ngân hàng" textFill="#4a5568">
+                                    <font><Font name="System Bold" size="15.0" /></font>
+                                </Label>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <VBox spacing="20.0" VBox.vgrow="ALWAYS">
+            <children>
+                <Label text="Các giao dịch gần đây" textFill="#1a1a1a">
+                    <font>
+                        <Font name="System Bold" size="20.0" />
+                    </font>
+                </Label>
+
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <ComboBox prefHeight="45.0" prefWidth="180.0" promptText="Tháng này" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
+
+                        <Button prefHeight="45.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 10; -fx-cursor: hand;" text="Tất cả" textFill="white">
+                            <font><Font name="System Bold" size="14.0" /></font>
+                            <padding><Insets left="20.0" right="20.0" /></padding>
+                        </Button>
+                        <Button prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền vào" textFill="#4a5568">
+                            <font><Font name="System Bold" size="14.0" /></font>
+                            <padding><Insets left="20.0" right="20.0" /></padding>
+                        </Button>
+                        <Button prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền ra" textFill="#4a5568">
+                            <font><Font name="System Bold" size="14.0" /></font>
+                            <padding><Insets left="20.0" right="20.0" /></padding>
+                        </Button>
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <TextField prefHeight="45.0" prefWidth="250.0" promptText="Tìm kiếm giao dịch..." style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-border-color: transparent; -fx-padding: 0 15 0 15;">
+                            <font><Font size="14.0" /></font>
+                        </TextField>
+                    </children>
+                </HBox>
+
+                <VBox alignment="CENTER" style="-fx-background-color: white; -fx-border-color: #f3f4f6; -fx-border-radius: 15; -fx-border-width: 2; -fx-background-radius: 15;" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label text="Chưa có giao dịch nào" textFill="#a0aec0">
+                            <font><Font size="15.0" /></font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</VBox>

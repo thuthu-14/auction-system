@@ -20,14 +20,19 @@ import java.util.List;
 
 public class HomeController {
 
-    @FXML private HBox menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings;
+    @FXML
+    private HBox menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings;
     private List<HBox> allMenus;
 
-    @FXML private StackPane rootPane;
-    @FXML private StackPane contentArea;
+    @FXML
+    private StackPane rootPane;
+    @FXML
+    private StackPane contentArea;
 
-    @FXML private TextField productSearchInput;
-    @FXML private Button clearSearchBtn;
+    @FXML
+    private TextField productSearchInput;
+    @FXML
+    private Button clearSearchBtn;
 
     @FXML
     public void initialize() {
@@ -89,11 +94,13 @@ public class HomeController {
         productSearchInput.clear();
         productSearchInput.requestFocus();
     }
+
     public void loadProfileView() {
+        updateMenuSelection(null);
         try {
             java.net.URL fxmlLocation = getClass().getResource("/io/auctionsystem/ProfileView.fxml");
             if (fxmlLocation == null) {
-                System.err.println("Á à, không tìm thấy file ProfileView.fxml nha!");
+                System.err.println("Không tìm thấy file ProfileView.fxml!");
                 return;
             }
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
@@ -101,7 +108,25 @@ public class HomeController {
             contentArea.getChildren().clear();
             contentArea.getChildren().add(profileNode);
         } catch (IOException e) {
-            System.err.println("Lỗi load giao diện Profile rồi:");
+            System.err.println("Lỗi load giao diện Profile");
+            e.printStackTrace();
+        }
+    }
+
+    public void loadWalletView() {
+        updateMenuSelection(menuPay);
+        try {
+            java.net.URL fxmlLocation = getClass().getResource("/io/auctionsystem/WalletView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("Không tìm thấy file WalletView.fxml!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent walletNode = loader.load();
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(walletNode);
+        } catch (IOException e) {
+            System.err.println("Lỗi load giao diện Wallet");
             e.printStackTrace();
         }
     }

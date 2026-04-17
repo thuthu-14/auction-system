@@ -7,9 +7,9 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<HBox alignment="CENTER" prefHeight="800.0" prefWidth="1300.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.auctionsystem.controllers.LoginController">
+<HBox alignment="CENTER" minHeight="650.0" minWidth="1000.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.auctionsystem.controllers.LoginController">
     <children>
-        <StackPane HBox.hgrow="ALWAYS">
+        <StackPane minWidth="450.0" HBox.hgrow="ALWAYS">
             <children>
                 <VBox alignment="CENTER_LEFT" maxWidth="440.0" spacing="25.0">
                     <children>
@@ -82,7 +82,7 @@
             </children>
         </StackPane>
 
-        <StackPane style="-fx-padding: 40;" HBox.hgrow="ALWAYS">
+        <StackPane minWidth="550.0" style="-fx-padding: 40;" HBox.hgrow="ALWAYS">
             <children>
                 <ImageView fitHeight="699.0" fitWidth="600.0" pickOnBounds="true">
                     <image>
