@@ -7,7 +7,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<HBox alignment="CENTER" prefHeight="800.0" prefWidth="1300.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.auctionsystem.LoginController">
+<HBox alignment="CENTER" prefHeight="800.0" prefWidth="1300.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.auctionsystem.controllers.LoginController">
     <children>
         <StackPane HBox.hgrow="ALWAYS">
             <children>
