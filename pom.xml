@@ -48,15 +48,24 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>source/src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>source/src/main/resources</directory>
+            </resource>
+        </resources>
+        <testSourceDirectory>source/src/test/java</testSourceDirectory>
+
         <plugins>
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>vn.uetchau.auction.client.MainApp</mainClass>
+                    <mainClass>client.ClientMain</mainClass>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 </project>
