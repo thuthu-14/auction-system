@@ -3,14 +3,7 @@ package server.model;
 
 import common.ItemCategory;
 
-/**
- * Fashion - Loại sản phẩm Thời trang
- * OOP: Inheritance, Polymorphism
- *
- * Thuộc tính riêng:
- * - brand: Hãng (Nike, Adidas, Zara, H&M, v.v)
- * - material: Chất liệu (Cotton, Polyester, Silk, Wool, v.v)
- */
+
 public class Fashion extends Item {
     private static final long serialVersionUID = 1L;
 
