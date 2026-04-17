@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 public class AuctionService {
 
     public static Auction createAuction(RegularUser seller, Item item, int durationMinutes)
