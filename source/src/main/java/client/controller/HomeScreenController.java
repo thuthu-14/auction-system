@@ -26,6 +26,14 @@ import java.util.*;
  * 2. Có nút "Nâng cấp Seller" - sau khi nâng cấp sẽ hiển thị tab SELLER
  * 3. User vừa có thể bid vừa có thể sell (nếu là seller)
  */
+
+
+
+
+import javafx.event.ActionEvent;
+import javafx.scene.input.MouseEvent;
+
+
 public class HomeScreenController {
 
     @FXML private Label titleLabel;
@@ -47,9 +55,26 @@ public class HomeScreenController {
     private Runnable onLogout;
     private Timer refreshTimer;
 
-    /**
-     * Initialize controller
-     */
+    @FXML
+    private void handleMenuClick() {
+        // TODO: map menu -> content/tab
+    }
+
+    @FXML
+    private void handleProductSearch() {
+        // TODO: search logic
+    }
+
+    @FXML
+    private void clearSearch() {
+        // TODO: clear search logic
+    }
+
+
+
+
+
+
     @FXML
     public void initialize() {
         LoggerUtil.info("✓ HomeScreenController initialized");
@@ -295,3 +320,4 @@ public class HomeScreenController {
         }
     }
 }
+
