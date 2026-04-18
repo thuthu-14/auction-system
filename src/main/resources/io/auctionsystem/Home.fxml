@@ -11,7 +11,7 @@
 
       <HBox style="-fx-background-color: #ffffff;">
          <children>
-            <VBox minWidth="215.0" maxWidth="215.0" prefWidth="215.0" spacing="5.0" style="-fx-background-color: #ffffff; -fx-border-color: #f0f0f0; -fx-border-width: 0 1 0 0; -fx-padding: 20 15 20 15;">
+            <VBox maxWidth="215.0" minWidth="215.0" prefWidth="215.0" spacing="5.0" style="-fx-background-color: #ffffff; -fx-border-color: #f0f0f0; -fx-border-width: 0 1 0 0; -fx-padding: 20 15 20 15;">
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="10.0">
                      <children>
@@ -35,8 +35,7 @@
                      </VBox.margin>
                   </HBox>
 
-                  <HBox fx:id="menuHome" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
-                     <children>
+                  <HBox fx:id="menuHome" alignment="CENTER_LEFT" onMouseClicked="#loadDashboardView" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">                     <children>
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" styleClass="font-mulish" stylesheets="@../../CSS/style.css" text="🏠   Trang chủ" textFill="#4a5568">
                            <font><Font size="17.0" /></font>
                         </Button>
@@ -45,8 +44,8 @@
 
                   <HBox fx:id="menuAI" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
                      <children>
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="☁️ Ask Bubbly AI" textFill="#4a5568">
-                           <font><Font size="14.0" /></font>
+                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="☁   Ask Bubbly AI" textFill="#4a5568">
+                           <font><Font size="15.0" /></font>
                         </Button>
                      </children>
                   </HBox>

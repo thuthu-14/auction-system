@@ -37,17 +37,24 @@ public class HomeController {
     @FXML
     public void initialize() {
         allMenus = Arrays.asList(menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings);
-        updateMenuSelection(menuHome);
-
-        productSearchInput.textProperty().addListener((observable, oldValue, newValue) -> {
-            clearSearchBtn.setVisible(!newValue.trim().isEmpty());
-        });
+        try {
+            loadDashboardView();
+        } catch (Exception e) {
+            System.err.println("Cảnh báo: Lỗi khi load ngầm Dashboard: " + e.getMessage());
+        }
+        if (productSearchInput != null && clearSearchBtn != null) {
+            productSearchInput.textProperty().addListener((observable, oldValue, newValue) -> {
+                clearSearchBtn.setVisible(!newValue.trim().isEmpty());
+            });
+        } else {
+            System.err.println("Cảnh báo: productSearchInput hoặc clearSearchBtn bị null (chưa gắn fx:id)!");
+        }
 
         Platform.runLater(() -> {
             if (rootPane != null && rootPane.getScene() != null) {
                 KeyCombination ctrlK = new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN);
                 rootPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-                    if (ctrlK.match(event)) {
+                    if (ctrlK.match(event) && productSearchInput != null) {
                         productSearchInput.requestFocus();
                         event.consume();
                     }
@@ -58,31 +65,62 @@ public class HomeController {
 
     @FXML
     private void handleMenuClick(MouseEvent event) {
-        HBox clickedMenu = (HBox) event.getSource();
-        updateMenuSelection(clickedMenu);
+        if (event.getSource() instanceof HBox) {
+            HBox clickedMenu = (HBox) event.getSource();
+            updateMenuSelection(clickedMenu);
+        }
     }
 
     private void updateMenuSelection(HBox selectedMenu) {
         for (HBox menu : allMenus) {
-            if (menu == null) continue;
+            if (menu == null || menu.getChildren().isEmpty()) continue;
 
-            Button btn = (Button) menu.getChildren().get(0);
-            if (menu == selectedMenu) {
-                menu.setStyle("-fx-background-color: #edf2f7; -fx-background-radius: 8; -fx-cursor: hand;");
-                btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0; -fx-font-weight: bold;");
-            } else {
-                menu.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-cursor: hand;");
-                if (menu == menuUpgrade) {
-                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e; -fx-font-weight: bold;");
+            try {
+                Button btn = (Button) menu.getChildren().get(0);
+                if (menu == selectedMenu) {
+                    menu.setStyle("-fx-background-color: #edf2f7; -fx-background-radius: 8; -fx-cursor: hand;");
+                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0; -fx-font-weight: bold;");
                 } else {
-                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #4a5568;");
+                    menu.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-cursor: hand;");
+                    if (menu == menuUpgrade) {
+                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e; -fx-font-weight: bold;");
+                    } else {
+                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #4a5568;");
+                    }
                 }
+            } catch (ClassCastException e) {
+                System.err.println("Cảnh báo: Element bên trong menu không phải là Button!");
             }
         }
     }
 
     @FXML
+    public void loadDashboardView() {
+        updateMenuSelection(menuHome);
+        try {
+            java.net.URL fxmlLocation = getClass().getResource("/io/auctionsystem/Dashboard.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("Không tìm thấy file Dashboard.fxml!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent dashboardNode = loader.load();
+
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(dashboardNode);
+            } else {
+                System.err.println("Cảnh báo: contentArea bị null (chưa gắn fx:id trong Home.fxml)!");
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi load giao diện Dashboard: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     private void handleProductSearch() {
+        if (productSearchInput == null) return;
         String keyword = productSearchInput.getText().trim();
         if (!keyword.isEmpty()) {
             System.out.println("Searching for: " + keyword);
@@ -91,8 +129,10 @@ public class HomeController {
 
     @FXML
     private void clearSearch() {
-        productSearchInput.clear();
-        productSearchInput.requestFocus();
+        if (productSearchInput != null) {
+            productSearchInput.clear();
+            productSearchInput.requestFocus();
+        }
     }
 
     public void loadProfileView() {
@@ -105,8 +145,10 @@ public class HomeController {
             }
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent profileNode = loader.load();
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(profileNode);
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(profileNode);
+            }
         } catch (IOException e) {
             System.err.println("Lỗi load giao diện Profile");
             e.printStackTrace();
@@ -123,8 +165,10 @@ public class HomeController {
             }
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent walletNode = loader.load();
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(walletNode);
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(walletNode);
+            }
         } catch (IOException e) {
             System.err.println("Lỗi load giao diện Wallet");
             e.printStackTrace();

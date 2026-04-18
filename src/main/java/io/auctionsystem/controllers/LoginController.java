@@ -34,9 +34,18 @@ public class LoginController implements Initializable {
 
     @FXML
     void handleLogin(ActionEvent event) {
-        String user = username.getText();
-        String pass = mkHide.isVisible() ? mkHide.getText() : mkShow.getText();
+        String user = username.getText() != null ? username.getText().trim() : "";
+        String pass = "";
+        if (mkHide.isVisible()) {
+            pass = mkHide.getText() != null ? mkHide.getText().trim() : "";
+        } else {
+            pass = mkShow.getText() != null ? mkShow.getText().trim() : "";
+        }
 
+        System.out.println("--- CHECK ĐĂNG NHẬP ---");
+        System.out.println("Tài khoản đang lấy được: [" + user + "]");
+        System.out.println("Mật khẩu đang lấy được: [" + pass + "]");
+        System.out.println("-----------------------");
         if (user.equals("admin") && pass.equals("123")) {
             try {
                 URL fxmlLocation = getClass().getResource("/io/auctionsystem/Home.fxml");
@@ -57,7 +66,7 @@ public class LoginController implements Initializable {
                 stage.setMaximized(true);
                 stage.show();
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 System.err.println("Lỗi khi load màn hình Home!");
                 e.printStackTrace();
             }
