@@ -1,6 +1,13 @@
 package common;
 
+import server.exception.PermissionDeniedException;
+import server.model.*;
+import server.service.AuctionService;
+import util.LoggerUtil;
+
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Map;
 
 public enum UserRole implements Serializable {
     BIDDER("Người mua - Tham gia đấu giá"),
@@ -17,3 +24,8 @@ public enum UserRole implements Serializable {
         return description;
     }
 }
+
+
+
+
+
