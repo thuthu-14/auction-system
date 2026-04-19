@@ -15,10 +15,10 @@ import javafx.scene.layout.StackPane;
 import java.util.Arrays;
 import java.util.List;
 
-public class HomeController {
+public class SellerHomeController {
 
     @FXML
-    private HBox menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings;
+    private HBox menuHome, menuAI, menuCreateAuctions, menuManageAuctions, menuHistory, menuMsg, menuPay, menuDowngrade, menuSettings;
 
     private List<HBox> allMenus;
 
@@ -37,8 +37,8 @@ public class HomeController {
     @FXML
     public void initialize() {
         allMenus = Arrays.asList(
-                menuHome, menuAI, menuRecent, menuFlash,
-                menuMsg, menuPay, menuUpgrade, menuSettings
+                menuHome, menuAI, menuCreateAuctions, menuManageAuctions, menuHistory,
+                menuMsg, menuPay, menuDowngrade, menuSettings
         );
 
         updateMenuSelection(menuHome);
