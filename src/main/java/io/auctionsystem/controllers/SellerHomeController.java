@@ -9,6 +9,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
@@ -18,12 +19,14 @@ import java.util.List;
 public class SellerHomeController {
 
     @FXML
-    private HBox menuHome, menuAI, menuCreateAuctions, menuManageAuctions, menuHistory, menuMsg, menuPay, menuDowngrade, menuSettings;
+    private HBox menuHome, menuAI,
+            menuCreateAuctions, menuManageAuctions, menuHistory, menuAuctionStatistic, menuMsg, menuPay,
+            menuDowngrade, menuSettings;
 
     private List<HBox> allMenus;
 
     @FXML
-    private StackPane rootPane;
+    private AnchorPane rootPane;
 
     @FXML
     private StackPane contentArea;
@@ -37,8 +40,9 @@ public class SellerHomeController {
     @FXML
     public void initialize() {
         allMenus = Arrays.asList(
-                menuHome, menuAI, menuCreateAuctions, menuManageAuctions, menuHistory,
-                menuMsg, menuPay, menuDowngrade, menuSettings
+                menuHome, menuAI,
+                menuCreateAuctions, menuManageAuctions, menuHistory, menuAuctionStatistic, menuMsg, menuPay,
+                menuSettings
         );
 
         updateMenuSelection(menuHome);
@@ -67,6 +71,11 @@ public class SellerHomeController {
     @FXML
     private void handleMenuClick(MouseEvent event) {
         if (event.getSource() instanceof HBox clickedMenu) {
+            if (clickedMenu == menuDowngrade) {
+                System.out.println("Đang chuyển về màn hình Bidder");
+                // TODO://
+                return;
+            }
             updateMenuSelection(clickedMenu);
         }
     }
@@ -105,6 +114,6 @@ public class SellerHomeController {
 
     @FXML
     private void loadProfileView() {
-        System.out.println("Profile sẽ được merge từ branch khác.");
+        System.out.println("Merge sau nha pp");
     }
 }

@@ -18,9 +18,15 @@ import java.util.List;
 public class HomeController {
 
     @FXML
-    private HBox menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings;
+    private HBox menuHome, menuAI,
+            menuRecent, menuFlash, menuMsg, menuPay,
+            //menuUpgrade,
+            menuSettings;
 
     private List<HBox> allMenus;
+
+    @FXML
+    private HBox menuUpgrade;
 
     @FXML
     private StackPane rootPane;
@@ -37,8 +43,10 @@ public class HomeController {
     @FXML
     public void initialize() {
         allMenus = Arrays.asList(
-                menuHome, menuAI, menuRecent, menuFlash,
-                menuMsg, menuPay, menuUpgrade, menuSettings
+                menuHome, menuAI,
+                menuRecent, menuFlash, menuMsg, menuPay,
+                //menuUpgrade,
+                menuSettings
         );
 
         updateMenuSelection(menuHome);
@@ -64,9 +72,44 @@ public class HomeController {
         });
     }
 
+    /* @FXML
+    private void handleMenuClick(MouseEvent event) {
+        if (event.getSource() instanceof HBox clickedMenu) {
+            updateMenuSelection(clickedMenu);
+        }
+    } */
+
     @FXML
     private void handleMenuClick(MouseEvent event) {
         if (event.getSource() instanceof HBox clickedMenu) {
+            if (clickedMenu == menuUpgrade) {
+                System.out.println("Đang chuyển sang màn hình Become Seller");
+
+                try {
+                    javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/io/auctionsystem/BecomeSeller.fxml"));
+                    javafx.scene.Node becomeSellerNode = loader.load();
+
+                    // Clear vùng chứa hiện tại và add màn hình mới vào
+                    contentArea.getChildren().clear();
+                    contentArea.getChildren().add(becomeSellerNode);
+
+                    // Màn hình mới tràn hết vùng chứa:
+                    if (becomeSellerNode instanceof javafx.scene.layout.AnchorPane) {
+                        javafx.scene.layout.AnchorPane.setTopAnchor(becomeSellerNode, 0.0);
+                        javafx.scene.layout.AnchorPane.setBottomAnchor(becomeSellerNode, 0.0);
+                        javafx.scene.layout.AnchorPane.setLeftAnchor(becomeSellerNode, 0.0);
+                        javafx.scene.layout.AnchorPane.setRightAnchor(becomeSellerNode, 0.0);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Lỗi load màn hình BecomeSeller: " + e.getMessage());
+                }
+
+                // Cập nhật trạng thái chọn menu (đổi màu nền chẳng hạn)
+                updateMenuSelection(clickedMenu);
+                return;
+            }
             updateMenuSelection(clickedMenu);
         }
     }
@@ -105,6 +148,6 @@ public class HomeController {
 
     @FXML
     private void loadProfileView() {
-        System.out.println("Profile sẽ được merge từ branch khác.");
+        System.out.println("Merge sau nha pp");
     }
 }

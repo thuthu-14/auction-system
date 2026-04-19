@@ -98,7 +98,7 @@
                                         text="☁   Ask Bubbly AI"
                                         textFill="#4a5568">
                                     <font>
-                                        <Font size="15.0" />
+                                        <Font size="17.0" />
                                     </font>
                                 </Button>
                             </children>
@@ -106,7 +106,7 @@
 
                         <Label text="BIDDING" textFill="#a0aec0">
                             <font>
-                                <Font name="System Bold" size="11.0" />
+                                <Font name="System Bold" size="13.0" />
                             </font>
                             <VBox.margin>
                                 <Insets bottom="5.0" left="15.0" top="20.0" />
@@ -124,7 +124,7 @@
                                         mouseTransparent="true"
                                         prefWidth="230.0"
                                         style="-fx-background-color: transparent;"
-                                        text=" ⚡     Flash Bid"
+                                        text=" ⚡    Flash Bid"
                                         textFill="#4a5568">
                                     <font>
                                         <Font size="17.0" />
@@ -147,7 +147,7 @@
                                         text="📈   Lịch sử giao dịch"
                                         textFill="#4a5568">
                                     <font>
-                                        <Font size="16.0" />
+                                        <Font size="17.0" />
                                     </font>
                                 </Button>
                             </children>
@@ -168,7 +168,7 @@
                                         text="🔔   Thông báo"
                                         textFill="#4a5568">
                                     <font>
-                                        <Font size="16.0" />
+                                        <Font size="17.0" />
                                     </font>
                                 </Button>
                             </children>
@@ -210,7 +210,7 @@
                                         text="👨‍🏫 Trở thành Người bán"
                                         textFill="#e53e3e">
                                     <font>
-                                        <Font name="System Bold" size="14.0" />
+                                        <Font name="System Bold" size="16.0" />
                                     </font>
                                 </Button>
                             </children>

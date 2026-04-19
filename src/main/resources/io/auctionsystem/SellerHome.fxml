@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane fx:id="rootPane"
+<AnchorPane fx:id="rootPane"
            minHeight="600.0"
            minWidth="900.0"
            prefHeight="900.0"
@@ -18,7 +18,12 @@
 
     <children>
 
-        <HBox style="-fx-background-color: #ffffff;">
+        <HBox style="-fx-background-color: #ffffff;"
+              AnchorPane.topAnchor="0.0"
+              AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0">
+
             <children>
 
                 <VBox maxWidth="215.0"
@@ -239,7 +244,7 @@
 
                         <Region VBox.vgrow="ALWAYS" />
 
-                        <HBox fx:id="menuUpgrade"
+                        <HBox fx:id="menuDowngrade"
                               alignment="CENTER_LEFT"
                               onMouseClicked="#handleMenuClick"
                               prefHeight="45.0"
@@ -383,4 +388,4 @@
         </HBox>
 
     </children>
-</StackPane>
+</AnchorPane>
