@@ -73,8 +73,7 @@
                      </children>
                   </HBox>
 
-                  <HBox fx:id="menuMsg" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
-                     <children>
+                  <HBox fx:id="menuMsg" alignment="CENTER_LEFT" onMouseClicked="#loadNotificationsView" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">                     <children>
                         <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefHeight="40.0" prefWidth="182.0" style="-fx-background-color: transparent; -fx-translate-x: 0;" text="🔔   Thông báo" textFill="#4a5568">
                            <font><Font size="16.0" /></font>
                         </Button>
