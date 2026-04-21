@@ -7,11 +7,10 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-
-<HBox alignment="CENTER" prefHeight="800.0" prefWidth="1300.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SignupController">
+<HBox alignment="CENTER" minHeight="650.0" minWidth="1000.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SignupController">
     <children>
 
-        <StackPane style="-fx-padding: 40;" HBox.hgrow="ALWAYS">
+        <StackPane minWidth="550.0" style="-fx-padding: 40;" HBox.hgrow="ALWAYS">
             <children>
                 <ImageView fitHeight="700.0" fitWidth="600.0" pickOnBounds="true">
                     <image>
@@ -24,7 +23,7 @@
             </children>
         </StackPane>
 
-        <StackPane HBox.hgrow="ALWAYS">
+        <StackPane minWidth="450.0" HBox.hgrow="ALWAYS">
             <children>
                 <VBox alignment="CENTER_LEFT" maxWidth="440.0" spacing="20.0">
                     <children>
