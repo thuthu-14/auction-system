@@ -49,7 +49,7 @@ public class HomeController {
                 menuSettings
         );
 
-        updateMenuSelection(menuHome);
+        //updateMenuSelection(menuHome);
 
         if (productSearchInput != null && clearSearchBtn != null) {
             productSearchInput.textProperty().addListener((observable, oldValue, newValue) ->

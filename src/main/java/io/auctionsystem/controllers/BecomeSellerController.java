@@ -53,7 +53,7 @@ public class BecomeSellerController {
 
         // Kiểm tra tính hợp lệ (Validation)
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || address.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Lỗi nhập dữ liệu", "Vui lòng nhập đầy đủ tất cả các thông tin!");
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đầy đủ tất cả các thông tin!");
             return;
         }
 
@@ -106,24 +106,33 @@ public class BecomeSellerController {
     // Hàm tạo Popup thông báo
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
-        alert.setTitle(title);
+        alert.initOwner(nameField.getScene().getWindow());
+        alert.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+        alert.setTitle("");
         alert.setHeaderText(null);
         alert.setContentText(message);
 
         DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getScene().setFill(javafx.scene.paint.Color.TRANSPARENT);
+        //tạo header riêng
+        javafx.scene.layout.VBox customHeader = new javafx.scene.layout.VBox();
+        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label(title);
+        // Gắn class để style trong CSS
+        titleLabel.getStyleClass().add("custom-title-label");
+        customHeader.getStyleClass().add("custom-header-box");
+        customHeader.getChildren().add(titleLabel);
+        // Gắn Header tự chế vào bảng Alert
+        dialogPane.setHeader(customHeader);
 
         try {
-            javafx.scene.text.Font.loadFont(getClass().getResourceAsStream("/io/auctionsystem/css/BDLifelessGrotesk-SemiBold.otf"), 14);
-
             String cssPath = "/io/auctionsystem/css/style.css";
             var cssResource = getClass().getResource(cssPath);
-
             if (cssResource != null) {
                 dialogPane.getStylesheets().add(cssResource.toExternalForm());
                 dialogPane.getStyleClass().add("my-custom-alert");
             }
         } catch (Exception e) {
-            System.out.println("Cảnh báo: Không load được CSS/Font cho cảnh báo. Dùng giao diện mặc định.");
+            System.out.println("Cảnh báo: Không load được CSS cho cảnh báo. Chuyển sang giao diện mặc định.");
         }
 
         alert.showAndWait();

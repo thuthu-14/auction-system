@@ -20,7 +20,7 @@ public class SellerHomeController {
 
     @FXML
     private HBox menuHome, menuAI,
-            menuCreateAuctions, menuManageAuctions, menuHistory, menuAuctionStatistic, menuMsg, menuPay,
+            menuCreateAuctions, menuManageAuctions, menuAuctionStatistic, menuMsg, menuPay,
             menuDowngrade, menuSettings;
 
     private List<HBox> allMenus;
@@ -41,11 +41,11 @@ public class SellerHomeController {
     public void initialize() {
         allMenus = Arrays.asList(
                 menuHome, menuAI,
-                menuCreateAuctions, menuManageAuctions, menuHistory, menuAuctionStatistic, menuMsg, menuPay,
+                menuCreateAuctions, menuManageAuctions, menuAuctionStatistic, menuMsg, menuPay,
                 menuSettings
         );
 
-        updateMenuSelection(menuHome);
+        //updateMenuSelection(menuHome);
 
         if (productSearchInput != null && clearSearchBtn != null) {
             productSearchInput.textProperty().addListener((observable, oldValue, newValue) ->

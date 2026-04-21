@@ -157,7 +157,7 @@
                                         maxWidth="Infinity"
                                         HBox.hgrow="ALWAYS"
                                         style="-fx-background-color: transparent;"
-                                        text="⚙   Cài Đặt" textFill="#4a5568">
+                                        text="⚙   Cài đặt" textFill="#4a5568">
                                     <font>
                                         <Font size="17.0" />
                                     </font>
