@@ -45,7 +45,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import client.model.Transaction;
+import common.Transaction;
 
 
 
