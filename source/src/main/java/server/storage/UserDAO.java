@@ -35,6 +35,17 @@ public class UserDAO {
         return null;
     }
 
+    public static User getUserByEmail(String email) throws IOException, ClassNotFoundException {
+        List<User> users = getAllUsers();
+        for (User user : users) {
+            if (user.getEmail() != null && user.getEmail().equalsIgnoreCase(email)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+
     public static void saveUser(User user) throws IOException, ClassNotFoundException {
         List<User> users = getAllUsers();
 
