@@ -1,38 +1,35 @@
 @font-face {
-    font-family: "Darley Sans Custom";
     src: url("DarleySans-Regular.otf");
 }
 
-@font-face {
-    font-family: "Mulish";
-    src: url("Mulish-VariableFont_wght.ttf");
-}
-
-@font-face {
-    font-family: "MBDLifelessGrotesk";
-    src: url("BDLifelessGrotesk-SemiBold.otf");
-}
-
 .root {
-    -fx-font-family: "Darley Sans Custom";
+    -fx-font-family: "System";
 }
 
 .my-darley {
-    -fx-font-family: "Darley Sans Custom";
+    -fx-font-family: "Darley Sans" !important;
+    -fx-font-smoothing-type: lcd;
 }
 
-.font-mulish {
-    -fx-font-family: "Mulish";
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
 }
 
-.my-font2 {
-    -fx-font-family: "Mulish";
-    -fx-font-size: 13px;
+.menu-item:hover {
+    -fx-background-color: #f3f4f6;
 }
 
-.my-font3 {
-    -fx-font-family: "MBDLifelessGrotesk";
-    -fx-font-size: 13px;
+.menu-item-active {
+    -fx-background-color: #e6f0fd;
+    -fx-background-radius: 8;
+}
+
+.menu-item-active .button {
+    -fx-text-fill: #3b82f6;
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
 }
 
 .eye-button {
@@ -52,7 +49,7 @@
     -fx-background-color: #111827;
     -fx-text-fill: white;
     -fx-background-radius: 25;
-    -fx-font-family: "MBDLifelessGrotesk";
+    -fx-font-family: "BD Lifeless Grotesk SemiBold";
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-padding: 8 25;
@@ -74,7 +71,7 @@
 
 /* Ép font cho tất cả label bên trong Alert */
 .my-custom-alert.dialog-pane .label {
-    -fx-font-family: "MBDLifelessGrotesk" !important;
+    -fx-font-family: "BD Lifeless Grotesk SemiBold" !important;
     -fx-font-size: 15px;
     -fx-text-fill: #2e384d;
 }
@@ -84,7 +81,7 @@
     -fx-background-color: #111827;
     -fx-text-fill: white;
     -fx-background-radius: 25;
-    -fx-font-family: "MBDLifelessGrotesk" !important;
+    -fx-font-family: "BD Lifeless Grotesk SemiBold" !important;
     -fx-font-weight: bold;
     -fx-cursor: hand;
     -fx-padding: 8 25;
