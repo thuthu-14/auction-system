@@ -2,6 +2,7 @@ package server.service;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import server.exception.AuthenticationException;
 import server.model.User;
@@ -15,7 +16,7 @@ public class AuthServiceTest {
             User user = AuthService.register("testuser", "password123", "test@email.com");
 
             assertNotNull(user);
-            assertEquals("testuser", user.getUsername());
+            SSsassertEquals("testuser", user.getUsername());
             assertEquals("test@email.com", user.getEmail());
             assertTrue(user.isActive());
 
@@ -84,7 +85,8 @@ public class AuthServiceTest {
             fail("Should throw AuthenticationException");
         } catch (AuthenticationException e) {
             assertTrue(e.getMessage().contains("rỗng"));
-            System.out.println("Test loginEmptyPassword PASSED");
+            System.out.println("" +
+                    "Test loginEmptyPassword PASSED");
         } catch (Exception e) {
             fail("Unexpected exception: " + e.getMessage());
         }
