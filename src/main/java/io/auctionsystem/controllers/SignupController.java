@@ -3,7 +3,6 @@ package io.auctionsystem.controllers;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.Node;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -49,10 +48,10 @@ public class SignupController implements Initializable {
     @FXML
     private void switchToLogin(ActionEvent event) {
         try {
-            URL loginLocation = getClass().getResource("/io/auctionsystem/logindemo.fxml");
+            URL loginLocation = getClass().getResource("/io/auctionsystem/login.fxml");
 
             if (loginLocation == null) {
-                System.err.println("Lỗi: Không tìm thấy logindemo.fxml tại /io.auctionsystem/logindemo.fxml");
+                System.err.println("Lỗi: Không tìm thấy login.fxml tại /io.auctionsystem/login.fxml");
                 return;
             }
 

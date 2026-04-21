@@ -200,26 +200,4 @@
                 e.printStackTrace();
             }
         }
-        @FXML
-        private void toggleNightMode() {
-            isNightMode = !isNightMode;
-
-            if (rootPane != null && rootPane.getScene() != null) {
-                try {
-                    String cssPath = getClass().getResource("/CSS/dark-mode.css").toExternalForm();
-
-                    if (isNightMode) {
-                        rootPane.getScene().getStylesheets().add(cssPath);
-                        themeToggleBtn.setText("☀️");
-                        System.out.println("🌙 Đã bật Night Mode");
-                    } else {
-                        rootPane.getScene().getStylesheets().remove(cssPath);
-                        themeToggleBtn.setText("🌙");
-                        System.out.println("☀️ Đã tắt Night Mode");
-                    }
-                } catch (NullPointerException e) {
-                    System.err.println("Cảnh báo: Không tìm thấy file /CSS/dark-mode.css");
-                }
-            }
-        }
     }

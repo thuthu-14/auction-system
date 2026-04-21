@@ -36,19 +36,12 @@
                   </HBox>
 
                   <HBox fx:id="menuHome" alignment="CENTER_LEFT" onMouseClicked="#loadDashboardView" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">                     <children>
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" styleClass="font-mulish" stylesheets="@../../CSS/style.css" text="🏠   Trang chủ" textFill="#4a5568">
-                           <font><Font size="17.0" /></font>
-                        </Button>
-                     </children>
+                     <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" styleClass="font-mulish" stylesheets="@../../CSS/style.css" text="🏠   Trang chủ" textFill="#4a5568">
+                        <font><Font size="17.0" /></font>
+                     </Button>
+                  </children>
                   </HBox>
 
-                  <HBox fx:id="menuAI" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
-                     <children>
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="☁   Ask Bubbly AI" textFill="#4a5568">
-                           <font><Font size="15.0" /></font>
-                        </Button>
-                     </children>
-                  </HBox>
 
                   <Label text="BIDDING" textFill="#a0aec0">
                      <font><Font name="System Bold" size="11.0" /></font>
@@ -74,10 +67,10 @@
                   </HBox>
 
                   <HBox fx:id="menuMsg" alignment="CENTER_LEFT" onMouseClicked="#loadNotificationsView" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">                     <children>
-                        <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefHeight="40.0" prefWidth="182.0" style="-fx-background-color: transparent; -fx-translate-x: 0;" text="🔔   Thông báo" textFill="#4a5568">
-                           <font><Font size="16.0" /></font>
-                        </Button>
-                     </children>
+                     <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefHeight="40.0" prefWidth="182.0" style="-fx-background-color: transparent; -fx-translate-x: 0;" text="🔔   Thông báo" textFill="#4a5568">
+                        <font><Font size="16.0" /></font>
+                     </Button>
+                  </children>
                   </HBox>
 
                   <HBox fx:id="menuPay" alignment="CENTER_LEFT" onMouseClicked="#loadWalletView" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
@@ -129,10 +122,6 @@
                         </HBox>
 
                         <Region HBox.hgrow="ALWAYS" />
-
-                        <Button fx:id="themeToggleBtn" onAction="#toggleNightMode" style="-fx-background-color: transparent; -fx-cursor: hand;" text="🌙">
-                           <font><Font size="20.0" /></font>
-                        </Button>
                         <Button onAction="#loadProfileView" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e2e8f0; -fx-background-radius: 20; -fx-cursor: hand;" text="👤">
                            <font><Font size="14.0" /></font>
                            <HBox.margin><Insets left="20.0" /></HBox.margin>

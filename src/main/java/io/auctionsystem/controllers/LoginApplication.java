@@ -11,10 +11,10 @@ public class LoginApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        URL fxmlLocation = getClass().getResource("/io/auctionsystem/logindemo.fxml");
+        URL fxmlLocation = getClass().getResource("/io/auctionsystem/login.fxml");
 
         if (fxmlLocation == null) {
-            System.err.println("Lỗi nghiêm trọng: Không tìm thấy file logindemo.fxml để khởi chạy!");
+            System.err.println("Lỗi nghiêm trọng: Không tìm thấy file login.fxml để khởi chạy!");
             System.err.println("Hãy kiểm tra lại xem file đã nằm trong src/main/resources/io.auctionsystem/ chưa.");
             System.exit(1);
         }
