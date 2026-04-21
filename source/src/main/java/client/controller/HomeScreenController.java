@@ -1,322 +1,257 @@
-// src/main/java/client/controller/HomeScreenController.java
 package client.controller;
-
 import client.network.ClientSocket;
-import client.util.AlertUtil;
-import common.*;
-import server.model.Auction;
 import server.model.User;
-import server.model.RegularUser;
-import util.LoggerUtil;
-import util.DateTimeUtil;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import java.io.IOException;
-import java.util.*;
-
-/**
- * HomeScreenController - Màn hình chính
- * MVC Pattern: Controller
- *
- * Flow:
- * 1. Mặc định hiển thị tab BIDDER (xem & bid)
- * 2. Có nút "Nâng cấp Seller" - sau khi nâng cấp sẽ hiển thị tab SELLER
- * 3. User vừa có thể bid vừa có thể sell (nếu là seller)
- */
-
-
-
-
-import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class HomeScreenController {
 
-    @FXML private Label titleLabel;
-    @FXML private Label walletLabel;
-    @FXML private HBox roleButtonsBox;
-    @FXML private Button bidderButton;
-    @FXML private Button sellerButton;
-    @FXML private Button upgradeSellerButton;
-    @FXML private TabPane tabPane;
-    @FXML private Tab bidderTab;
-    @FXML private Tab sellerTab;
-    @FXML private Button logoutButton;
-    @FXML private Button addFundsButton;
-
-    private ClientSocket clientSocket;
-    private User currentUser;
-    private BidderPanelController bidderController;
-    private SellerPanelController sellerController;
-    private Runnable onLogout;
-    private Timer refreshTimer;
+    @FXML
+    private HBox menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings;
+    private List<HBox> allMenus;
 
     @FXML
-    private void handleMenuClick() {
-        // TODO: map menu -> content/tab
+    private StackPane rootPane;
+    @FXML
+    private StackPane contentArea;
+
+    @FXML
+    private TextField productSearchInput;
+    @FXML
+    private Button clearSearchBtn;
+
+    @FXML
+    private Button themeToggleBtn;
+    private boolean isNightMode = false;
+    private User currentUser;
+    private ClientSocket clientSocket;
+    private Runnable onLogout;
+
+    @FXML
+
+    public void initialize() {
+        allMenus = Arrays.asList(menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings);
+        try {
+            loadDashboardView();
+        } catch (Exception e) {
+            System.err.println("Cảnh báo: Lỗi khi load ngầm Dashboard: " + e.getMessage());
+        }
+        if (productSearchInput != null && clearSearchBtn != null) {
+            productSearchInput.textProperty().addListener((observable, oldValue, newValue) -> {
+                clearSearchBtn.setVisible(!newValue.trim().isEmpty());
+            });
+        } else {
+            System.err.println("Cảnh báo: productSearchInput hoặc clearSearchBtn bị null (chưa gắn fx:id)!");
+        }
+
+        Platform.runLater(() -> {
+            if (rootPane != null && rootPane.getScene() != null) {
+                KeyCombination ctrlK = new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN);
+                rootPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (ctrlK.match(event) && productSearchInput != null) {
+                        productSearchInput.requestFocus();
+                        event.consume();
+                    }
+                });
+            }
+        });
+    }
+
+    @FXML
+    private void handleMenuClick(MouseEvent event) {
+        if (event.getSource() instanceof HBox) {
+            HBox clickedMenu = (HBox) event.getSource();
+            updateMenuSelection(clickedMenu);
+        }
+    }
+
+    private void updateMenuSelection(HBox selectedMenu) {
+        for (HBox menu : allMenus) {
+            if (menu == null || menu.getChildren().isEmpty()) continue;
+
+            try {
+                Button btn = (Button) menu.getChildren().get(0);
+                if (menu == selectedMenu) {
+                    menu.setStyle("-fx-background-color: #edf2f7; -fx-background-radius: 8; -fx-cursor: hand;");
+                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0; -fx-font-weight: bold;");
+                } else {
+                    menu.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-cursor: hand;");
+                    if (menu == menuUpgrade) {
+                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e; -fx-font-weight: bold;");
+                    } else {
+                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #4a5568;");
+                    }
+                }
+            } catch (ClassCastException e) {
+                System.err.println("Cảnh báo: Element bên trong menu không phải là Button!");
+            }
+        }
+    }
+
+    @FXML
+    public void loadDashboardView() {
+        updateMenuSelection(menuHome);
+        try {
+            java.net.URL fxmlLocation = getClass().getResource("/fxml/Dashboard.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("Không tìm thấy file Dashboard.fxml!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent dashboardNode = loader.load();
+
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(dashboardNode);
+            } else {
+                System.err.println("Cảnh báo: contentArea bị null (chưa gắn fx:id trong Home.fxml)!");
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi load giao diện Dashboard: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @FXML
     private void handleProductSearch() {
-        // TODO: search logic
+        if (productSearchInput == null) return;
+        String keyword = productSearchInput.getText().trim();
+        if (!keyword.isEmpty()) {
+            System.out.println("Searching for: " + keyword);
+        }
     }
 
     @FXML
     private void clearSearch() {
-        // TODO: clear search logic
+        if (productSearchInput != null) {
+            productSearchInput.clear();
+            productSearchInput.requestFocus();
+        }
     }
 
+    public void loadProfileView() {
+        updateMenuSelection(null);
+        try {
+            java.net.URL fxmlLocation = getClass().getResource("/fxml/ProfileView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("Không tìm thấy file ProfileView.fxml!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent profileNode = loader.load();
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(profileNode);
+            }
+        } catch (IOException e) {
+            System.err.println("Lỗi load giao diện Profile");
+            e.printStackTrace();
+        }
+    }
 
+    public void loadNotificationsView() {
+        updateMenuSelection(menuMsg);
+        try {
+            java.net.URL fxmlLocation = getClass().getResource("/fxml/Notifications.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("Không tìm thấy file Notifications.fxml!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent notiNode = loader.load();
+            NotificationsController notiController = loader.getController();
+            notiController.setHomeController(this);
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(notiNode);
+            }
+        } catch (IOException e) {
+            System.err.println("Lỗi load giao diện Thông báo");
+            e.printStackTrace();
+        }
+    }
 
+    public void loadWalletView() {
+        updateMenuSelection(menuPay);
+        try {
+            java.net.URL fxmlLocation = getClass().getResource("/fxml/WalletView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("Không tìm thấy file WalletView.fxml!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent walletNode = loader.load();
 
+            WalletController walletController = loader.getController();
+            if (currentUser != null && clientSocket != null) {
+                walletController.setUserData(currentUser, clientSocket);  // ← SỬA ĐÂY
+            }
 
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(walletNode);
+            }
+
+        } catch (IOException e) {
+            System.err.println("Lỗi load giao diện Wallet");
+            e.printStackTrace();
+        }
+    }
 
     @FXML
-    public void initialize() {
-        LoggerUtil.info("✓ HomeScreenController initialized");
+    private void toggleNightMode() {
+        isNightMode = !isNightMode;
+
+        if (rootPane != null && rootPane.getScene() != null) {
+            try {
+                String cssPath = getClass().getResource("/CSS/dark-mode.css").toExternalForm();
+
+                if (isNightMode) {
+                    rootPane.getScene().getStylesheets().add(cssPath);
+                    themeToggleBtn.setText("☀️");
+                    System.out.println("🌙 Đã bật Night Mode");
+                } else {
+                    rootPane.getScene().getStylesheets().remove(cssPath);
+                    themeToggleBtn.setText("🌙");
+                    System.out.println("☀️ Đã tắt Night Mode");
+                }
+            } catch (NullPointerException e) {
+                System.err.println("Cảnh báo: Không tìm thấy file /CSS/dark-mode.css");
+            }
+        }
     }
 
-    /**
-     * Set user data after login
-     */
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;
-
-        updateUI();
-        startAutoRefresh();
-
-        LoggerUtil.info("✓ HomeScreen set for user: " + user.getUsername());
     }
 
-    /**
-     * Cập nhật UI dựa trên user role
-     */
-    private void updateUI() {
-        titleLabel.setText(currentUser.getDashboardTitle());
-        walletLabel.setText("💳 Tài khoản: $" + String.format("%.2f", currentUser.getWallet()));
-
-        // Kiểm tra xem có phải RegularUser không
-        if (!(currentUser instanceof RegularUser)) {
-            sellerButton.setVisible(false);
-            upgradeSellerButton.setVisible(false);
-            return;
-        }
-
-        RegularUser regularUser = (RegularUser) currentUser;
-
-        if (regularUser.isSeller()) {
-            // Đã là seller - hiển thị cả 2 tab
-            bidderButton.setVisible(true);
-            bidderButton.setStyle("-fx-text-fill: #2196F3;");
-            bidderButton.setOnAction(e -> tabPane.getSelectionModel().select(bidderTab));
-
-            sellerButton.setVisible(true);
-            sellerButton.setStyle("-fx-text-fill: #FF9800;");
-            sellerButton.setOnAction(e -> tabPane.getSelectionModel().select(sellerTab));
-
-            upgradeSellerButton.setText("✓ Bạn đã là Seller");
-            upgradeSellerButton.setDisable(true);
-        } else {
-            // Chưa là seller - ẩn tab seller
-            bidderButton.setVisible(true);
-            bidderButton.setStyle("-fx-text-fill: #2196F3;");
-            bidderButton.setDisable(true);
-
-            sellerButton.setVisible(false);
-
-            upgradeSellerButton.setText("⬆️ Nâng cấp Seller");
-            upgradeSellerButton.setDisable(false);
-            upgradeSellerButton.setStyle("-fx-padding: 10; -fx-font-size: 14;");
-            upgradeSellerButton.setOnAction(e -> handleUpgradeSeller());
-        }
-
-        logoutButton.setOnAction(e -> handleLogout());
-        addFundsButton.setOnAction(e -> handleAddFunds());
+    public void setOnLogout(Runnable onLogout) {
+        this.onLogout = onLogout;
     }
 
-    /**
-     * Set tab controllers
-     */
-    public void setTabControllers(BidderPanelController bidderCtrl, SellerPanelController sellerCtrl) {
-        this.bidderController = bidderCtrl;
-        this.sellerController = sellerCtrl;
-
-        bidderCtrl.setUserData(currentUser, clientSocket, this);
-
-        // Chỉ set seller controller nếu user là seller
-        if (currentUser instanceof RegularUser) {
-            RegularUser regularUser = (RegularUser) currentUser;
-            if (regularUser.isSeller()) {
-                sellerCtrl.setUserData(currentUser, clientSocket, this);
-            }
-        }
-    }
-
-    /**
-     * Set logout callback
-     */
-    public void setOnLogout(Runnable callback) {
-        this.onLogout = callback;
-    }
-
-    /**
-     * ← THÊM: Xử lý nâng cấp seller
-     */
-    @FXML
-    private void handleUpgradeSeller() {
-        if (!(currentUser instanceof RegularUser)) {
-            AlertUtil.showError("Lỗi", "Chỉ người dùng thường mới có thể nâng cấp!");
-            return;
-        }
-
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setTitle("Nâng cấp Seller");
-        confirmation.setHeaderText("Xác nhận nâng cấp");
-        confirmation.setContentText("Bạn có chắc chắn muốn nâng cấp lên Seller?\n" +
-                "Sau đó bạn sẽ có thể tạo phiên đấu giá và quản lý sản phẩm.");
-
-        if (confirmation.showAndWait().get() == ButtonType.OK) {
-            new Thread(() -> {
-                try {
-                    Message message = new Message(MessageType.UPGRADE_SELLER, null, currentUser.getUserId());
-                    clientSocket.sendMessage(message);
-
-                    Message response = clientSocket.receiveMessage();
-
-                    if (response != null && response.getStatus().equals("SUCCESS")) {
-                        currentUser = (User) response.getData();
-
-                        Platform.runLater(() -> {
-                            AlertUtil.showSuccess("Thành công", "Bạn đã nâng cấp lên Seller!");
-                            updateUI();
-
-                            // Re-initialize seller controller
-                            if (sellerController != null) {
-                                sellerController.setUserData(currentUser, clientSocket, this);
-                            }
-                        });
-
-                        LoggerUtil.info("✓ User upgraded to Seller: " + currentUser.getUsername());
-                    } else {
-                        String errorMsg = response != null ? response.getMessage() : "Lỗi không xác định";
-                        AlertUtil.showError("Lỗi", errorMsg);
-                    }
-
-                } catch (IOException | ClassNotFoundException e) {
-                    LoggerUtil.error("Upgrade seller error: " + e.getMessage());
-                    AlertUtil.showError("Lỗi", "Lỗi kết nối: " + e.getMessage());
-                }
-            }).start();
-        }
-    }
-
-    /**
-     * Xử lý nạp tiền
-     */
-    @FXML
-    private void handleAddFunds() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Nạp tiền");
-        dialog.setHeaderText("Nhập số tiền cần nạp");
-        dialog.setContentText("Số tiền (USD):");
-
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
-            try {
-                double amount = Double.parseDouble(result.get());
-
-                if (amount <= 0) {
-                    AlertUtil.showError("Lỗi", "Vui lòng nhập số tiền dương!");
-                    return;
-                }
-
-                currentUser.addFunds(amount);
-                walletLabel.setText("💳 Tài khoản: $" + String.format("%.2f", currentUser.getWallet()));
-
-                AlertUtil.showSuccess("Thành công", "Bạn đã nạp $" + String.format("%.2f", amount));
-                LoggerUtil.info("✓ User added funds: $" + amount);
-
-            } catch (NumberFormatException e) {
-                AlertUtil.showError("Lỗi", "Vui lòng nhập số hợp lệ!");
-            }
-        }
-    }
-
-    /**
-     * Xử lý logout
-     */
     @FXML
     private void handleLogout() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Xác nhận");
-        alert.setHeaderText("Đăng xuất");
-        alert.setContentText("Bạn có chắc chắn muốn đăng xuất?");
-
-        if (alert.showAndWait().get() == ButtonType.OK) {
-            try {
-                if (refreshTimer != null) {
-                    refreshTimer.cancel();
-                }
-
-                if (clientSocket != null) {
-                    clientSocket.close();
-                }
-
-                Platform.runLater(() -> {
-                    if (onLogout != null) {
-                        onLogout.run();
-                    }
-                });
-
-                LoggerUtil.info("✓ User logged out: " + currentUser.getUsername());
-            } catch (Exception e) {
-                LoggerUtil.error("Logout error: " + e.getMessage());
-            }
+        if (onLogout != null) {
+            onLogout.run();
         }
     }
 
-    /**
-     * Auto-refresh wallet & auctions
-     */
-    private void startAutoRefresh() {
-        refreshTimer = new Timer();
-        refreshTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() -> {
-                    walletLabel.setText("💳 Tài khoản: $" + String.format("%.2f", currentUser.getWallet()));
-                });
-            }
-        }, 5000, 5000);
-    }
 
-    /**
-     * Cập nhật wallet
-     */
-    public void updateWallet(double newWallet) {
-        currentUser.setWallet(newWallet);
-        walletLabel.setText("💳 Tài khoản: $" + String.format("%.2f", newWallet));
-    }
-
-    /**
-     * Cleanup
-     */
-    public void cleanup() {
-        if (refreshTimer != null) {
-            refreshTimer.cancel();
-        }
-
-        if (bidderController != null) {
-            bidderController.cleanup();
-        }
-
-        if (sellerController != null) {
-            sellerController.cleanup();
-        }
-    }
 }
