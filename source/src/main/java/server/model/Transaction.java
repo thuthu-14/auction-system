@@ -1,4 +1,4 @@
-package client.model;
+package server.model;
 
 public class Transaction {
     public String id;
