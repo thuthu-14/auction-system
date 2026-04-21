@@ -1,28 +1,30 @@
 package io.auctionsystem.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class WalletController implements Initializable {
 
-    @FXML
-    private Label balanceLabel;
-
-    @FXML
-    private ComboBox<String> timeFilter;
-
-    @FXML
-    private TextField searchField;
-
-    @FXML
-    private VBox addBankBox;
+    @FXML private Label balanceLabel;
+    @FXML private ComboBox<String> timeFilter;
+    @FXML private TextField searchField;
+    @FXML private VBox addBankBox;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -34,7 +36,7 @@ public class WalletController implements Initializable {
     }
 
     private void loadWalletData() {
-        balanceLabel.setText("0 đ");
+        if (balanceLabel != null) balanceLabel.setText("0 đ");
     }
 
     @FXML
@@ -47,24 +49,46 @@ public class WalletController implements Initializable {
         System.out.println("Mở popup rút tiền...");
     }
 
-
     @FXML
-    private void handleAddBankAccount() {
-        System.out.println("Mở form liên kết ngân hàng...");
+    private void showAddBankPopup() {
+        try {
+            URL fxmlLocation = getClass().getResource("/io/auctionsystem/AddBankDialog.fxml");
+            if (fxmlLocation == null) {
+                System.out.println("LỖI: Không tìm thấy file AddBankDialog.fxml.");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.initStyle(StageStyle.TRANSPARENT);
+
+            Scene scene = new Scene(root);
+            scene.setFill(Color.TRANSPARENT);
+
+            dialogStage.setScene(scene);
+            dialogStage.setResizable(false);
+            dialogStage.showAndWait();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void closePopup(ActionEvent event) {
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.close();
     }
 
     @FXML
     private void handleSearch() {
-        String keyword = searchField.getText();
+        String keyword = searchField != null ? searchField.getText() : "";
         System.out.println("Đang tìm giao dịch: " + keyword);
     }
 
-    @FXML
-    private void filterAll() { /* Logic lọc tất cả */ }
-
-    @FXML
-    private void filterIn() { /* Logic lọc tiền vào */ }
-
-    @FXML
-    private void filterOut() { /* Logic lọc tiền ra */ }
+    @FXML private void filterAll() { /* Logic lọc tất cả */ }
+    @FXML private void filterIn() { /* Logic lọc tiền vào */ }
+    @FXML private void filterOut() { /* Logic lọc tiền ra */ }
 }
