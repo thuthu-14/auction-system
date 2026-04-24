@@ -173,7 +173,7 @@ public class SignupController {
                     FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/admin.fxml"));
                     Scene adminScene = new Scene(adminLoader.load(), 1000, 700);
 
-                    AdminPanelController adminController = adminLoader.getController();
+                    AdminController adminController = adminLoader.getController();
                     adminController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
 
 
@@ -281,7 +281,7 @@ public class SignupController {
                 FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/admin.fxml"));
                 Scene adminScene = new Scene(adminLoader.load(), 1000, 700);
 
-                AdminPanelController adminController = adminLoader.getController();
+                AdminController adminController = adminLoader.getController();
                 adminController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
 
 
