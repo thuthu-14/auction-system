@@ -1,4 +1,4 @@
-package io.auctionsystem.controllers;
+package client.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;

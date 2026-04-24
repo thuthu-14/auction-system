@@ -13,8 +13,8 @@
            prefWidth="1440.0"
            xmlns="http://javafx.com/javafx/17.0.12"
            xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="io.auctionsystem.controllers.SellerHomeController"
-           stylesheets="@css/style.css">
+           fx:controller="client.controller.SellerHomeController"
+           stylesheets="@../CSS/style.css">
 
     <children>
 
@@ -41,7 +41,7 @@
                                 <ImageView fitHeight="60.0" fitWidth="65.0"
                                            pickOnBounds="true" preserveRatio="true" smooth="true">
                                     <image>
-                                        <Image url="@css/logo.png" />
+                                        <Image url="@../CSS/logo.png" />
                                     </image>
                                 </ImageView>
 
