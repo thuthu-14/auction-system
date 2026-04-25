@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="io.auctionsystem.controllers.BecomeSellerController"
+      alignment="TOP_LEFT"
+      spacing="18"
+      style="-fx-background-color: #fcfcfc;">
+
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <VBox spacing="6">
+        <Label text="Đăng ký trở thành Người bán"
+               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2e384d;"/>
+        <Label text="Điền thông tin cửa hàng để mở Seller Home"
+               style="-fx-font-size: 15px; -fx-text-fill: #a0aec0;"/>
+    </VBox>
+
+    <VBox spacing="14"
+          style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 24; -fx-border-color: #eceff3; -fx-border-radius: 14;">
+
+        <Label text="Thông tin người bán"
+               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2e384d;"/>
+
+        <TextField fx:id="shopNameField" promptText="Tên cửa hàng"/>
+        <TextField fx:id="phoneField" promptText="Số điện thoại"/>
+        <TextField fx:id="addressField" promptText="Địa chỉ"/>
+        <TextArea fx:id="descriptionArea" promptText="Mô tả cửa hàng" prefRowCount="4" wrapText="true"/>
+
+        <HBox spacing="10">
+            <Button text="Quay lại" onAction="#handleBack"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Xác nhận trở thành Seller"
+                    onAction="#handleConfirmSeller"
+                    style="-fx-background-color: #2b6cb0; -fx-text-fill: white; -fx-background-radius: 8;"/>
+        </HBox>
+    </VBox>
+</VBox>
