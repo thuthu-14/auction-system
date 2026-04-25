@@ -57,21 +57,6 @@
             </children>
         </VBox>
 
-        <VBox spacing="8.0">
-            <children>
-                <Label text="Số dư ban đầu (VND)" textFill="#4a5568">
-                    <font>
-                        <Font name="System Bold" size="14.0" />
-                    </font>
-                </Label>
-                <TextField  fx:id="initialBalanceField" prefHeight="45.0" promptText="Ví dụ: 500,000" style="-fx-background-color: #f3f4f6; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 0 15 0 15;">
-                    <font>
-                        <Font size="14.0" />
-                    </font>
-                </TextField>
-            </children>
-        </VBox>
-
         <HBox alignment="CENTER_RIGHT" spacing="15.0">
             <children>
                 <Button onAction="#closePopup" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Hủy bỏ" textFill="#4a5568">
