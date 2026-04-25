@@ -51,7 +51,7 @@
         <sourceDirectory>source/src/main/java</sourceDirectory>
         <resources>
             <resource>
-                <directory>source/src/main/resources</directory>
+                <directory>source/src/resources</directory>
             </resource>
         </resources>
         <testSourceDirectory>source/src/test/java</testSourceDirectory>
