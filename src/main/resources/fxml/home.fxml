@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane fx:id="rootPane" prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.HomeScreenController">
+    <children>
+
+        <HBox prefHeight="900.0" prefWidth="1440.0" style="-fx-background-color: #ffffff;">
+            <children>
+                <VBox prefHeight="900.0" prefWidth="215.0" spacing="5.0" style="-fx-background-color: #ffffff; -fx-border-color: #f0f0f0; -fx-border-width: 0 1 0 0; -fx-padding: 20 15 20 15;">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="10.0">
+                            <children>
+                                <StackPane prefHeight="150.0" prefWidth="200.0" style="-fx-translate-y: -5; -fx-translate-x: -5;">
+                                    <children>
+                                        <ImageView fitHeight="56.0" fitWidth="59.0" pickOnBounds="true" preserveRatio="true" style="-fx-translate-x: -58;">
+                                            <image>
+                                                <Image url="@../CSS/logo.png" />
+                                            </image>
+                                        </ImageView>
+                                        <Label alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="170.0" style="-fx-font-size: 25;" styleClass="my-darley" stylesheets="@../CSS/style.css" text="BubblyBid" textFill="#2e384d">
+                                            <font>
+                                                <Font name="System Bold" size="25.0" />
+                                            </font>
+                                        </Label>
+                                    </children>
+                                </StackPane>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="25.0" left="10.0" />
+                            </VBox.margin>
+                        </HBox>
+
+                        <HBox fx:id="menuHome" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                            <children>
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" styleClass="font-mulish" stylesheets="@../CSS/style.css" text="🏠   Trang chủ" textFill="#4a5568">
+                                    <font><Font size="17.0" /></font>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <HBox fx:id="menuAI" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                            <children>
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="☁️ Ask Bubbly AI" textFill="#4a5568">
+                                    <font><Font size="14.0" /></font>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <Label text="BIDDING" textFill="#a0aec0">
+                            <font><Font name="System Bold" size="11.0" /></font>
+                            <VBox.margin>
+                                <Insets bottom="5.0" left="15.0" top="20.0" />
+                            </VBox.margin>
+                        </Label>
+
+                        <HBox fx:id="menuFlash" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                            <children>
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text=" ⚡     Flash Bid" textFill="#4a5568">
+                                    <font><Font size="17.0" /></font>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <HBox fx:id="menuRecent" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                            <children>
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="📈   Lịch sử giao dịch" textFill="#4a5568">
+                                    <font><Font size="16.0" /></font>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <HBox fx:id="menuMsg" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                            <children>
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefHeight="40.0" prefWidth="182.0" style="-fx-background-color: transparent; -fx-translate-x: -5;" text="📨   Tin nhắn" textFill="#4a5568">
+                                    <font><Font size="18.0" /></font>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <HBox fx:id="menuPay" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                            <children>
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="💳   Nạp tiền" textFill="#4a5568">
+                                    <font><Font size="17.0" /></font>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <Region VBox.vgrow="ALWAYS" />
+
+                        <HBox fx:id="menuUpgrade" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                            <children>
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="👨‍🏫 Trở thành Người bán" textFill="#e53e3e">
+                                    <font><Font name="System Bold" size="14.0" /></font>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <HBox fx:id="menuSettings" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                            <children>
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" mouseTransparent="true" prefWidth="230.0" style="-fx-background-color: transparent;" text="⚙   Cài Đặt" textFill="#4a5568">
+                                    <font><Font size="17.0" /></font>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <VBox HBox.hgrow="ALWAYS">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="80.0" style="-fx-background-color: #ffffff; -fx-padding: 0 40 0 40; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
+                            <children>
+                                <VBox spacing="5.0" VBox.vgrow="ALWAYS">
+                                    <Label fx:id="titleLabel" style="-fx-font-size: 18; -fx-font-weight: bold;" text="Xin chao, User" textFill="#2e384d" />
+                                    <Label fx:id="walletLabel" style="-fx-font-size: 14; -fx-text-fill: #059669;" text="Tai khoan: $500.00" />
+                                </VBox>
+
+                                <Region HBox.hgrow="ALWAYS" />
+
+                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" prefHeight="48.0" prefWidth="500.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 24; -fx-padding: 0 20 0 20;">
+                                    <children>
+                                        <Label text="🔍" textFill="#9ca3af" style="-fx-font-size: 16px;" />
+                                        <TextField fx:id="productSearchInput" onAction="#handleProductSearch" promptText="Tim kiem san pham..." style="-fx-background-color: transparent; -fx-prompt-text-fill: #9ca3af; -fx-text-fill: #374151;" HBox.hgrow="ALWAYS">
+                                            <font><Font size="15.0" /></font>
+                                            <padding><Insets left="10.0" /></padding>
+                                        </TextField>
+                                        <Button fx:id="clearSearchBtn" onAction="#clearSearch" style="-fx-background-color: transparent; -fx-cursor: hand;" text="✕" textFill="#9ca3af" visible="false">
+                                            <font><Font name="System Bold" size="14.0" /></font>
+                                        </Button>
+                                    </children>
+                                </HBox>
+
+                                <Region HBox.hgrow="ALWAYS" />
+
+                                <HBox fx:id="roleButtonsBox" spacing="10.0" alignment="CENTER_RIGHT">
+                                    <children>
+                                        <Button fx:id="bidderButton" text="Buyer" style="-fx-padding: 8 15; -fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: #2196F3;" visible="false" />
+                                        <Button fx:id="sellerButton" text="Seller" style="-fx-padding: 8 15; -fx-background-color: transparent; -fx-cursor: hand; -fx-text-fill: #FF9800;" visible="false" />
+                                        <Button fx:id="upgradeSellerButton" text="Upgrade Seller" style="-fx-padding: 8 15; -fx-background-color: #e53e3e; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;" />
+                                        <Button fx:id="addFundsButton" text="Add Funds" style="-fx-padding: 8 15; -fx-background-color: #059669; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;" />
+                                        <Button fx:id="logoutButton" text="Logout" style="-fx-padding: 8 15; -fx-background-color: #dc2626; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;" />
+                                        <Button style="-fx-background-color: transparent; -fx-cursor: hand;" text="🌙">
+                                            <font><Font size="20.0" /></font>
+                                        </Button>
+                                        <Button prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e2e8f0; -fx-background-radius: 20; -fx-cursor: hand;" text="👤">
+                                            <font><Font size="14.0" /></font>
+                                            <HBox.margin><Insets left="20.0" /></HBox.margin>
+                                        </Button>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </HBox>
+
+                        <TabPane fx:id="tabPane" VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
+                            <tabs>
+                                <Tab fx:id="bidderTab" text="Buyer" closable="false">
+                                    <content>
+                                        <StackPane style="-fx-background-color: #fcfcfc;" />
+                                    </content>
+                                </Tab>
+                                <Tab fx:id="sellerTab" text="Seller" closable="false">
+                                    <content>
+                                        <StackPane style="-fx-background-color: #fcfcfc;" />
+                                    </content>
+                                </Tab>
+                            </tabs>
+                        </TabPane>
+                    </children>
+                </VBox>
+
+            </children>
+        </HBox>
+    </children>
+</StackPane>

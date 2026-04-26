@@ -1,0 +1,19 @@
+[
+  {
+    "userId": "ADMIN001",
+    "username": "admin",
+    "password": "admin123",
+    "email": "admin@auction.com",
+    "wallet": 1000000.0,
+    "role": "ADMIN",
+    "createdAt": 1712486400000,
+    "active": true,
+    "adminLevel": "SUPER_ADMIN",
+    "permissions": [
+      "VIEW_ALL_USERS",
+      "BAN_USER",
+      "DELETE_AUCTION",
+      "VIEW_LOGS"
+    ]
+  }
+]
