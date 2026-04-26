@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: #fcfcfc; -fx-background: #fcfcfc;" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerManageAuctionsController">
+    <VBox spacing="25.0" style="-fx-background-color: #fcfcfc;">
+        <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+        </padding>
+
+        <HBox alignment="CENTER_LEFT">
+            <children>
+                <VBox spacing="5.0">
+                    <Label text="Danh sách phiên đấu giá" textFill="#1a1a1a">
+                        <font><Font name="System Bold" size="28.0" /></font>
+                    </Label>
+                    <Label text="Quản lý và theo dõi trạng thái các sản phẩm đang đấu giá" textFill="#718096">
+                        <font><Font size="14.0" /></font>
+                    </Label>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Button style="-fx-background-color: #3182ce; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;" text="+ Tạo phiên mới">
+                    <font><Font name="System Bold" size="14.0" /></font>
+                </Button>
+            </children>
+        </HBox>
+
+        <HBox spacing="15.0">
+            <TextField prefWidth="400.0" promptText="🔍 Tìm tên sản phẩm..." style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10;" />
+            <ComboBox prefWidth="150.0" promptText="Trạng thái" style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8;" />
+        </HBox>
+
+        <FlowPane fx:id="productsContainer" hgap="25.0" vgap="25.0">
+            <children>
+
+                <VBox prefWidth="280.0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-border-color: #edf2f7; -fx-border-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                    <children>
+                        <StackPane prefHeight="180.0" style="-fx-background-color: #f7fafc; -fx-background-radius: 16 16 0 0;">
+                            <children>
+                                <Label text="🖼️ Ảnh sản phẩm" textFill="#a0aec0" />
+                                <Label style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-padding: 5 12; -fx-background-radius: 20;" text="Đang diễn ra" StackPane.alignment="TOP_RIGHT">
+                                    <StackPane.margin><Insets right="10.0" top="10.0" /></StackPane.margin>
+                                    <font><Font name="System Bold" size="11.0" /></font>
+                                </Label>
+                            </children>
+                        </StackPane>
+
+                        <VBox spacing="8.0" style="-fx-padding: 20;">
+                            <Label text="Đồng hồ Rolex Submariner" textFill="#2d3748" wrapText="true">
+                                <font><Font name="System Bold" size="16.0" /></font>
+                            </Label>
+
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Giá hiện tại: " textFill="#718096" />
+                                <Label text="215.000.000 đ" textFill="#3182ce">
+                                    <font><Font name="System Bold" size="15.0" /></font>
+                                </Label>
+                            </HBox>
+
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Lượt Bid: " textFill="#718096" />
+                                <Label text="24" textFill="#2d3748" />
+                            </HBox>
+
+                            <Separator opacity="0.5">
+                                <VBox.margin><Insets bottom="5.0" top="5.0" /></VBox.margin>
+                            </Separator>
+
+                            <HBox spacing="10.0">
+                                <Button maxWidth="Infinity" style="-fx-background-color: #edf2f7; -fx-text-fill: #4a5568; -fx-background-radius: 8; -fx-cursor: hand;" text="Chi tiết" HBox.hgrow="ALWAYS" />
+                                <Button maxWidth="Infinity" style="-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Chỉnh sửa" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <VBox prefWidth="280.0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-border-color: #edf2f7; -fx-border-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                    <children>
+                        <StackPane prefHeight="180.0" style="-fx-background-color: #f7fafc; -fx-background-radius: 16 16 0 0;">
+                            <children>
+                                <Label text="🖼️ Ảnh sản phẩm" textFill="#a0aec0" />
+                                <Label style="-fx-background-color: #718096; -fx-text-fill: white; -fx-padding: 5 12; -fx-background-radius: 20;" text="Đã kết thúc" StackPane.alignment="TOP_RIGHT">
+                                    <StackPane.margin><Insets right="10.0" top="10.0" /></StackPane.margin>
+                                    <font><Font name="System Bold" size="11.0" /></font>
+                                </Label>
+                            </children>
+                        </StackPane>
+
+                        <VBox spacing="8.0" style="-fx-padding: 20;">
+                            <Label text="Bình gốm cổ thời Minh" textFill="#2d3748" wrapText="true">
+                                <font><Font name="System Bold" size="16.0" /></font>
+                            </Label>
+
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Giá chốt: " textFill="#718096" />
+                                <Label text="45.500.000 đ" textFill="#e53e3e">
+                                    <font><Font name="System Bold" size="15.0" /></font>
+                                </Label>
+                            </HBox>
+
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Lượt Bid: " textFill="#718096" />
+                                <Label text="42" textFill="#2d3748" />
+                            </HBox>
+
+                            <Separator opacity="0.5">
+                                <VBox.margin><Insets bottom="5.0" top="5.0" /></VBox.margin>
+                            </Separator>
+
+                            <HBox spacing="10.0">
+                                <Button maxWidth="Infinity" style="-fx-background-color: #edf2f7; -fx-text-fill: #4a5568; -fx-background-radius: 8; -fx-cursor: hand;" text="Chi tiết" HBox.hgrow="ALWAYS" />
+                                <Button maxWidth="Infinity" style="-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Liên hệ" HBox.hgrow="ALWAYS" />
+                            </HBox>
+                        </VBox>
+                    </children>
+                </VBox>
+
+            </children>
+        </FlowPane>
+    </VBox>
+</ScrollPane>

@@ -118,7 +118,7 @@ public class SellerHomeController {
     public void loadAddAuctionProductView() {
         updateMenuSelection(menuHome);
         try {
-            java.net.URL fxmlLocation = getClass().getResource("/io/auctionsystem/AddAuctionProduct.fxml");
+            java.net.URL fxmlLocation = getClass().getResource("/fxml/AddAuctionProduct.fxml");
             if (fxmlLocation == null) {
                 System.err.println("Không tìm thấy file AddAuctionProduct.fxml!");
                 return;
@@ -130,10 +130,35 @@ public class SellerHomeController {
                 contentArea.getChildren().clear();
                 contentArea.getChildren().add(dashboardNode);
             } else {
-                System.err.println("Cảnh báo: contentArea bị null (chưa gắn fx:id trong Home.fxml)!");
+                System.err.println("Cảnh báo: contentArea bị null (chưa gắn fx:id trong SellerHome.fxml)!");
             }
         } catch (Exception e) {
             System.err.println("Lỗi load giao diện Dashboard: " + e.getMessage());
             e.printStackTrace();
         }
-    }}
+    }
+
+    @FXML
+    public void loadSellerStatisticsView() {
+        updateMenuSelection(menuHome);
+        try {
+            java.net.URL fxmlLocation = getClass().getResource("/fxml/SellerStatistics.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("Không tìm thấy file SellerStatistics.fxml!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent dashboardNode = loader.load();
+
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(dashboardNode);
+            } else {
+                System.err.println("Cảnh báo: contentArea bị null (chưa gắn fx:id trong SellerStatistics.fxml)!");
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi load giao diện Dashboard: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}

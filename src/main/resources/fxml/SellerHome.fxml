@@ -41,7 +41,7 @@
                                 <ImageView fitHeight="60.0" fitWidth="65.0"
                                            pickOnBounds="true" preserveRatio="true" smooth="true">
                                     <image>
-                                        <Image url="@../../CSS/logo.png" />
+                                        <Image url="@../CSS/logo.png" />
                                     </image>
                                 </ImageView>
 
@@ -54,39 +54,15 @@
                                 </Label>
                             </children>
                             <VBox.margin>
-                                <Insets bottom="30.0" left = "0.0" top="-10.0"/>
+                                <Insets bottom="30.0" left = "0.0"/>
                             </VBox.margin>
                         </HBox>
-
-                        <HBox fx:id="menuHome"
-                              alignment="CENTER_LEFT"
-                              onMouseClicked="#handleMenuClick"
-                              prefHeight="45.0"
-                              prefWidth="230.0" maxWidth="Infinity"
-                              style="-fx-background-radius: 8; -fx-cursor: hand;">
-                            <children>
-                                <Button alignment="BASELINE_LEFT"
-                                        graphicTextGap="15.0"
-                                        mouseTransparent="true"
-                                        maxWidth="Infinity" HBox.hgrow="ALWAYS"
-                                        style="-fx-background-color: transparent;"
-                                        text="🏠   Trang chủ"
-                                        textFill="#4a5568">
-                                    <font>
-                                        <Font size="17.0" />
-                                    </font>
-                                    <padding>
-                                        <Insets left="20.0" /> </padding>
-                                </Button>
-                            </children>
-                        </HBox>
-
                         <Label text="SELLING" textFill="#a0aec0">
                             <font>
                                 <Font size="15.0" />
                             </font>
                             <VBox.margin>
-                                <Insets bottom="5.0" left="20.0" top="20.0" />
+                                <Insets bottom="5.0" left="20.0"/>
                             </VBox.margin>
                         </Label>
 
@@ -138,7 +114,7 @@
 
                         <HBox fx:id="menuAuctionStatistic"
                               alignment="CENTER_LEFT"
-                              onMouseClicked="#handleMenuClick"
+                              onMouseClicked="#loadSellerStatisticsView"
                               prefHeight="45.0"
                               prefWidth="230.0" maxWidth="Infinity"
                               style="-fx-background-radius: 8; -fx-cursor: hand;">
