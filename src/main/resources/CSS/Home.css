@@ -1,6 +1,0 @@
-.menu-item { -fx-background-color: transparent; }
-.menu-item-active {
-    -fx-background-color: #e6f0fd;
-    -fx-background-radius: 8;
-}
-.menu-item-active .button { -fx-text-fill: #3b82f6; }
