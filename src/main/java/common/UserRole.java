@@ -1,7 +1,5 @@
 package common;
 
-import server.exception.PermissionDeniedException;
-
 import java.io.Serializable;
 
 public enum UserRole implements Serializable {
@@ -19,8 +17,3 @@ public enum UserRole implements Serializable {
         return description;
     }
 }
-
-
-
-
-
