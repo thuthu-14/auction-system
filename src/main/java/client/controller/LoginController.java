@@ -7,7 +7,6 @@ import client.network.MessageHandler;
 import common.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import server.model.User;
 import util.LoggerUtil;
@@ -69,7 +68,7 @@ public class LoginController {
     @FXML
     private void switchToSignup() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/signup.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Signup.fxml"));
             Scene scene = new Scene(loader.load(), 1300, 800);
 
             Stage stage = (Stage) registerButton.getScene().getWindow();

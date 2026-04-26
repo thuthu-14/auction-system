@@ -130,7 +130,7 @@ public class SignupController {
     @FXML
     private void switchToLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/logindemo.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
             Scene scene = new Scene(loader.load(), 1300, 800);
 
 
@@ -144,7 +144,7 @@ public class SignupController {
 
             loginController.setOnLoginSuccess(() -> {
                 try {
-                    FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
+                    FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/ClientHome.fxml"));
                     Scene homeScene = new Scene(homeLoader.load(), 1000, 700);
 
                     HomeScreenController homeController = homeLoader.getController();
@@ -170,7 +170,7 @@ public class SignupController {
 
             loginController.setOnAdminLoginSuccess(() -> {
                 try {
-                    FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/admin.fxml"));
+                    FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/AdminHome.fxml"));
                     Scene adminScene = new Scene(adminLoader.load(), 1000, 700);
 
                     AdminController adminController = adminLoader.getController();
@@ -246,7 +246,7 @@ public class SignupController {
 
 
     private void showLoginFromLogout() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/logindemo.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
         Scene scene = new Scene(loader.load(), 1300, 800);
 
         LoginController loginController = loader.getController();
@@ -254,7 +254,7 @@ public class SignupController {
         // Set callbacks
         loginController.setOnLoginSuccess(() -> {
             try {
-                FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
+                FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/ClientHome.fxml"));
                 Scene homeScene = new Scene(homeLoader.load(), 1000, 700);
 
                 HomeScreenController homeController = homeLoader.getController();
@@ -278,7 +278,7 @@ public class SignupController {
 
         loginController.setOnAdminLoginSuccess(() -> {
             try {
-                FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/admin.fxml"));
+                FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/AdminHome.fxml"));
                 Scene adminScene = new Scene(adminLoader.load(), 1000, 700);
 
                 AdminController adminController = adminLoader.getController();
