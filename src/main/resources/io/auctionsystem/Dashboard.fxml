@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: #fcfcfc;" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.auctionsystem.controllers.DashboardController">
+
+    <VBox alignment="TOP_LEFT" spacing="35.0" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+        </padding>
+
+        <children>
+            <VBox spacing="5.0">
+                <children>
+                    <Label text="Khám phá BubblyBid" textFill="#1a1a1a">
+                        <font><Font name="System Bold" size="28.0" /></font>
+                    </Label>
+                    <Label text="Hàng ngàn sản phẩm độc đáo đang chờ bạn chốt giá ngay hôm nay!" textFill="#718096">
+                        <font><Font size="15.0" /></font>
+                    </Label>
+                </children>
+            </VBox>
+
+            <StackPane style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 5);" VBox.vgrow="NEVER">
+                <children>
+                    <Button maxWidth="Infinity" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                        <graphic>
+                            <ImageView fx:id="bannerImageView" fitHeight="250.0" fitWidth="800.0" preserveRatio="false" smooth="true" />                        </graphic>
+                    </Button>
+
+                    <Button fx:id="prevBannerBtn" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" text="&lt;" StackPane.alignment="CENTER_LEFT">
+                        <font><Font name="System Bold" size="18.0" /></font>
+                        <StackPane.margin>
+                            <Insets left="20.0" />
+                        </StackPane.margin>
+                    </Button>
+
+                    <Button fx:id="nextBannerBtn" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" text="&gt;" StackPane.alignment="CENTER_RIGHT">
+                        <font><Font name="System Bold" size="18.0" /></font>
+                        <StackPane.margin>
+                            <Insets right="20.0" />
+                        </StackPane.margin>
+                    </Button>
+                </children>
+            </StackPane>
+
+            <VBox spacing="20.0">
+                <children>
+                    <HBox alignment="CENTER_LEFT">
+                        <children>
+                            <Label text="🔥 Sắp kết thúc - Chốt ngay!" textFill="#1a1a1a">
+                                <font><Font name="System Bold" size="22.0" /></font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;" text="Xem tất cả &gt;" textFill="#3182ce" underline="true">
+                                <font><Font size="14.0" /></font>
+                            </Button>
+                        </children>
+                    </HBox>
+
+                    <GridPane hgap="25.0" vgap="25.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                        </rowConstraints>
+                        <children>
+                            <VBox spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1; -fx-padding: 15;">
+                                <ImageView fitHeight="150.0" fitWidth="150.0" preserveRatio="true" style="-fx-translate-x: -3;"> </ImageView>
+                                <Label text="MacBook Pro M3 Max 36GB" textFill="#2d3748">
+                                    <font><Font name="System Bold" size="15.0" /></font>
+                                </Label>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <Label text="⏱ Còn 00:05:12" textFill="#e53e3e">
+                                        <font><Font size="13.0" /></font>
+                                    </Label>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label text="55.500.000 đ" textFill="#1a1a1a">
+                                        <font><Font name="System Bold" size="18.0" /></font>
+                                    </Label>
+                                </HBox>
+                                <Button maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 20; -fx-cursor: hand;" text="Đặt giá" textFill="white">
+                                    <font><Font name="System Bold" size="14.0" /></font>
+                                </Button>
+                            </VBox>
+
+                            <VBox spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1; -fx-padding: 15;" GridPane.columnIndex="1">
+                                <ImageView fitHeight="150.0" fitWidth="150.0" preserveRatio="true" style="-fx-translate-x: -3;"> </ImageView>
+                                <Label text="iPhone 15 Pro Max 1TB" textFill="#2d3748">
+                                    <font><Font name="System Bold" size="15.0" /></font>
+                                </Label>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <Label text="⏱ Còn 00:02:45" textFill="#e53e3e">
+                                        <font><Font size="13.0" /></font>
+                                    </Label>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label text="38.200.000 đ" textFill="#1a1a1a">
+                                        <font><Font name="System Bold" size="18.0" /></font>
+                                    </Label>
+                                </HBox>
+                                <Button maxWidth="1.7976931348623157E308" prefHeight="40.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 20; -fx-cursor: hand;" text="Đặt giá" textFill="white">
+                                    <font><Font name="System Bold" size="14.0" /></font>
+                                </Button>
+                            </VBox>
+                        </children>
+                    </GridPane>
+                </children>
+            </VBox>
+
+            <VBox spacing="15.0">
+                <children>
+                    <Label text="🛍 Gợi ý dành riêng cho bạn" textFill="#1a1a1a">
+                        <font><Font name="System Bold" size="20.0" /></font>
+                    </Label>
+                    <ScrollPane fitToHeight="true" prefHeight="230.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                        <content>
+                            <HBox spacing="15.0">
+                                <children>
+                                    <VBox prefWidth="180.0" spacing="8.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #f3f4f6; -fx-border-radius: 10; -fx-padding: 10;">
+                                        <ImageView fitHeight="120.0" fitWidth="120.0" preserveRatio="true"> </ImageView>
+                                        <Label text="AirPods Pro 2 Gen" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        <Label text="4.200.000 đ" textFill="#1a1a1a"><font><Font name="System Bold" size="16.0" /></font></Label>
+                                    </VBox>
+                                    <VBox prefWidth="180.0" spacing="8.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #f3f4f6; -fx-border-radius: 10; -fx-padding: 10;">
+                                        <ImageView fitHeight="120.0" fitWidth="120.0" preserveRatio="true"> </ImageView>
+                                        <Label text="Loa Marshall Emberton" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        <Label text="3.800.000 đ" textFill="#1a1a1a"><font><Font name="System Bold" size="16.0" /></font></Label>
+                                    </VBox>
+                                    <VBox prefWidth="180.0" spacing="8.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #f3f4f6; -fx-border-radius: 10; -fx-padding: 10;">
+                                        <ImageView fitHeight="120.0" fitWidth="120.0" preserveRatio="true"> </ImageView>
+                                        <Label text="iPad Pro M2 11inch" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        <Label text="20.100.000 đ" textFill="#1a1a1a"><font><Font name="System Bold" size="16.0" /></font></Label>
+                                    </VBox>
+                                </children>
+                            </HBox>
+                        </content>
+                    </ScrollPane>
+                </children>
+            </VBox>
+
+            <VBox spacing="15.0" VBox.vgrow="ALWAYS">
+                <children>
+                    <Label text="🔔 Hoạt động gần đây" textFill="#1a1a1a">
+                        <font><Font name="System Bold" size="20.0" /></font>
+                    </Label>
+                    <VBox spacing="10.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 15; -fx-padding: 20;" VBox.vgrow="ALWAYS">
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-padding: 8 0 8 0; -fx-border-color: #cbd5e1; -fx-border-width: 0 0 1 0;">
+                                <children>
+                                    <Label text="👤" textFill="#94a3b8"><font><Font size="16.0"/></font></Label>
+                                    <Label text="User @jack vừa đặt giá" textFill="#4a5568"><font><Font size="14.0"/></font></Label>
+                                    <Label text="20.500.000 đ" textFill="#e53e3e"><font><Font name="System Bold" size="14.0"/></font></Label>
+                                    <Label text="cho MacBook Pro M3 Max" textFill="#4a5568"><font><Font size="14.0"/></font></Label>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label text="1 phút trước" textFill="#9ca3af"><font><Font size="12.0"/></font></Label>
+                                </children>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-padding: 8 0 8 0;">
+                                <children>
+                                    <Label text="🏆" textFill="#eab308"><font><Font size="16.0"/></font></Label>
+                                    <Label text="User @minh vừa thắng đấu giá" textFill="#4a5568"><font><Font size="14.0"/></font></Label>
+                                    <Label text="iPhone 15 Pro" textFill="#1a1a1a"><font><Font name="System Bold" size="14.0"/></font></Label>
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Label text="5 phút trước" textFill="#9ca3af"><font><Font size="12.0"/></font></Label>
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+                </children>
+            </VBox>
+        </children>
+    </VBox>
+</ScrollPane>

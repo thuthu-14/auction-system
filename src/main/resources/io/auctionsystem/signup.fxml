@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<HBox alignment="CENTER" minHeight="650.0" minWidth="1000.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.auctionsystem.controllers.SignupController">
+    <children>
+
+        <StackPane minWidth="550.0" style="-fx-padding: 40;" HBox.hgrow="ALWAYS">
+            <children>
+                <ImageView fitHeight="700.0" fitWidth="600.0" pickOnBounds="true">
+                    <image>
+                        <Image url="@../../CSS/login.png" />
+                    </image>
+                    <clip>
+                        <Rectangle arcHeight="60.0" arcWidth="60.0" height="700.0" width="600.0" />
+                    </clip>
+                </ImageView>
+            </children>
+        </StackPane>
+
+        <StackPane minWidth="450.0" HBox.hgrow="ALWAYS">
+            <children>
+                <VBox alignment="CENTER_LEFT" maxWidth="440.0" spacing="20.0">
+                    <children>
+
+                        <Label alignment="CENTER" prefHeight="51.0" prefWidth="446.0" styleClass="my-darley" stylesheets="@../../CSS/style.css" text="Tạo tài khoản của bạn">
+                            <font>
+                                <Font name="System Bold" size="33.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets bottom="10.0" />
+                            </VBox.margin>
+                        </Label>
+
+                        <HBox spacing="15.0">
+                            <children>
+                                <TextField fx:id="Ho" prefHeight="55.0" promptText="Họ" style="-fx-border-color: #dddddd; -fx-background-radius: 10; -fx-background-color: #f7f7f7; -fx-border-radius: 10; -fx-padding: 0 15 0 15;" HBox.hgrow="ALWAYS">
+                                    <font>
+                                        <Font size="15.0" />
+                                    </font>
+                                </TextField>
+                                <TextField fx:id="Ten" prefHeight="55.0" promptText="Tên" style="-fx-border-color: #dddddd; -fx-background-radius: 10; -fx-background-color: #f7f7f7; -fx-border-radius: 10; -fx-padding: 0 15 0 15;" HBox.hgrow="ALWAYS">
+                                    <font>
+                                        <Font size="15.0" />
+                                    </font>
+                                </TextField>
+                            </children>
+                        </HBox>
+
+                        <TextField fx:id="Email" prefHeight="55.0" promptText="Email" style="-fx-border-color: #dddddd; -fx-background-radius: 10; -fx-background-color: #f7f7f7; -fx-border-radius: 10; -fx-padding: 0 15 0 15;">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </TextField>
+
+                        <PasswordField fx:id="mk" prefHeight="55.0" promptText="Mật khẩu mới" style="-fx-border-color: #dddddd; -fx-background-radius: 10; -fx-background-color: #f7f7f7; -fx-border-radius: 10; -fx-padding: 0 15 0 15;">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </PasswordField>
+
+                        <Button fx:id="loginButton" onAction="#switchToLogin" prefHeight="60.0" prefWidth="440.0" style="-fx-background-color: #1a1a1a; -fx-border-radius: 30; -fx-background-radius: 30; -fx-cursor: hand;" stylesheets="@../../CSS/style.css" text="Tiếp tục" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets top="10.0" />
+                            </VBox.margin>
+                        </Button>
+
+                        <HBox alignment="CENTER" prefHeight="30.0" spacing="5.0">
+                            <children>
+                                <Label text="Bạn đã có tài khoản?" textFill="#555555">
+                                    <font>
+                                        <Font size="15.0" />
+                                    </font>
+                                </Label>
+                                <Button mnemonicParsing="false" onAction="#switchToLogin" style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;" text="Đăng nhập" textFill="#426ded" underline="true">
+                                    <font>
+                                        <Font name="System Bold" size="15.0" />
+                                    </font>
+                                </Button>
+                            </children>
+                            <VBox.margin>
+                                <Insets top="15.0" />
+                            </VBox.margin>
+                        </HBox>
+
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+
+    </children>
+</HBox>
