@@ -6,7 +6,6 @@ import client.network.MessageHandler;
 import common.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import server.model.User;
 import util.LoggerUtil;
@@ -21,8 +20,8 @@ import java.util.Map;
  * LoginController - Xử lý màn hình Login
  * MVC Pattern: Controller
  */
-// imports
-import javafx.scene.input.MouseEvent;
+
+
 
 
 
@@ -68,7 +67,7 @@ public class LoginController {
     @FXML
     private void switchToSignup() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/signup.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Signup.fxml"));
             Scene scene = new Scene(loader.load(), 1300, 800);
 
             Stage stage = (Stage) registerButton.getScene().getWindow();
@@ -124,12 +123,12 @@ public class LoginController {
 
     @FXML
     private void handleLogin() {
-        String username = usernameField.getText().trim();
+        String email = usernameField.getText().trim();
         String password = passwordField.getText();
 
         // Validation
-        if (username.isEmpty() || password.isEmpty()) {
-            showError("❌ Username và password không được rỗng!");
+        if (email.isEmpty() || password.isEmpty()) {
+            showError("❌ email và password không được rỗng!");
             return;
         }
 
@@ -158,8 +157,8 @@ public class LoginController {
 
 
 
-                LoginRequest loginRequest = new LoginRequest(username, password);
-                Message message = new Message(MessageType.LOGIN, loginRequest, username);
+                LoginRequest loginRequest = new LoginRequest(email, password);
+                Message message = new Message(MessageType.LOGIN, loginRequest, email);
 
 
                 clientSocket.sendMessage(message);
@@ -219,12 +218,12 @@ public class LoginController {
 
         // Validation
         if (username.isEmpty() || password.isEmpty()) {
-            showError(" Username và password không được rỗng!");
+            showError(" email và password không được rỗng!");
             return;
         }
 
         if (username.length() < 3) {
-            showError(" Username phải có ít nhất 3 ký tự!");
+            showError(" email phải có ít nhất 3 ký tự!");
             return;
         }
 

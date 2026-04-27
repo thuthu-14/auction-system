@@ -14,6 +14,8 @@ public class DataManager {
     public static final String JSON_AUCTIONS = Constants.JSON_DIR + "/auctions.json";
     public static final String JSON_BIDS = Constants.JSON_DIR + "/bids.json";
     public static final String JSON_ITEMS = Constants.JSON_DIR + "/items.json";
+    public static final String JSON_BANK_ACCOUNTS = Constants.JSON_DIR + "/bank_accounts.json";
+
 
     public static final String DAT_USERS = Constants.SERIALIZED_DIR + "/users.dat";
     public static final String DAT_AUCTIONS = Constants.SERIALIZED_DIR + "/auctions.dat";
@@ -36,6 +38,8 @@ public class DataManager {
         JsonUtil.createFileIfNotExists(JSON_AUCTIONS);
         JsonUtil.createFileIfNotExists(JSON_BIDS);
         JsonUtil.createFileIfNotExists(JSON_ITEMS);
+        JsonUtil.createFileIfNotExists(JSON_BANK_ACCOUNTS);
+
 
         SerializationUtil.createFileIfNotExists(DAT_USERS);
         SerializationUtil.createFileIfNotExists(DAT_AUCTIONS);

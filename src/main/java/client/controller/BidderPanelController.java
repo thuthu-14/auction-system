@@ -6,8 +6,6 @@ import client.network.ClientSocket;
 
 import client.util.AlertUtil;
 
-import common.*;
-
 import server.model.Auction;
 
 import server.model.Bid;
@@ -22,13 +20,9 @@ import javafx.fxml.FXML;
 
 import javafx.scene.control.*;
 
-import javafx.scene.control.cell.PropertyValueFactory;
-
 import javafx.geometry.Insets;
 
 import javafx.scene.layout.VBox;
-
-import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 

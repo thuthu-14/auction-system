@@ -130,7 +130,7 @@ public class SignupController {
     @FXML
     private void switchToLogin() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/logindemo.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
             Scene scene = new Scene(loader.load(), 1300, 800);
 
 
@@ -144,7 +144,7 @@ public class SignupController {
 
             loginController.setOnLoginSuccess(() -> {
                 try {
-                    FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
+                    FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/ClientHome.fxml"));
                     Scene homeScene = new Scene(homeLoader.load(), 1000, 700);
 
                     HomeScreenController homeController = homeLoader.getController();
@@ -170,11 +170,12 @@ public class SignupController {
 
             loginController.setOnAdminLoginSuccess(() -> {
                 try {
-                    FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/a.fxml"));
+                    FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/AdminHome.fxml"));
                     Scene adminScene = new Scene(adminLoader.load(), 1000, 700);
 
-                    AdminPanelController adminController = adminLoader.getController();
+                    AdminController adminController = adminLoader.getController();
                     adminController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
+
 
                     stage.setScene(adminScene);
                     stage.setTitle("Bảng điều khiển Admin");
@@ -201,13 +202,15 @@ public class SignupController {
 
     private String buildUsername(String ho, String ten, String email) {
         // Ưu tiên tạo username từ họ+tên
-        String base = (ho + ten).replaceAll("[^a-zA-Z0-9_]", "").toLowerCase();
+        String base = (ho + ten).replaceAll("[^a-zA-Z0-9_]", "");
+
 
         // Nếu không đủ, fallback sang phần trước @ của email
         if (base.length() < 3) {
             int atIndex = email.indexOf('@');
             String emailPrefix = atIndex > 0 ? email.substring(0, atIndex) : "user";
-            base = emailPrefix.replaceAll("[^a-zA-Z0-9_]", "").toLowerCase();
+            base = emailPrefix.replaceAll("[^a-zA-Z0-9_]", "");
+
         }
 
         if (base.length() < 3) {
@@ -243,7 +246,7 @@ public class SignupController {
 
 
     private void showLoginFromLogout() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/logindemo.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
         Scene scene = new Scene(loader.load(), 1300, 800);
 
         LoginController loginController = loader.getController();
@@ -251,7 +254,7 @@ public class SignupController {
         // Set callbacks
         loginController.setOnLoginSuccess(() -> {
             try {
-                FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
+                FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/ClientHome.fxml"));
                 Scene homeScene = new Scene(homeLoader.load(), 1000, 700);
 
                 HomeScreenController homeController = homeLoader.getController();
@@ -275,11 +278,12 @@ public class SignupController {
 
         loginController.setOnAdminLoginSuccess(() -> {
             try {
-                FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/a.fxml"));
+                FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/AdminHome.fxml"));
                 Scene adminScene = new Scene(adminLoader.load(), 1000, 700);
 
-                AdminPanelController adminController = adminLoader.getController();
+                AdminController adminController = adminLoader.getController();
                 adminController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
+
 
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 stage.setScene(adminScene);
@@ -297,6 +301,10 @@ public class SignupController {
 
         LoggerUtil.info("Returned to login screen");
     }
+
+
+
+
 }
 
 

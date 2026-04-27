@@ -2,7 +2,6 @@
 package client.network;
 
 import common.Message;
-import common.MessageType;
 import util.LoggerUtil;
 import java.io.IOException;
 import java.util.*;

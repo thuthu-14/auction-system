@@ -1,7 +1,5 @@
 package server.service;
 
-import server.model.*;
-import server.storage.*;
 import server.exception.PermissionDeniedException;
 import common.AuctionStatus;
 import util.LoggerUtil;

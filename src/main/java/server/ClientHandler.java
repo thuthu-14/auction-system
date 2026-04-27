@@ -87,6 +87,13 @@ public class ClientHandler implements Runnable {
                 case GET_ALL_USERS:
                     handleGetAllUsers(message);
                     break;
+                case ADD_FUNDS:
+                    handleAddFunds(message);
+                    break;
+                case WITHDRAW:
+                    handleWithdraw(message);
+                    break;
+
                 case BAN_USER:
                     handleBanUser(message);
                     break;
@@ -105,6 +112,7 @@ public class ClientHandler implements Runnable {
                 case DELETE_SELLER_ITEM:
                     handleDeleteSellerItem(message);
                     break;
+
                 default:
                     sendError("Unknown message type: " + message.getType());
                     LoggerUtil.warn("Unknown message type: " + message.getType());
@@ -638,6 +646,76 @@ public class ClientHandler implements Runnable {
         Message errorMessage = new Message(MessageType.ERROR, "ERROR", errorMsg);
         sendMessage(errorMessage);
     }
+
+
+    private void handleAddFunds(Message message) throws IOException, ClassNotFoundException {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> data = (Map<String, Object>) message.getData();
+
+        String username = (String) data.get("username");
+        double amount = ((Number) data.get("amount")).doubleValue();
+
+        if (amount <= 0) {
+            sendError("Số tiền nạp phải > 0");
+            return;
+        }
+
+        User user = UserDAO.getUserByUsername(username);
+        if (user == null) {
+            sendError("Không tìm thấy người dùng");
+            return;
+        }
+
+        user.addFunds(amount);
+        UserDAO.saveUser(user);
+
+        if (currentUser != null && currentUser.getUserId().equals(user.getUserId())) {
+            currentUser = user;
+        }
+
+        Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Nạp tiền thành công");
+        response.setData(user);
+        sendMessage(response);
+
+        LoggerUtil.info("User added funds: " + username + " +" + amount);
+    }
+
+    private void handleWithdraw(Message message) throws IOException, ClassNotFoundException {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> data = (Map<String, Object>) message.getData();
+
+        String username = (String) data.get("username");
+        double amount = ((Number) data.get("amount")).doubleValue();
+
+        if (amount <= 0) {
+            sendError("Số tiền rút phải > 0");
+            return;
+        }
+
+        User user = UserDAO.getUserByUsername(username);
+        if (user == null) {
+            sendError("Không tìm thấy người dùng");
+            return;
+        }
+
+        if (!user.deductFunds(amount)) {
+            sendError("Số dư không đủ");
+            return;
+        }
+
+        UserDAO.saveUser(user);
+
+        if (currentUser != null && currentUser.getUserId().equals(user.getUserId())) {
+            currentUser = user;
+        }
+
+        Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Rút tiền thành công");
+        response.setData(user);
+        sendMessage(response);
+
+        LoggerUtil.info("User withdrew funds: " + username + " -" + amount);
+    }
+
 
     public void closeConnection() {
         try {
