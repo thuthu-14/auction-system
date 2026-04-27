@@ -254,6 +254,7 @@
 
                         <HBox alignment="CENTER_LEFT"
                               prefHeight="80.0"
+                              minHeight="80.0"
                               style="-fx-background-color: #ffffff;
                               -fx-padding: 0 40 0 40;
                               -fx-border-color: #f0f0f0;
@@ -318,31 +319,36 @@
                             </children>
                         </HBox>
 
-                        <StackPane fx:id="contentArea"
-                                   style="-fx-background-color: #fcfcfc;"
-                                   VBox.vgrow="ALWAYS">
-                            <children>
-                                <VBox alignment="CENTER" spacing="10.0">
+                        <ScrollPane fx:id="mainScrollPane"
+                                    fitToWidth="true"
+                                    style="-fx-background-color: transparent; -fx-background: #fcfcfc;"
+                                    VBox.vgrow="ALWAYS">
+                            <content>
+                                <StackPane fx:id="contentArea"
+                                           style="-fx-background-color: #fcfcfc;">
                                     <children>
-                                        <Label style="-fx-translate-x: -3;"
-                                               text="Welcome to BubblyBid Dashboard"
-                                               textFill="#2e384d">
-                                            <font>
-                                                <Font name="System Bold" size="28.0" />
-                                            </font>
-                                        </Label>
+                                        <VBox alignment="CENTER" spacing="10.0" minHeight="600">
+                                            <children>
+                                                <Label style="-fx-translate-x: -3;"
+                                                       text="Welcome to BubblyBid Seller Dashboard"
+                                                       textFill="#2e384d">
+                                                    <font>
+                                                        <Font name="System Bold" size="28.0" />
+                                                    </font>
+                                                </Label>
 
-                                        <Label text="Select a menu item from the left to get started"
-                                               textFill="#a0aec0">
-                                            <font>
-                                                <Font size="16.0" />
-                                            </font>
-                                        </Label>
+                                                <Label text="Mở đấu giá đê!"
+                                                       textFill="#a0aec0">
+                                                    <font>
+                                                        <Font size="16.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </VBox>
                                     </children>
-                                </VBox>
-                            </children>
-                        </StackPane>
-
+                                </StackPane>
+                            </content>
+                        </ScrollPane>
                     </children>
                 </VBox>
 

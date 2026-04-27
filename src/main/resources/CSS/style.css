@@ -110,3 +110,86 @@
     -fx-background-insets: 0;
     -fx-border-width: 0;
 }
+
+ /* Container */
+ .dashboard-cards-container {
+     -fx-padding: 24 32 24 32;
+     -fx-spacing: 16;
+     -fx-background-color: #ffffff;
+ }
+
+ /* ScrollPane background */
+ .bar > .viewport {
+     -fx-background-color: #ffffff;
+ }
+
+ /* ── Card base ── */
+ .dashboard-card {
+     -fx-background-color: #ffffff;
+     -fx-background-radius: 12;
+     -fx-border-color: #e5e7eb;
+     -fx-border-width: 1;
+     -fx-border-radius: 12;
+     -fx-padding: 20 22 16 22;
+     -fx-spacing: 12;
+     -fx-cursor: hand;
+     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 1);
+ }
+
+ /* ── Hover: subtle lift, border đậm nhẹ, shadow rõ hơn chút ── */
+ .dashboard-card-hover {
+     -fx-background-color: #fafafa;
+     -fx-border-color: #d1d5db;
+     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.09), 12, 0, 0, 3);
+ }
+
+ /* ── Icon badges — monochrome, giống style app ── */
+ .card-icon-badge {
+     -fx-background-color: #f3f4f6;
+     -fx-background-radius: 8;
+     -fx-padding: 6 8 6 8;
+     -fx-font-size: 20px;
+     -fx-min-width: 36;
+     -fx-alignment: CENTER;
+     -fx-text-fill: #111827;
+ }
+
+ /* Tắt màu riêng từng card — dùng chung 1 màu xám nhạt */
+ .card-icon-purple,
+ .card-icon-teal,
+ .card-icon-orange,
+ .card-icon-pink,
+ .card-icon-blue {
+     -fx-background-color: #f3f4f6;
+ }
+
+ /* ── Text ── */
+ .card-title {
+     -fx-font-family: "System";
+     -fx-font-size: 20px;
+     -fx-font-weight: bold;
+     -fx-text-fill: #111827;
+ }
+
+ .card-desc {
+     -fx-font-family: "System";
+     -fx-font-size: 17px;
+     -fx-text-fill: #6b7280;
+     -fx-wrap-text: true;
+ }
+
+ /* ── CTA — dùng chung màu xám thay vì màu sắc ── */
+ .card-cta {
+     -fx-font-family: "System";
+     -fx-font-size: 17px;
+     -fx-font-weight: bold;
+     -fx-text-fill: #374151;
+ }
+
+ .card-cta-purple,
+ .card-cta-teal,
+ .card-cta-orange,
+ .card-cta-pink,
+ .card-cta-blue {
+     -fx-text-fill: #374151;
+ }

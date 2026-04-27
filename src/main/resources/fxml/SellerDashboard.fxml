@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="client.controller.SellerDashboardController"
+      stylesheets="@../CSS/style.css"
+      spacing="0">
+
+
+    <!-- CARDS GRID -->
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                styleClass="bar">
+        <VBox styleClass="dashboard-cards-container">
+
+            <!-- ROW 1: Tạo phiên + Quản lý phiên -->
+            <HBox spacing="16">
+
+                <VBox fx:id="cardTaoPhien" styleClass="dashboard-card"
+                      onMouseClicked="#onCardClick"
+                      onMouseEntered="#onCardEnter"
+                      onMouseExited="#onCardExit"
+                      HBox.hgrow="ALWAYS" minHeight="120">
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <Label text="➕" styleClass="card-icon-badge card-icon-purple"/>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Tạo phiên mới" styleClass="card-title"/>
+                            <Label text="Khởi tạo phiên đấu giá với sản phẩm của bạn"
+                                   styleClass="card-desc" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Label text="Bắt đầu →" styleClass="card-cta card-cta-purple"/>
+                    </HBox>
+                </VBox>
+
+                <VBox fx:id="cardQuanLyPhien" styleClass="dashboard-card"
+                      onMouseClicked="#onCardClick"
+                      onMouseEntered="#onCardEnter"
+                      onMouseExited="#onCardExit"
+                      HBox.hgrow="ALWAYS" minHeight="120">
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <Label text="⚖" styleClass="card-icon-badge card-icon-teal"/>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Quản lý phiên" styleClass="card-title"/>
+                            <Label text="Theo dõi và điều phối các phiên đang diễn ra"
+                                   styleClass="card-desc" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Label text="Xem ngay →" styleClass="card-cta card-cta-teal"/>
+                    </HBox>
+                </VBox>
+
+            </HBox>
+
+            <!-- ROW 2: Thống kê + Thông báo -->
+            <HBox spacing="16">
+
+                <VBox fx:id="cardThongKe" styleClass="dashboard-card"
+                      onMouseClicked="#onCardClick"
+                      onMouseEntered="#onCardEnter"
+                      onMouseExited="#onCardExit"
+                      HBox.hgrow="ALWAYS" minHeight="120">
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <Label text="📊" styleClass="card-icon-badge card-icon-orange"/>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Thống kê" styleClass="card-title"/>
+                            <Label text="Xem báo cáo doanh thu và hiệu suất bán hàng"
+                                   styleClass="card-desc" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Label text="Phân tích →" styleClass="card-cta card-cta-orange"/>
+                    </HBox>
+                </VBox>
+
+                <VBox fx:id="cardThongBao" styleClass="dashboard-card"
+                      onMouseClicked="#onCardClick"
+                      onMouseEntered="#onCardEnter"
+                      onMouseExited="#onCardExit"
+                      HBox.hgrow="ALWAYS" minHeight="120">
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <Label text="🔔" styleClass="card-icon-badge card-icon-pink"/>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Thông báo" styleClass="card-title"/>
+                            <Label text="Cập nhật tin tức về các phiên và người đấu giá"
+                                   styleClass="card-desc" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Label text="Đọc thêm →" styleClass="card-cta card-cta-pink"/>
+                    </HBox>
+                </VBox>
+
+            </HBox>
+
+            <!-- ROW 3: Ví tiền full width -->
+            <HBox>
+                <VBox fx:id="cardViTien" styleClass="dashboard-card"
+                      onMouseClicked="#onCardClick"
+                      onMouseEntered="#onCardEnter"
+                      onMouseExited="#onCardExit"
+                      HBox.hgrow="ALWAYS" minHeight="120">
+                    <HBox alignment="CENTER_LEFT" spacing="14">
+                        <Label text="💳" styleClass="card-icon-badge card-icon-blue"/>
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="Ví tiền" styleClass="card-title"/>
+                            <Label text="Quản lý số dư, nạp tiền và lịch sử giao dịch của bạn"
+                                   styleClass="card-desc" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Label text="Quản lý →" styleClass="card-cta card-cta-blue"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+
+        </VBox>
+    </ScrollPane>
+
+</VBox>

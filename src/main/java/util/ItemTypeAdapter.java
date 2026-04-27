@@ -1,3 +1,4 @@
+/*
 // src/main/java/util/ItemTypeAdapter.java
 package util;
 
@@ -6,18 +7,19 @@ import server.model.*;
 import common.ItemCategory;
 import java.lang.reflect.Type;
 
-/**
+/*
  * ItemTypeAdapter - Hỗ trợ Gson serialize/deserialize polymorphic Item
- *
  * Vấn đề: Item là abstract, Gson ko biết serialize Item nào (Electronics, Art, etc)
  * Giải pháp: Custom type adapter - thêm field "type" vào JSON
  */
-public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<Item> {
 
-    /**
+/*
+public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<Item> {
+    /*
      * Serialize Item → JSON
      * Thêm field "type" để biết loại Item
      */
+/*
     @Override
     public JsonElement serialize(Item src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
@@ -45,10 +47,11 @@ public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<I
         return jsonObject;
     }
 
-    /**
+    /*
      * Deserialize JSON → Item
      * Đọc field "type" để tạo đúng class
      */
+/*
     @Override
     public Item deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
@@ -73,4 +76,4 @@ public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<I
                 throw new JsonParseException("Unknown item type: " + type);
         }
     }
-}
+}  */

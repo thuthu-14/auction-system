@@ -17,7 +17,7 @@ public class ClientMain extends Application {
         Font.loadFont(getClass().getResourceAsStream("/CSS/DarleySans-Regular.otf"), 14);
 
         FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/fxml/Home.fxml")
+                getClass().getResource("/fxml/SellerHome.fxml")
         );
         Parent root = loader.load();
         Scene scene = new Scene(root);

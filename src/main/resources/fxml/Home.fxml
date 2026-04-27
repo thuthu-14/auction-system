@@ -235,13 +235,13 @@
                             <children>
                                 <VBox alignment="CENTER" spacing="10.0">
                                     <children>
-                                        <Label style="-fx-translate-x: -3;" text="Welcome to BubblyBid Dashboard" textFill="#2e384d">
+                                        <Label style="-fx-translate-x: -3;" text="Welcome to BubblyBid Bidder Dashboard" textFill="#2e384d">
                                             <font>
                                                 <Font name="System Bold" size="28.0" />
                                             </font>
                                         </Label>
 
-                                        <Label text="Select a menu item from the left to get started" textFill="#a0aec0">
+                                        <Label text="Đấu giá đê!" textFill="#a0aec0">
                                             <font>
                                                 <Font size="16.0" />
                                             </font>

@@ -1,3 +1,4 @@
+/*
 package util;
 
 import com.google.gson.*;
@@ -54,5 +55,4 @@ public class UserTypeAdapter implements JsonSerializer<User>, JsonDeserializer<U
         }
     }
 }
-
-
+*/
