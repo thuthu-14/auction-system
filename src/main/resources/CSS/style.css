@@ -1,16 +1,24 @@
 @font-face {
-    font-family: 'Darley Sans Custom';
-    src: url('DarleySans-Regular.otf');
+    font-family: "Darley Sans Custom";
+    src: url("DarleySans-Regular.otf");
 }
-.root {
-    -fx-font-family: 'Darley Sans Custom';
-}
-.my-darley {
-    -fx-font-family: "Darley Sans";
-}
+
 @font-face {
     font-family: "Mulish";
     src: url("Mulish-VariableFont_wght.ttf");
+}
+
+@font-face {
+    font-family: "MBDLifelessGrotesk";
+    src: url("BDLifelessGrotesk-SemiBold.otf");
+}
+
+.root {
+    -fx-font-family: "Darley Sans Custom";
+}
+
+.my-darley {
+    -fx-font-family: "Darley Sans Custom";
 }
 
 .font-mulish {
@@ -21,21 +29,67 @@
     -fx-font-family: "Mulish";
     -fx-font-size: 13px;
 }
+
+.my-font3 {
+    -fx-font-family: "MBDLifelessGrotesk";
+    -fx-font-size: 13px;
+}
+
 .eye-button {
     -fx-background-color: transparent;
     -fx-cursor: hand;
 }
+
 .eye-button:hover {
     -fx-opacity: 0.7;
 }
+
 .bar {
-        -fx-background-color: transparent;
+    -fx-background-color: transparent;
 }
-@font-face {
-    font-family: "MBDLifelessGrotesk";
-    src: url("MBDLifelessGrotesk-SemiBold.otf");
-}
-.my-font3 {
+
+.form-button {
+    -fx-background-color: #111827;
+    -fx-text-fill: white;
+    -fx-background-radius: 25;
     -fx-font-family: "MBDLifelessGrotesk";
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 25;
+    -fx-cursor: hand;
+}
+
+/* Hiệu ứng khi di chuột vào nút */
+.form-button:hover {
+    -fx-background-color: #374151;
+}
+
+.my-custom-alert.dialog-pane {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+}
+
+/* Ép font cho tất cả label bên trong Alert */
+.my-custom-alert.dialog-pane .label {
+    -fx-font-family: "MBDLifelessGrotesk" !important;
+    -fx-font-size: 15px;
+    -fx-text-fill: #2e384d;
+}
+
+/* Style cho nút OK trong Alert */
+.my-custom-alert.dialog-pane .button {
+    -fx-background-color: #111827;
+    -fx-text-fill: white;
+    -fx-background-radius: 25;
+    -fx-font-family: "MBDLifelessGrotesk" !important;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 8 25;
+}
+
+.my-custom-alert.dialog-pane .button:hover {
+    -fx-background-color: #374151;
 }

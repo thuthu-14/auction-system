@@ -11,7 +11,6 @@ public class AddBankDialogController {
 
     @FXML private TextField bankNameField;
     @FXML private TextField accountNumberField;
-    @FXML private TextField initialBalanceField;
 
     @FunctionalInterface
     public interface OnBankLinkedListener {
@@ -19,36 +18,28 @@ public class AddBankDialogController {
     }
 
     private OnBankLinkedListener onBankLinkedListener;
+    private Runnable onCloseCallback;
 
     public void setOnBankLinkedListener(OnBankLinkedListener listener) {
         this.onBankLinkedListener = listener;
+    }
+
+    public void setOnCloseCallback(Runnable callback) {
+        this.onCloseCallback = callback;
     }
 
     @FXML
     private void handleConfirmBankLink(ActionEvent event) {
         String bank = bankNameField != null ? bankNameField.getText().trim() : "";
         String account = accountNumberField != null ? accountNumberField.getText().trim() : "";
-        String initial = initialBalanceField != null ? initialBalanceField.getText().trim() : "";
 
-        if (bank.isEmpty() || account.isEmpty() || initial.isEmpty()) {
+        if (bank.isEmpty() || account.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng nhập đầy đủ thông tin.");
             return;
         }
 
-        double amount;
-        try {
-            amount = Double.parseDouble(initial.replace(",", "").trim());
-            if (amount < 0) {
-                showAlert(Alert.AlertType.ERROR, "Lỗi", "Số dư ban đầu phải >= 0.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Số dư ban đầu không hợp lệ.");
-            return;
-        }
-
         if (onBankLinkedListener != null) {
-            onBankLinkedListener.onBankLinked(bank, account, amount);
+            onBankLinkedListener.onBankLinked(bank, account, 0.0);
         }
 
         closePopup(event);
@@ -56,6 +47,9 @@ public class AddBankDialogController {
 
     @FXML
     private void closePopup(ActionEvent event) {
+        if (onCloseCallback != null) {
+            onCloseCallback.run();
+        }
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
     }
