@@ -1,4 +1,4 @@
-package io.auctionsystem.controllers;
+package client.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TableView;

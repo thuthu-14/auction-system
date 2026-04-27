@@ -10,7 +10,7 @@
             style="-fx-background-color: transparent; -fx-background: #fcfcfc;"
             xmlns="http://javafx.com/javafx/17.0.12"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="io.auctionsystem.controllers.BecomeSellerController">
+            fx:controller="client.controller.BecomeSellerController">
 
     <content>
         <VBox spacing="20.0" style="-fx-background-color: #fcfcfc; -fx-padding: 50;">
@@ -98,10 +98,10 @@
                         <StackPane alignment="CENTER_RIGHT">
                             <children>
                                 <PasswordField fx:id="passwordField" prefHeight="50.0" promptText="Nhập mật khẩu"
-                                               style="-fx-background-color: #e5e7eb; -fx-background-radius: 12; -fx-padding: 0 45 0 20; -fx-font-size: 14" />
+                                               style="-fx-background-color: #e5e7eb; -fx-background-radius: 12; -fx-padding: 0 45 0 20; -fx-font-size: 14px" />
 
                                 <TextField fx:id="passwordTextField" managed="false" visible="false" prefHeight="50.0"
-                                           style="-fx-background-color: #e5e7eb; -fx-background-radius: 12; -fx-padding: 0 45 0 20;" />
+                                           style="-fx-background-color: #e5e7eb; -fx-background-radius: 12; -fx-padding: 0 45 0 20; -fx-font-size: 14px" />
 
                                 <Button fx:id="btnTogglePassword" onAction="#togglePasswordVisibility"
                                         style="-fx-background-color: transparent; -fx-cursor: hand;" text="👁">

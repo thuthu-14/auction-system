@@ -1,7 +1,7 @@
-package io.auctionsystem;
+package client;
 
 public class Launcher {
     public static void main(String[] args) {
-        MainApp.main(args);
+        ClientMain.main(args);
     }
 }

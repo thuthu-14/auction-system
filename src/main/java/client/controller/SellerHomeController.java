@@ -1,5 +1,6 @@
 package client.controller;
 
+import navigation.NavigationManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -73,7 +74,7 @@ public class SellerHomeController {
         if (event.getSource() instanceof HBox clickedMenu) {
             if (clickedMenu == menuDowngrade) {
                 System.out.println("Đang chuyển về màn hình Bidder");
-                // TODO://
+                NavigationManager.getInstance().goToHome();
                 return;
             }
             updateMenuSelection(clickedMenu);

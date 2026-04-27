@@ -1,11 +1,18 @@
 module io.auctionsystem {
     requires javafx.controls;
     requires javafx.fxml;
+    requires com.google.gson;
+    requires java.sql;
 
+    exports util;
+    opens util to javafx.fxml, com.google.gson;
 
-    opens io.auctionsystem to javafx.fxml;
-    opens io.auctionsystem.controllers to javafx.fxml;
+    exports navigation;
+    opens navigation to javafx.fxml;
 
-    exports io.auctionsystem;
-    exports io.auctionsystem.controllers;
+    exports client.controller;
+    opens client.controller to javafx.fxml;
+
+    exports client;
+    opens client to javafx.fxml;
 }
