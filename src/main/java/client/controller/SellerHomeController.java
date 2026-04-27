@@ -94,7 +94,18 @@ public class SellerHomeController {
         updateMenuSelection(menu);
         // TODO: thêm logic load view tương ứng ở đây, ví dụ:
         // if (menu == menuCreateAuctions) loadCreateAuctionView();
-        // if (menu == menuManageAuctions) loadManageAuctionView();
+        if (menu == menuManageAuctions) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ManageAuctions.fxml"));
+                javafx.scene.Node view = loader.load();
+                contentArea.getChildren().setAll(view);
+
+            } catch (java.io.IOException e) {
+                System.err.println("Lỗi: Không thể load màn hình ManageAuctions!");
+                // In ra chi tiết dòng code nào gây lỗi để dễ fix
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML

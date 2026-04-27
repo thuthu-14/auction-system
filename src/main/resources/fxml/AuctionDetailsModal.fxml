@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<?import javafx.scene.image.ImageView?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="client.controller.AuctionDetailsController"
+      styleClass="manage-auctions-root"
+      spacing="16"
+      style="-fx-padding: 24;">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="Chi tiết phiên đấu giá" styleClass="custom-title-label"/>
+        <Region HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <!-- Tabs -->
+    <TabPane style="-fx-border-color: transparent; -fx-focus-color: transparent;">
+        <!-- Tab 1: Thông tin phiên -->
+        <Tab text="Thông tin" closable="false">
+            <VBox spacing="16" style="-fx-padding: 16;">
+                <!-- Product Info -->
+                <VBox spacing="8">
+                    <Label text="Sản phẩm" styleClass="form-label"/>
+                    <HBox spacing="12" alignment="TOP_LEFT">
+                        <ImageView fx:id="productImage" fitWidth="100" fitHeight="100" preserveRatio="true"/>
+                        <VBox spacing="6">
+                            <Label fx:id="productName" text="Động hộ Seiko 5 Sports" styleClass="card-value"/>
+                            <Label fx:id="productId" text="Mã: AU-2024-001" style="-fx-text-fill: #6b7280;"/>
+                            <Label fx:id="productDesc" text="Đồng hồ thể thao chính hãng" style="-fx-text-fill: #6b7280; -fx-wrap-text: true;" wrapText="true"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <Separator/>
+
+                <!-- Pricing -->
+                <GridPane hgap="24" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <Label text="Giá khởi điểm" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="form-label"/>
+                    <Label fx:id="startPrice" text="1.200.000 đ" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="card-value"/>
+
+                    <Label text="Giá hiện tại" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="form-label"/>
+                    <Label fx:id="currentPrice" text="2.850.000 đ" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="card-value" style="-fx-text-fill: #dc2626;"/>
+                </GridPane>
+
+                <Separator/>
+
+                <!-- Time Info -->
+                <GridPane hgap="24" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <Label text="Thời gian bắt đầu" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="form-label"/>
+                    <Label fx:id="startTime" text="10/04/2024 14:30" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+
+                    <Label text="Thời gian kết thúc" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="form-label"/>
+                    <Label fx:id="endTime" text="12/04/2024 16:45" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Thời gian còn lại" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="form-label"/>
+                    <Label fx:id="timeLeft" text="1 ngày 5 giờ" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-text-fill: #dc2626; -fx-font-weight: bold;"/>
+                </GridPane>
+
+                <Separator/>
+
+                <!-- Status & Stats -->
+                <GridPane hgap="24" vgap="12">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <Label text="Trạng thái" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="form-label"/>
+                    <Label fx:id="status" text="Đang diễn ra" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="status-pill-active"/>
+
+                    <Label text="Số lượt đặt" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="form-label"/>
+                    <Label fx:id="bidCount" text="18 lượt" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="card-value"/>
+                </GridPane>
+            </VBox>
+        </Tab>
+
+        <!-- Tab 2: Lịch sử đấu giá -->
+        <Tab text="Lịch sử đặt giá" closable="false">
+            <VBox spacing="12" style="-fx-padding: 16;">
+                <TableView fx:id="bidsTable" VBox.vgrow="ALWAYS" styleClass="auction-table">
+                    <columns>
+                        <TableColumn text="STT" prefWidth="50"/>
+                        <TableColumn text="Người đặt" prefWidth="150"/>
+                        <TableColumn text="Giá đặt" prefWidth="150"/>
+                        <TableColumn text="Thời gian" prefWidth="150"/>
+                    </columns>
+                </TableView>
+            </VBox>
+        </Tab>
+
+        <!-- Tab 3: Người đặt giá cao nhất -->
+        <Tab text="Thông tin người trúng" closable="false">
+            <VBox spacing="16" style="-fx-padding: 16;">
+                <HBox spacing="16" alignment="TOP_LEFT">
+                    <ImageView fx:id="topBidderAvatar" fitWidth="80" fitHeight="80" preserveRatio="true" style="-fx-border-radius: 40;"/>
+                    <VBox spacing="8">
+                        <Label fx:id="topBidderName" text="Nguyễn Văn A" styleClass="custom-title-label"/>
+                        <Label fx:id="topBidderId" text="ID: USER-2024-001" style="-fx-text-fill: #6b7280;"/>
+                        <Label fx:id="topBidderRating" text="⭐ 4.8/5 (125 đánh giá)" style="-fx-text-fill: #6b7280;"/>
+                        <Label fx:id="topBidderPhone" text="0901234567" style="-fx-text-fill: #6b7280;"/>
+                    </VBox>
+                </HBox>
+
+                <Separator/>
+
+                <VBox spacing="8">
+                    <Label text="Giá đặt cuối cùng" styleClass="form-label"/>
+                    <Label fx:id="topBidAmount" text="2.850.000 đ" styleClass="card-value" style="-fx-text-fill: #dc2626;"/>
+                </VBox>
+
+                <Button text="📧 Gửi thông báo cho người trúng" styleClass="form-button"/>
+            </VBox>
+        </Tab>
+    </TabPane>
+
+    <!-- Action Buttons -->
+    <HBox spacing="12" alignment="CENTER_RIGHT">
+        <Button text="✏️ Chỉnh sửa" styleClass="form-button"/>
+        <Button text="⏸ Tạm dừng" styleClass="btn-outline-small"/>
+        <Button text="🗑 Hủy phiên" styleClass="btn-outline-small" style="-fx-border-color: #fca5a5; -fx-text-fill: #dc2626;"/>
+    </HBox>
+
+</VBox>
