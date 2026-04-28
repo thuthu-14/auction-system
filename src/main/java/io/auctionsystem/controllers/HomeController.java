@@ -1,4 +1,4 @@
-package client.controller;
+package io.auctionsystem.controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -9,24 +9,27 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class SellerHomeController {
+public class HomeController {
 
     @FXML
     private HBox menuHome, menuAI,
-            menuCreateAuctions, menuManageAuctions, menuAuctionStatistic, menuMsg, menuPay,
-            menuDowngrade, menuSettings;
+            menuRecent, menuFlash, menuMsg, menuPay,
+            //menuUpgrade,
+            menuSettings;
 
     private List<HBox> allMenus;
 
     @FXML
-    private AnchorPane rootPane;
+    private HBox menuUpgrade;
+
+    @FXML
+    private StackPane rootPane;
 
     @FXML
     private StackPane contentArea;
@@ -41,7 +44,8 @@ public class SellerHomeController {
     public void initialize() {
         allMenus = Arrays.asList(
                 menuHome, menuAI,
-                menuCreateAuctions, menuManageAuctions, menuAuctionStatistic, menuMsg, menuPay,
+                menuRecent, menuFlash, menuMsg, menuPay,
+                //menuUpgrade,
                 menuSettings
         );
 
@@ -68,12 +72,42 @@ public class SellerHomeController {
         });
     }
 
+    /* @FXML
+    private void handleMenuClick(MouseEvent event) {
+        if (event.getSource() instanceof HBox clickedMenu) {
+            updateMenuSelection(clickedMenu);
+        }
+    } */
+
     @FXML
     private void handleMenuClick(MouseEvent event) {
         if (event.getSource() instanceof HBox clickedMenu) {
-            if (clickedMenu == menuDowngrade) {
-                System.out.println("Đang chuyển về màn hình Bidder");
-                // TODO://
+            if (clickedMenu == menuUpgrade) {
+                System.out.println("Đang chuyển sang màn hình Become Seller");
+
+                try {
+                    javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/io/auctionsystem/BecomeSeller.fxml"));
+                    javafx.scene.Node becomeSellerNode = loader.load();
+
+                    // Clear vùng chứa hiện tại và add màn hình mới vào
+                    contentArea.getChildren().clear();
+                    contentArea.getChildren().add(becomeSellerNode);
+
+                    // Màn hình mới tràn hết vùng chứa:
+                    if (becomeSellerNode instanceof javafx.scene.layout.AnchorPane) {
+                        javafx.scene.layout.AnchorPane.setTopAnchor(becomeSellerNode, 0.0);
+                        javafx.scene.layout.AnchorPane.setBottomAnchor(becomeSellerNode, 0.0);
+                        javafx.scene.layout.AnchorPane.setLeftAnchor(becomeSellerNode, 0.0);
+                        javafx.scene.layout.AnchorPane.setRightAnchor(becomeSellerNode, 0.0);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Lỗi load màn hình BecomeSeller: " + e.getMessage());
+                }
+
+                // Cập nhật trạng thái chọn menu (đổi màu nền chẳng hạn)
+                updateMenuSelection(clickedMenu);
                 return;
             }
             updateMenuSelection(clickedMenu);
