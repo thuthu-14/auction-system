@@ -93,12 +93,6 @@
 
                                 <Region HBox.hgrow="ALWAYS" />
 
-                                <Button style="-fx-background-color: transparent; -fx-cursor: hand;" text="🌙">
-                                    <font>
-                                        <Font size="20.0" />
-                                    </font>
-                                </Button>
-
                                 <Button prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e2e8f0; -fx-background-radius: 20; -fx-cursor: hand;" text="👤">
                                     <font>
                                         <Font size="14.0" />

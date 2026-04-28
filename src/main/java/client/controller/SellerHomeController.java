@@ -161,4 +161,50 @@ public class SellerHomeController {
             e.printStackTrace();
         }
     }
+    @FXML
+    public void loadSellerNotificationsView() {
+        updateMenuSelection(menuHome);
+        try {
+            java.net.URL fxmlLocation = getClass().getResource("/fxml/SellerNotifications.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("Không tìm thấy file fxml!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent dashboardNode = loader.load();
+
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(dashboardNode);
+            } else {
+                System.err.println("Cảnh báo: contentArea bị null (chưa gắn fx:id trong SellerNotifications.fxml)!");
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi load giao diện Dashboard: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    public void loadWalletView() {
+        updateMenuSelection(menuHome);
+        try {
+            java.net.URL fxmlLocation = getClass().getResource("/fxml/WalletView.fxml");
+            if (fxmlLocation == null) {
+                System.err.println("Không tìm thấy file fxml!");
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent dashboardNode = loader.load();
+
+            if (contentArea != null) {
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(dashboardNode);
+            } else {
+                System.err.println("Cảnh báo: contentArea bị null (chưa gắn fx:id trong WalletViews.fxml)!");
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi load giao diện Dashboard: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

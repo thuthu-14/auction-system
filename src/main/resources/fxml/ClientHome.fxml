@@ -208,11 +208,6 @@
 
                                 <Region HBox.hgrow="ALWAYS" />
 
-                                <Button style="-fx-background-color: transparent; -fx-cursor: hand;" text="🌙">
-                                    <font>
-                                        <Font size="20.0" />
-                                    </font>
-                                </Button>
 
                                 <Button onAction="#loadProfileView"
                                         prefHeight="40.0" prefWidth="40.0"

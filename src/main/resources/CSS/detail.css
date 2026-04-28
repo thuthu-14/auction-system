@@ -1,0 +1,109 @@
+/* ════════════════════════════════════════════════════════
+   CUSTOM TABPANE GIỐNG GIAO DIỆN MẪU
+════════════════════════════════════════════════════════ */
+
+/* Xóa viền và nền mặc định của toàn bộ TabPane */
+.tab-pane {
+    -fx-background-color: transparent;
+}
+.tab-pane .tab-content-area {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+
+/* Tạo khối nền màu xám nhạt bọc ngoài các Tab */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #e5e7eb;
+    -fx-background-radius: 6;
+}
+
+/* Căn chỉnh khoảng cách bên trong khối xám */
+.tab-pane .tab-header-area {
+    -fx-padding: 4 4 15 4; /* padding dưới 15 để cách phần nội dung ra 1 chút */
+}
+
+/* Style cho từng Tab khi bình thường (Chưa chọn) */
+.tab-pane .tab {
+    -fx-background-color: transparent;
+    -fx-padding: 8 20 8 20;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-background-insets: 0;
+}
+
+/* Text của Tab bình thường */
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #6b7280;
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+}
+
+/* Style cho Tab khi đang được chọn (Tab Active) */
+.tab-pane .tab:selected {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0, 0, 1);
+    -fx-background-radius: 4;
+}
+
+/* Text của Tab khi được chọn */
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #111827;
+    -fx-font-weight: bold;
+}
+
+/* Xóa cái đường line gạch dưới mặc định của JavaFX */
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0;
+}
+
+/* ════════════════════════════════════════════════════════
+   TYPOGRAPHY (Dành cho các class bạn đã định nghĩa trong FXML)
+════════════════════════════════════════════════════════ */
+
+/* Chữ tiêu đề xám (Sản phẩm, Giá khởi điểm...) */
+.form-label {
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+    -fx-text-fill: #4b5563;
+}
+
+/* Chữ nội dung đen (Tên đồng hồ, 18 lượt...) */
+.card-value {
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+    -fx-text-fill: #111827;
+}
+
+/* Tùy chỉnh thêm một chút cho nút Form Button bo tròn */
+.form-button {
+    -fx-background-color: #111827;
+    -fx-text-fill: white;
+    -fx-background-radius: 25;
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 25;
+    -fx-cursor: hand;
+}
+
+.form-button:hover {
+    -fx-background-color: #374151;
+}
+
+/* Nút Outline bo tròn */
+.btn-outline-small {
+    -fx-background-color: white;
+    -fx-text-fill: #374151;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 25;
+    -fx-background-radius: 25;
+    -fx-padding: 7 20;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.btn-outline-small:hover {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #9ca3af;
+}
