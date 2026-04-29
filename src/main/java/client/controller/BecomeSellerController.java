@@ -1,8 +1,9 @@
-package io.auctionsystem.controllers;
+package client.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import navigation.NavigationManager;
 
 public class BecomeSellerController {
 
@@ -24,8 +25,8 @@ public class BecomeSellerController {
 
     @FXML
     public void initialize() {
-        //btnSave.setOnAction(event -> handleSave());
-        //btnCancel.setOnAction(event -> handleCancel());
+        btnSave.setOnAction(event -> handleSave());
+        btnCancel.setOnAction(event -> handleCancel());
 
         //con mắt password
         btnTogglePassword.setVisible(false); //ẩn khi mở
@@ -41,39 +42,54 @@ public class BecomeSellerController {
         });
     }
 
-    @FXML
-    private void handleSave() {
-        // Lấy dữ liệu
+    private record SellerData(String name, String email, String phone, String address, String password) {}
+
+    private SellerData validateInput() {
         String name = nameField.getText().trim();
         String email = emailField.getText().trim();
         String phone = phoneField.getText().trim();
         String address = addressField.getText().trim();
-
         String password = getPassword(); //lấy mk ko trim (mất dấu cách)
 
         // Kiểm tra tính hợp lệ (Validation)
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || address.isEmpty() || password.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đầy đủ tất cả các thông tin!");
-            return;
+            return null;
         }
+        if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đúng định dạng email!");
+            return null;
+        }
+        if (!phone.matches("\\d{10,11}")) {
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đúng SDT");
+            return null;
+        }
+        return new SellerData(name, email, phone, address, password);
+    }
 
-        // In ra console để test
-        System.out.println("--- ĐANG LƯU THÔNG TIN NGƯỜI BÁN ---");
-        System.out.println("Họ tên: " + name);
-        System.out.println("Email: " + email);
-        System.out.println("Số điện thoại: " + phone);
-        System.out.println("Địa chỉ: " + address);
-        System.out.println("Mật khẩu (Đã lấy thành công): " + "*".repeat(password.length()));
-        // Trong thực tế, gọi logic Database ở đây
+    @FXML
+    private void handleSave() {
+        SellerData data = validateInput();
+        if (data != null) {
+            // In ra console để test
+            System.out.println("--- ĐANG LƯU THÔNG TIN NGƯỜI BÁN ---");
+            System.out.println("Họ tên: " + data.name);
+            System.out.println("Email: " + data.email);
+            System.out.println("Số điện thoại: " + data.phone);
+            System.out.println("Địa chỉ: " + data.address);
+            System.out.println("Mật khẩu (Đã lấy thành công): " + "*".repeat(data.password.length()));
+            // Trong thực tế, gọi logic Database ở đây
 
-        // Hiển thị thông báo thành công
-        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Thông tin đăng ký Người bán đã được lưu!");
+            // Hiển thị thông báo thành công
+            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Thông tin đăng ký Người bán đã được lưu!");
+            NavigationManager.getInstance().goToSellerHome();
+            }
     }
 
     @FXML
     private void handleCancel() {
-        System.out.println("Người dùng đã bấm Quay lại/Hủy.");
-        // TODO: Thêm code load lại màn hình Home vào contentArea
+        NavigationManager.getInstance().goToHome();
+        System.out.println("Người dùng đã bấm Quay lại");
     }
 
     // Hàm ẩn/hiện mật khẩu
@@ -125,7 +141,7 @@ public class BecomeSellerController {
         dialogPane.setHeader(customHeader);
 
         try {
-            String cssPath = "/io/auctionsystem/css/style.css";
+            String cssPath = "/CSS/style.css";
             var cssResource = getClass().getResource(cssPath);
             if (cssResource != null) {
                 dialogPane.getStylesheets().add(cssResource.toExternalForm());

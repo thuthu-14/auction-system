@@ -1,5 +1,5 @@
 // src/main/java/util/JsonUtil.java
-package util;
+/*package util;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -44,9 +44,7 @@ public class JsonUtil {
         return gson.fromJson(json, clazz);
     }
 
-    /**
-     * Load list từ JSON file
-     */
+    //Load list từ JSON file
     public static <T> List<T> loadListFromJson(String filePath, Class<T> clazz) throws IOException {
         if (!Files.exists(Paths.get(filePath))) {
             LoggerUtil.warn("JSON file not found: " + filePath);
@@ -76,4 +74,4 @@ public class JsonUtil {
             LoggerUtil.info("✓ Created JSON file: " + filePath);
         }
     }
-}
+} */

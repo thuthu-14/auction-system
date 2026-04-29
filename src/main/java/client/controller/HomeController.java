@@ -1,4 +1,4 @@
-package io.auctionsystem.controllers;
+package client.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -86,7 +86,7 @@ public class HomeController {
                 System.out.println("Đang chuyển sang màn hình Become Seller");
 
                 try {
-                    javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/io/auctionsystem/BecomeSeller.fxml"));
+                    javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/fxml/BecomeSeller.fxml"));
                     javafx.scene.Node becomeSellerNode = loader.load();
 
                     // Clear vùng chứa hiện tại và add màn hình mới vào
@@ -106,7 +106,7 @@ public class HomeController {
                     System.out.println("Lỗi load màn hình BecomeSeller: " + e.getMessage());
                 }
 
-                // Cập nhật trạng thái chọn menu (đổi màu nền chẳng hạn)
+                //cập nhật trạng thái chọn menu
                 updateMenuSelection(clickedMenu);
                 return;
             }
