@@ -1,4 +1,4 @@
-/*
+
 package common;
 
 import server.exception.PermissionDeniedException;
@@ -25,4 +25,3 @@ public enum UserRole implements Serializable {
         return description;
     }
 }
-*/
