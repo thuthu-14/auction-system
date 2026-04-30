@@ -6,6 +6,9 @@ import org.junit.After;
 import static org.junit.Assert.*;
 
 import common.AuctionStatus;
+import server.model.Auction;
+import server.model.Item;
+import server.model.RegularUser;
 
 public class BidServiceTest {
 

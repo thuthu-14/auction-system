@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import server.exception.PermissionDeniedException;
 import common.AuctionStatus;
+import server.model.Electronics;
+import server.model.RegularUser;
+import server.service.AuctionService;
 
 public class AuctionServiceTest {
 

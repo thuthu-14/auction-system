@@ -6,6 +6,8 @@ import org.junit.After;
 import static org.junit.Assert.*;
 
 import common.UserRole;
+import server.model.Admin;
+import server.model.RegularUser;
 
 public class UserTest {
 
