@@ -2,6 +2,12 @@ package server.service;
 
 import server.exception.PermissionDeniedException;
 import common.AuctionStatus;
+import server.model.Auction;
+import server.model.Item;
+import server.model.RegularUser;
+import server.storage.AuctionDAO;
+import server.storage.ItemDAO;
+import server.storage.UserDAO;
 import util.LoggerUtil;
 import util.ValidationUtil;
 import java.io.IOException;

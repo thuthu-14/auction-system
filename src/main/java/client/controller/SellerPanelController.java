@@ -3,6 +3,10 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.util.AlertUtil;
+import common.AuctionStatus;
+import common.ItemCategory;
+import common.Message;
+import common.MessageType;
 import server.model.Auction;
 import util.ItemValidationUtil;
 import util.LoggerUtil;

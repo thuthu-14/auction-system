@@ -6,6 +6,9 @@ import client.network.ClientSocket;
 
 import client.util.AlertUtil;
 
+import common.AuctionStatus;
+import common.Message;
+import common.MessageType;
 import server.model.Auction;
 
 import server.model.Bid;

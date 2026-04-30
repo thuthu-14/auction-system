@@ -1,5 +1,5 @@
 // src/main/java/util/JsonUtil.java
-/*package util;
+package util;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
@@ -74,4 +74,4 @@ public class JsonUtil {
             LoggerUtil.info("✓ Created JSON file: " + filePath);
         }
     }
-} */
+}
