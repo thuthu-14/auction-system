@@ -2,6 +2,8 @@ package server.model;
 
 import common.ItemCategory;
 
+import java.util.List;
+
 public class Art extends Item {
     private static final long serialVersionUID = 1L;
 
@@ -10,10 +12,11 @@ public class Art extends Item {
 
     public Art(String itemId, String name, String description,
                double startingPrice, String sellerId,
-               String creator, String material) {
+               String creator, String material, List<String> images) {
         super(itemId, name, description, startingPrice, ItemCategory.ART, sellerId);
         this.creator = creator;
         this.material = material;
+        this.setImages(images);
     }
 
     public Art() {
