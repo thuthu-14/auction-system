@@ -2,7 +2,6 @@ package server.storage;
 
 import server.model.Bid;
 import util.JsonUtil;
-import util.SerializationUtil;
 import util.LoggerUtil;
 import java.io.IOException;
 import java.util.*;
@@ -18,7 +17,7 @@ public class BidDAO {
     public static Bid getBidById(String bidId) throws IOException, ClassNotFoundException {
         List<Bid> bids = getAllBids();
         for (Bid bid : bids) {
-            if (bid.getBidId().equals(bidId)) {
+            if (bid.getBidId() != null && bid.getBidId().equals(bidId)) {
                 return bid;
             }
         }
@@ -29,7 +28,7 @@ public class BidDAO {
         List<Bid> bids = getAllBids();
         List<Bid> result = new ArrayList<>();
         for (Bid bid : bids) {
-            if (bid.getAuctionId().equals(auctionId)) {
+            if (bid.getAuctionId() != null && bid.getAuctionId().equals(auctionId)) {
                 result.add(bid);
             }
         }
@@ -40,7 +39,7 @@ public class BidDAO {
         List<Bid> bids = getAllBids();
         List<Bid> result = new ArrayList<>();
         for (Bid bid : bids) {
-            if (bid.getBidderId().equals(bidderId)) {
+            if (bid.getBidderId() != null && bid.getBidderId().equals(bidderId)) {
                 result.add(bid);
             }
         }
@@ -51,19 +50,18 @@ public class BidDAO {
         List<Bid> bids = getAllBids();
         bids.add(bid);
 
+        // CHỈ LƯU JSON
         JsonUtil.saveToJson(DataManager.JSON_BIDS, bids);
-        SerializationUtil.serialize(DataManager.DAT_BIDS, bids);
 
-        LoggerUtil.info("Bid saved: " + bid.getBidId());
+        LoggerUtil.info("Bid saved to JSON: " + bid.getBidId());
     }
 
     public static void deleteBid(String bidId) throws IOException, ClassNotFoundException {
         List<Bid> bids = getAllBids();
-        bids.removeIf(b -> b.getBidId().equals(bidId));
+        bids.removeIf(b -> b.getBidId() != null && b.getBidId().equals(bidId));
 
         JsonUtil.saveToJson(DataManager.JSON_BIDS, bids);
-        SerializationUtil.serialize(DataManager.DAT_BIDS, bids);
 
-        LoggerUtil.info("Bid deleted: " + bidId);
+        LoggerUtil.info("Bid deleted from JSON: " + bidId);
     }
 }
