@@ -3,6 +3,11 @@ package server.service;
 
 import server.model.User;
 import server.model.RegularUser;
+// src/main/java/server/service/UserService.java
+package server.service;
+
+import server.model.User;
+import server.model.RegularUser;
 import server.storage.UserDAO;
 import util.LoggerUtil;
 import java.io.IOException;
@@ -79,7 +84,11 @@ public class UserService {
     /**
      * ← THÊM: Nâng cấp user lên seller
      */
-    public static void upgradeSeller(String userId)
+    /**
+     * ← CHỈNH SỬA: Nâng cấp user lên seller với thông tin cửa hàng
+     */
+    public static void upgradeSeller(String userId, String shopName, String shopPhone,
+                                     String shopAddress, String shopEmail)
             throws IOException, ClassNotFoundException {
         User user = UserDAO.getUserById(userId);
 
@@ -97,10 +106,12 @@ public class UserService {
             throw new IOException("User is already a Seller");
         }
 
-        regularUser.upgradeSeller();
+        // ✅ Gọi upgrade với thông tin cửa hàng
+        regularUser.upgradeSeller(shopName, shopPhone, shopAddress, shopEmail);
         UserDAO.saveUser(regularUser);
 
-        LoggerUtil.info("✓ User upgraded to Seller: " + user.getUsername());
+        LoggerUtil.info("✓ User upgraded to Seller: " + user.getUsername() +
+                " - Shop: " + shopName);
     }
 
     /**
