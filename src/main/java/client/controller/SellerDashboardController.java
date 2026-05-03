@@ -1,8 +1,14 @@
 package client.controller;
 
+import client.network.ClientSocket;
+import server.model.User;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import util.LoggerUtil;
 
 public class SellerDashboardController {
 
@@ -12,44 +18,84 @@ public class SellerDashboardController {
     @FXML private VBox cardThongBao;
     @FXML private VBox cardViTien;
 
-    // SellerHomeController inject vào đây sau khi load FXML
-    private SellerHomeController homeController;
+    // ===== THÊM ĐỂ LINK SERVER =====
+    private User currentUser;
+    private ClientSocket clientSocket;
 
-    public void setHomeController(SellerHomeController homeController) {
-        this.homeController = homeController;
+    public void setUserData(User user, ClientSocket socket) {
+        this.currentUser = user;
+        this.clientSocket = socket;
     }
 
-    // Mỗi card map sang đúng HBox menu trong SellerHome.fxml
-    // rồi gọi thẳng updateMenuSelection() của SellerHomeController
-    @FXML
-    private void onCardClick(MouseEvent event) {
-        if (homeController == null) return;
+    private void loadView(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent newNode = loader.load();
 
-        VBox card = (VBox) event.getSource();
+            // ===== BƠM DỮ LIỆU SERVER SANG MÀN HÌNH MỚI =====
+            Object controller = loader.getController();
+            if (controller != null) {
+                if (controller instanceof WalletController) {
+                    ((WalletController) controller).setUserData(currentUser, clientSocket);
+                } else if (controller instanceof SellerManagementController) {
+                    ((SellerManagementController) controller).refreshAuctions();
+                }
+                // (Nếu sau này các trang Thống kê, Thông báo cần Server, bạn thêm else if vào đây)
+            }
 
-        if (card == cardTaoPhien) {
-            homeController.selectMenu(homeController.menuCreateAuctions);
-        } else if (card == cardQuanLyPhien) {
-            homeController.selectMenu(homeController.menuManageAuctions);
-        } else if (card == cardThongKe) {
-            homeController.selectMenu(homeController.menuAuctionStatistic);
-        } else if (card == cardThongBao) {
-            homeController.selectMenu(homeController.menuMsg);
-        } else if (card == cardViTien) {
-            homeController.selectMenu(homeController.menuPay);
+            Pane contentArea = (Pane) cardTaoPhien.getScene().lookup("#contentArea");
+            if (contentArea != null) {
+                contentArea.getChildren().setAll(newNode);
+            } else {
+                LoggerUtil.error("Lỗi: Không tìm thấy fx:id='contentArea' ở trang chính!");
+            }
+        } catch (Exception e) {
+            LoggerUtil.error("Không thể load file FXML: " + fxmlPath + " - " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    //hover effect
+    @FXML
+    private void onCardClick(MouseEvent event) {
+        VBox source = (VBox) event.getSource();
+        String id = source.getId();
+
+        switch (id) {
+            case "cardTaoPhien":
+                LoggerUtil.info("Đang mở: Tạo phiên mới");
+                loadView("/fxml/AddAuctionProduct.fxml");
+                break;
+            case "cardQuanLyPhien":
+                LoggerUtil.info("Đang mở: Quản lý phiên");
+                loadView("/fxml/SellerManageAuctions.fxml"); // Sửa lại tên file cho chuẩn với HomeController
+                break;
+            case "cardThongKe":
+                LoggerUtil.info("Đang mở: Thống kê");
+                loadView("/fxml/SellerStatistics.fxml");
+                break;
+            case "cardThongBao":
+                LoggerUtil.info("Đang mở: Thông báo");
+                loadView("/fxml/SellerNotifications.fxml");
+                break;
+            case "cardViTien":
+                LoggerUtil.info("Đang mở: Ví tiền");
+                loadView("/fxml/WalletView.fxml"); // Sửa lại tên file cho chuẩn với HomeController
+                break;
+        }
+    }
+
     @FXML
     private void onCardEnter(MouseEvent event) {
-        VBox card = (VBox) event.getSource();
-        card.getStyleClass().add("dashboard-card-hover");
+        VBox source = (VBox) event.getSource();
+        source.setScaleX(1.02);
+        source.setScaleY(1.02);
+        source.setStyle(source.getStyle() + "; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 8);");
     }
 
     @FXML
     private void onCardExit(MouseEvent event) {
-        VBox card = (VBox) event.getSource();
-        card.getStyleClass().remove("dashboard-card-hover");
+        VBox source = (VBox) event.getSource();
+        source.setScaleX(1.0);
+        source.setScaleY(1.0);
     }
 }
