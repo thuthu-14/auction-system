@@ -7,11 +7,8 @@ package common;
  */
 public class AppConfig {
 
-    /* private static String serverHost = Constants.SERVER_HOST;
-    private static int serverPort = Constants.SERVER_PORT;*/
-    private static String serverHost = "localhost";
-    private static int serverPort = 8080;
-
+    private static String serverHost = Constants.SERVER_HOST;
+    private static int serverPort = Constants.SERVER_PORT;
     private boolean isDebugMode = false;
     private static AppConfig instance;
 
