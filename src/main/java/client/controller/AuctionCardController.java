@@ -1,0 +1,166 @@
+package client.controller;
+
+import javafx.application.Platform;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import server.model.Auction;
+import server.model.Item;
+
+import util.DateTimeUtil; // CHỈ THÊM IMPORT NÀY
+
+import java.io.File;
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
+
+public class AuctionCardController {
+
+    @FXML private ImageView productImageView;
+    @FXML private Label productNameLabel;
+    @FXML private Label timerLabel;
+    @FXML private Label priceLabel;
+    @FXML private Button bidButton;
+
+    private Auction currentAuction;
+    private Timeline countdownTimer;
+    private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
+
+    @FXML
+    public void initialize() {
+        if (bidButton != null) {
+            bidButton.setOnAction(event -> openAuctionDetail());
+        }
+    }
+
+    public void setAuctionData(Auction auction) {
+        this.currentAuction = auction;
+        if (auction == null || auction.getItem() == null) return;
+
+        Item item = auction.getItem();
+        productNameLabel.setText(item.getName());
+        priceLabel.setText(VND_FORMATTER.format(Math.round(auction.getCurrentPrice())) + " đ");
+
+        // --- PHẦN LOAD ẢNH CỰC KỲ AN TOÀN (GIỮ NGUYÊN) ---
+        if (productImageView != null) {
+            List<String> images = item.getImages();
+            if (images != null && !images.isEmpty()) {
+                String rawPath = images.get(0);
+                try {
+                    Image img = null;
+
+                    // 1. Nếu đường dẫn đã có định dạng URL (bắt đầu bằng file: hoặc http:)
+                    if (rawPath.startsWith("file:") || rawPath.startsWith("http")) {
+                        img = new Image(rawPath, 250, 0, true, true);
+                    }
+                    // 2. Nếu là đường dẫn ổ đĩa thuần (C:\...)
+                    else {
+                        File file = new File(rawPath);
+                        if (file.exists()) {
+                            String imageUrl = file.toURI().toURL().toString();
+                            img = new Image(imageUrl, 250, 0, true, true);
+                        }
+                    }
+
+                    if (img != null) {
+                        productImageView.setImage(img);
+                    } else {
+                        System.err.println("Card: Không thể load ảnh từ: " + rawPath);
+                    }
+
+                } catch (Exception e) {
+                    System.err.println("Card: Lỗi hệ thống khi load ảnh: " + e.getMessage());
+                }
+            }
+        }
+        // ------------------------------------
+
+        startCountdown();
+    }
+
+    // =========================================
+    // ĐÃ SỬA LẠI: CHỈ LINK VỚI DATETIMEUTIL VÀ AUCTION
+    // =========================================
+    private void startCountdown() {
+        if (countdownTimer != null) countdownTimer.stop();
+
+        countdownTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            long endTime = currentAuction.getEndTime(); // Lấy thời gian kết thúc (miligiây) từ model
+
+            // Link với DateTimeUtil để kiểm tra hết giờ
+            if (!DateTimeUtil.isExpired(endTime)) {
+                // Tính khoảng cách (miligiây) và link với formatTimestamp để hiển thị
+                long remainingMs = endTime - System.currentTimeMillis();
+                timerLabel.setText("⏱ Còn " + DateTimeUtil.formatTimestamp(remainingMs));
+            } else {
+                timerLabel.setText("⏱ Đã kết thúc");
+                bidButton.setDisable(true);
+                countdownTimer.stop();
+            }
+        }));
+        countdownTimer.setCycleCount(Timeline.INDEFINITE);
+        countdownTimer.play();
+    }
+    // =========================================
+
+    private void openAuctionDetail() {
+        if (currentAuction == null) return;
+
+        try {
+            String fxmlPath = "/fxml/AuctionDetail.fxml";
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+
+            AuctionDetailController detailController = loader.getController();
+            detailController.loadAuctionData(currentAuction);
+
+            Stage stage = new Stage();
+            stage.setTitle("Chi tiết: " + currentAuction.getItem().getName());
+
+            stage.setScene(new Scene(root, 1000, 700));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.show();
+
+        } catch (Exception e) {
+            System.err.println("LỖI KHI MỞ CHI TIẾT: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // =========================================
+    // CÁC HÀM HỖ TRỢ REAL-TIME (GIỮ NGUYÊN)
+    // =========================================
+
+    /**
+     * Hàm này được Dashboard gọi khi nhận được tín hiệu có người đặt giá mới
+     */
+    public void updatePrice(double newPrice) {
+        if (currentAuction != null) {
+            currentAuction.setCurrentPrice(newPrice); // Cập nhật dữ liệu ngầm
+        }
+
+        // Cập nhật giao diện (Bắt buộc chạy trong Platform.runLater đối với JavaFX)
+        Platform.runLater(() -> {
+            priceLabel.setText(VND_FORMATTER.format(Math.round(newPrice)) + " đ");
+        });
+    }
+
+    /**
+     * Hàm này giúp Dashboard biết thẻ này đang hiển thị sản phẩm nào
+     */
+    public String getCurrentAuctionId() {
+        return currentAuction != null ? currentAuction.getAuctionId() : "";
+    }
+}

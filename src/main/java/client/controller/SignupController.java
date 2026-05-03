@@ -21,18 +21,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * SignupController - Xử lý màn hình Đăng ký qua Server Socket
+ */
 public class SignupController {
 
-    @FXML
-    private TextField Ho;
-    @FXML
-    private TextField Ten;
-    @FXML
-    private TextField Email;
-    @FXML
-    private PasswordField mk;
-    @FXML
-    private Button loginButton;
+    @FXML private TextField Ho;
+    @FXML private TextField Ten;
+    @FXML private TextField Email;
+    @FXML private PasswordField mk;
+    @FXML private Button loginButton;
 
     private ConnectionManager connectionManager;
     private ClientSocket clientSocket;
@@ -40,7 +38,7 @@ public class SignupController {
 
     @FXML
     public void initialize() {
-        LoggerUtil.info("SignupController initialized");
+        LoggerUtil.info("✓ SignupController initialized");
     }
 
     @FXML
@@ -50,6 +48,7 @@ public class SignupController {
         String email = Email.getText().trim();
         String password = mk.getText();
 
+        // 1. Validation cơ bản
         if (ho.isEmpty() || ten.isEmpty() || email.isEmpty() || password.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Thiếu thông tin", "Vui lòng nhập đầy đủ Họ, Tên, Email và Mật khẩu.");
             return;
@@ -61,34 +60,34 @@ public class SignupController {
         }
 
         if (!ValidationUtil.isValidPassword(password)) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Mật khẩu không hợp lệ", "Mật khẩu phải có ít nhất 6 ký tự.");
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Mật khẩu yếu", "Mật khẩu phải có ít nhất 6 ký tự.");
             return;
         }
 
         String username = buildUsername(ho, ten, email);
 
         if (!ValidationUtil.isValidUsername(username)) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Tên đăng nhập không hợp lệ",
-                    "Không thể tạo tên đăng nhập từ Họ/Tên/Email. Vui lòng nhập email hợp lệ hơn.");
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Tên đăng nhập lỗi", "Không thể tạo tên đăng nhập. Vui lòng thử email khác.");
             return;
         }
 
         loginButton.setDisable(true);
 
+        // 2. Giao tiếp với Server ở luồng riêng
         new Thread(() -> {
             try {
                 connectionManager = ConnectionManager.getInstance();
 
                 if (!connectionManager.isConnected()) {
                     if (!connectionManager.connect()) {
-                        showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể kết nối tới server",
-                                "Hãy kiểm tra server đã chạy chưa.");
+                        showAlert(Alert.AlertType.ERROR, "Lỗi", "Mất kết nối", "Không thể kết nối tới server.");
                         return;
                     }
                 }
 
                 clientSocket = connectionManager.getClientSocket();
 
+                // Đóng gói dữ liệu đăng ký
                 Map<String, String> registerData = new HashMap<>();
                 registerData.put("username", username);
                 registerData.put("password", password);
@@ -97,30 +96,26 @@ public class SignupController {
                 Message message = new Message(MessageType.REGISTER, registerData, username);
                 clientSocket.sendMessage(message);
 
+                // Chờ Server phản hồi
                 Message response = clientSocket.receiveMessage();
 
-                if (response != null && "SUCCESS".equals(response.getStatus())) {
-                    currentUser = (User) response.getData();
-
-                    Platform.runLater(() -> {
+                Platform.runLater(() -> {
+                    if (response != null && "SUCCESS".equals(response.getStatus())) {
+                        currentUser = (User) response.getData();
                         showAlert(Alert.AlertType.INFORMATION,
                                 "Đăng ký thành công",
-                                "Tạo tài khoản thành công",
-                                "Tên đăng nhập của bạn là: " + username + "\n"
-                                        + "Bạn có thể dùng tên này để đăng nhập.");
+                                "Tạo tài khoản thành công!",
+                                "Tên đăng nhập của bạn là: " + username + "\nBạn có thể dùng tên này hoặc email để đăng nhập.");
                         switchToLogin();
-                    });
-                } else {
-                    String errorMsg = response != null ? response.getMessage() : "Lỗi không xác định";
-                    showAlert(Alert.AlertType.ERROR, "Đăng ký thất bại", "Không thể tạo tài khoản", errorMsg);
-                }
+                    } else {
+                        String errorMsg = response != null ? response.getMessage() : "Lỗi không xác định từ Server";
+                        showAlert(Alert.AlertType.ERROR, "Đăng ký thất bại", "Không thể tạo tài khoản", errorMsg);
+                    }
+                });
 
-            } catch (IOException e) {
-                LoggerUtil.error("Signup IO error: " + e.getMessage());
-                showAlert(Alert.AlertType.ERROR, "Lỗi kết nối", "Không thể kết nối tới server", e.getMessage());
-            } catch (ClassNotFoundException e) {
-                LoggerUtil.error("Signup ClassNotFoundException: " + e.getMessage());
-                showAlert(Alert.AlertType.ERROR, "Lỗi dữ liệu", "Không đọc được phản hồi từ server", e.getMessage());
+            } catch (Exception e) {
+                LoggerUtil.error("Signup error: " + e.getMessage());
+                showAlert(Alert.AlertType.ERROR, "Lỗi hệ thống", "Sự cố kết nối", e.getMessage());
             } finally {
                 Platform.runLater(() -> loginButton.setDisable(false));
             }
@@ -133,91 +128,35 @@ public class SignupController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
             Scene scene = new Scene(loader.load(), 1300, 800);
 
-
             Stage stage = (Stage) loginButton.getScene().getWindow();
-
-            LoginController loginController = loader.getController();
-
-            if (clientSocket != null) {
-                loginController.setClientSocket(clientSocket);
-            }
-
-            loginController.setOnLoginSuccess(() -> {
-                try {
-                    FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/ClientHome.fxml"));
-                    Scene homeScene = new Scene(homeLoader.load(), 1000, 700);
-
-                    HomeScreenController homeController = homeLoader.getController();
-                    homeController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
-
-                    homeController.setOnLogout(() -> {
-                        try {
-                            switchToLogin();
-                        } catch (Exception ex) {
-                            LoggerUtil.error("Error returning to login screen: " + ex.getMessage());
-                        }
-                    });
-
-                    stage.setScene(homeScene);
-                    stage.setTitle("Chợ Đấu giá");
-                    stage.show();
-
-                    LoggerUtil.info("Switched to home screen from signup flow");
-                } catch (IOException e) {
-                    LoggerUtil.error("Error loading home screen: " + e.getMessage());
-                }
-            });
-
-            loginController.setOnAdminLoginSuccess(() -> {
-                try {
-                    FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/AdminHome.fxml"));
-                    Scene adminScene = new Scene(adminLoader.load(), 1000, 700);
-
-                    AdminController adminController = adminLoader.getController();
-                    adminController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
-
-
-                    stage.setScene(adminScene);
-                    stage.setTitle("Bảng điều khiển Admin");
-                    stage.show();
-
-                    LoggerUtil.info("Switched to admin screen from signup flow");
-                } catch (IOException e) {
-                    LoggerUtil.error("Error loading admin panel: " + e.getMessage());
-                }
-            });
-
             stage.setScene(scene);
             stage.setTitle("Đăng nhập");
             stage.show();
 
-            LoggerUtil.info("Switched to login screen");
+            LoggerUtil.info("Switched back to login screen");
         } catch (IOException e) {
             LoggerUtil.error("Error switching to login screen: " + e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không mở được màn hình đăng nhập", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Lỗi UI", "Không mở được màn hình đăng nhập", e.getMessage());
         }
     }
 
-
-
     private String buildUsername(String ho, String ten, String email) {
-        // Ưu tiên tạo username từ họ+tên
+        // Ưu tiên tạo username từ họ+tên, loại bỏ ký tự đặc biệt
         String base = (ho + ten).replaceAll("[^a-zA-Z0-9_]", "");
 
-
-        // Nếu không đủ, fallback sang phần trước @ của email
+        // Nếu chuỗi quá ngắn, lấy phần trước @ của email
         if (base.length() < 3) {
             int atIndex = email.indexOf('@');
             String emailPrefix = atIndex > 0 ? email.substring(0, atIndex) : "user";
             base = emailPrefix.replaceAll("[^a-zA-Z0-9_]", "");
-
         }
 
+        // Nếu vẫn quá ngắn, dùng timestamp
         if (base.length() < 3) {
             base = "user" + System.currentTimeMillis();
         }
 
-
+        // Giới hạn độ dài tối đa 50 ký tự
         if (base.length() > 50) {
             base = base.substring(0, 50);
         }
@@ -242,69 +181,4 @@ public class SignupController {
     public ClientSocket getClientSocket() {
         return clientSocket;
     }
-
-
-
-    private void showLoginFromLogout() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-        Scene scene = new Scene(loader.load(), 1300, 800);
-
-        LoginController loginController = loader.getController();
-
-        // Set callbacks
-        loginController.setOnLoginSuccess(() -> {
-            try {
-                FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/fxml/ClientHome.fxml"));
-                Scene homeScene = new Scene(homeLoader.load(), 1000, 700);
-
-                HomeScreenController homeController = homeLoader.getController();
-                homeController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
-                homeController.setOnLogout(() -> {
-                    try {
-                        showLoginFromLogout();
-                    } catch (IOException e) {
-                        LoggerUtil.error("Error: " + e.getMessage());
-                    }
-                });
-
-                Stage stage = (Stage) loginButton.getScene().getWindow();
-                stage.setScene(homeScene);
-                stage.setTitle("🏪 Chợ Đấu giá");
-                stage.show();
-            } catch (IOException e) {
-                LoggerUtil.error("Error loading home screen: " + e.getMessage());
-            }
-        });
-
-        loginController.setOnAdminLoginSuccess(() -> {
-            try {
-                FXMLLoader adminLoader = new FXMLLoader(getClass().getResource("/fxml/AdminHome.fxml"));
-                Scene adminScene = new Scene(adminLoader.load(), 1000, 700);
-
-                AdminController adminController = adminLoader.getController();
-                adminController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
-
-
-                Stage stage = (Stage) loginButton.getScene().getWindow();
-                stage.setScene(adminScene);
-                stage.setTitle("⚙️ Bảng điều khiển Admin");
-                stage.show();
-            } catch (IOException e) {
-                LoggerUtil.error("Error loading admin panel: " + e.getMessage());
-            }
-        });
-
-        Stage stage = (Stage) loginButton.getScene().getWindow();
-        stage.setScene(scene);
-        stage.setTitle("Đăng nhập");
-        stage.show();
-
-        LoggerUtil.info("Returned to login screen");
-    }
-
-
-
-
 }
-
-
