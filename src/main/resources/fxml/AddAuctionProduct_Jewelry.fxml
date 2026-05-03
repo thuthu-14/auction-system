@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <HBox style="-fx-background-color: #ffe6f0; -fx-background-radius: 8; -fx-padding: 12 16; -fx-border-color: #cbd5e1; -fx-border-radius: 8;">
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="💍 TRANG SỨC - Nhẫn, Vòng, Dây chuyền..." style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;" />
+            <Label text="💰 Giá tối thiểu: 25,000 VNĐ  |  📈 Mỗi bid: 25,000 VNĐ  |  ⏱ 1-5 ngày" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+        </VBox>
+    </HBox>
+
+    <Label text="Thông tin Trang sức" textFill="#1a1a1a" styleClass="field-label">
+        <font><Font name="System Bold" size="18.0" /></font>
+    </Label>
+
+    <HBox spacing="20.0" maxWidth="1.7976931348623157E308">
+        <VBox spacing="15.0" HBox.hgrow="ALWAYS">
+            <VBox spacing="5.0">
+                <Label text="* Giá khởi điểm (VNĐ) - Tối thiểu: 25,000" textFill="#4a5568" styleClass="field-label">
+                    <font><Font name="System Bold" size="13.0" /></font>
+                </Label>
+                <TextField fx:id="jewelryStartPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Nhập giá khởi điểm" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+            </VBox>
+
+            <VBox spacing="5.0">
+                <Label text="Giá bảo lưu (VNĐ)" textFill="#4a5568" styleClass="field-label">
+                    <font><Font name="System Bold" size="13.0" /></font>
+                </Label>
+                <TextField fx:id="jewelryReservePriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Để trống nếu bán mọi giá" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+            </VBox>
+
+            <VBox spacing="5.0">
+                <Label text="* Bước giá (VNĐ)" textFill="#4a5568" styleClass="field-label">
+                    <font><Font name="System Bold" size="13.0" /></font>
+                </Label>
+                <TextField fx:id="jewelryStepPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="25000" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+            </VBox>
+        </VBox>
+
+        <VBox spacing="15.0" HBox.hgrow="ALWAYS">
+            <VBox spacing="5.0">
+                <Label text="* Chất liệu" textFill="#4a5568" styleClass="field-label">
+                    <font><Font name="System Bold" size="13.0" /></font>
+                </Label>
+                <TextField fx:id="jewelryMaterialField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="Gold" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+            </VBox>
+
+            <VBox spacing="5.0">
+                <Label text="* Trọng lượng (gram)" textFill="#4a5568" styleClass="field-label">
+                    <font><Font name="System Bold" size="13.0" /></font>
+                </Label>
+                <TextField fx:id="jewelryWeightField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="10" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+            </VBox>
+        </VBox>
+    </HBox>
+
+    <Separator />
+    <Label text="Thời gian phiên đấu giá: 1-5 ngày" textFill="#1a1a1a" styleClass="field-label">
+        <font><Font name="System Bold" size="14.0" /></font>
+    </Label>
+
+    <HBox spacing="20.0" maxWidth="1.7976931348623157E308">
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label text="* Bắt đầu" textFill="#4a5568" styleClass="field-label">
+                <font><Font name="System Bold" size="13.0" /></font>
+            </Label>
+            <HBox spacing="5.0">
+                <DatePicker fx:id="jewelryStartDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" HBox.hgrow="ALWAYS" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;" promptText="Chọn ngày"/>
+                <ComboBox fx:id="jewelryStartHourCombo" prefWidth="100.0" prefHeight="40.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;" />
+            </HBox>
+        </VBox>
+        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+            <Label text="* Kết thúc" textFill="#4a5568" styleClass="field-label">
+                <font><Font name="System Bold" size="13.0" /></font>
+            </Label>
+            <HBox spacing="5.0">
+                <DatePicker fx:id="jewelryEndDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" HBox.hgrow="ALWAYS" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;" promptText="Chọn ngày"/>
+                <ComboBox fx:id="jewelryEndHourCombo" prefWidth="100.0" prefHeight="40.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;" />
+            </HBox>
+        </VBox>
+    </HBox>
+</VBox>

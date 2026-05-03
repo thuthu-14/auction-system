@@ -14,7 +14,7 @@
         <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
         </padding>
-        <Label text="Gợi ý điền Thông tin" textFill="#1a1a1a">
+        <Label text="Gợi ý điền Thông tin" textFill="#1a1a1a" styleClass="field-label">
             <font><Font name="System Bold" size="16.0" /></font>
         </Label>
         <Separator />
@@ -32,102 +32,57 @@
                     <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
-                    <Label text="Thông tin cơ bản" textFill="#1a1a1a">
+                    <Label text="Thông tin cơ bản" textFill="#1a1a1a" styleClass="field-label">
                         <font><Font name="System Bold" size="18.0" /></font>
                     </Label>
 
                     <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
-                        <Label text="* Tên sản phẩm" textFill="#4a5568">
+                        <Label text="* Tên sản phẩm" textFill="#4a5568" styleClass="field-label">
                             <font><Font name="System Bold" size="13.0" /></font>
                         </Label>
                         <TextField fx:id="productNameField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Tên sản phẩm + Thương hiệu + Model..." style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
                     </VBox>
 
                     <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
-                        <Label text="* Ngành hàng" textFill="#4a5568">
+                        <Label text="* Ngành hàng" textFill="#4a5568" styleClass="field-label">
                             <font><Font name="System Bold" size="13.0" /></font>
                         </Label>
                         <ComboBox fx:id="categoryComboBox" maxWidth="1.7976931348623157E308" onAction="#handleCategoryChange" prefHeight="40.0" promptText="Chọn ngành hàng" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
                     </VBox>
                 </VBox>
 
-                <VBox maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
-                    <padding>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                    </padding>
-                    <Label text="Thông tin phiên đấu giá" textFill="#1a1a1a">
-                        <font><Font name="System Bold" size="18.0" /></font>
-                    </Label>
-
-                    <HBox maxWidth="1.7976931348623157E308" spacing="20.0">
-                        <VBox maxWidth="1.7976931348623157E308" spacing="15.0" HBox.hgrow="ALWAYS">
-                            <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
-                                <Label text="* Giá khởi điểm (VNĐ)" textFill="#4a5568">
-                                    <font><Font name="System Bold" size="13.0" /></font>
-                                </Label>
-                                <TextField fx:id="startPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Mức giá đầu tiên người mua phải trả" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
-                            </VBox>
-
-                            <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
-                                <Label text="Giá mong muốn / Giá bảo lưu (VNĐ)" textFill="#4a5568">
-                                    <font><Font name="System Bold" size="13.0" /></font>
-                                </Label>
-                                <TextField fx:id="reservePriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Để trống nếu bán mọi giá" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
-                            </VBox>
-
-                            <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
-                                <Label text="* Bước giá (VNĐ)" textFill="#4a5568">
-                                    <font><Font name="System Bold" size="13.0" /></font>
-                                </Label>
-                                <TextField fx:id="stepPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Khoảng cách giữa các lần trả giá" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
-                                <Label fx:id="stepPriceHintLabel" textFill="#2563eb" wrapText="true">
-                                    <font><Font name="System Italic" size="12.0" /></font>
-                                </Label>
-                            </VBox>
-                        </VBox>
-
-                        <VBox maxWidth="1.7976931348623157E308" spacing="15.0" HBox.hgrow="ALWAYS">
-                            <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
-                                <Label text="* Thời gian bắt đầu" textFill="#4a5568">
-                                    <font><Font name="System Bold" size="13.0" /></font>
-                                </Label>
-                                <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
-                                    <DatePicker fx:id="startDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Chọn ngày" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8;" HBox.hgrow="ALWAYS" />
-                                    <ComboBox fx:id="startHourCombo" prefHeight="40.0" prefWidth="100.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6; -fx-border-color: transparent;" />                                </HBox>
-                            </VBox>
-                            <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
-                                <Label text="* Thời gian kết thúc" textFill="#4a5568">
-                                    <font><Font name="System Bold" size="13.0" /></font>
-                                </Label>
-                                <HBox maxWidth="1.7976931348623157E308" spacing="10.0">
-                                    <DatePicker fx:id="endDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Chọn ngày" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8;" HBox.hgrow="ALWAYS" />
-                                    <ComboBox fx:id="endHourCombo" prefHeight="40.0" prefWidth="100.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6; -fx-border-color: transparent;" />
-                                </HBox>
-                                <Label fx:id="timeHintLabel" textFill="#2563eb" wrapText="true">
-                                    <font><Font name="System Italic" size="12.0" /></font>
-                                </Label>
-                            </VBox>
-                        </VBox>
-                    </HBox>
-                </VBox>
+                <StackPane fx:id="categoryFormPane" maxWidth="1.7976931348623157E308" minHeight="400.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
+                    <VBox alignment="CENTER" spacing="10.0">
+                        <padding>
+                            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                        </padding>
+                        <Label text="Chọn ngành hàng để bắt đầu" textFill="#a0aec0" styleClass="field-label">
+                            <font><Font size="14.0" /></font>
+                        </Label>
+                    </VBox>
+                </StackPane>
 
                 <VBox maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
                     <padding>
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
-                    <Label text="Mô tả chi tiết" textFill="#1a1a1a">
+                    <Label text="Mô tả chi tiết" textFill="#1a1a1a" styleClass="field-label">
                         <font><Font name="System Bold" size="18.0" /></font>
                     </Label>
 
-                    <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
-                        <Label text="Hình ảnh sản phẩm (Tỷ lệ 1:1)" textFill="#4a5568">
+                    <VBox maxWidth="1.7976931348623157E308" spacing="10.0">
+                        <Label text="Hình ảnh sản phẩm (Tối đa 5 ảnh - Tỷ lệ 1:1)" textFill="#4a5568" styleClass="field-label">
                             <font><Font name="System Bold" size="13.0" /></font>
                         </Label>
-                        <Button style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-width: 2; -fx-text-fill: #4a5568; -fx-pref-width: 100; -fx-pref-height: 100; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;" text="+ Thêm ảnh" />
+                        <HBox spacing="15.0" alignment="CENTER_LEFT">
+                            <Button onAction="#handleSelectImage" style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-width: 2; -fx-text-fill: #4a5568; -fx-pref-width: 100; -fx-pref-height: 100; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;" text="+ Thêm ảnh" />
+
+                            <HBox fx:id="imagePreviewContainer" spacing="10.0" alignment="CENTER_LEFT" />
+                        </HBox>
                     </VBox>
 
                     <VBox maxWidth="1.7976931348623157E308" spacing="5.0" VBox.vgrow="ALWAYS">
-                        <Label text="* Mô tả sản phẩm" textFill="#4a5568">
+                        <Label text="* Mô tả sản phẩm" textFill="#4a5568" styleClass="field-label">
                             <font><Font name="System Bold" size="13.0" /></font>
                         </Label>
                         <TextArea fx:id="descriptionArea" maxWidth="1.7976931348623157E308" prefHeight="150.0" promptText="Nhập mô tả sản phẩm..." style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-control-inner-background: #f8fafc;" />
