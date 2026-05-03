@@ -1,0 +1,55 @@
+[1777557164077] INFO: ╔════════════════════════════════════════╗
+[1777557164124] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777557164128] INFO: ║   Online Bidding Platform              ║
+[1777557164130] INFO: ╚════════════════════════════════════════╝
+[1777557164146] INFO: AuctionServer initialized
+[1777557164147] INFO: Starting Auction Server...
+[1777557164159] INFO: Initializing data files...
+[1777557164305] INFO: All data files initialized
+[1777557164326] INFO: 📊 Initializing default data...
+[1777557164374] INFO: Server shutdown complete
+[1777557164377] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777557185120] INFO: ╔════════════════════════════════════════╗
+[1777557185158] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777557185159] INFO: ║   Online Bidding Platform              ║
+[1777557185162] INFO: ╚════════════════════════════════════════╝
+[1777557185167] INFO: AuctionServer initialized
+[1777557185169] INFO: Starting Auction Server...
+[1777557185172] INFO: Initializing data files...
+[1777557185247] INFO: All data files initialized
+[1777557185251] INFO: 📊 Initializing default data...
+[1777557185283] INFO: Server shutdown complete
+[1777557185286] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777557722758] INFO: ╔════════════════════════════════════════╗
+[1777557722795] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777557722797] INFO: ║   Online Bidding Platform              ║
+[1777557722799] INFO: ╚════════════════════════════════════════╝
+[1777557722806] INFO: AuctionServer initialized
+[1777557722808] INFO: Starting Auction Server...
+[1777557722811] INFO: Initializing data files...
+[1777557722876] INFO: All data files initialized
+[1777557722880] INFO: 📊 Initializing default data...
+[1777557722907] INFO: Server shutdown complete
+[1777557722915] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777559269264] INFO: ╔════════════════════════════════════════╗
+[1777559269322] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777559269325] INFO: ║   Online Bidding Platform              ║
+[1777559269327] INFO: ╚════════════════════════════════════════╝
+[1777559269339] INFO: AuctionServer initialized
+[1777559269342] INFO: Starting Auction Server...
+[1777559269351] INFO: Initializing data files...
+[1777559269469] INFO: All data files initialized
+[1777559269474] INFO: 📊 Initializing default data...
+[1777559269515] INFO: Server shutdown complete
+[1777559269518] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777559714482] INFO: ╔════════════════════════════════════════╗
+[1777559714533] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777559714536] INFO: ║   Online Bidding Platform              ║
+[1777559714538] INFO: ╚════════════════════════════════════════╝
+[1777559714567] INFO: AuctionServer initialized
+[1777559714570] INFO: Starting Auction Server...
+[1777559714575] INFO: Initializing data files...
+[1777559714693] INFO: All data files initialized
+[1777559714698] INFO: 📊 Initializing default data...
+[1777559714748] INFO: Server shutdown complete
+[1777559714752] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
