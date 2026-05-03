@@ -17,36 +17,37 @@ public class AuthService {
     /**
      * Login user
      */
-    public static User login(String username, String password)
+    public static User login(String email, String password)
             throws AuthenticationException, IOException, ClassNotFoundException {
 
-        // Validate input
-        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-            LoggerUtil.error("Login failed: Empty username or password");
-            throw new AuthenticationException("❌ Username và password không được rỗng!");
+        if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+            throw new AuthenticationException("❌ email và password không được rỗng!");
         }
 
-        // Tìm user
-        User user = UserDAO.getUserByUsername(username);
+        User user = UserDAO.getUserByEmail(email);
 
         if (user == null) {
-            LoggerUtil.error("Login failed: User not found - " + username);
             throw new AuthenticationException("❌ Tài khoản không tồn tại!");
         }
 
-        // Kiểm tra password
         if (!user.getPassword().equals(password)) {
-            LoggerUtil.error("Login failed: Wrong password for " + username);
             throw new AuthenticationException("❌ Mật khẩu không đúng!");
         }
 
-        // Kiểm tra tài khoản có bị khóa không
         if (!user.isActive()) {
-            LoggerUtil.error("Login failed: User account banned - " + username);
-            throw new AuthenticationException("❌ Tài khoản của bạn bị khóa!");
+            throw new AuthenticationException("❌ Tài khoản bị khóa!");
         }
 
-        LoggerUtil.info("✓ User logged in: " + username + " (Role: " + user.getRole() + ")");
+        // 🔥 FIX QUAN TRỌNG NHẤT
+        if (user.getRole() == common.UserRole.ADMIN) {
+            return new server.model.Admin(
+                    user.getUserId(),
+                    user.getUsername(),
+                    user.getPassword(),
+                    user.getEmail()
+            );
+        }
+
         return user;
     }
 
@@ -69,6 +70,14 @@ public class AuthService {
         if (!ValidationUtil.isValidEmail(email)) {
             throw new AuthenticationException("❌ Email không hợp lệ");
         }
+
+// Kiểm tra email đã tồn tại chưa
+        User existingByEmail = UserDAO.getUserByEmail(email);
+        if (existingByEmail != null) {
+            LoggerUtil.error("Registration failed: Email already exists - " + email);
+            throw new AuthenticationException("❌ Email đã tồn tại!");
+        }
+
 
         // ← THÊM: Block tạo admin account
         if (username.equalsIgnoreCase("admin")) {
