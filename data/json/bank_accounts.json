@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "userId": "U1777878819404",
+    "bankName": "Đinh Hà Ngân",
+    "accountNumber": "0123456789",
+    "initialBalance": 1.0E7,
+    "createdAt": 1777879997594
+  }
+]

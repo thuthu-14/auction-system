@@ -18,14 +18,35 @@
   },
   {
     "ownedAuctionIds": [],
-    "bidIds": [],
+    "bidIds": [
+      "BID1777880546392"
+    ],
     "isSeller": false,
+    "userId": "U1777880526939",
+    "username": "HNgn",
+    "password": "87654321",
+    "email": "123@gmail.com",
+    "wallet": 0.0,
+    "role": "BIDDER",
+    "createdAt": 1777880526939,
+    "active": true
+  },
+  {
+    "ownedAuctionIds": [
+      "AU1777879942563"
+    ],
+    "bidIds": [],
+    "isSeller": true,
+    "shopName": "Đinh Hà Ngân",
+    "shopPhone": "0961528478",
+    "shopAddress": "123 Nghĩa Đô",
+    "shopEmail": "posuto@gmail.com",
     "userId": "U1777878819404",
     "username": "inhHNgn",
     "password": "12345678",
     "email": "posuto@gmail.com",
-    "wallet": 0.0,
-    "role": "BIDDER",
+    "wallet": 3.0E7,
+    "role": "SELLER",
     "createdAt": 1777878819405,
     "active": true
   }

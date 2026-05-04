@@ -1,6 +1,7 @@
 package client.controller;
 
 import client.network.ClientSocket;
+import navigation.NavigationManager;
 import server.model.RegularUser;
 import server.model.User;
 
@@ -132,8 +133,17 @@ public class HomeScreenController {
     @FXML
     public void loadDashboardView() {
         updateMenuSelection(menuHome);
-        loadView("/fxml/Dashboard.fxml", null);
+        loadView("/fxml/Dashboard.fxml", controller -> {
+            // ← THÊM: Refresh data khi load
+            if (controller instanceof DashboardController && currentUser != null && clientSocket != null) {
+                DashboardController dashCtrl = (DashboardController) controller;
+                dashCtrl.setUserData(currentUser, clientSocket);
+                dashCtrl.refreshAuctions();  // ← Auto-refresh danh sách
+            }
+        });
     }
+
+
 
     public void loadProfileView() {
         updateMenuSelection(null);

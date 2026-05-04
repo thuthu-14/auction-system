@@ -13,14 +13,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
+import util.LoggerUtil;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable {
@@ -209,5 +212,10 @@ public class DashboardController implements Initializable {
         if (bannerImages == null || bannerImages.isEmpty()) return;
         currentImageIndex = (currentImageIndex - 1 + bannerImages.size()) % bannerImages.size();
         bannerImageView.setImage(bannerImages.get(currentImageIndex));
+    }
+
+    public void refreshAuctions() {
+        // Load lại danh sách từ server
+        initialize(null, null);  // hoặc gọi method load data
     }
 }

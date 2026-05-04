@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "brand": "Apple",
+    "warrantyPeriod": "1 Year",
+    "itemId": "IT1777879942565",
+    "name": "Điện thoại iphone 20",
+    "description": "màu hồng",
+    "startingPrice": 2.0E7,
+    "category": "ELECTRONICS",
+    "sellerId": "U1777878819404",
+    "createdAt": 1777879942563,
+    "images": [
+      "file:/C:/Users/dodin/Downloads/he-dieu-hanh-one-ui-tren-dien-thoai-samsung.jpg"
+    ]
+  }
+]

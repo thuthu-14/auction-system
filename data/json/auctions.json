@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "auctionId": "AU1777879942563",
+    "itemId": "IT1777879942565",
+    "sellerId": "U1777878819404",
+    "sellerName": "inhHNgn",
+    "item": {
+      "itemId": "IT1777879942565",
+      "name": "Điện thoại iphone 20",
+      "description": "màu hồng",
+      "startingPrice": 2.0E7,
+      "sellerId": "U1777878819404",
+      "images": [
+        "file:/C:/Users/dodin/Downloads/he-dieu-hanh-one-ui-tren-dien-thoai-samsung.jpg"
+      ],
+      "type": "ELECTRONICS",
+      "brand": "Apple",
+      "warrantyPeriod": "1 Year"
+    },
+    "currentPrice": 2.000005E7,
+    "highestBidderId": "U1777880526939",
+    "highestBidderName": "HNgn",
+    "status": "RUNNING",
+    "startTime": 1777879942566,
+    "endTime": 1778369542566,
+    "createdAt": 1777879942566,
+    "bidIds": [
+      "BID1777880546392"
+    ],
+    "viewCount": 0
+  }
+]

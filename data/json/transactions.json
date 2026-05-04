@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": "TXN_1777880138762",
+    "userId": "U1777878819404",
+    "type": "DEPOSIT",
+    "amount": 3000000.0,
+    "balanceAfter": 3.0E7,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1777880138763
+  },
+  {
+    "id": "TXN_1777883293546",
+    "userId": "U1777878819404",
+    "type": "WITHDRAW",
+    "amount": 3000000.0,
+    "balanceAfter": 3.0E7,
+    "description": "Rút tiền về ngân hàng",
+    "timestamp": 1777883293547
+  }
+]

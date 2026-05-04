@@ -99,7 +99,9 @@ public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<I
                         getStringSafe(jsonObject, "material", ""),
                         getDoubleSafe(jsonObject, "weight", 0.0), images);
             default:
-                throw new JsonParseException("Unknown item type: " + type);
+                // ← THAY THROW THÀNH TRỊ MẶC ĐỊNH
+                System.err.println("⚠️ Unknown item type: " + type + ", creating default Fashion item");
+                return new Fashion(itemId, name, description, startingPrice, sellerId, "", "", images);
         }
     }
 

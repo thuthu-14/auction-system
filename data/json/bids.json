@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "bidId": "BID1777880546392",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1777880526939",
+    "bidderName": "HNgn",
+    "amount": 2.000005E7,
+    "bidTime": 1777880546393,
+    "status": "ACTIVE"
+  }
+]
