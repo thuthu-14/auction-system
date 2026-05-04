@@ -3,11 +3,6 @@ package server.service;
 
 import server.model.User;
 import server.model.RegularUser;
-// src/main/java/server/service/UserService.java
-package server.service;
-
-import server.model.User;
-import server.model.RegularUser;
 import server.storage.UserDAO;
 import util.LoggerUtil;
 import java.io.IOException;
