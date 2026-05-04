@@ -4,47 +4,40 @@ import client.network.ClientSocket;
 import common.Message;
 import common.MessageType;
 import common.Transaction;
-import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Duration;
+import navigation.NavigationManager;
 import server.model.User;
 import util.LoggerUtil;
 
-import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.lang.reflect.Type;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 public class WalletController implements Initializable {
 
-    // Thẻ ngoài cùng để chèn overlay, nếu FXML chưa có nó sẽ lấy root của Scene
     @FXML private StackPane rootPane;
-
     @FXML private Label balanceLabel;
     @FXML private ComboBox<String> timeFilter;
     @FXML private TextField searchField;
@@ -52,7 +45,6 @@ public class WalletController implements Initializable {
     @FXML private VBox linkedBankBox;
     @FXML private Label displayBankName;
     @FXML private Label displayAccNumber;
-    @FXML private Label displayBankBalance;
 
     @FXML private TableView<Transaction> transactionTable;
     @FXML private TableColumn<Transaction, String> dateColumn;
@@ -65,8 +57,8 @@ public class WalletController implements Initializable {
     private User currentUser;
 
     private static final String BANK_FILE = "data/json/bank_accounts.json";
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final String TRANSACTIONS_FILE = "data/json/transactions.json";
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private static class BankAccountEntry {
         String userId;
@@ -88,91 +80,89 @@ public class WalletController implements Initializable {
         if (amountColumn != null) amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
         if (balanceColumn != null) balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balanceAfter"));
         if (descriptionColumn != null) descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-
-        loadWalletData();
     }
 
-    public void setUserData(User currentUser, ClientSocket clientSocket) {
-        this.currentUser = currentUser;
-        this.clientSocket = clientSocket;
-        loadWalletData();
+    public void setUserData(User user, ClientSocket socket) {
+        this.currentUser = user;
+        this.clientSocket = socket;
+        Platform.runLater(this::loadWalletData);
     }
 
     private void loadWalletData() {
-        if (currentUser != null && balanceLabel != null) {
-            balanceLabel.setText(formatVnd(currentUser.getWallet()));
+        this.currentUser = NavigationManager.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            LoggerUtil.warn("WalletController: currentUser is still null");
+            return;
         }
 
+        balanceLabel.setText(formatVnd(currentUser.getWallet()));
+
         BankAccountEntry entry = loadBankAccountForCurrentUser();
+
         if (entry != null) {
-            if (displayBankName != null) displayBankName.setText(entry.bankName.toUpperCase());
-            if (displayAccNumber != null) {
-                String acc = entry.accountNumber == null ? "" : entry.accountNumber;
-                displayAccNumber.setText(acc.length() >= 4 ? "**** **** **** " + acc.substring(acc.length() - 4) : acc);
-            }
-            if (displayBankBalance != null) displayBankBalance.setText(formatVnd(entry.initialBalance));
-            if (addBankBox != null) { addBankBox.setVisible(false); addBankBox.setManaged(false); }
-            if (linkedBankBox != null) { linkedBankBox.setVisible(true); linkedBankBox.setManaged(true); }
+            displayBankName.setText(entry.bankName.toUpperCase());
+            String acc = entry.accountNumber == null ? "" : entry.accountNumber;
+            displayAccNumber.setText(acc.length() >= 4 ? "**** **** **** " + acc.substring(acc.length() - 4) : acc);
+
+            addBankBox.setVisible(false);
+            addBankBox.setManaged(false);
+            linkedBankBox.setVisible(true);
+            linkedBankBox.setManaged(true);
         } else {
-            if (addBankBox != null) { addBankBox.setVisible(true); addBankBox.setManaged(true); }
-            if (linkedBankBox != null) { linkedBankBox.setVisible(false); linkedBankBox.setManaged(false); }
+            addBankBox.setVisible(true);
+            addBankBox.setManaged(true);
+            linkedBankBox.setVisible(false);
+            linkedBankBox.setManaged(false);
         }
+
         loadTransactionHistory();
     }
 
     @FXML
     private void showAddBankPopup() {
+        if (this.currentUser == null) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Dữ liệu người dùng chưa được tải!");
+            return;
+        }
+
         try {
             URL fxmlLocation = getClass().getResource("/fxml/AddBankDialog.fxml");
-            if (fxmlLocation == null) return;
-
-            // XỬ LÝ LỖI NULL ROOTPANE: Nếu rootPane null, tìm thằng cha là Pane để chèn overlay
-            Pane container = rootPane;
-            if (container == null) {
-                // Lấy Scene root hiện tại nếu không thấy rootPane
-                if (balanceLabel != null && balanceLabel.getScene() != null) {
-                    Parent root = balanceLabel.getScene().getRoot();
-                    if (root instanceof Pane) container = (Pane) root;
-                }
+            if (fxmlLocation == null) {
+                LoggerUtil.error("Không tìm thấy file AddBankDialog.fxml");
+                return;
             }
 
-            // Nếu vẫn null thì show dialog bình thường không cần overlay để không bị crash
-            Region overlay = null;
+            Pane container = rootPane;
+            Region overlay = new Region();
+            overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
+            overlay.setPrefSize(2000, 2000);
+
             if (container != null) {
-                overlay = new Region();
-                overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
-                overlay.setPrefSize(container.getWidth() + 100, container.getHeight() + 100);
-
-                FadeTransition fadeIn = new FadeTransition(Duration.millis(300), overlay);
-                fadeIn.setFromValue(0); fadeIn.setToValue(1);
-
                 container.getChildren().add(overlay);
-                fadeIn.play();
             }
 
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
+
             AddBankDialogController dialogController = loader.getController();
 
-            final Region finalOverlay = overlay;
-            final Pane finalContainer = container;
+            dialogController.setUserData(this.currentUser, this.clientSocket);
 
             dialogController.setOnCloseCallback(() -> {
-                if (finalOverlay != null && finalContainer != null) {
-                    FadeTransition fadeOut = new FadeTransition(Duration.millis(200), finalOverlay);
-                    fadeOut.setFromValue(1); fadeOut.setToValue(0);
-                    fadeOut.setOnFinished(e -> finalContainer.getChildren().remove(finalOverlay));
-                    fadeOut.play();
-                }
+                if (container != null) container.getChildren().remove(overlay);
             });
 
             dialogController.setOnBankLinkedListener((bank, account, amount) -> {
                 try {
                     saveBankAccountForCurrentUser(bank, account, amount);
-                    Platform.runLater(this::loadWalletData);
-                    showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã liên kết tài khoản ngân hàng.");
+                    Platform.runLater(() -> {
+                        loadWalletData();
+                        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Liên kết ngân hàng thành công!");
+                    });
                 } catch (Exception e) {
-                    showAlert(Alert.AlertType.ERROR, "Lỗi", e.getMessage());
+                    LoggerUtil.error("Lỗi lưu ngân hàng: " + e.getMessage());
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể lưu thông tin ngân hàng."));
                 }
             });
 
@@ -182,110 +172,182 @@ public class WalletController implements Initializable {
             Scene scene = new Scene(root);
             scene.setFill(Color.TRANSPARENT);
             dialogStage.setScene(scene);
+
+            dialogStage.setOnHiding(e -> {
+                if (container != null) container.getChildren().remove(overlay);
+            });
+
             dialogStage.showAndWait();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LoggerUtil.error("Lỗi show popup thêm thẻ: " + e.getMessage());
         }
     }
 
-    // --- Giữ nguyên các hàm xử lý dữ liệu của sếp ---
     private void processTransaction(String type, String amountStr, BankAccountEntry bankEntry) {
         try {
             double amount = Double.parseDouble(amountStr.replace(",", "").trim());
-            if (amount <= 0) return;
+            if (amount <= 0) {
+                showAlert(Alert.AlertType.WARNING, "Thông báo", "Số tiền phải lớn hơn 0");
+                return;
+            }
+
             new Thread(() -> {
                 try {
                     Map<String, Object> data = new HashMap<>();
                     data.put("username", currentUser.getUsername());
                     data.put("amount", amount);
+
                     MessageType msgType = type.equals("DEPOSIT") ? MessageType.ADD_FUNDS : MessageType.WITHDRAW;
+
                     clientSocket.sendMessage(new Message(msgType, data, currentUser.getUsername()));
                     Message response = clientSocket.receiveMessage();
+
                     if (response != null && "SUCCESS".equals(response.getStatus())) {
-                        currentUser = (User) response.getData();
+                        User updatedUser = (User) response.getData();
+
                         Platform.runLater(() -> {
+                            NavigationManager.getInstance().setCurrentUser(updatedUser);
+                            this.currentUser = updatedUser;
+
                             try {
-                                updateBankBalanceForCurrentUser(type.equals("DEPOSIT") ? -amount : amount);
-                                saveTransaction(type, amount, currentUser.getWallet());
-                                loadWalletData();
-                            } catch (Exception ex) { ex.printStackTrace(); }
+                                // ĐÃ XÓA: updateBankBalanceForCurrentUser - Không còn can thiệp tiền ngân hàng ảo
+                                saveTransaction(type, amount, updatedUser.getWallet());
+                            } catch (Exception ex) {
+                                LoggerUtil.error("Lỗi lưu file local: " + ex.getMessage());
+                            }
+                            loadWalletData();
+                            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Giao dịch hoàn tất!");
                         });
+                    } else {
+                        String errorMsg = response != null ? response.getMessage() : "Giao dịch bị từ chối";
+                        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", errorMsg));
                     }
-                } catch (Exception e) { e.printStackTrace(); }
+
+                } catch (Exception e) {
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Không thể gửi yêu cầu tới Server"));
+                }
             }).start();
-        } catch (Exception e) { }
+
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng nhập số tiền hợp lệ");
+        }
     }
 
     @FXML private void handleDeposit() {
         BankAccountEntry bankEntry = loadBankAccountForCurrentUser();
-        if (bankEntry == null) { showAlert(Alert.AlertType.ERROR, "Lỗi", "Chưa liên kết ngân hàng"); return; }
-        TextInputDialog d = new TextInputDialog(); d.setHeaderText("Nạp tiền");
+        if (bankEntry == null) { showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng liên kết ngân hàng trước"); return; }
+
+        TextInputDialog d = new TextInputDialog();
+        d.setTitle("Nạp tiền");
+        // ĐÃ SỬA: Set Header về null để xóa dòng số dư ngân hàng
+        d.setHeaderText(null);
+        d.setContentText("Nhập số tiền muốn nạp vào ví:");
         d.showAndWait().ifPresent(s -> processTransaction("DEPOSIT", s, bankEntry));
     }
 
     @FXML private void handleWithdraw() {
         BankAccountEntry bankEntry = loadBankAccountForCurrentUser();
-        if (bankEntry == null) { showAlert(Alert.AlertType.ERROR, "Lỗi", "Chưa liên kết ngân hàng"); return; }
-        TextInputDialog d = new TextInputDialog(); d.setHeaderText("Rút tiền");
+        if (bankEntry == null) { showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng liên kết ngân hàng trước"); return; }
+
+        TextInputDialog d = new TextInputDialog();
+        d.setTitle("Rút tiền");
+        d.setHeaderText("Ví hiện có: " + formatVnd(currentUser.getWallet()));
+        d.setContentText("Nhập số tiền muốn rút về ngân hàng:");
         d.showAndWait().ifPresent(s -> processTransaction("WITHDRAW", s, bankEntry));
     }
 
     private String formatVnd(double value) { return String.format("%,.0f đ", value); }
+
     private void showAlert(Alert.AlertType type, String title, String msg) {
         Alert a = new Alert(type); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
     }
 
     private void saveBankAccountForCurrentUser(String bank, String account, double amount) throws Exception {
         Path path = Paths.get(BANK_FILE);
-        if (!Files.exists(path)) { Files.createDirectories(path.getParent()); Files.writeString(path, "[]"); }
-        List<BankAccountEntry> list = gson.fromJson(Files.readString(path), new TypeToken<List<BankAccountEntry>>(){}.getType());
+        if (path.getParent() != null && !Files.exists(path.getParent())) {
+            Files.createDirectories(path.getParent());
+        }
+        if (!Files.exists(path)) {
+            Files.writeString(path, "[]");
+        }
+
+        String content = Files.readString(path).trim();
+        if (content.isEmpty() || content.equals("null")) content = "[]";
+
+        List<BankAccountEntry> list = gson.fromJson(content, new TypeToken<List<BankAccountEntry>>(){}.getType());
         if (list == null) list = new ArrayList<>();
+
         list.removeIf(x -> currentUser.getUserId().equals(x.userId));
-        BankAccountEntry e = new BankAccountEntry(); e.userId = currentUser.getUserId();
-        e.bankName = bank; e.accountNumber = account; e.initialBalance = amount; e.createdAt = System.currentTimeMillis();
-        list.add(e); Files.writeString(path, gson.toJson(list));
+
+        BankAccountEntry e = new BankAccountEntry();
+        e.userId = currentUser.getUserId();
+        e.bankName = bank;
+        e.accountNumber = account;
+        e.initialBalance = amount;
+        e.createdAt = System.currentTimeMillis();
+
+        list.add(e);
+        Files.writeString(path, gson.toJson(list));
     }
 
     private BankAccountEntry loadBankAccountForCurrentUser() {
         try {
             Path path = Paths.get(BANK_FILE);
             if (!Files.exists(path)) return null;
-            List<BankAccountEntry> list = gson.fromJson(Files.readString(path), new TypeToken<List<BankAccountEntry>>(){}.getType());
+            String content = Files.readString(path).trim();
+            if (content.isEmpty() || content.equals("null")) return null;
+
+            List<BankAccountEntry> list = gson.fromJson(content, new TypeToken<List<BankAccountEntry>>(){}.getType());
+            if (list == null) return null;
             return list.stream().filter(e -> e.userId.equals(currentUser.getUserId())).findFirst().orElse(null);
         } catch (Exception e) { return null; }
-    }
-
-    private void updateBankBalanceForCurrentUser(double delta) throws Exception {
-        Path path = Paths.get(BANK_FILE);
-        List<BankAccountEntry> list = gson.fromJson(Files.readString(path), new TypeToken<List<BankAccountEntry>>(){}.getType());
-        for (BankAccountEntry e : list) if (e.userId.equals(currentUser.getUserId())) { e.initialBalance += delta; break; }
-        Files.writeString(path, gson.toJson(list));
     }
 
     private void loadTransactionHistory() {
         try {
             if (currentUser == null) return;
-            ObservableList<Transaction> data = FXCollections.observableArrayList(loadTransactionsForUser());
-            if (transactionTable != null) transactionTable.setItems(data);
-        } catch (Exception e) { }
+            List<Transaction> list = loadTransactionsForUser();
+            Platform.runLater(() -> {
+                transactionTable.getItems().clear();
+                transactionTable.setItems(FXCollections.observableArrayList(list));
+                transactionTable.refresh();
+            });
+        } catch (Exception e) {
+            LoggerUtil.error("Lỗi load lịch sử GD: " + e.getMessage());
+        }
     }
 
     private void saveTransaction(String type, double amount, double balanceAfter) throws Exception {
         Path path = Paths.get(TRANSACTIONS_FILE);
-        if (!Files.exists(path)) { Files.createDirectories(path.getParent()); Files.writeString(path, "[]"); }
-        List<Transaction> txns = gson.fromJson(Files.readString(path), new TypeToken<List<Transaction>>(){}.getType());
+        if (path.getParent() != null && !Files.exists(path.getParent())) {
+            Files.createDirectories(path.getParent());
+        }
+        if (!Files.exists(path)) {
+            Files.writeString(path, "[]");
+        }
+
+        String content = Files.readString(path).trim();
+        if (content.isEmpty() || content.equals("null")) content = "[]";
+
+        List<Transaction> txns = gson.fromJson(content, new TypeToken<List<Transaction>>(){}.getType());
         if (txns == null) txns = new ArrayList<>();
-        txns.add(new Transaction(currentUser.getUserId(), type, amount, balanceAfter, type.equals("DEPOSIT")?"Nạp tiền":"Rút tiền"));
+        txns.add(new Transaction(currentUser.getUserId(), type, amount, balanceAfter, type.equals("DEPOSIT") ? "Nạp tiền vào ví" : "Rút tiền về ngân hàng"));
         Files.writeString(path, gson.toJson(txns));
     }
 
     private List<Transaction> loadTransactionsForUser() throws Exception {
         Path path = Paths.get(TRANSACTIONS_FILE);
         if (!Files.exists(path)) return new ArrayList<>();
-        List<Transaction> all = gson.fromJson(Files.readString(path), new TypeToken<List<Transaction>>(){}.getType());
-        return (all == null) ? new ArrayList<>() : all.stream().filter(t -> currentUser.getUserId().equals(t.userId))
-                .sorted((a, b) -> Long.compare(b.timestamp, a.timestamp)).collect(java.util.stream.Collectors.toList());
+        String content = Files.readString(path).trim();
+        if (content.isEmpty() || content.equals("null")) return new ArrayList<>();
+
+        List<Transaction> all = gson.fromJson(content, new TypeToken<List<Transaction>>(){}.getType());
+        if (all == null) return new ArrayList<>();
+        return all.stream()
+                .filter(t -> currentUser.getUserId().equals(t.userId))
+                .sorted((a, b) -> Long.compare(b.timestamp, a.timestamp))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     @FXML private void handleSearch() {}

@@ -64,9 +64,9 @@
                 <VBox fx:id="cardThongBao" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
                         <Label styleClass="card-icon-badge card-icon-pink" style="-fx-font-size: 20px;" text="🔔">
-                     <font>
-                        <Font size="22.0" />
-                     </font></Label>
+                            <font>
+                                <Font size="22.0" />
+                            </font></Label>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label styleClass="card-title" text="Thông báo" />
                             <Label styleClass="card-desc" text="Cập nhật tin tức về các phiên và người đấu giá" wrapText="true" />

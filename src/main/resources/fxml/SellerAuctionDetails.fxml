@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="client.controller.SellerAuctionDetailsController"
+      spacing="25"
+      style="-fx-background-color: #ffffff; -fx-padding: 40;">
+
+    <Label text="Chi tiết phiên đấu giá" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #111827;"/>
+
+    <HBox style="-fx-background-color: #e5e7eb; -fx-background-radius: 8; -fx-padding: 5;" spacing="5" alignment="CENTER_LEFT" maxWidth="-Infinity">
+        <Button text="Thông tin" style="-fx-background-color: white; -fx-text-fill: #111827; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 8 20; -fx-background-radius: 6; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 1); -fx-cursor: hand;"/>
+
+        <Button text="Lịch sử đặt giá" style="-fx-background-color: transparent; -fx-text-fill: #6b7280; -fx-font-size: 14px; -fx-padding: 8 20; -fx-cursor: hand; -fx-border-width: 0;"/>
+        <Button text="Thông tin người trúng" style="-fx-background-color: transparent; -fx-text-fill: #6b7280; -fx-font-size: 14px; -fx-padding: 8 20; -fx-cursor: hand; -fx-border-width: 0;"/>
+    </HBox>
+
+    <VBox VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 10 0 0 0;">
+
+        <VBox spacing="8">
+            <Label text="Sản phẩm" style="-fx-font-size: 14px; -fx-text-fill: #4b5563;"/>
+            <HBox spacing="15" alignment="TOP_LEFT">
+                <Region style="-fx-background-color: #f3f4f6; -fx-min-width: 80; -fx-min-height: 80; -fx-background-radius: 8;"/>
+                <VBox spacing="5">
+                    <Label text="Đồng hồ Seiko 5 Sports" style="-fx-font-size: 15px; -fx-text-fill: #111827; -fx-font-weight: bold;"/>
+                    <Label text="Mã: AU-2024-001" style="-fx-font-size: 14px; -fx-text-fill: #6b7280;"/>
+                    <Label text="Đồng hồ thể thao chính hãng" style="-fx-font-size: 14px; -fx-text-fill: #6b7280;"/>
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <Separator style="-fx-border-color: transparent transparent #e5e7eb transparent; -fx-border-width: 0 0 1 0;"/>
+
+        <GridPane hgap="40" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints minWidth="200"/>
+                <ColumnConstraints minWidth="200"/>
+            </columnConstraints>
+            <Label text="Giá khởi điểm" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-size: 14px; -fx-text-fill: #4b5563;"/>
+            <Label text="1.200.000 đ" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-size: 15px; -fx-text-fill: #111827;"/>
+
+            <Label text="Giá hiện tại" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-font-size: 14px; -fx-text-fill: #4b5563;"/>
+            <Label text="2.850.000 đ" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #dc2626;"/>
+        </GridPane>
+
+        <GridPane hgap="40" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints minWidth="200"/>
+                <ColumnConstraints minWidth="200"/>
+            </columnConstraints>
+            <Label text="Thời gian bắt đầu" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-size: 14px; -fx-text-fill: #4b5563;"/>
+            <Label text="10/04/2024 14:30" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-font-size: 15px; -fx-text-fill: #111827;"/>
+
+            <Label text="Thời gian kết thúc" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-font-size: 14px; -fx-text-fill: #4b5563;"/>
+            <Label text="12/04/2024 16:45" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-font-size: 15px; -fx-text-fill: #111827;"/>
+
+            <Label text="Thời gian còn lại" GridPane.columnIndex="0" GridPane.rowIndex="2" style="-fx-font-size: 14px; -fx-text-fill: #4b5563;">
+                <GridPane.margin><Insets top="10"/></GridPane.margin>
+            </Label>
+            <Label text="1 ngày 5 giờ" GridPane.columnIndex="0" GridPane.rowIndex="3" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #dc2626;"/>
+        </GridPane>
+
+        <Separator style="-fx-border-color: transparent transparent #e5e7eb transparent; -fx-border-width: 0 0 1 0;"/>
+
+        <GridPane hgap="40" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints minWidth="200"/>
+                <ColumnConstraints minWidth="200"/>
+            </columnConstraints>
+            <Label text="Trạng thái" GridPane.columnIndex="0" GridPane.rowIndex="0" style="-fx-font-size: 14px; -fx-text-fill: #4b5563;"/>
+            <Label text="Đang diễn ra" GridPane.columnIndex="0" GridPane.rowIndex="1" style="-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-padding: 4 12; -fx-background-radius: 20; -fx-font-weight: bold; -fx-font-size: 12px;"/>
+
+            <Label text="Số lượt đặt" GridPane.columnIndex="1" GridPane.rowIndex="0" style="-fx-font-size: 14px; -fx-text-fill: #4b5563;"/>
+            <Label text="18 lượt" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-font-size: 15px; -fx-text-fill: #111827;"/>
+        </GridPane>
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS" />
+
+    <HBox spacing="15" alignment="BOTTOM_RIGHT">
+        <Button text="✏️ Chỉnh sửa" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 25; -fx-cursor: hand;"/>
+        <Button text="⏸ Tạm dừng" style="-fx-background-color: white; -fx-text-fill: #374151; -fx-font-size: 14px; -fx-padding: 8 20; -fx-border-color: #d1d5db; -fx-border-width: 1; -fx-border-radius: 25; -fx-background-radius: 25; -fx-cursor: hand;"/>
+        <Button text="🗑 Hủy phiên" style="-fx-background-color: white; -fx-text-fill: #dc2626; -fx-font-size: 14px; -fx-padding: 8 20; -fx-border-color: #fca5a5; -fx-border-width: 1; -fx-border-radius: 25; -fx-background-radius: 25; -fx-cursor: hand;"/>
+    </HBox>
+</VBox>

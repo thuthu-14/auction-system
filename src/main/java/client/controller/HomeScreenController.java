@@ -1,5 +1,8 @@
 package client.controller;
+
 import client.network.ClientSocket;
+import navigation.NavigationManager;
+import server.model.RegularUser;
 import server.model.User;
 
 import javafx.application.Platform;
@@ -15,51 +18,44 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import util.LoggerUtil;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
 public class HomeScreenController {
 
-    @FXML
-    private HBox menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings;
+    @FXML private HBox menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings;
     private List<HBox> allMenus;
 
-    @FXML
-    private StackPane rootPane;
-    @FXML
-    private StackPane contentArea;
+    @FXML private StackPane rootPane;
+    @FXML private StackPane contentArea;
+    @FXML private TextField productSearchInput;
+    @FXML private Button clearSearchBtn;
+    @FXML private Button themeToggleBtn;
 
-    @FXML
-    private TextField productSearchInput;
-    @FXML
-    private Button clearSearchBtn;
-
-    @FXML
-    private Button themeToggleBtn;
     private boolean isNightMode = false;
     private User currentUser;
     private ClientSocket clientSocket;
     private Runnable onLogout;
 
     @FXML
-
     public void initialize() {
         allMenus = Arrays.asList(menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings);
-        try {
-            loadDashboardView();
-        } catch (Exception e) {
-            System.err.println("Cảnh báo: Lỗi khi load ngầm Dashboard: " + e.getMessage());
-        }
+
+        // Mặc định load Dashboard
+        loadDashboardView();
+
+        // Xử lý thanh tìm kiếm
         if (productSearchInput != null && clearSearchBtn != null) {
             productSearchInput.textProperty().addListener((observable, oldValue, newValue) -> {
                 clearSearchBtn.setVisible(!newValue.trim().isEmpty());
             });
-        } else {
-            System.err.println("Cảnh báo: productSearchInput hoặc clearSearchBtn bị null (chưa gắn fx:id)!");
         }
 
+        // Phím tắt Ctrl + K để focus thanh tìm kiếm
         Platform.runLater(() -> {
             if (rootPane != null && rootPane.getScene() != null) {
                 KeyCombination ctrlK = new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN);
@@ -71,7 +67,35 @@ public class HomeScreenController {
                 });
             }
         });
+
+        // LƯU Ý: Không gọi updateMenuBasedOnSellerStatus() ở đây vì currentUser đang là null!
     }
+
+    // ================= DATA INJECTION =================
+
+    public void setUserData(User user, ClientSocket socket) {
+        this.currentUser = user;
+        this.clientSocket = socket;
+
+        // Gọi ở đây mới đúng, vì lúc này user đã được truyền từ Login/Signup sang
+        updateMenuBasedOnSellerStatus();
+    }
+
+    public void setOnLogout(Runnable onLogout) {
+        this.onLogout = onLogout;
+    }
+
+    private void updateMenuBasedOnSellerStatus() {
+        if (currentUser instanceof RegularUser) {
+            RegularUser regularUser = (RegularUser) currentUser;
+            if (regularUser.isSeller()) {
+                menuUpgrade.setVisible(false);
+                menuUpgrade.setManaged(false);
+            }
+        }
+    }
+
+    // ================= MENU ACTIONS =================
 
     @FXML
     private void handleMenuClick(MouseEvent event) {
@@ -99,41 +123,87 @@ public class HomeScreenController {
                     }
                 }
             } catch (ClassCastException e) {
-                System.err.println("Cảnh báo: Element bên trong menu không phải là Button!");
+                LoggerUtil.error("Element trong menu không phải là Button");
             }
         }
     }
+
+    // ================= VIEW LOADERS =================
 
     @FXML
     public void loadDashboardView() {
         updateMenuSelection(menuHome);
+        loadView("/fxml/Dashboard.fxml", null);
+    }
+
+    public void loadProfileView() {
+        updateMenuSelection(null);
+        loadView("/fxml/ProfileView.fxml", null);
+    }
+
+    public void loadNotificationsView() {
+        updateMenuSelection(menuMsg);
+        loadView("/fxml/Notifications.fxml", controller -> {
+            if (controller instanceof NotificationsController) {
+                ((NotificationsController) controller).setHomeController(this);
+            }
+        });
+    }
+
+    public void loadWalletView() {
+        updateMenuSelection(menuPay);
+        loadView("/fxml/WalletView.fxml", controller -> {
+            if (controller instanceof WalletController && currentUser != null && clientSocket != null) {
+                ((WalletController) controller).setUserData(currentUser, clientSocket);
+            }
+        });
+    }
+
+    @FXML
+    private void openBecomeSeller() {
+        updateMenuSelection(menuUpgrade);
+        loadView("/fxml/BecomeSeller.fxml", controller -> {
+            if (controller instanceof BecomeSellerController) {
+                ((BecomeSellerController) controller).setCurrentUser(currentUser);
+            }
+        });
+    }
+
+    /**
+     * Hàm Helper dùng chung để load các file FXML vào contentArea
+     * Giúp giảm thiểu code lặp lại (Boilerplate code)
+     */
+    private void loadView(String fxmlPath, java.util.function.Consumer<Object> controllerSetup) {
         try {
-            java.net.URL fxmlLocation = getClass().getResource("/fxml/Dashboard.fxml");
+            URL fxmlLocation = getClass().getResource(fxmlPath);
             if (fxmlLocation == null) {
-                System.err.println("Không tìm thấy file Dashboard.fxml!");
+                LoggerUtil.error("Không tìm thấy file: " + fxmlPath);
                 return;
             }
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
-            Parent dashboardNode = loader.load();
+            Parent viewNode = loader.load();
+
+            if (controllerSetup != null) {
+                controllerSetup.accept(loader.getController());
+            }
 
             if (contentArea != null) {
-                contentArea.getChildren().clear();
-                contentArea.getChildren().add(dashboardNode);
-            } else {
-                System.err.println("Cảnh báo: contentArea bị null (chưa gắn fx:id trong Home.fxml)!");
+                contentArea.getChildren().setAll(viewNode);
             }
-        } catch (Exception e) {
-            System.err.println("Lỗi load giao diện Dashboard: " + e.getMessage());
+        } catch (IOException e) {
+            LoggerUtil.error("Lỗi load giao diện " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
+
+    // ================= UTILITIES =================
 
     @FXML
     private void handleProductSearch() {
         if (productSearchInput == null) return;
         String keyword = productSearchInput.getText().trim();
         if (!keyword.isEmpty()) {
-            System.out.println("Searching for: " + keyword);
+            System.out.println("Searching for: " + keyword); // Sau này thay bằng logic tìm kiếm thực tế
         }
     }
 
@@ -145,105 +215,23 @@ public class HomeScreenController {
         }
     }
 
-    public void loadProfileView() {
-        updateMenuSelection(null);
-        try {
-            java.net.URL fxmlLocation = getClass().getResource("/fxml/ProfileView.fxml");
-            if (fxmlLocation == null) {
-                System.err.println("Không tìm thấy file ProfileView.fxml!");
-                return;
-            }
-            FXMLLoader loader = new FXMLLoader(fxmlLocation);
-            Parent profileNode = loader.load();
-            if (contentArea != null) {
-                contentArea.getChildren().clear();
-                contentArea.getChildren().add(profileNode);
-            }
-        } catch (IOException e) {
-            System.err.println("Lỗi load giao diện Profile");
-            e.printStackTrace();
-        }
-    }
-
-    public void loadNotificationsView() {
-        updateMenuSelection(menuMsg);
-        try {
-            java.net.URL fxmlLocation = getClass().getResource("/fxml/Notifications.fxml");
-            if (fxmlLocation == null) {
-                System.err.println("Không tìm thấy file Notifications.fxml!");
-                return;
-            }
-            FXMLLoader loader = new FXMLLoader(fxmlLocation);
-            Parent notiNode = loader.load();
-            NotificationsController notiController = loader.getController();
-            notiController.setHomeController(this);
-            if (contentArea != null) {
-                contentArea.getChildren().clear();
-                contentArea.getChildren().add(notiNode);
-            }
-        } catch (IOException e) {
-            System.err.println("Lỗi load giao diện Thông báo");
-            e.printStackTrace();
-        }
-    }
-
-    public void loadWalletView() {
-        updateMenuSelection(menuPay);
-        try {
-            java.net.URL fxmlLocation = getClass().getResource("/fxml/WalletView.fxml");
-            if (fxmlLocation == null) {
-                System.err.println("Không tìm thấy file WalletView.fxml!");
-                return;
-            }
-            FXMLLoader loader = new FXMLLoader(fxmlLocation);
-            Parent walletNode = loader.load();
-
-            WalletController walletController = loader.getController();
-            if (currentUser != null && clientSocket != null) {
-                walletController.setUserData(currentUser, clientSocket);  // ← SỬA ĐÂY
-            }
-
-            if (contentArea != null) {
-                contentArea.getChildren().clear();
-                contentArea.getChildren().add(walletNode);
-            }
-
-        } catch (IOException e) {
-            System.err.println("Lỗi load giao diện Wallet");
-            e.printStackTrace();
-        }
-    }
-
     @FXML
     private void toggleNightMode() {
         isNightMode = !isNightMode;
-
         if (rootPane != null && rootPane.getScene() != null) {
             try {
                 String cssPath = getClass().getResource("/CSS/dark-mode.css").toExternalForm();
-
                 if (isNightMode) {
                     rootPane.getScene().getStylesheets().add(cssPath);
                     themeToggleBtn.setText("☀️");
-                    System.out.println("🌙 Đã bật Night Mode");
                 } else {
                     rootPane.getScene().getStylesheets().remove(cssPath);
                     themeToggleBtn.setText("🌙");
-                    System.out.println("☀️ Đã tắt Night Mode");
                 }
             } catch (NullPointerException e) {
-                System.err.println("Cảnh báo: Không tìm thấy file /CSS/dark-mode.css");
+                LoggerUtil.error("Không tìm thấy file /CSS/dark-mode.css");
             }
         }
-    }
-
-    public void setUserData(User user, ClientSocket socket) {
-        this.currentUser = user;
-        this.clientSocket = socket;
-    }
-
-    public void setOnLogout(Runnable onLogout) {
-        this.onLogout = onLogout;
     }
 
     @FXML
@@ -252,6 +240,4 @@ public class HomeScreenController {
             onLogout.run();
         }
     }
-
-
 }

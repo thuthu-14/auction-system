@@ -7,14 +7,14 @@
 <?import javafx.scene.text.*?>
 
 <AnchorPane fx:id="rootPane"
-           minHeight="600.0"
-           minWidth="900.0"
-           prefHeight="900.0"
-           prefWidth="1440.0"
-           xmlns="http://javafx.com/javafx/17.0.12"
-           xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="client.controller.SellerHomeController"
-           stylesheets="@../CSS/style.css">
+            minHeight="600.0"
+            minWidth="900.0"
+            prefHeight="900.0"
+            prefWidth="1440.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="client.controller.SellerHomeController"
+            stylesheets="@../CSS/style.css">
 
     <children>
 
@@ -92,7 +92,7 @@
 
                         <HBox fx:id="menuCreateAuctions"
                               alignment="CENTER_LEFT"
-                              onMouseClicked="#handleMenuClick"
+                              onMouseClicked="#loadAddAuctionProductView"
                               prefHeight="45.0"
                               prefWidth="230.0" maxWidth="Infinity"
                               style="-fx-background-radius: 8; -fx-cursor: hand;">
@@ -115,7 +115,7 @@
 
                         <HBox fx:id="menuManageAuctions"
                               alignment="CENTER_LEFT"
-                              onMouseClicked="#handleMenuClick"
+                              onMouseClicked="#loa"
                               prefHeight="45.0"
                               prefWidth="230.0" maxWidth="Infinity"
                               style="-fx-background-radius: 8; -fx-cursor: hand;">
@@ -138,7 +138,7 @@
 
                         <HBox fx:id="menuAuctionStatistic"
                               alignment="CENTER_LEFT"
-                              onMouseClicked="#handleMenuClick"
+                              onMouseClicked="#loadSellerStatisticsView"
                               prefHeight="45.0"
                               prefWidth="230.0" maxWidth="Infinity"
                               style="-fx-background-radius: 8; -fx-cursor: hand;">
@@ -161,7 +161,7 @@
 
                         <HBox fx:id="menuMsg"
                               alignment="CENTER_LEFT"
-                              onMouseClicked="#handleMenuClick"
+                              onMouseClicked="#loadSellerNotificationsView"
                               prefHeight="45.0"
                               prefWidth="230.0" maxWidth="Infinity"
                               style="-fx-background-radius: 8; -fx-cursor: hand;">
@@ -184,7 +184,7 @@
 
                         <HBox fx:id="menuPay"
                               alignment="CENTER_LEFT"
-                              onMouseClicked="#handleMenuClick"
+                              onMouseClicked="#loadWalletView"
                               prefHeight="45.0"
                               prefWidth="230.0" maxWidth="Infinity"
                               style="-fx-background-radius: 8; -fx-cursor: hand;">
@@ -225,23 +225,6 @@
                                     </font>
                                     <padding>
                                         <Insets left="18.0" /> </padding>
-                                </Button>
-                            </children>
-                        </HBox>
-
-                        <HBox fx:id="menuSettings" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" maxWidth="Infinity" style="-fx-background-radius: 8; -fx-cursor: hand;">
-                            <children>
-                                <Button alignment="BASELINE_LEFT"
-                                        mouseTransparent="true"
-                                        maxWidth="Infinity"
-                                        HBox.hgrow="ALWAYS"
-                                        style="-fx-background-color: transparent;"
-                                        text="⚙   Cài đặt" textFill="#4a5568">
-                                    <font>
-                                        <Font size="17.0" />
-                                    </font>
-                                    <padding>
-                                        <Insets left="20.0" /> </padding>
                                 </Button>
                             </children>
                         </HBox>
@@ -296,12 +279,6 @@
                                 </HBox>
 
                                 <Region HBox.hgrow="ALWAYS" />
-
-                                <Button style="-fx-background-color: transparent; -fx-cursor: hand;" text="🌙">
-                                    <font>
-                                        <Font size="20.0" />
-                                    </font>
-                                </Button>
 
                                 <Button onAction="#loadProfileView"
                                         prefHeight="40.0"

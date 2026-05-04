@@ -1,45 +1,116 @@
 package client.controller;
 
+import client.network.ClientSocket;
+import client.network.ConnectionManager;
+import common.Message;
+import common.MessageType;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
+import navigation.NavigationManager;
+import server.model.User;
+import util.LoggerUtil;
+
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class AddAuctionProductController implements Initializable {
 
-    @FXML private TextField productNameField;
-    @FXML private ComboBox<String> categoryComboBox;
-    @FXML private TextField startPriceField;
-    @FXML private TextField reservePriceField;
-    @FXML private TextField stepPriceField;
+    @FXML
+    private TextField productNameField;
+    @FXML
+    private ComboBox<String> categoryComboBox;
+    @FXML
+    private TextArea descriptionArea;
+    @FXML
+    private StackPane categoryFormPane;
+    @FXML
+    private HBox imagePreviewContainer;
 
-    @FXML private DatePicker startDatePicker;
-    @FXML private ComboBox<String> startHourCombo;
-    @FXML private DatePicker endDatePicker;
-    @FXML private ComboBox<String> endHourCombo;
-
-    @FXML private TextArea descriptionArea;
-    @FXML private Label stepPriceHintLabel;
-    @FXML private Label timeHintLabel;
+    private String currentCategory;
+    private javafx.collections.ObservableList<String> timeOptions;
+    private List<String> selectedImagePaths = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         categoryComboBox.setItems(FXCollections.observableArrayList(
-                "Đồ điện tử", "Thời trang", "Sưu tầm", "Đồ gia dụng", "Khác"
+                "Đồ điện tử", "Thời trang", "Trang sức", "Sưu tầm", "Xe cộ"
         ));
 
-        startHourCombo.setItems(generateTimeOptions());
-        endHourCombo.setItems(generateTimeOptions());
+        timeOptions = generateTimeOptions();
+    }
 
-        startDatePicker.setValue(LocalDate.now());
-        startHourCombo.getSelectionModel().select("08:00");
-        setupPriceFormatter(startPriceField);
-        setupPriceFormatter(reservePriceField);
-        setupPriceFormatter(stepPriceField);
+    @FXML
+    public void handleSelectImage(ActionEvent event) {
+        if (selectedImagePaths.size() >= 5) {
+            showAlert(Alert.AlertType.WARNING, "Giới hạn ảnh", "Chỉ được chọn tối đa 5 ảnh thôi nha!");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Chọn ảnh sản phẩm (Tối đa 5 ảnh)");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
+
+        // Lấy cửa sổ an toàn từ nút bấm kích hoạt sự kiện
+        Window window = ((Node) event.getSource()).getScene().getWindow();
+        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(window);
+
+        if (selectedFiles != null) {
+            for (File file : selectedFiles) {
+                if (selectedImagePaths.size() >= 5) {
+                    showAlert(Alert.AlertType.INFORMATION, "Thông báo", "Đã đạt giới hạn 5 ảnh, các ảnh dư sẽ bị bỏ qua.");
+                    break;
+                }
+
+                String imagePath = file.toURI().toString();
+
+                if (!selectedImagePaths.contains(imagePath)) {
+                    selectedImagePaths.add(imagePath);
+
+                    ImageView imageView = new ImageView(new Image(imagePath));
+                    imageView.setFitWidth(98.0);
+                    imageView.setFitHeight(98.0);
+                    imageView.setPreserveRatio(true);
+
+                    StackPane imagePane = new StackPane(imageView);
+                    imagePane.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-cursor: hand;");
+
+                    imagePane.setOnMouseClicked(e -> {
+                        if (e.getClickCount() == 2) {
+                            imagePreviewContainer.getChildren().remove(imagePane);
+                            selectedImagePaths.remove(imagePath);
+                        }
+                    });
+
+                    Tooltip.install(imagePane, new Tooltip("Click đúp chuột để xóa ảnh này"));
+                    imagePreviewContainer.getChildren().add(imagePane);
+                }
+            }
+        }
     }
 
     @FXML
@@ -47,37 +118,93 @@ public class AddAuctionProductController implements Initializable {
         String selectedCategory = categoryComboBox.getValue();
         if (selectedCategory == null) return;
 
-        if (stepPriceHintLabel != null && timeHintLabel != null) {
-            stepPriceHintLabel.setStyle("-fx-text-fill: #2563eb;");
-            timeHintLabel.setStyle("-fx-text-fill: #2563eb;");
+        currentCategory = selectedCategory;
+        categoryFormPane.getChildren().clear();
+
+        try {
+            Parent formNode = null;
 
             switch (selectedCategory) {
                 case "Đồ điện tử":
-                    stepPriceHintLabel.setText("↳ Bước giá tối thiểu: 50,000 đ");
-                    timeHintLabel.setText("↳ Thời gian: 1 - 7 ngày");
-                    stepPriceField.setText("50000"); 
+                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Electronics.fxml"));
                     break;
                 case "Thời trang":
-                    stepPriceHintLabel.setText("↳ Bước giá tối thiểu: 10,000 đ");
-                    timeHintLabel.setText("↳ Thời gian: 1 - 3 ngày");
-                    stepPriceField.setText("10000");
+                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Fashion.fxml"));
+                    break;
+                case "Trang sức":
+                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Jewelry.fxml"));
                     break;
                 case "Sưu tầm":
-                    stepPriceHintLabel.setText("↳ Bước giá tối thiểu: 100,000 đ");
-                    timeHintLabel.setText("↳ Thời gian: 1 - 14 ngày");
-                    stepPriceField.setText("100000");
+                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Art.fxml"));
                     break;
-                case "Đồ gia dụng":
-                    stepPriceHintLabel.setText("↳ Bước giá tối thiểu: 20,000 đ");
-                    timeHintLabel.setText("↳ Thời gian: 1 - 5 ngày");
-                    stepPriceField.setText("20000");
-                    break;
-                default:
-                    stepPriceHintLabel.setText("↳ Tùy chọn bước giá");
-                    timeHintLabel.setText("↳ Tùy chọn thời gian");
-                    stepPriceField.clear();
+                case "Xe cộ":
+                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Vehicle.fxml"));
                     break;
             }
+
+            if (formNode != null) {
+                categoryFormPane.getChildren().add(formNode);
+                setupTimeOptions(formNode);
+            }
+        } catch (IOException e) {
+            LoggerUtil.error("Lỗi tải form danh mục: " + e.getMessage());
+        }
+    }
+
+    private void setupTimeOptions(Parent formNode) {
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plusDays(1);
+
+        ComboBox<?> startHourCombo = null;
+        ComboBox<?> endHourCombo = null;
+        DatePicker startDatePicker = null;
+        DatePicker endDatePicker = null;
+
+        switch (currentCategory) {
+            case "Đồ điện tử":
+                startHourCombo = (ComboBox<?>) formNode.lookup("#elecStartHourCombo");
+                endHourCombo = (ComboBox<?>) formNode.lookup("#elecEndHourCombo");
+                startDatePicker = (DatePicker) formNode.lookup("#elecStartDatePicker");
+                endDatePicker = (DatePicker) formNode.lookup("#elecEndDatePicker");
+                break;
+            case "Thời trang":
+                startHourCombo = (ComboBox<?>) formNode.lookup("#fashionStartHourCombo");
+                endHourCombo = (ComboBox<?>) formNode.lookup("#fashionEndHourCombo");
+                startDatePicker = (DatePicker) formNode.lookup("#fashionStartDatePicker");
+                endDatePicker = (DatePicker) formNode.lookup("#fashionEndDatePicker");
+                break;
+            case "Trang sức":
+                startHourCombo = (ComboBox<?>) formNode.lookup("#jewelryStartHourCombo");
+                endHourCombo = (ComboBox<?>) formNode.lookup("#jewelryEndHourCombo");
+                startDatePicker = (DatePicker) formNode.lookup("#jewelryStartDatePicker");
+                endDatePicker = (DatePicker) formNode.lookup("#jewelryEndDatePicker");
+                break;
+            case "Sưu tầm":
+                startHourCombo = (ComboBox<?>) formNode.lookup("#artStartHourCombo");
+                endHourCombo = (ComboBox<?>) formNode.lookup("#artEndHourCombo");
+                startDatePicker = (DatePicker) formNode.lookup("#artStartDatePicker");
+                endDatePicker = (DatePicker) formNode.lookup("#artEndDatePicker");
+                break;
+            case "Xe cộ":
+                startHourCombo = (ComboBox<?>) formNode.lookup("#vehicleStartHourCombo");
+                endHourCombo = (ComboBox<?>) formNode.lookup("#vehicleEndHourCombo");
+                startDatePicker = (DatePicker) formNode.lookup("#vehicleStartDatePicker");
+                endDatePicker = (DatePicker) formNode.lookup("#vehicleEndDatePicker");
+                break;
+        }
+
+        if (startDatePicker != null) startDatePicker.setValue(today);
+        if (endDatePicker != null) endDatePicker.setValue(tomorrow);
+
+        if (startHourCombo != null) {
+            @SuppressWarnings("unchecked") ComboBox<String> comboBox = (ComboBox<String>) startHourCombo;
+            comboBox.setItems(timeOptions);
+            comboBox.getSelectionModel().select("08:00");
+        }
+        if (endHourCombo != null) {
+            @SuppressWarnings("unchecked") ComboBox<String> comboBox = (ComboBox<String>) endHourCombo;
+            comboBox.setItems(timeOptions);
+            comboBox.getSelectionModel().select("17:00");
         }
     }
 
@@ -90,61 +217,163 @@ public class AddAuctionProductController implements Initializable {
         return times;
     }
 
-    private void setupPriceFormatter(TextField textField) {
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.matches("\\d*")) return; // Chỉ cho nhập số
-            textField.setText(newValue.replaceAll("[^\\d]", ""));
-        });
-    }
-
     @FXML
     private void handleSaveAndPublish(ActionEvent event) {
-        if (productNameField.getText().isEmpty() || startPriceField.getText().isEmpty() ||
-                stepPriceField.getText().isEmpty() || startDatePicker.getValue() == null) {
-            showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ các trường bắt buộc (*)");
+        if (productNameField.getText().isEmpty() || descriptionArea.getText().isEmpty() || categoryComboBox.getValue() == null) {
+            showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ tên sản phẩm, mô tả và chọn ngành hàng!");
+            return;
+        }
+
+        if (selectedImagePaths.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Thiếu ảnh", "Vui lòng chọn ít nhất 1 ảnh cho sản phẩm!");
+            return;
+        }
+
+        User currentUser = NavigationManager.getInstance().getCurrentUser();
+        ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
+
+        if (currentUser == null || socket == null) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Bạn chưa đăng nhập hoặc mất kết nối máy chủ!");
             return;
         }
 
         try {
-            String name = productNameField.getText();
-            double startPrice = Double.parseDouble(startPriceField.getText());
-            double stepPrice = Double.parseDouble(stepPriceField.getText());
+            String name = productNameField.getText().trim();
+            String description = descriptionArea.getText().trim();
+            String category = categoryComboBox.getValue();
 
-            // Nếu không nhập giá mong muốn, mặc định nó bằng với giá khởi điểm
-            double reservePrice = startPrice;
-            if (!reservePriceField.getText().isEmpty()) {
-                reservePrice = Double.parseDouble(reservePriceField.getText());
+            Map<String, Object> payload = new HashMap<>();
+            // THÊM 2 DÒNG NÀY ĐỂ SERVER KHÔNG BỊ NULL
+            payload.put("itemId", "");
+            payload.put("sellerId", currentUser.getUsername());
+
+            payload.put("name", name);
+            payload.put("description", description);
+            payload.put("images", new ArrayList<>(selectedImagePaths));
+
+            double startPrice = 0;
+            int durationMinutes = 0;
+
+            switch (category) {
+                case "Đồ điện tử":
+                    payload.put("type", "ELECTRONICS"); // SỬA THÀNH CHỮ THƯỜNG
+                    startPrice = validateAndParsePrice(getFieldValue("#elecStartPriceField", ""), "Giá khởi điểm", 50000.0);
+                    if (startPrice < 0) return;
+                    durationMinutes = (int) calculateDuration("#elecStartDatePicker", "#elecStartHourCombo", "#elecEndDatePicker", "#elecEndHourCombo");
+                    if (durationMinutes < 1440 || durationMinutes > 10080) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-7 ngày"); return; }
+                    payload.put("brand", getFieldValue("#elecBrandField", ""));
+                    payload.put("warrantyPeriod", getFieldValue("#elecWarrantyField", "")); // Sửa warranty thành warrantyPeriod
+                    break;
+
+                case "Thời trang":
+                    payload.put("type", "FASHION"); // SỬA THÀNH CHỮ THƯỜNG
+                    startPrice = validateAndParsePrice(getFieldValue("#fashionStartPriceField", ""), "Giá khởi điểm", 10000.0);
+                    if (startPrice < 0) return;
+                    durationMinutes = (int) calculateDuration("#fashionStartDatePicker", "#fashionStartHourCombo", "#fashionEndDatePicker", "#fashionEndHourCombo");
+                    if (durationMinutes < 1440 || durationMinutes > 4320) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-3 ngày"); return; }
+                    payload.put("brand", getFieldValue("#fashionBrandField", ""));
+                    payload.put("material", getFieldValue("#fashionMaterialField", ""));
+                    break;
+
+                case "Trang sức":
+                    payload.put("type", "JEWELRY"); // SỬA THÀNH CHỮ THƯỜNG
+                    startPrice = validateAndParsePrice(getFieldValue("#jewelryStartPriceField", ""), "Giá khởi điểm", 25000.0);
+                    if (startPrice < 0) return;
+                    durationMinutes = (int) calculateDuration("#jewelryStartDatePicker", "#jewelryStartHourCombo", "#jewelryEndDatePicker", "#jewelryEndHourCombo");
+                    if (durationMinutes < 1440 || durationMinutes > 7200) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-5 ngày"); return; }
+                    payload.put("material", getFieldValue("#jewelryMaterialField", ""));
+                    double jewelryWeight = validateAndParseDouble(getFieldValue("#jewelryWeightField", ""), "Trọng lượng", 0.1, 100000);
+                    if (jewelryWeight < 0) return;
+                    payload.put("weight", jewelryWeight);
+                    break;
+
+                case "Sưu tầm":
+                    payload.put("type", "ART"); // SỬA THÀNH CHỮ THƯỜNG
+                    startPrice = validateAndParsePrice(getFieldValue("#artStartPriceField", ""), "Giá khởi điểm", 100000.0);
+                    if (startPrice < 0) return;
+                    durationMinutes = (int) calculateDuration("#artStartDatePicker", "#artStartHourCombo", "#artEndDatePicker", "#artEndHourCombo");
+                    if (durationMinutes < 1440 || durationMinutes > 20160) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-14 ngày"); return; }
+                    payload.put("creator", getFieldValue("#artCreatorField", ""));
+                    payload.put("material", getFieldValue("#artMaterialField", ""));
+                    break;
+
+                case "Xe cộ":
+                    payload.put("type", "VEHICLE"); // SỬA THÀNH CHỮ THƯỜNG
+                    startPrice = validateAndParsePrice(getFieldValue("#vehicleStartPriceField", ""), "Giá khởi điểm", 500000.0);
+                    if (startPrice < 0) return;
+                    durationMinutes = (int) calculateDuration("#vehicleStartDatePicker", "#vehicleStartHourCombo", "#vehicleEndDatePicker", "#vehicleEndHourCombo");
+                    if (durationMinutes < 1440 || durationMinutes > 10080) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-7 ngày"); return; }
+                    int odometer = validateAndParseInt(getFieldValue("#vehicleOdometerField", ""), "Số km", 0, 10000000);
+                    if (odometer < 0) return;
+                    payload.put("model", getFieldValue("#vehicleYearField", ""));
+                    payload.put("odometer", odometer);
+                    break;
+
+                default:
+                    showAlert(Alert.AlertType.ERROR, "Lỗi", "Category không hợp lệ!");
+                    return;
             }
 
-            // Chặn Giá khởi điểm lớn hơn Giá mong muốn
-            if (startPrice > reservePrice) {
-                showAlert(Alert.AlertType.ERROR, "Lỗi đặt giá", "Giá khởi điểm không được lớn hơn Giá mong muốn!");
+            if (durationMinutes <= 0) {
+                showAlert(Alert.AlertType.ERROR, "Lỗi", "Thời gian kết thúc phải sau thời gian bắt đầu!");
                 return;
             }
 
-            String startTime = startDatePicker.getValue().toString() + " " + startHourCombo.getValue();
+            payload.put("startingPrice", startPrice); // SỬA TỪ price THÀNH startingPrice
+            payload.put("duration", durationMinutes);
 
-            System.out.println("Đang tạo phiên đấu giá: " + name
-                    + " | Khởi điểm: " + startPrice
-                    + " | Mong muốn: " + reservePrice
-                    + " | Bước giá: " + stepPrice
-                    + " | Bắt đầu: " + startTime);
+            // Gửi dữ liệu cho Server (ĐÃ SỬA CÁCH TẠO MESSAGE ĐỂ KHÔNG BỊ NULL DATA)
+            new Thread(() -> {
+                try {
+                    Message request = new Message();
+                    request.setType(MessageType.CREATE_SELLER_ITEM);
+                    request.setData(payload); // Gán data rõ ràng
+                    request.setSenderId(currentUser.getUsername());
 
-            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Đã lưu và hiển thị sản phẩm đấu giá!");
+                    socket.sendMessage(request);
+                    Message response = socket.receiveMessage();
 
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", "Giá trị nhập vào phải là số hợp lệ!");
+                    Platform.runLater(() -> {
+                        if (response != null && "SUCCESS".equals(response.getStatus())) {
+                            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Sản phẩm đã được đẩy lên Sàn Đấu Giá!");
+                            clearForm();
+                        } else {
+                            showAlert(Alert.AlertType.ERROR, "Thất bại", "Server từ chối: " + (response != null ? response.getMessage() : ""));
+                        }
+                    });
+                } catch (Exception e) {
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi kết nối", "Mất kết nối tới Server."));
+                    LoggerUtil.error("Lỗi khi tạo sản phẩm đấu giá: " + e.getMessage());
+                }
+            }).start();
+
+        } catch (Exception e) {
+            LoggerUtil.error("Lỗi xử lý UI: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi: " + e.getMessage());
         }
+    }
+
+    private void clearForm() {
+        productNameField.clear();
+        descriptionArea.clear();
+        categoryComboBox.setValue(null);
+        categoryFormPane.getChildren().clear();
+
+        if (imagePreviewContainer != null) {
+            imagePreviewContainer.getChildren().clear();
+        }
+        selectedImagePaths.clear();
     }
 
     @FXML
     private void handleSaveHidden(ActionEvent event) {
-        System.out.println("Lưu nháp sản phẩm...");
+        LoggerUtil.info("Lưu nháp sản phẩm...");
     }
 
     @FXML
     private void handleCancel(ActionEvent event) {
-        System.out.println("Hủy thao tác...");
+        LoggerUtil.info("Hủy thao tác...");
+        clearForm();
     }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {
@@ -153,5 +382,106 @@ public class AddAuctionProductController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
+    }
+
+    private String getFieldValue(String fieldId, String defaultValue) {
+        if (categoryFormPane != null && !categoryFormPane.getChildren().isEmpty()) {
+            Node node = categoryFormPane.getChildren().get(0);
+            if (node instanceof Parent) {
+                Parent form = (Parent) node;
+                TextField field = (TextField) form.lookup(fieldId);
+                if (field != null && !field.getText().isEmpty()) {
+                    return field.getText();
+                }
+            }
+        }
+        return defaultValue;
+    }
+
+    private double validateAndParsePrice(String value, String fieldName, double minValue) {
+        if (value == null || value.trim().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Thiếu thông tin", "Vui lòng nhập " + fieldName + "!");
+            return -1;
+        }
+        try {
+            double price = Double.parseDouble(value);
+            if (price < minValue) {
+                showAlert(Alert.AlertType.ERROR, "Lỗi giá", fieldName + " phải tối thiểu " + minValue);
+                return -1;
+            }
+            return price;
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", fieldName + " phải là số!");
+            return -1;
+        }
+    }
+
+    private double validateAndParseDouble(String value, String fieldName, double minValue, double maxValue) {
+        if (value == null || value.trim().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Thiếu thông tin", "Vui lòng nhập " + fieldName + "!");
+            return -1;
+        }
+        try {
+            double val = Double.parseDouble(value);
+            if (val < minValue || val > maxValue) {
+                showAlert(Alert.AlertType.ERROR, "Lỗi giá trị", fieldName + " phải từ " + minValue + " đến " + maxValue);
+                return -1;
+            }
+            return val;
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", fieldName + " phải là số!");
+            return -1;
+        }
+    }
+
+    private int validateAndParseInt(String value, String fieldName, int minValue, int maxValue) {
+        if (value == null || value.trim().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Thiếu thông tin", "Vui lòng nhập " + fieldName + "!");
+            return -1;
+        }
+        try {
+            int val = Integer.parseInt(value);
+            if (val < minValue || val > maxValue) {
+                showAlert(Alert.AlertType.ERROR, "Lỗi giá trị", fieldName + " phải từ " + minValue + " đến " + maxValue);
+                return -1;
+            }
+            return val;
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", fieldName + " phải là số!");
+            return -1;
+        }
+    }
+
+    private long calculateDuration(String startDateId, String startHourId, String endDateId, String endHourId) {
+        try {
+            if (categoryFormPane != null && !categoryFormPane.getChildren().isEmpty()) {
+                Node node = categoryFormPane.getChildren().get(0);
+                if (node instanceof Parent) {
+                    Parent form = (Parent) node;
+                    DatePicker startDatePicker = (DatePicker) form.lookup(startDateId);
+                    ComboBox<String> startHourCombo = (ComboBox<String>) form.lookup(startHourId);
+                    DatePicker endDatePicker = (DatePicker) form.lookup(endDateId);
+                    ComboBox<String> endHourCombo = (ComboBox<String>) form.lookup(endHourId);
+
+                    if (startDatePicker == null || startHourCombo == null || endDatePicker == null || endHourCombo == null)
+                        return 1440;
+
+                    LocalDate startDate = startDatePicker.getValue();
+                    String startHourStr = startHourCombo.getValue();
+                    LocalDate endDate = endDatePicker.getValue();
+                    String endHourStr = endHourCombo.getValue();
+
+                    if (startDate == null || startHourStr == null || endDate == null || endHourStr == null) return 1440;
+
+                    LocalDateTime startTime = LocalDateTime.of(startDate, LocalTime.parse(startHourStr));
+                    LocalDateTime endTime = LocalDateTime.of(endDate, LocalTime.parse(endHourStr));
+
+                    return Duration.between(startTime, endTime).toMinutes();
+                }
+            }
+        } catch (Exception e) {
+            LoggerUtil.error("Lỗi tính thời gian: " + e.getMessage());
+        }
+        return 1440;
     }
 }

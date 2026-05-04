@@ -608,3 +608,69 @@
 .filter-combo .combo-box-popup .list-view .list-cell:selected {
     -fx-background-color: #eff6ff;
 }
+/* ==========================================================
+   NUKE MODENA: ÉP TABPANE PHẢI THEO Ý MÌNH
+========================================================== */
+
+/* 1. Xóa nền toàn bộ TabPane */
+.my-clean-tabpane.tab-pane {
+    -fx-background-color: transparent !important;
+}
+
+/* 2. Dọn sạch cái background xám xịt mặc định */
+.my-clean-tabpane.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: transparent !important;
+    -fx-border-width: 0 !important;
+}
+
+/* Khoảng cách giữa các tab và nội dung bên dưới */
+.my-clean-tabpane.tab-pane > .tab-header-area {
+    -fx-padding: 0 0 15 0 !important;
+}
+
+/* 3. Khối xám bo tròn bọc ngoài các Tab */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region {
+    -fx-background-color: #e5e7eb !important;
+    -fx-background-radius: 8 !important;
+    -fx-padding: 4 !important;
+}
+
+/* 4. Triệt tiêu toàn bộ viền và nền của từng Tab */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent !important;
+    -fx-background-insets: 0 !important;
+    -fx-border-width: 0 !important;
+    -fx-background-radius: 6 !important;
+    -fx-padding: 8 20 8 20 !important;
+    -fx-cursor: hand !important;
+}
+
+/* Chữ Tab bình thường */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: #6b7280 !important;
+    -fx-font-size: 14px !important;
+}
+
+/* 5. Tab khi được chọn (Bật nền trắng, đổ bóng) */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: white !important;
+    -fx-background-insets: 0 !important;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 1) !important;
+}
+
+/* Chữ Tab khi được chọn */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-text-fill: #111827 !important;
+    -fx-font-weight: bold !important;
+}
+
+/* 6. Xóa cái viền focus màu xanh dương lúc bấm chuột */
+.my-clean-tabpane.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0 !important;
+}
+
+/* 7. Xóa viền của khung nội dung bên dưới */
+.my-clean-tabpane.tab-pane > .tab-content-area {
+    -fx-border-width: 0 !important;
+    -fx-background-color: transparent !important;
+}
