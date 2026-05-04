@@ -51,7 +51,7 @@
                     </VBox>
                 </VBox>
 
-                <StackPane fx:id="categoryFormPane" maxWidth="1.7976931348623157E308" minHeight="400.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
+                <VBox fx:id="categoryFormPane" maxWidth="1.7976931348623157E308" minHeight="400.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
                     <VBox alignment="CENTER" spacing="10.0">
                         <padding>
                             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -60,7 +60,7 @@
                             <font><Font size="14.0" /></font>
                         </Label>
                     </VBox>
-                </StackPane>
+                </VBox>
 
                 <VBox maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
                     <padding>

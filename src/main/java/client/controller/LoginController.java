@@ -3,6 +3,7 @@ package client.controller;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import common.*;
+import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,6 +44,9 @@ public class LoginController {
 
         loginButton.setOnAction(e -> handleLogin());
         registerButton.setOnAction(e -> switchToSignup());
+        usernameField.setOnAction(e -> handleLogin());
+        passwordField.setOnAction(e -> handleLogin());
+        mkShow.setOnAction(e -> handleLogin());
 
         LoggerUtil.info("✓ LoginController initialized");
     }
@@ -50,7 +54,7 @@ public class LoginController {
     @FXML
     private void handleLogin() {
         String email = usernameField.getText().trim();
-        String password = passwordField.getText();
+        String password = getEnteredPassword();
 
         if (email.isEmpty() || password.isEmpty()) {
             showError("❌ Email và mật khẩu không được rỗng!");
@@ -61,7 +65,6 @@ public class LoginController {
 
         new Thread(() -> {
             try {
-                // 1. Khởi tạo kết nối tới Server
                 if (clientSocket == null) {
                     connectionManager = ConnectionManager.getInstance();
                     if (!connectionManager.isConnected()) {
@@ -73,29 +76,23 @@ public class LoginController {
                     clientSocket = connectionManager.getClientSocket();
                 }
 
-                // 2. Gửi yêu cầu đăng nhập tới Server
                 LoginRequest loginRequest = new LoginRequest(email, password);
                 Message loginMsg = new Message(MessageType.LOGIN, loginRequest, email);
                 clientSocket.sendMessage(loginMsg);
 
-                // 3. Đợi phản hồi từ Server
                 Message response = clientSocket.receiveMessage();
 
                 if (response != null && "SUCCESS".equals(response.getStatus())) {
                     try {
-                        // ✅ SỬ DỤNG GSON ĐÃ CẤU HÌNH ADAPTER TỪ JSONUTIL
                         com.google.gson.Gson contextGson = util.JsonUtil.getGson();
 
-                        // Chuyển dữ liệu Object từ Message thành JSON String
                         String json = contextGson.toJson(response.getData());
 
-                        // ✅ Parse thẳng ra User.class, UserTypeAdapter sẽ tự biết tạo Admin hay RegularUser
                         currentUser = contextGson.fromJson(json, server.model.User.class);
 
                         LoggerUtil.info("✓ Login thành công cho user: " + currentUser.getUsername() + " (Role: " + currentUser.getRole() + ")");
                     } catch (Exception e) {
                         LoggerUtil.error("Lỗi parse dữ liệu User: " + e.getMessage());
-                        // Fallback cuối cùng nếu có lỗi parse
                         if (response.getData() instanceof server.model.User) {
                             currentUser = (server.model.User) response.getData();
                         }
@@ -148,7 +145,6 @@ public class LoginController {
                 if (onLoginSuccess != null) {
                     onLoginSuccess.run();
                 } else {
-                    // SỬ DỤNG goToHome() được định nghĩa trong NavigationManager
                     nav.goToHome();
                 }
             }
@@ -199,6 +195,10 @@ public class LoginController {
         passwordField.setManaged(!show);
     }
 
+    private String getEnteredPassword() {
+        return mkShow.isVisible() ? mkShow.getText() : passwordField.getText();
+    }
+
     private void setLoading(boolean isLoading) {
         Platform.runLater(() -> {
             loginButton.setDisable(isLoading);
@@ -221,7 +221,6 @@ public class LoginController {
         });
     }
 
-    // Getters & Setters
     public void setOnLoginSuccess(Runnable callback) { this.onLoginSuccess = callback; }
     public void setOnAdminLoginSuccess(Runnable callback) { this.onAdminLoginSuccess = callback; }
     public void setClientSocket(ClientSocket socket) { this.clientSocket = socket; }

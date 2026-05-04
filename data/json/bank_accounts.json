@@ -5,5 +5,12 @@
     "accountNumber": "0123456789",
     "initialBalance": 1.0E7,
     "createdAt": 1777879997594
+  },
+  {
+    "userId": "U1777887117887",
+    "bankName": "MB",
+    "accountNumber": "20001406300",
+    "initialBalance": 1.0E7,
+    "createdAt": 1777888988821
   }
 ]

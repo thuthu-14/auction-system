@@ -4,6 +4,7 @@ import client.network.ClientSocket;
 import common.Message;
 import common.MessageType;
 import common.Transaction;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -21,6 +22,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import navigation.NavigationManager;
 import server.model.User;
 import util.LoggerUtil;
@@ -134,12 +136,25 @@ public class WalletController implements Initializable {
             }
 
             Pane container = rootPane;
-            Region overlay = new Region();
-            overlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
-            overlay.setPrefSize(2000, 2000);
+            if (container == null && balanceLabel != null && balanceLabel.getScene() != null) {
+                Parent sceneRoot = balanceLabel.getScene().getRoot();
+                if (sceneRoot instanceof Pane) {
+                    container = (Pane) sceneRoot;
+                }
+            }
 
+            Region overlay = null;
             if (container != null) {
+                overlay = new Region();
+                overlay.setStyle("-fx-background-color: rgba(229, 231, 235, 0.74);");
+                overlay.setPrefSize(container.getWidth() + 100, container.getHeight() + 100);
+
+                FadeTransition fadeIn = new FadeTransition(Duration.millis(300), overlay);
+                fadeIn.setFromValue(0);
+                fadeIn.setToValue(1);
+
                 container.getChildren().add(overlay);
+                fadeIn.play();
             }
 
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
@@ -149,8 +164,17 @@ public class WalletController implements Initializable {
 
             dialogController.setUserData(this.currentUser, this.clientSocket);
 
+            final Region finalOverlay = overlay;
+            final Pane finalContainer = container;
+
             dialogController.setOnCloseCallback(() -> {
-                if (container != null) container.getChildren().remove(overlay);
+                if (finalOverlay != null && finalContainer != null) {
+                    FadeTransition fadeOut = new FadeTransition(Duration.millis(200), finalOverlay);
+                    fadeOut.setFromValue(1);
+                    fadeOut.setToValue(0);
+                    fadeOut.setOnFinished(e -> finalContainer.getChildren().remove(finalOverlay));
+                    fadeOut.play();
+                }
             });
 
             dialogController.setOnBankLinkedListener((bank, account, amount) -> {
@@ -174,7 +198,9 @@ public class WalletController implements Initializable {
             dialogStage.setScene(scene);
 
             dialogStage.setOnHiding(e -> {
-                if (container != null) container.getChildren().remove(overlay);
+                if (finalOverlay != null && finalContainer != null && finalContainer.getChildren().contains(finalOverlay)) {
+                    finalContainer.getChildren().remove(finalOverlay);
+                }
             });
 
             dialogStage.showAndWait();

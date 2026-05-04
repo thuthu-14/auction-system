@@ -53,6 +53,14 @@
     -fx-border-color: transparent;
 }
 
+/* ================= FORM LABELS ================= */
+.field-label {
+    -fx-opacity: 1;
+    -fx-text-fill: #4a5568;
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
+}
+
 /* ================= SCROLL BAR ================= */
 .table-view .scroll-bar:vertical, .table-view .scroll-bar:horizontal {
     -fx-background-color: transparent;

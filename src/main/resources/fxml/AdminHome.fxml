@@ -44,9 +44,10 @@
                             </VBox.margin>
                         </Label>
 
-                        <HBox fx:id="menuRecent" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuRecent" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadUserManagementView"
+                              prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
-                                <Button alignment="BASELINE_LEFT" maxWidth="Infinity" onMouseClicked="#loadUserManagementView" style="-fx-background-color: transparent;" text="👥  Quản lý User" textFill="#4a5568" HBox.hgrow="ALWAYS">
+                                <Button alignment="BASELINE_LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" text="👥  Quản lý User" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
                                         <Font size="17.0" />
                                     </font>
@@ -56,9 +57,9 @@
                             </children>
                         </HBox>
 
-                        <HBox fx:id="menuMsg" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuMsg" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadAuctionManagementView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
-                                <Button alignment="BASELINE_LEFT" maxWidth="Infinity" onMouseClicked="#loadAuctionManagementView" style="-fx-background-color: transparent;" text="⚖  Quản lý Phiên đấu" textFill="#4a5568" HBox.hgrow="ALWAYS">
+                                <Button alignment="BASELINE_LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" text="⚖  Quản lý Phiên đấu" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
                                         <Font size="17.0" />
                                     </font>

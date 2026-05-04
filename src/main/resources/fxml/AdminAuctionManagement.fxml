@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -18,7 +20,7 @@
       stylesheets="@../CSS/table.css"
       xmlns="http://javafx.com/javafx/17.0.12"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="client.controller.UserManagementController">
+      fx:controller="client.controller.AdminAuctionManagementController">
 
     <padding>
         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
@@ -29,12 +31,12 @@
             <children>
                 <VBox spacing="5.0">
                     <children>
-                        <Label text="Quản lý người dùng" textFill="#1a1a1a">
+                        <Label text="Quản lý phiên đấu giá" textFill="#1a1a1a">
                             <font>
                                 <Font name="System Bold" size="28.0" />
                             </font>
                         </Label>
-                        <Label text="Xem danh sách, khóa và mở khóa tài khoản thành viên hệ thống" textFill="#4a5568">
+                        <Label text="Theo dõi, lọc và sắp xếp các phiên đấu giá trong hệ thống" textFill="#4a5568">
                             <font>
                                 <Font size="14.0" />
                             </font>
@@ -52,7 +54,7 @@
                     <children>
                         <HBox alignment="CENTER_LEFT"
                               maxHeight="-Infinity"
-                              maxWidth="350.0"
+                              maxWidth="280.0"
                               prefHeight="40.0"
                               style="-fx-background-color: #f3f4f6; -fx-background-radius: 20; -fx-padding: 0 15 0 15;"
                               HBox.hgrow="ALWAYS">
@@ -62,8 +64,8 @@
                                         <Font size="16.0" />
                                     </font>
                                 </Label>
-                                <TextField fx:id="searchUserInput"
-                                           promptText="Tìm theo tên, email, vai trò..."
+                                <TextField fx:id="searchBidInput"
+                                           promptText="Tìm mã phiên, sản phẩm, người bán..."
                                            style="-fx-background-color: transparent; -fx-prompt-text-fill: #9ca3af; -fx-text-fill: #1a1a1a;"
                                            HBox.hgrow="ALWAYS">
                                     <font>
@@ -72,6 +74,26 @@
                                 </TextField>
                             </children>
                         </HBox>
+
+                        <ComboBox fx:id="filterStatus"
+                                  prefHeight="40.0"
+                                  prefWidth="150.0"
+                                  promptText="Trạng thái" />
+
+                        <DatePicker fx:id="filterStartDate"
+                                    prefHeight="40.0"
+                                    prefWidth="145.0"
+                                    promptText="Từ ngày" />
+
+                        <DatePicker fx:id="filterEndDate"
+                                    prefHeight="40.0"
+                                    prefWidth="145.0"
+                                    promptText="Đến ngày" />
+
+                        <ComboBox fx:id="sortOptions"
+                                  prefHeight="40.0"
+                                  prefWidth="165.0"
+                                  promptText="Sắp xếp" />
 
                         <Region HBox.hgrow="ALWAYS" />
 
@@ -82,47 +104,49 @@
                                 <Font name="System Bold" size="14.0" />
                             </font>
                         </Button>
-
-                        <Button fx:id="btnUnlock"
-                                style="-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 8 20 8 20;"
-                                text="Mở khóa">
-                            <font>
-                                <Font name="System Bold" size="14.0" />
-                            </font>
-                        </Button>
-
-                        <Button fx:id="btnLock"
-                                style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 8 20 8 20;"
-                                text="Khóa tài khoản">
-                            <font>
-                                <Font name="System Bold" size="14.0" />
-                            </font>
-                        </Button>
                     </children>
                 </HBox>
+
+                <Label fx:id="totalLabel" text="Tổng số: 0 phiên đấu giá" textFill="#4a5568">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
 
                 <VBox style="-fx-border-color: #f3f4f6; -fx-border-radius: 15; -fx-background-radius: 15; -fx-background-color: #ffffff;"
                       VBox.vgrow="ALWAYS">
                     <children>
-                        <TableView fx:id="userTable"
+                        <TableView fx:id="tableBids"
                                    style="-fx-background-color: transparent; -fx-selection-bar: #e0f2fe; -fx-selection-bar-non-focused: #f3f4f6; -fx-border-color: transparent;"
                                    VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="colId"
-                                             prefWidth="120.0"
-                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 15px; -fx-alignment: CENTER;"
-                                             text="ID" />
-                                <TableColumn fx:id="colUsername"
-                                             prefWidth="360.0"
-                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 15px; -fx-alignment: CENTER-LEFT;"
-                                             text="Người dùng" />
-                                <TableColumn fx:id="colRole"
-                                             prefWidth="200.0"
-                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 15px; -fx-alignment: CENTER;"
-                                             text="Vai trò" />
+                                <TableColumn fx:id="colBidId"
+                                             prefWidth="145.0"
+                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-alignment: CENTER;"
+                                             text="Mã phiên" />
+                                <TableColumn fx:id="colAuctionId"
+                                             prefWidth="145.0"
+                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-alignment: CENTER;"
+                                             text="Mã sản phẩm" />
+                                <TableColumn fx:id="colBidderId"
+                                             prefWidth="140.0"
+                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-alignment: CENTER;"
+                                             text="Người bán" />
+                                <TableColumn fx:id="colBidderName"
+                                             prefWidth="260.0"
+                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-alignment: CENTER-LEFT;"
+                                             text="Sản phẩm" />
+                                <TableColumn fx:id="colAmount"
+                                             prefWidth="150.0"
+                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-alignment: CENTER-RIGHT;"
+                                             text="Giá hiện tại" />
+                                <TableColumn fx:id="colBidTime"
+                                             prefWidth="160.0"
+                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-alignment: CENTER;"
+                                             text="Kết thúc" />
                                 <TableColumn fx:id="colStatus"
-                                             prefWidth="220.0"
-                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 15px; -fx-alignment: CENTER;"
+                                             prefWidth="130.0"
+                                             style="-fx-font-family: 'Segoe UI'; -fx-font-size: 14px; -fx-alignment: CENTER;"
                                              text="Trạng thái" />
                             </columns>
                             <columnResizePolicy>
@@ -135,4 +159,3 @@
         </VBox>
     </children>
 </VBox>
-

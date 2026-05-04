@@ -15,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
@@ -45,7 +46,7 @@ public class AddAuctionProductController implements Initializable {
     @FXML
     private TextArea descriptionArea;
     @FXML
-    private StackPane categoryFormPane;
+    private VBox categoryFormPane;
     @FXML
     private HBox imagePreviewContainer;
 
@@ -143,6 +144,7 @@ public class AddAuctionProductController implements Initializable {
             }
 
             if (formNode != null) {
+                applyCalendarStylesheet(formNode);
                 categoryFormPane.getChildren().add(formNode);
                 setupTimeOptions(formNode);
             }
@@ -195,6 +197,7 @@ public class AddAuctionProductController implements Initializable {
 
         if (startDatePicker != null) startDatePicker.setValue(today);
         if (endDatePicker != null) endDatePicker.setValue(tomorrow);
+        applyCalendarStyles(startDatePicker, endDatePicker);
 
         if (startHourCombo != null) {
             @SuppressWarnings("unchecked") ComboBox<String> comboBox = (ComboBox<String>) startHourCombo;
@@ -206,6 +209,50 @@ public class AddAuctionProductController implements Initializable {
             comboBox.setItems(timeOptions);
             comboBox.getSelectionModel().select("17:00");
         }
+    }
+
+    private void applyCalendarStyles(DatePicker... datePickers) {
+        String calendarCss = getCalendarStylesheet();
+        if (calendarCss == null) return;
+
+        for (DatePicker datePicker : datePickers) {
+            if (datePicker != null && !datePicker.getStylesheets().contains(calendarCss)) {
+                datePicker.getStylesheets().add(calendarCss);
+            }
+            if (datePicker != null) {
+                datePicker.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                    if (newScene != null && !newScene.getStylesheets().contains(calendarCss)) {
+                        newScene.getStylesheets().add(calendarCss);
+                    }
+                });
+                datePicker.setOnShowing(event -> {
+                    if (datePicker.getScene() != null && !datePicker.getScene().getStylesheets().contains(calendarCss)) {
+                        datePicker.getScene().getStylesheets().add(calendarCss);
+                    }
+                });
+            }
+        }
+    }
+
+    private void applyCalendarStylesheet(Parent formNode) {
+        String calendarCss = getCalendarStylesheet();
+        if (calendarCss != null && !formNode.getStylesheets().contains(calendarCss)) {
+            formNode.getStylesheets().add(calendarCss);
+        }
+        Platform.runLater(() -> {
+            if (calendarCss != null && formNode.getScene() != null && !formNode.getScene().getStylesheets().contains(calendarCss)) {
+                formNode.getScene().getStylesheets().add(calendarCss);
+            }
+        });
+    }
+
+    private String getCalendarStylesheet() {
+        URL calendarCssUrl = getClass().getResource("/CSS/calendar.css");
+        if (calendarCssUrl == null) {
+            LoggerUtil.error("Không tìm thấy CSS lịch: /CSS/calendar.css");
+            return null;
+        }
+        return calendarCssUrl.toExternalForm();
     }
 
     private javafx.collections.ObservableList<String> generateTimeOptions() {

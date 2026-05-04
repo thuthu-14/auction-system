@@ -49,5 +49,22 @@
     "role": "SELLER",
     "createdAt": 1777878819405,
     "active": true
+  },
+  {
+    "ownedAuctionIds": [],
+    "bidIds": [],
+    "isSeller": true,
+    "shopName": "Digi",
+    "shopPhone": "0328718657",
+    "shopAddress": "Hòa bình",
+    "shopEmail": "bhbngoc2@gmail.com",
+    "userId": "U1777887117887",
+    "username": "buingoc",
+    "password": "bhbnbhbn",
+    "email": "bhbngoc@gmail.com",
+    "wallet": 0.0,
+    "role": "SELLER",
+    "createdAt": 1777887117887,
+    "active": true
   }
 ]
