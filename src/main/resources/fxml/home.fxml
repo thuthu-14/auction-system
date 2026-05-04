@@ -10,9 +10,10 @@
            minHeight="600.0" minWidth="900.0"
            prefHeight="900.0" prefWidth="1440.0"
            stylesheets="@../CSS/style.css"
+
            xmlns="http://javafx.com/javafx/17.0.12"
            xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="client.controller.HomeController">
+           fx:controller="client.controller.HomeScreenController">
 
     <children>
 
@@ -54,10 +55,10 @@
                             <children>
                                 <Button alignment="BASELINE_LEFT"
                                         graphicTextGap="15.0"
-                                        mouseTransparent="true"
                                         maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                         style="-fx-background-color: transparent;"
-                                        text="🏠   Trang chủ" textFill="#4a5568">
+                                        text="🏠   Trang chủ" textFill="#4a5568"
+                                        onMouseClicked="#loadDashboardView">
                                     <font>
                                         <Font name = "System" size="17.0" />
                                     </font>
@@ -84,7 +85,6 @@
                               style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
                                 <Button alignment="BASELINE_LEFT"
-                                        mouseTransparent="true"
                                         maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                         style="-fx-background-color: transparent;"
                                         text="📈   Lịch sử đấu giá" textFill="#4a5568">
@@ -101,10 +101,10 @@
                               alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" maxWidth="Infinity" style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
                                 <Button alignment="BASELINE_LEFT"
-                                        mouseTransparent="true"
                                         maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                         style="-fx-background-color: transparent;"
-                                        text="🔔   Thông báo" textFill="#4a5568">
+                                        text="🔔   Thông báo" textFill="#4a5568"
+                                        onMouseClicked="#loadNotificationsView">
                                     <font>
                                         <Font size="17.0" />
                                     </font>
@@ -117,11 +117,11 @@
                         <HBox fx:id="menuPay" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" maxWidth="Infinity" style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
                                 <Button alignment="BASELINE_LEFT"
-                                        mouseTransparent="true"
                                         maxWidth="Infinity"
                                         HBox.hgrow="ALWAYS"
                                         style="-fx-background-color: transparent;"
-                                        text="💳   Ví tiền" textFill="#4a5568">
+                                        text="💳   Ví tiền" textFill="#4a5568"
+                                        onAction="#loadWalletView">
                                     <font>
                                         <Font size="17.0" />
                                     </font>
@@ -136,11 +136,12 @@
                         <HBox fx:id="menuUpgrade" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" maxWidth="Infinity" style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
                                 <Button alignment="BASELINE_LEFT"
-                                        mouseTransparent="true"
                                         maxWidth="Infinity"
                                         HBox.hgrow="ALWAYS"
                                         style="-fx-background-color: transparent;"
-                                        text="👨‍🏫  Trở thành Người bán" textFill="#e53e3e">
+                                        text="👨‍🏫  Trở thành Người bán"
+                                        textFill="#e53e3e"
+                                        onAction="#openBecomeSeller">
                                     <font>
                                         <Font name="System Bold" size="16.0" />
                                     </font>
@@ -153,11 +154,10 @@
                         <HBox fx:id="menuSettings" alignment="CENTER_LEFT" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" maxWidth="Infinity" style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
                                 <Button alignment="BASELINE_LEFT"
-                                        mouseTransparent="true"
                                         maxWidth="Infinity"
                                         HBox.hgrow="ALWAYS"
                                         style="-fx-background-color: transparent;"
-                                        text="⚙   Cài đặt" textFill="#4a5568">
+                                        text="⚙   Cài Đặt" textFill="#4a5568">
                                     <font>
                                         <Font size="17.0" />
                                     </font>
@@ -174,7 +174,6 @@
                     <children>
 
                         <HBox alignment="CENTER_LEFT"
-                              minHeight="80.0"
                               prefHeight="80.0"
                               style="-fx-background-color: #ffffff; -fx-padding: 0 40 0 40; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
                             <children>
@@ -211,6 +210,11 @@
 
                                 <Region HBox.hgrow="ALWAYS" />
 
+                                <Button style="-fx-background-color: transparent; -fx-cursor: hand;" text="🌙">
+                                    <font>
+                                        <Font size="20.0" />
+                                    </font>
+                                </Button>
 
                                 <Button onAction="#loadProfileView"
                                         prefHeight="40.0" prefWidth="40.0"
@@ -230,13 +234,13 @@
                             <children>
                                 <VBox alignment="CENTER" spacing="10.0">
                                     <children>
-                                        <Label style="-fx-translate-x: -3;" text="Welcome to BubblyBid Bidder Dashboard" textFill="#2e384d">
+                                        <Label style="-fx-translate-x: -3;" text="Welcome to BubblyBid Dashboard" textFill="#2e384d">
                                             <font>
                                                 <Font name="System Bold" size="28.0" />
                                             </font>
                                         </Label>
 
-                                        <Label text="Đấu giá đê!" textFill="#a0aec0">
+                                        <Label text="Select a menu item from the left to get started" textFill="#a0aec0">
                                             <font>
                                                 <Font size="16.0" />
                                             </font>
