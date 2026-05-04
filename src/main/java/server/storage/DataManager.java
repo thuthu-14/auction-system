@@ -2,7 +2,6 @@ package server.storage;
 
 import common.Constants;
 import util.JsonUtil;
-import util.SerializationUtil;
 import util.LoggerUtil;
 import java.io.IOException;
 
@@ -16,12 +15,6 @@ public class DataManager {
     public static final String JSON_ITEMS = Constants.JSON_DIR + "/items.json";
     public static final String JSON_BANK_ACCOUNTS = Constants.JSON_DIR + "/bank_accounts.json";
 
-
-    public static final String DAT_USERS = Constants.SERIALIZED_DIR + "/users.dat";
-    public static final String DAT_AUCTIONS = Constants.SERIALIZED_DIR + "/auctions.dat";
-    public static final String DAT_BIDS = Constants.SERIALIZED_DIR + "/bids.dat";
-    public static final String DAT_ITEMS = Constants.SERIALIZED_DIR + "/items.dat";
-
     private DataManager() {}
 
     public static synchronized DataManager getInstance() {
@@ -32,20 +25,15 @@ public class DataManager {
     }
 
     public static void initializeDataFiles() throws IOException {
-        LoggerUtil.info("Initializing data files...");
+        LoggerUtil.info("Initializing JSON data files...");
 
+        // Chỉ khởi tạo các file JSON
         JsonUtil.createFileIfNotExists(JSON_USERS);
         JsonUtil.createFileIfNotExists(JSON_AUCTIONS);
         JsonUtil.createFileIfNotExists(JSON_BIDS);
         JsonUtil.createFileIfNotExists(JSON_ITEMS);
         JsonUtil.createFileIfNotExists(JSON_BANK_ACCOUNTS);
 
-
-        SerializationUtil.createFileIfNotExists(DAT_USERS);
-        SerializationUtil.createFileIfNotExists(DAT_AUCTIONS);
-        SerializationUtil.createFileIfNotExists(DAT_BIDS);
-        SerializationUtil.createFileIfNotExists(DAT_ITEMS);
-
-        LoggerUtil.info("All data files initialized");
+        LoggerUtil.info("All JSON data files initialized successfully");
     }
 }

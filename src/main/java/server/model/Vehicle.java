@@ -2,6 +2,8 @@ package server.model;
 
 import common.ItemCategory;
 
+import java.util.List;
+
 public class Vehicle extends Item {
     private static final long serialVersionUID = 1L;
 
@@ -10,10 +12,11 @@ public class Vehicle extends Item {
 
     public Vehicle(String itemId, String name, String description,
                    double startingPrice, String sellerId,
-                   String model, int odometer) {
+                   String model, int odometer, List<String> images) {
         super(itemId, name, description, startingPrice, ItemCategory.VEHICLE, sellerId);
         this.model = model;
         this.odometer = odometer;
+        this.setImages(images);
     }
 
     public Vehicle() {

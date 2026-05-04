@@ -25,6 +25,29 @@ public class Auction implements Serializable {
     private List<String> bidIds;
     private int viewCount;
 
+    // Constructor 1: Với startTimeMillis/endTimeMillis (dùng cho AddAuctionProductController)
+    public Auction(String auctionId, String itemId, String sellerId, String sellerName,
+                   Item item, double startingPrice, long startTimeMillis, long endTimeMillis) {
+        this.auctionId = auctionId;
+        this.itemId = itemId;
+        this.sellerId = sellerId;
+        this.sellerName = sellerName;
+        this.item = item;
+
+        this.currentPrice = startingPrice;
+        this.highestBidderId = null;
+        this.highestBidderName = null;
+
+        this.status = AuctionStatus.OPEN;
+        this.startTime = startTimeMillis;
+        this.endTime = endTimeMillis;
+        this.createdAt = System.currentTimeMillis();
+
+        this.bidIds = new ArrayList<>();
+        this.viewCount = 0;
+    }
+
+    // Constructor 2: Với durationMinutes (dùng cho AuctionService)
     public Auction(String auctionId, String itemId, String sellerId, String sellerName,
                    Item item, double startingPrice, int durationMinutes) {
         this.auctionId = auctionId;
@@ -46,6 +69,7 @@ public class Auction implements Serializable {
         this.viewCount = 0;
     }
 
+    // Constructor 3: Empty
     public Auction() {
         this.bidIds = new ArrayList<>();
     }

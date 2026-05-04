@@ -2,6 +2,8 @@ package server.model;
 
 import common.ItemCategory;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Item implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -14,6 +16,9 @@ public abstract class Item implements Serializable {
     protected String sellerId;
     protected long createdAt;
 
+    // THÊM: Danh sách đường dẫn ảnh
+    protected List<String> images = new ArrayList<>();
+
     public Item(String itemId, String name, String description,
                 double startingPrice, ItemCategory category, String sellerId) {
         this.itemId = itemId;
@@ -23,11 +28,23 @@ public abstract class Item implements Serializable {
         this.category = category;
         this.sellerId = sellerId;
         this.createdAt = System.currentTimeMillis();
+        this.images = new ArrayList<>();
     }
 
-    public Item() {}
+    public Item() {
+        this.images = new ArrayList<>();
+    }
 
     public abstract String getDetailedInfo();
+
+    // THÊM: Getter và Setter cho images để Dashboard có thể lấy ảnh
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
 
     public String getItemId() {
         return itemId;

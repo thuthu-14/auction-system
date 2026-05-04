@@ -2,7 +2,6 @@ package server.storage;
 
 import server.model.User;
 import util.JsonUtil;
-import util.SerializationUtil;
 import util.LoggerUtil;
 import java.io.IOException;
 import java.util.*;
@@ -18,7 +17,7 @@ public class UserDAO {
     public static User getUserById(String userId) throws IOException, ClassNotFoundException {
         List<User> users = getAllUsers();
         for (User user : users) {
-            if (user.getUserId().equals(userId)) {
+            if (user.getUserId() != null && user.getUserId().equals(userId)) {
                 return user;
             }
         }
@@ -28,7 +27,7 @@ public class UserDAO {
     public static User getUserByUsername(String username) throws IOException, ClassNotFoundException {
         List<User> users = getAllUsers();
         for (User user : users) {
-            if (user.getUsername().equals(username)) {
+            if (user.getUsername() != null && user.getUsername().equals(username)) {
                 return user;
             }
         }
@@ -45,37 +44,31 @@ public class UserDAO {
         return null;
     }
 
-
     public static void saveUser(User user) throws IOException, ClassNotFoundException {
         List<User> users = getAllUsers();
-
-        users.removeIf(u -> u.getUserId().equals(user.getUserId()));
-
+        // Xóa bản cũ nếu trùng ID để tránh nhân đôi dữ liệu
+        users.removeIf(u -> u.getUserId() != null && u.getUserId().equals(user.getUserId()));
         users.add(user);
 
+        // CHỈ LƯU JSON
         JsonUtil.saveToJson(DataManager.JSON_USERS, users);
-        SerializationUtil.serialize(DataManager.DAT_USERS, users);
-
-        LoggerUtil.info("User saved: " + user.getUsername());
+        LoggerUtil.info("User updated in JSON: " + user.getUsername());
     }
 
     public static void registerUser(User user) throws IOException, ClassNotFoundException {
         List<User> users = getAllUsers();
         users.add(user);
 
+        // CHỈ LƯU JSON
         JsonUtil.saveToJson(DataManager.JSON_USERS, users);
-        SerializationUtil.serialize(DataManager.DAT_USERS, users);
-
-        LoggerUtil.info("User registered: " + user.getUsername());
+        LoggerUtil.info("User registered in JSON: " + user.getUsername());
     }
 
     public static void deleteUser(String userId) throws IOException, ClassNotFoundException {
         List<User> users = getAllUsers();
-        users.removeIf(u -> u.getUserId().equals(userId));
+        users.removeIf(u -> u.getUserId() != null && u.getUserId().equals(userId));
 
         JsonUtil.saveToJson(DataManager.JSON_USERS, users);
-        SerializationUtil.serialize(DataManager.DAT_USERS, users);
-
-        LoggerUtil.info("User deleted: " + userId);
+        LoggerUtil.info("User deleted from JSON: " + userId);
     }
 }

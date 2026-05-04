@@ -3,6 +3,8 @@ package server.model;
 
 import common.ItemCategory;
 
+import java.util.List;
+
 
 public class Fashion extends Item {
     private static final long serialVersionUID = 1L;
@@ -12,10 +14,11 @@ public class Fashion extends Item {
 
     public Fashion(String itemId, String name, String description,
                    double startingPrice, String sellerId,
-                   String brand, String material) {
+                   String brand, String material, List<String> images) {
         super(itemId, name, description, startingPrice, ItemCategory.FASHION, sellerId);
         this.brand = brand;
         this.material = material;
+        this.setImages(images);
     }
 
     public Fashion() {

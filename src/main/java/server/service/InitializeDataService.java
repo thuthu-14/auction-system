@@ -1,22 +1,16 @@
-// src/main/java/server/service/InitializeDataService.java
 package server.service;
 
 import server.model.*;
 import server.storage.*;
 import common.Constants;
 import util.LoggerUtil;
+import util.JsonUtil; // Import thêm JsonUtil
 import java.io.IOException;
 import java.util.*;
 
 /**
  * InitializeDataService - Tạo dữ liệu mặc định khi server khởi động
- *
- * Logic:
- * 1. Kiểm tra users.json tồn tại + có admin không
- * 2. Nếu không → Tạo admin account
- * 3. Nếu có → Skip
- * 4. items.json, auctions.json, bids.json sẽ trống []
- * 5. User tạo data sau (tự tạo auctions, items, bids)
+ * Đã lược bỏ hoàn toàn Serialization để dùng thuần JSON.
  */
 public class InitializeDataService {
 
@@ -24,26 +18,19 @@ public class InitializeDataService {
      * Khởi tạo tất cả dữ liệu mặc định
      */
     public static void initializeDefaultData() throws IOException, ClassNotFoundException {
-        LoggerUtil.info("📊 Initializing default data...");
+        LoggerUtil.info("📊 Initializing default data (JSON only)...");
 
-        // 1. Tạo admin account nếu chưa tồn tại
-        initializeAdminAccount();
-
-        // 2. Kiểm tra items.json, auctions.json, bids.json tồn tại không
-        // Nếu không → Tạo files trống
+        // 1. Đảm bảo các file JSON tồn tại
         initializeEmptyDataFiles();
+
+        // 2. Tạo admin account nếu chưa tồn tại
+        initializeAdminAccount();
 
         LoggerUtil.info("✓ Default data initialized successfully");
     }
 
     /**
      * Tạo admin account mặc định
-     *
-     * Logic:
-     * 1. Load users từ JSON
-     * 2. Kiểm tra "admin" username tồn tại không
-     * 3. Nếu không → Tạo admin, lưu JSON + Serialized
-     * 4. Nếu có → Skip, display info
      */
     private static void initializeAdminAccount() throws IOException, ClassNotFoundException {
         List<User> users = UserDAO.getAllUsers();
@@ -51,7 +38,8 @@ public class InitializeDataService {
         // Kiểm tra admin account đã tồn tại
         boolean adminExists = false;
         for (User user : users) {
-            if (user.getUsername().equals("admin") && user instanceof Admin) {
+            // Dùng .equals an toàn hơn
+            if ("admin".equals(user.getUsername()) && user instanceof Admin) {
                 adminExists = true;
                 LoggerUtil.info("ℹ Admin account already exists");
                 break;
@@ -64,68 +52,41 @@ public class InitializeDataService {
             admin.setWallet(Constants.ADMIN_WALLET); // $1,000,000
             admin.setActive(true);
 
-            // Lưu vào users.json + users.dat
+            // Lưu vào users.json (Hàm này giờ chỉ lưu JSON theo fix trước đó)
             UserDAO.registerUser(admin);
 
-            // Hiển thị thông tin
-            System.out.println();
-            System.out.println("╔════════════════════════════════════════╗");
-            System.out.println("║   ✅ ADMIN ACCOUNT CREATED              ║");
+            // Hiển thị thông tin trực quan
+            System.out.println("\n╔════════════════════════════════════════╗");
+            System.out.println("║   ✅ ADMIN ACCOUNT CREATED (JSON)      ║");
             System.out.println("╠════════════════════════════════════════╣");
             System.out.println("║ 👤 Username: admin                     ║");
             System.out.println("║ 🔐 Password: admin123                  ║");
             System.out.println("║ 💼 Role: ADMIN                         ║");
             System.out.println("║ 💳 Wallet: $1,000,000.00               ║");
-            System.out.println("╠════════════════════════════════════════╣");
-            System.out.println("║ 📝 Note:                               ║");
-            System.out.println("║ - Only this admin account is created   ║");
-            System.out.println("║ - Other users must register via client ║");
-            System.out.println("║ - Items, Auctions, Bids created by UI  ║");
-            System.out.println("╚════════════════════════════════════════╝");
-            System.out.println();
+            System.out.println("╚════════════════════════════════════════╝\n");
 
-            LoggerUtil.info("✓ Admin account created and saved to JSON + Serialized");
+            LoggerUtil.info("✓ Admin account created and saved to JSON");
         }
     }
 
     /**
-     * ← THÊM: Kiểm tra + tạo empty data files nếu chưa tồn tại
+     * Kiểm tra + tạo empty JSON files nếu chưa tồn tại
+     * Đã xóa bỏ phần tạo file .dat
      */
     private static void initializeEmptyDataFiles() throws IOException {
-        // items.json - trống
-        if (!util.JsonUtil.fileExists(server.storage.DataManager.JSON_ITEMS)) {
-            util.JsonUtil.createFileIfNotExists(server.storage.DataManager.JSON_ITEMS);
-            LoggerUtil.info("✓ Created empty items.json");
-        }
+        String[] jsonFiles = {
+                DataManager.JSON_ITEMS,
+                DataManager.JSON_AUCTIONS,
+                DataManager.JSON_BIDS,
+                DataManager.JSON_USERS,
+                DataManager.JSON_BANK_ACCOUNTS
+        };
 
-        // auctions.json - trống
-        if (!util.JsonUtil.fileExists(server.storage.DataManager.JSON_AUCTIONS)) {
-            util.JsonUtil.createFileIfNotExists(server.storage.DataManager.JSON_AUCTIONS);
-            LoggerUtil.info("✓ Created empty auctions.json");
-        }
-
-        // bids.json - trống
-        if (!util.JsonUtil.fileExists(server.storage.DataManager.JSON_BIDS)) {
-            util.JsonUtil.createFileIfNotExists(server.storage.DataManager.JSON_BIDS);
-            LoggerUtil.info("✓ Created empty bids.json");
-        }
-
-        // items.dat - trống
-        if (!util.SerializationUtil.fileExists(server.storage.DataManager.DAT_ITEMS)) {
-            util.SerializationUtil.createFileIfNotExists(server.storage.DataManager.DAT_ITEMS);
-            LoggerUtil.info("✓ Created empty items.dat");
-        }
-
-        // auctions.dat - trống
-        if (!util.SerializationUtil.fileExists(server.storage.DataManager.DAT_AUCTIONS)) {
-            util.SerializationUtil.createFileIfNotExists(server.storage.DataManager.DAT_AUCTIONS);
-            LoggerUtil.info("✓ Created empty auctions.dat");
-        }
-
-        // bids.dat - trống
-        if (!util.SerializationUtil.fileExists(server.storage.DataManager.DAT_BIDS)) {
-            util.SerializationUtil.createFileIfNotExists(server.storage.DataManager.DAT_BIDS);
-            LoggerUtil.info("✓ Created empty bids.dat");
+        for (String filePath : jsonFiles) {
+            if (!JsonUtil.fileExists(filePath)) {
+                JsonUtil.createFileIfNotExists(filePath);
+                LoggerUtil.info("✓ Created empty JSON file: " + filePath);
+            }
         }
     }
 }

@@ -3,6 +3,8 @@ package server.model;
 
 import common.ItemCategory;
 
+import java.util.List;
+
 /**
  * Jewelry - Loại sản phẩm Trang sức
  * OOP: Inheritance, Polymorphism
@@ -19,10 +21,12 @@ public class Jewelry extends Item {
 
     public Jewelry(String itemId, String name, String description,
                    double startingPrice, String sellerId,
-                   String material, double weight) {
+                   String material, double weight, List<String> images) {
         super(itemId, name, description, startingPrice, ItemCategory.JEWELRY, sellerId);
         this.material = material;
         this.weight = weight;
+        this.setImages(images);
+
     }
 
     public Jewelry() {
