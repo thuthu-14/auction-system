@@ -104,7 +104,7 @@ public class NavigationManager {
      */
     public void goToHome() {
         // Đảm bảo đường dẫn này khớp với tên file FXML của bạn
-        navigateTo("/fxml/Home.fxml");
+        navigateTo("/fxml/home.fxml");
     }
 
     /**
