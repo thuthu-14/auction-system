@@ -7,15 +7,11 @@
 <?import javafx.scene.text.*?>
 
 <StackPane fx:id="rootPane" minHeight="600.0" minWidth="900.0" prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AdminHomeController">
-
     <children>
-
         <HBox style="-fx-background-color: #ffffff;">
             <children>
-
                 <VBox maxWidth="230.0" minWidth="230.0" prefWidth="230.0" spacing="5.0" style="-fx-background-color: #ffffff; -fx-border-color: #f0f0f0; -fx-border-width: 0 1 0 0; -fx-padding: 20 15 20 15;">
                     <children>
-
                         <HBox alignment="CENTER_LEFT" prefHeight="70.0" spacing="5.0">
                             <children>
                                 <ImageView fitHeight="60.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true" smooth="true">
@@ -44,15 +40,15 @@
                             </VBox.margin>
                         </Label>
 
-                        <HBox fx:id="menuRecent" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadUserManagementView"
-                              prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuRecent" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadUserManagementView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
                                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" text="👥  Quản lý User" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
                                         <Font size="17.0" />
                                     </font>
                                     <padding>
-                                        <Insets left="20.0" /> </padding>
+                                        <Insets left="20.0" />
+                                    </padding>
                                 </Button>
                             </children>
                         </HBox>
@@ -64,34 +60,33 @@
                                         <Font size="17.0" />
                                     </font>
                                     <padding>
-                                        <Insets left="20.0" /> </padding>
+                                        <Insets left="20.0" />
+                                    </padding>
                                 </Button>
                             </children>
                         </HBox>
 
                         <Region VBox.vgrow="ALWAYS" />
 
-                        <HBox fx:id="menuUpgrade" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuUpgrade" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadLogOutView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
-                                <Button alignment="BASELINE_LEFT" onMouseClicked="#loadLogOutView" maxWidth="Infinity" style="-fx-background-color: transparent;" text="🚪  Đăng xuất" textFill="#e53e3e" HBox.hgrow="ALWAYS">
+                                <Button alignment="BASELINE_LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" text="🚪  Đăng xuất" textFill="#e53e3e" HBox.hgrow="ALWAYS">
                                     <font>
                                         <Font name="System Bold" size="16.0" />
                                     </font>
                                     <padding>
-                                        <Insets left="18.0" /> </padding>
+                                        <Insets left="18.0" />
+                                    </padding>
                                 </Button>
                             </children>
                         </HBox>
-
                     </children>
                 </VBox>
 
                 <VBox HBox.hgrow="ALWAYS">
                     <children>
-
                         <HBox alignment="CENTER_LEFT" prefHeight="80.0" style="-fx-background-color: #ffffff; -fx-padding: 0 40 0 40; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
                             <children>
-
                                 <Region HBox.hgrow="ALWAYS" />
 
                                 <Button style="-fx-background-color: transparent; -fx-cursor: hand;" text="🌙">
@@ -108,7 +103,6 @@
                                         <Insets left="20.0" />
                                     </HBox.margin>
                                 </Button>
-
                             </children>
                         </HBox>
 
@@ -122,7 +116,7 @@
                                             </font>
                                         </Label>
 
-                                        <Label text="Select a menu item from the left to get started" textFill="#a0aec0">
+                                        <Label text="Chọn một mục ở menu bên trái để bắt đầu" textFill="#a0aec0">
                                             <font>
                                                 <Font size="16.0" />
                                             </font>
@@ -131,13 +125,9 @@
                                 </VBox>
                             </children>
                         </StackPane>
-
                     </children>
                 </VBox>
-
             </children>
         </HBox>
-
     </children>
 </StackPane>
-
