@@ -1,9 +1,20 @@
 package client.controller;
 
+import client.network.ConnectionManager;
+import client.network.ClientSocket;
+import common.Message;
+import common.MessageType;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import navigation.NavigationManager;
+import server.model.User;
+import server.model.RegularUser;
+import util.JsonUtil;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BecomeSellerController {
 
@@ -12,15 +23,14 @@ public class BecomeSellerController {
     @FXML private TextField phoneField;
     @FXML private TextField addressField;
 
-    @FXML private PasswordField passwordField; // Ô ẩn MK (mặc định)
-    @FXML private TextField passwordTextField; // Ô hiện MK
-    @FXML private Button btnTogglePassword;    // Nút con mắt
+    @FXML private PasswordField passwordField;
+    @FXML private TextField passwordTextField;
+    @FXML private Button btnTogglePassword;
 
-    @FXML
-    private Button btnCancel;
-    @FXML
-    private Button btnSave;
+    @FXML private Button btnCancel;
+    @FXML private Button btnSave;
 
+    private User currentUser;
     private boolean isPasswordVisible = false;
 
     @FXML
@@ -28,18 +38,14 @@ public class BecomeSellerController {
         btnSave.setOnAction(event -> handleSave());
         btnCancel.setOnAction(event -> handleCancel());
 
-        //con mắt password
-        btnTogglePassword.setVisible(false); //ẩn khi mở
-        //lắng nghe hành động
+        btnTogglePassword.setVisible(false);
         passwordField.textProperty().addListener((observable, oldValue, newValue) ->
-        {
-            btnTogglePassword.setVisible(!newValue.isEmpty());
-        });
+                btnTogglePassword.setVisible(!newValue.isEmpty())
+        );
 
         passwordTextField.textProperty().addListener((observable, oldValue, newValue) ->
-        {
-            btnTogglePassword.setVisible(!newValue.isEmpty());
-        });
+                btnTogglePassword.setVisible(!newValue.isEmpty())
+        );
     }
 
     private record SellerData(String name, String email, String phone, String address, String password) {}
@@ -49,9 +55,8 @@ public class BecomeSellerController {
         String email = emailField.getText().trim();
         String phone = phoneField.getText().trim();
         String address = addressField.getText().trim();
-        String password = getPassword(); //lấy mk ko trim (mất dấu cách)
+        String password = getPassword();
 
-        // Kiểm tra tính hợp lệ (Validation)
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || address.isEmpty() || password.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đầy đủ tất cả các thông tin!");
             return null;
@@ -69,30 +74,102 @@ public class BecomeSellerController {
 
     @FXML
     private void handleSave() {
+        if (this.currentUser == null) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không lấy được thông tin user hiện tại!");
+            return;
+        }
+
+        if (!(currentUser instanceof RegularUser)) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Chỉ người dùng thường mới có thể nâng cấp!");
+            return;
+        }
+
+        RegularUser regularUser = (RegularUser) currentUser;
+
+        if (regularUser.isSeller()) {
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Bạn đã là Người bán rồi! Không cần nâng cấp lại.");
+            NavigationManager.getInstance().goToHome();
+            return;
+        }
+
         SellerData data = validateInput();
         if (data != null) {
-            // In ra console để test
-            System.out.println("--- ĐANG LƯU THÔNG TIN NGƯỜI BÁN ---");
-            System.out.println("Họ tên: " + data.name);
-            System.out.println("Email: " + data.email);
-            System.out.println("Số điện thoại: " + data.phone);
-            System.out.println("Địa chỉ: " + data.address);
-            System.out.println("Mật khẩu (Đã lấy thành công): " + "*".repeat(data.password.length()));
-            // Trong thực tế, gọi logic Database ở đây
+            btnSave.setDisable(true);
+            btnSave.setText("Đang xử lý...");
 
-            // Hiển thị thông báo thành công
-            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Thông tin đăng ký Người bán đã được lưu!");
-            NavigationManager.getInstance().goToSellerHome();
-            }
+            new Thread(() -> {
+                try {
+                    ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
+                    if (socket == null) {
+                        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Chưa kết nối tới Server!"));
+                        return;
+                    }
+
+                    // 1. Đóng gói dữ liệu gửi Server
+                    Map<String, String> payload = new HashMap<>();
+                    payload.put("userId", currentUser.getUserId());
+                    payload.put("shopName", data.name());
+                    payload.put("phone", data.phone());
+                    payload.put("address", data.address());
+                    payload.put("email", data.email());
+
+                    // 2. Gửi lệnh UPGRADE_SELLER
+                    Message request = new Message(MessageType.UPGRADE_SELLER, payload, currentUser.getUsername());
+                    socket.sendMessage(request);
+
+                    // 3. Chờ phản hồi
+                    Message response = socket.receiveMessage();
+
+                    Platform.runLater(() -> {
+                        if (response != null && "SUCCESS".equals(response.getStatus())) {
+
+                            // Cập nhật User cục bộ
+                            regularUser.upgradeSeller(data.name(), data.phone(), data.address(), data.email());
+
+                            // Lưu JSON cục bộ cho Client
+                            try {
+                                Map<String, String> sellerIdMap = new HashMap<>();
+                                sellerIdMap.put("sellerId", regularUser.getUserId());
+                                sellerIdMap.put("sellerName", regularUser.getShopName());
+                                sellerIdMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
+                                JsonUtil.saveToJson("data/json/current_seller_id.json", sellerIdMap);
+                            } catch (Exception ignored) {}
+
+                            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chúc mừng! Bạn đã trở thành Người bán!");
+
+                            NavigationManager.getInstance().setMainStage((javafx.stage.Stage) nameField.getScene().getWindow());
+                            NavigationManager.getInstance().goToSellerHome();
+                        } else {
+                            String errorMsg = response != null ? response.getMessage() : "Lỗi không xác định";
+                            showAlert(Alert.AlertType.ERROR, "Lỗi Server", errorMsg);
+                        }
+                    });
+
+                } catch (Exception e) {
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi kết nối", "Không thể kết nối tới Server."));
+                } finally {
+                    Platform.runLater(() -> {
+                        btnSave.setDisable(false);
+                        btnSave.setText("Đăng ký");
+                    });
+                }
+            }).start();
+        }
+    }
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
+
+    public User getCurrentUser() {
+        return this.currentUser;
     }
 
     @FXML
     private void handleCancel() {
         NavigationManager.getInstance().goToHome();
-        System.out.println("Người dùng đã bấm Quay lại");
     }
 
-    // Hàm ẩn/hiện mật khẩu
     @FXML
     public void togglePasswordVisibility(ActionEvent event) {
         isPasswordVisible = !isPasswordVisible;
@@ -114,43 +191,15 @@ public class BecomeSellerController {
         passwordField.setManaged(!show);
     }
 
-    // Hàm an toàn để lấy text mật khẩu dù đang ở trạng thái ẩn hay hiện
     private String getPassword() {
         return isPasswordVisible ? passwordTextField.getText() : passwordField.getText();
     }
 
-    // Hàm tạo Popup thông báo
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.initOwner(nameField.getScene().getWindow());
-        alert.initStyle(javafx.stage.StageStyle.TRANSPARENT);
-        alert.setTitle("");
         alert.setHeaderText(null);
         alert.setContentText(message);
-
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.getScene().setFill(javafx.scene.paint.Color.TRANSPARENT);
-        //tạo header riêng
-        javafx.scene.layout.VBox customHeader = new javafx.scene.layout.VBox();
-        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label(title);
-        // Gắn class để style trong CSS
-        titleLabel.getStyleClass().add("custom-title-label");
-        customHeader.getStyleClass().add("custom-header-box");
-        customHeader.getChildren().add(titleLabel);
-        // Gắn Header tự chế vào bảng Alert
-        dialogPane.setHeader(customHeader);
-
-        try {
-            String cssPath = "/CSS/style.css";
-            var cssResource = getClass().getResource(cssPath);
-            if (cssResource != null) {
-                dialogPane.getStylesheets().add(cssResource.toExternalForm());
-                dialogPane.getStyleClass().add("my-custom-alert");
-            }
-        } catch (Exception e) {
-            System.out.println("Cảnh báo: Không load được CSS cho cảnh báo. Chuyển sang giao diện mặc định.");
-        }
-
         alert.showAndWait();
     }
 }
