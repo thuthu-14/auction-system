@@ -1,10 +1,9 @@
 package common;
 
-
 public class Transaction {
     public String id;
     public String userId;
-    public String type;        // "DEPOSIT" hoặc "WITHDRAW"
+    public String type;
     public double amount;
     public double balanceAfter;
     public String description;
@@ -22,15 +21,33 @@ public class Transaction {
         this.timestamp = System.currentTimeMillis();
     }
 
+    // ===== IMPORTANT GETTERS =====
     public String getFormattedDate() {
-        return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date(timestamp));
+        return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm")
+                .format(new java.util.Date(timestamp));
     }
 
     public String getTypeLabel() {
         return "DEPOSIT".equals(type) ? "+ Nạp tiền" : "- Rút tiền";
     }
 
-    public String getTypeColor() {
-        return "DEPOSIT".equals(type) ? "#27ae60" : "#e74c3c";
+    public double getAmount() {
+        return amount;
+    }
+
+    public double getBalanceAfter() {
+        return balanceAfter;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getType() {
+        return type;
     }
 }

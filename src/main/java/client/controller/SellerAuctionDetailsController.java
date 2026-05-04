@@ -1,135 +1,164 @@
 package client.controller;
 
+import client.network.ConnectionManager;
+import client.network.ClientSocket;
+import common.Message;
+import common.MessageType;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import navigation.NavigationManager;
+import server.model.Auction;
+import server.model.User;
+import util.LoggerUtil;
+import util.JsonUtil; // Thêm import JsonUtil
+
+import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class SellerAuctionDetailsController {
 
     @FXML private Label productName, productId, productDesc;
-    @FXML private ImageView productImage, topBidderAvatar;
     @FXML private Label startPrice, currentPrice;
     @FXML private Label startTime, endTime, timeLeft;
     @FXML private Label status, bidCount;
-    @FXML private Label topBidderName, topBidderId, topBidderRating, topBidderPhone;
-    @FXML private Label topBidAmount;
-    @FXML private TableView bidsTable;
+    @FXML private Label topBidderName, topBidAmount;
+    @FXML private ImageView productImage;
 
     private String auctionId;
 
-    @FXML
-    public void initialize() {
-        // Load data when modal opens
-    }
-
-    public void loadAuctionDetails(String auctionId) {
-        this.auctionId = auctionId;
-
-        // Gọi API để lấy dữ liệu
-        // AuctionService.getAuctionDetails(auctionId, response -> {
-        //     productName.setText(response.getProductName());
-        //     currentPrice.setText(formatCurrency(response.getCurrentPrice()));
-        //     bidCount.setText(response.getBidCount() + " lượt");
-        //
-        //     // Load bid history
-        //     loadBidHistory(auctionId);
-        //
-        //     // Load top bidder
-        //     loadTopBidder(auctionId);
-        // });
-    }
-
-    private void loadBidHistory(String auctionId) {
-        // Gọi API để lấy lịch sử đặt giá
-        // AuctionService.getBidHistory(auctionId, bids -> {
-        //     bidsTable.setItems(FXCollections.observableArrayList(bids));
-        // });
-    }
-
-    private void loadTopBidder(String auctionId) {
-        // Gọi API để lấy người đặt giá cao nhất
-        // AuctionService.getTopBidder(auctionId, bidder -> {
-        //     topBidderName.setText(bidder.getName());
-        //     topBidAmount.setText(formatCurrency(bidder.getAmount()));
-        // });
-    }
-
-    @FXML
-    private void handleEdit() {
-        System.out.println("Edit auction: " + auctionId);
-    }
-
-    @FXML
-    private void handlePause() {
-        System.out.println("Pause auction: " + auctionId);
-    }
-
-    @FXML
-    private void handleCancel() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Xác nhận");
-        alert.setContentText("Bạn có chắc muốn hủy phiên này?");
-        alert.getDialogPane().getStyleClass().add("my-custom-alert");
-
-        alert.showAndWait();
-    }
-
-    private String formatCurrency(double amount) {
-        return String.format("%.0f đ", amount);
-    }
-
+    /**
+     * Tải chi tiết phiên đấu giá từ Server
+     */
     public void loadSellerAuctionDetails(String auctionId) {
         this.auctionId = auctionId;
-        System.out.println("Đang tải dữ liệu chi tiết cho phiên đấu giá: " + auctionId);
+        ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
+        User user = NavigationManager.getInstance().getCurrentUser();
 
-        // =======================================================
-        // 1. DỮ LIỆU GIẢ (MOCK DATA) ĐỂ TEST GIAO DIỆN HIỂN THỊ
-        // =======================================================
-        // Thông tin sản phẩm
-        productId.setText("Mã: " + (auctionId != null ? auctionId : "AU-2024-001"));
-        productName.setText("Đồng hồ Seiko 5 Sports");
-        productDesc.setText("Đồng hồ thể thao chính hãng");
+        if (socket == null || user == null) {
+            LoggerUtil.error("Socket hoặc User bị null trong loadSellerAuctionDetails");
+            return;
+        }
 
-        // Thông tin giá
-        startPrice.setText("1.200.000 đ");
-        currentPrice.setText("2.850.000 đ");
+        new Thread(() -> {
+            try {
+                // Gửi yêu cầu lấy chi tiết
+                Message req = new Message(MessageType.GET_AUCTION_DETAIL, auctionId, user.getUsername());
 
-        // Thông tin thời gian
-        startTime.setText("10/04/2026 14:30");
-        endTime.setText("12/04/2026 16:45");
-        timeLeft.setText("1 ngày 5 giờ");
+                // Sử dụng hàm gửi/nhận đồng bộ để tránh bị lẫn dữ liệu với các luồng khác
+                socket.sendMessage(req);
+                Message res = socket.receiveMessage();
 
-        // Trạng thái và lượt đặt
-        status.setText("Đang diễn ra");
-        bidCount.setText("18 lượt");
+                if (res != null && "SUCCESS".equals(res.getStatus()) && res.getData() != null) {
 
-        // Chạy tiếp các hàm load lịch sử và người trúng thầu
-        loadBidHistory(auctionId);
-        loadTopBidder(auctionId);
+                    // --- ĐIỂM CHỐT LÀ Ở ĐÂY ---
+                    // KHÔNG dùng new Gson() nữa. Phải dùng Gson đã đăng ký TypeAdapter!
+                    Gson gson = JsonUtil.getGson();
 
-        // =======================================================
-        // 2. CODE GỌI API THẬT (Mở comment khi có Backend)
-        // =======================================================
-        /*
-        AuctionService.getAuctionDetails(auctionId, response -> {
-            // Lưu ý: Khi gọi API (chạy ở luồng mạng), phải dùng Platform.runLater
-            // để cập nhật giao diện (chạy ở luồng UI) tránh bị lỗi Not on FX application thread.
-            Platform.runLater(() -> {
-                productName.setText(response.getProductName());
-                productId.setText("Mã: " + response.getProductId());
-                productDesc.setText(response.getDescription());
+                    String json = gson.toJson(res.getData());
+                    Auction auction = null;
 
-                startPrice.setText(formatCurrency(response.getStartPrice()));
-                currentPrice.setText(formatCurrency(response.getCurrentPrice()));
+                    // FIX LỖI "Expected BEGIN_OBJECT but was BEGIN_ARRAY"
+                    // Kiểm tra xem dữ liệu trả về là Mảng (List) hay Đối tượng (Object)
+                    if (json.trim().startsWith("[")) {
+                        // Nếu là mảng (Array/List)
+                        Type listType = new TypeToken<ArrayList<Auction>>(){}.getType();
+                        List<Auction> auctionList = gson.fromJson(json, listType);
+                        if (auctionList != null && !auctionList.isEmpty()) {
+                            auction = auctionList.get(0); // Lấy phần tử đầu tiên
+                        }
+                    } else {
+                        // Nếu là đối tượng đơn lẻ
+                        auction = gson.fromJson(json, Auction.class);
+                    }
 
-                startTime.setText(response.getStartTime());
-                endTime.setText(response.getEndTime());
-                timeLeft.setText(response.getTimeLeft());
+                    final Auction finalAuction = auction;
+                    Platform.runLater(() -> {
+                        try {
+                            if (finalAuction != null) {
+                                updateUI(finalAuction);
+                            } else {
+                                LoggerUtil.warn("Không parse được dữ liệu Auction từ Server.");
+                            }
+                        } catch (Exception e) {
+                            LoggerUtil.error("Lỗi khi cập nhật giao diện: " + e.getMessage());
+                        }
+                    });
+                } else {
+                    String errorReason = (res != null && res.getData() != null) ? res.getData().toString() : "Không có phản hồi từ Server";
+                    LoggerUtil.warn("Không tìm thấy chi tiết phiên: " + errorReason);
+                    Platform.runLater(() -> {
+                        if (productName != null) productName.setText("Lỗi: " + errorReason);
+                    });
+                }
+            } catch (Exception e) {
+                LoggerUtil.error("Lỗi kết nối khi lấy chi tiết phiên: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
+    }
 
-                status.setText(response.getStatus());
-                bidCount.setText(response.getBidCount() + " lượt");
-            });
-        });
-        */
+    /**
+     * Cập nhật thông tin lên giao diện
+     */
+    private void updateUI(Auction auction) {
+        if (auction == null) return;
+
+        // Thông tin sản phẩm cơ bản (Kiểm tra null cho từng Label để tránh NullPointerException)
+        if (productName != null) productName.setText(auction.getItem() != null ? auction.getItem().getName() : "N/A");
+        if (productId != null) productId.setText("Mã phiên: " + auction.getAuctionId());
+        if (productDesc != null) productDesc.setText(auction.getItem() != null ? auction.getItem().getDescription() : "");
+
+        // Giá cả
+        if (startPrice != null) startPrice.setText(auction.getItem() != null ? formatVnd(auction.getItem().getStartingPrice()) : "0 đ");
+        if (currentPrice != null) currentPrice.setText(formatVnd(auction.getCurrentPrice()));
+
+        // Thời gian
+        if (startTime != null) startTime.setText(formatDate(auction.getStartTime()));
+        if (endTime != null) endTime.setText(formatDate(auction.getEndTime()));
+
+        if (timeLeft != null) {
+            long remain = auction.getTimeRemainingSeconds();
+            if (remain > 0) {
+                timeLeft.setText(formatRemain(remain));
+                timeLeft.setStyle("-fx-text-fill: #185fa5;"); // Màu xanh nếu còn thời gian
+            } else {
+                timeLeft.setText("Đã kết thúc");
+                timeLeft.setStyle("-fx-text-fill: #dc2626;"); // Màu đỏ nếu đã hết
+            }
+        }
+
+        // Trạng thái
+        if (status != null) {
+            String statusStr = auction.getStatus() != null ? auction.getStatus().toString() : "UNKNOWN";
+            status.setText(statusStr);
+            // Thêm màu sắc cho trạng thái sinh động hơn
+            if (statusStr.equals("ACTIVE")) status.setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-padding: 4 10; -fx-background-radius: 15;");
+            else status.setStyle("-fx-background-color: #f3f4f6; -fx-text-fill: #374151; -fx-padding: 4 10; -fx-background-radius: 15;");
+        }
+
+        // Lượt đặt và người dẫn đầu
+        if (bidCount != null) bidCount.setText((auction.getBidIds() != null ? auction.getBidIds().size() : 0) + " lượt");
+        if (topBidderName != null) topBidderName.setText(auction.getHighestBidderName() != null ? auction.getHighestBidderName() : "Chưa có");
+        if (topBidAmount != null) topBidAmount.setText(formatVnd(auction.getCurrentPrice()));
+    }
+
+    @FXML private void handleEdit() { LoggerUtil.info("Chỉnh sửa: " + auctionId); }
+    @FXML private void handlePause() { LoggerUtil.info("Tạm dừng: " + auctionId); }
+    @FXML private void handleCancel() { LoggerUtil.info("Hủy phiên: " + auctionId); }
+
+    private String formatVnd(double a) { return String.format("%,.0f đ", a).replace(',', '.'); }
+    private String formatDate(long m) { return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date(m)); }
+    private String formatRemain(long s) {
+        long h = s / 3600;
+        long m = (s % 3600) / 60;
+        if (h > 0) return h + " giờ " + m + " phút";
+        return m + " phút";
     }
 }

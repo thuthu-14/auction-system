@@ -1,29 +1,25 @@
-
 package util;
 
 import com.google.gson.*;
+import common.UserRole;
 import server.model.Admin;
 import server.model.RegularUser;
 import server.model.User;
-
 import java.lang.reflect.Type;
 
 public class UserTypeAdapter implements JsonSerializer<User>, JsonDeserializer<User> {
 
     @Override
     public JsonElement serialize(User src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject jsonObject = new JsonObject();
+        // Sử dụng src.getClass() để Gson biết chính xác đang serialize Admin hay RegularUser
+        // Tránh việc gọi lại JsonSerializer<User> gây đệ quy vô hạn
+        JsonObject jsonObject = context.serialize(src, src.getClass()).getAsJsonObject();
 
+        // Thêm trường "type" hoặc "role" để hỗ trợ nhận diện lúc đọc file
         if (src instanceof Admin) {
             jsonObject.addProperty("type", "ADMIN");
         } else {
             jsonObject.addProperty("type", "REGULAR");
-        }
-
-        JsonElement element = context.serialize(src);
-        if (element != null && element.isJsonObject()) {
-            JsonObject srcObj = element.getAsJsonObject();
-            srcObj.entrySet().forEach(entry -> jsonObject.add(entry.getKey(), entry.getValue()));
         }
 
         return jsonObject;
@@ -32,26 +28,22 @@ public class UserTypeAdapter implements JsonSerializer<User>, JsonDeserializer<U
     @Override
     public User deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
-        JsonObject jsonObject = json.getAsJsonObject();
 
-        String type = null;
-        if (jsonObject.has("type") && !jsonObject.get("type").isJsonNull()) {
-            type = jsonObject.get("type").getAsString();
-        } else if (jsonObject.has("role") && !jsonObject.get("role").isJsonNull()) {
-            // Backward compatible cho dữ liệu cũ chưa có field "type"
-            String role = jsonObject.get("role").getAsString();
-            type = "ADMIN".equalsIgnoreCase(role) ? "ADMIN" : "REGULAR";
-        } else {
-            type = "REGULAR";
+        JsonObject obj = json.getAsJsonObject();
+
+        // Kiểm tra field "type" chúng ta vừa thêm hoặc field "role" có sẵn trong model
+        String type = "REGULAR";
+        if (obj.has("type")) {
+            type = obj.get("type").getAsString();
+        } else if (obj.has("role")) {
+            type = obj.get("role").getAsString();
         }
 
-        switch (type.toUpperCase()) {
-            case "ADMIN":
-                return context.deserialize(json, Admin.class);
-            case "REGULAR":
-                return context.deserialize(json, RegularUser.class);
-            default:
-                throw new JsonParseException("Unknown user type: " + type);
+        // Quyết định class con để khởi tạo
+        if ("ADMIN".equalsIgnoreCase(type)) {
+            return context.deserialize(json, Admin.class);
+        } else {
+            return context.deserialize(json, RegularUser.class);
         }
     }
 }

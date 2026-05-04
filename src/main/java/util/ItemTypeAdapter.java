@@ -1,76 +1,51 @@
-// src/main/java/util/ItemTypeAdapter.java
 package util;
 
 import com.google.gson.*;
 import server.model.*;
-import common.ItemCategory;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * ItemTypeAdapter - Hỗ trợ Gson serialize/deserialize polymorphic Item
- *
- * Vấn đề: Item là abstract, Gson ko biết serialize Item nào (Electronics, Art, etc)
- * Giải pháp: Custom type adapter - thêm field "type" vào JSON
- */
 public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<Item> {
 
-    /**
-     * Serialize Item → JSON
-     * Thêm field "type" để biết loại Item
-     */
     @Override
     public JsonElement serialize(Item src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
 
-        // ✅ Thêm type
+        // --- THUỘC TÍNH CHUNG CỦA ITEM ---
+        jsonObject.addProperty("itemId", src.getItemId());
+        jsonObject.addProperty("name", src.getName());
+        jsonObject.addProperty("description", src.getDescription());
+        jsonObject.addProperty("startingPrice", src.getStartingPrice());
+        jsonObject.addProperty("sellerId", src.getSellerId());
+
+        // QUAN TRỌNG: Thêm danh sách ảnh vào JSON
+        jsonObject.add("images", context.serialize(src.getImages()));
+
+        // --- THUỘC TÍNH RIÊNG THEO LOẠI ---
         if (src instanceof Electronics) {
             jsonObject.addProperty("type", "ELECTRONICS");
             Electronics e = (Electronics) src;
-            jsonObject.addProperty("itemId", e.getItemId());
-            jsonObject.addProperty("name", e.getName());
-            jsonObject.addProperty("description", e.getDescription());
-            jsonObject.addProperty("startingPrice", e.getStartingPrice());
-            jsonObject.addProperty("sellerId", e.getSellerId());
             jsonObject.addProperty("brand", e.getBrand());
-            jsonObject.addProperty("warrantyPeriod", e.getWarrantyPeriod());  // ← FIX: warranty → warrantyPeriod
+            jsonObject.addProperty("warrantyPeriod", e.getWarrantyPeriod());
         } else if (src instanceof Art) {
             jsonObject.addProperty("type", "ART");
             Art a = (Art) src;
-            jsonObject.addProperty("itemId", a.getItemId());
-            jsonObject.addProperty("name", a.getName());
-            jsonObject.addProperty("description", a.getDescription());
-            jsonObject.addProperty("startingPrice", a.getStartingPrice());
-            jsonObject.addProperty("sellerId", a.getSellerId());
-            jsonObject.addProperty("creator", a.getCreator());  // ← FIX: artist → creator
-            jsonObject.addProperty("material", a.getMaterial());  // ← FIX: medium → material
+            jsonObject.addProperty("creator", a.getCreator());
+            jsonObject.addProperty("material", a.getMaterial());
         } else if (src instanceof Vehicle) {
             jsonObject.addProperty("type", "VEHICLE");
             Vehicle v = (Vehicle) src;
-            jsonObject.addProperty("itemId", v.getItemId());
-            jsonObject.addProperty("name", v.getName());
-            jsonObject.addProperty("description", v.getDescription());
-            jsonObject.addProperty("startingPrice", v.getStartingPrice());
-            jsonObject.addProperty("sellerId", v.getSellerId());
-            jsonObject.addProperty("model", v.getModel());  // ← FIX: Không có brand
-            jsonObject.addProperty("odometer", v.getOdometer());  // ← FIX: Thêm odometer
+            jsonObject.addProperty("model", v.getModel());
+            jsonObject.addProperty("odometer", v.getOdometer());
         } else if (src instanceof Fashion) {
             jsonObject.addProperty("type", "FASHION");
             Fashion f = (Fashion) src;
-            jsonObject.addProperty("itemId", f.getItemId());
-            jsonObject.addProperty("name", f.getName());
-            jsonObject.addProperty("description", f.getDescription());
-            jsonObject.addProperty("startingPrice", f.getStartingPrice());
-            jsonObject.addProperty("sellerId", f.getSellerId());
             jsonObject.addProperty("brand", f.getBrand());
-            jsonObject.addProperty("material", f.getMaterial());  // ← FIX: size → material
+            jsonObject.addProperty("material", f.getMaterial());
         } else if (src instanceof Jewelry) {
             jsonObject.addProperty("type", "JEWELRY");
             Jewelry j = (Jewelry) src;
-            jsonObject.addProperty("itemId", j.getItemId());
-            jsonObject.addProperty("name", j.getName());
-            jsonObject.addProperty("description", j.getDescription());
-            jsonObject.addProperty("startingPrice", j.getStartingPrice());
-            jsonObject.addProperty("sellerId", j.getSellerId());
             jsonObject.addProperty("material", j.getMaterial());
             jsonObject.addProperty("weight", j.getWeight());
         }
@@ -78,70 +53,84 @@ public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<I
         return jsonObject;
     }
 
-    /**
-     * Deserialize JSON → Item
-     * Đọc field "type" để tạo đúng class
-     */
     @Override
     public Item deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
             throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
 
-        String type = jsonObject.has("type") ? jsonObject.get("type").getAsString() : "UNKNOWN";
+        // Lấy type an toàn
+        String type = getStringSafe(jsonObject, "type", "UNKNOWN");
+
+        // Lấy các thuộc tính chung AN TOÀN (Không bao giờ bị lỗi null nữa)
+        String itemId = getStringSafe(jsonObject, "itemId", "");
+        String name = getStringSafe(jsonObject, "name", "No Name");
+        String description = getStringSafe(jsonObject, "description", "");
+        double startingPrice = getDoubleSafe(jsonObject, "startingPrice", 0.0);
+        String sellerId = getStringSafe(jsonObject, "sellerId", "");
+
+        // Lấy lại list ảnh an toàn
+        List<String> images = new ArrayList<>();
+        if (jsonObject.has("images") && !jsonObject.get("images").isJsonNull()) {
+            List<String> parsedImages = context.deserialize(jsonObject.get("images"), List.class);
+            if (parsedImages != null) {
+                images = parsedImages;
+            }
+        }
 
         switch (type) {
             case "ELECTRONICS":
-                return new Electronics(
-                        jsonObject.get("itemId").getAsString(),
-                        jsonObject.get("name").getAsString(),
-                        jsonObject.get("description").getAsString(),
-                        jsonObject.get("startingPrice").getAsDouble(),
-                        jsonObject.get("sellerId").getAsString(),
-                        jsonObject.get("brand").getAsString(),
-                        jsonObject.get("warrantyPeriod").getAsString()  // ← FIX
-                );
+                return new Electronics(itemId, name, description, startingPrice, sellerId,
+                        getStringSafe(jsonObject, "brand", ""),
+                        getStringSafe(jsonObject, "warrantyPeriod", ""), images);
             case "ART":
-                return new Art(
-                        jsonObject.get("itemId").getAsString(),
-                        jsonObject.get("name").getAsString(),
-                        jsonObject.get("description").getAsString(),
-                        jsonObject.get("startingPrice").getAsDouble(),
-                        jsonObject.get("sellerId").getAsString(),
-                        jsonObject.get("creator").getAsString(),  // ← FIX
-                        jsonObject.get("material").getAsString()  // ← FIX
-                );
+                return new Art(itemId, name, description, startingPrice, sellerId,
+                        getStringSafe(jsonObject, "creator", ""),
+                        getStringSafe(jsonObject, "material", ""), images);
             case "VEHICLE":
-                return new Vehicle(
-                        jsonObject.get("itemId").getAsString(),
-                        jsonObject.get("name").getAsString(),
-                        jsonObject.get("description").getAsString(),
-                        jsonObject.get("startingPrice").getAsDouble(),
-                        jsonObject.get("sellerId").getAsString(),
-                        jsonObject.get("model").getAsString(),  // ← FIX
-                        jsonObject.get("odometer").getAsInt()  // ← FIX
-                );
+                return new Vehicle(itemId, name, description, startingPrice, sellerId,
+                        getStringSafe(jsonObject, "model", ""),
+                        getIntSafe(jsonObject, "odometer", 0), images);
             case "FASHION":
-                return new Fashion(
-                        jsonObject.get("itemId").getAsString(),
-                        jsonObject.get("name").getAsString(),
-                        jsonObject.get("description").getAsString(),
-                        jsonObject.get("startingPrice").getAsDouble(),
-                        jsonObject.get("sellerId").getAsString(),
-                        jsonObject.get("brand").getAsString(),
-                        jsonObject.get("material").getAsString()  // ← FIX
-                );
+                return new Fashion(itemId, name, description, startingPrice, sellerId,
+                        getStringSafe(jsonObject, "brand", ""),
+                        getStringSafe(jsonObject, "material", ""), images);
             case "JEWELRY":
-                return new Jewelry(
-                        jsonObject.get("itemId").getAsString(),
-                        jsonObject.get("name").getAsString(),
-                        jsonObject.get("description").getAsString(),
-                        jsonObject.get("startingPrice").getAsDouble(),
-                        jsonObject.get("sellerId").getAsString(),
-                        jsonObject.get("material").getAsString(),
-                        jsonObject.get("weight").getAsDouble()
-                );
+                return new Jewelry(itemId, name, description, startingPrice, sellerId,
+                        getStringSafe(jsonObject, "material", ""),
+                        getDoubleSafe(jsonObject, "weight", 0.0), images);
             default:
                 throw new JsonParseException("Unknown item type: " + type);
         }
+    }
+
+    // --- CÁC HÀM HỖ TRỢ LẤY DỮ LIỆU AN TOÀN ---
+
+    private String getStringSafe(JsonObject obj, String key, String defaultValue) {
+        if (obj.has(key) && !obj.get(key).isJsonNull()) {
+            return obj.get(key).getAsString();
+        }
+        return defaultValue;
+    }
+
+    private double getDoubleSafe(JsonObject obj, String key, double defaultValue) {
+        if (obj.has(key) && !obj.get(key).isJsonNull()) {
+            try {
+                return obj.get(key).getAsDouble();
+            } catch (NumberFormatException e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    private int getIntSafe(JsonObject obj, String key, int defaultValue) {
+        if (obj.has(key) && !obj.get(key).isJsonNull()) {
+            try {
+                return obj.get(key).getAsInt();
+            } catch (NumberFormatException e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
     }
 }

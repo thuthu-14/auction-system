@@ -1,12 +1,14 @@
 package client.controller;
 
+import client.network.ClientSocket;
+import server.model.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import java.io.IOException;
+import util.LoggerUtil;
 
 public class SellerDashboardController {
 
@@ -16,21 +18,43 @@ public class SellerDashboardController {
     @FXML private VBox cardThongBao;
     @FXML private VBox cardViTien;
 
+    // ===== THÊM ĐỂ LINK SERVER =====
+    private User currentUser;
+    private ClientSocket clientSocket;
+
+    public void setUserData(User user, ClientSocket socket) {
+        this.currentUser = user;
+        this.clientSocket = socket;
+    }
+
     private void loadView(String fxmlPath) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent newNode = loader.load();
+
+            // ===== BƠM DỮ LIỆU SERVER SANG MÀN HÌNH MỚI =====
+            Object controller = loader.getController();
+            if (controller != null) {
+                if (controller instanceof WalletController) {
+                    ((WalletController) controller).setUserData(currentUser, clientSocket);
+                } else if (controller instanceof SellerManagementController) {
+                    ((SellerManagementController) controller).refreshAuctions();
+                }
+                // (Nếu sau này các trang Thống kê, Thông báo cần Server, bạn thêm else if vào đây)
+            }
+
             Pane contentArea = (Pane) cardTaoPhien.getScene().lookup("#contentArea");
             if (contentArea != null) {
                 contentArea.getChildren().setAll(newNode);
             } else {
-                System.err.println("Lỗi: Không tìm thấy fx:id='contentArea' ở trang chính!");
+                LoggerUtil.error("Lỗi: Không tìm thấy fx:id='contentArea' ở trang chính!");
             }
-        } catch (IOException e) {
-            System.err.println("Không thể load file FXML: " + fxmlPath);
+        } catch (Exception e) {
+            LoggerUtil.error("Không thể load file FXML: " + fxmlPath + " - " + e.getMessage());
             e.printStackTrace();
         }
     }
+
     @FXML
     private void onCardClick(MouseEvent event) {
         VBox source = (VBox) event.getSource();
@@ -38,28 +62,27 @@ public class SellerDashboardController {
 
         switch (id) {
             case "cardTaoPhien":
-                System.out.println("Đang mở: Tạo phiên mới");
+                LoggerUtil.info("Đang mở: Tạo phiên mới");
                 loadView("/fxml/AddAuctionProduct.fxml");
                 break;
             case "cardQuanLyPhien":
-                System.out.println("Đang mở: Quản lý phiên");
-                loadView("/fxml/SellerManageAuctions.fxml");
+                LoggerUtil.info("Đang mở: Quản lý phiên");
+                loadView("/fxml/SellerManageAuctions.fxml"); // Sửa lại tên file cho chuẩn với HomeController
                 break;
             case "cardThongKe":
-                System.out.println("Đang mở: Thống kê");
+                LoggerUtil.info("Đang mở: Thống kê");
                 loadView("/fxml/SellerStatistics.fxml");
                 break;
             case "cardThongBao":
-                System.out.println("Đang mở: Thông báo");
+                LoggerUtil.info("Đang mở: Thông báo");
                 loadView("/fxml/SellerNotifications.fxml");
                 break;
             case "cardViTien":
-                System.out.println("Đang mở: Ví tiền");
-                loadView("/fxml/SellerWallet.fxml");
+                LoggerUtil.info("Đang mở: Ví tiền");
+                loadView("/fxml/WalletView.fxml"); // Sửa lại tên file cho chuẩn với HomeController
                 break;
         }
     }
-
 
     @FXML
     private void onCardEnter(MouseEvent event) {
@@ -75,5 +98,4 @@ public class SellerDashboardController {
         source.setScaleX(1.0);
         source.setScaleY(1.0);
     }
-
 }

@@ -115,7 +115,7 @@
 
                         <HBox fx:id="menuManageAuctions"
                               alignment="CENTER_LEFT"
-                              onMouseClicked="#loa"
+                              onMouseClicked="#loadManageAuctionsView"
                               prefHeight="45.0"
                               prefWidth="230.0" maxWidth="Infinity"
                               style="-fx-background-radius: 8; -fx-cursor: hand;">
