@@ -1,7 +1,7 @@
 package client.controller;
 
-import client.network.ConnectionManager;
 import client.network.ClientSocket;
+import client.network.ConnectionManager;
 import common.Message;
 import common.MessageType;
 import javafx.application.Platform;
@@ -10,7 +10,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;

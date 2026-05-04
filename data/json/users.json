@@ -1,5 +1,12 @@
 [
   {
+    "adminLevel": "SUPER_ADMIN",
+    "permissions": [
+      "VIEW_ALL_USERS",
+      "BAN_USER",
+      "DELETE_AUCTION",
+      "VIEW_LOGS"
+    ],
     "userId": "ADMIN001",
     "username": "admin",
     "password": "admin123",
@@ -7,13 +14,19 @@
     "wallet": 1000000.0,
     "role": "ADMIN",
     "createdAt": 1712486400000,
-    "active": true,
-    "adminLevel": "SUPER_ADMIN",
-    "permissions": [
-      "VIEW_ALL_USERS",
-      "BAN_USER",
-      "DELETE_AUCTION",
-      "VIEW_LOGS"
-    ]
+    "active": true
+  },
+  {
+    "ownedAuctionIds": [],
+    "bidIds": [],
+    "isSeller": false,
+    "userId": "U1777878819404",
+    "username": "inhHNgn",
+    "password": "12345678",
+    "email": "posuto@gmail.com",
+    "wallet": 0.0,
+    "role": "BIDDER",
+    "createdAt": 1777878819405,
+    "active": true
   }
 ]

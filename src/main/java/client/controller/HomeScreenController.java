@@ -1,7 +1,6 @@
 package client.controller;
 
 import client.network.ClientSocket;
-import navigation.NavigationManager;
 import server.model.RegularUser;
 import server.model.User;
 

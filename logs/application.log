@@ -11400,3 +11400,330 @@
 [1777739374487] INFO: Connection closed for user: btlnhom
 [1777739457541] INFO: ? Application closed
 [1777739461984] INFO: ? Application closed
+[1777869834853] INFO: ╔════════════════════════════════════════╗
+[1777869834895] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777869834897] INFO: ║   Online Bidding Platform              ║
+[1777869834899] INFO: ╚════════════════════════════════════════╝
+[1777869834915] INFO: AuctionServer initialized
+[1777869834918] INFO: Starting Auction Server...
+[1777869834926] INFO: Initializing JSON data files...
+[1777869835093] INFO: All JSON data files initialized successfully
+[1777869835108] INFO: 📊 Initializing default data (JSON only)...
+[1777869835159] INFO: Server shutdown complete
+[1777869835162] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777869904768] INFO: ╔════════════════════════════════════════╗
+[1777869904807] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777869904809] INFO: ║   Online Bidding Platform              ║
+[1777869904811] INFO: ╚════════════════════════════════════════╝
+[1777869904819] INFO: AuctionServer initialized
+[1777869904822] INFO: Starting Auction Server...
+[1777869904825] INFO: Initializing JSON data files...
+[1777869904902] INFO: All JSON data files initialized successfully
+[1777869904906] INFO: 📊 Initializing default data (JSON only)...
+[1777869904945] INFO: Server shutdown complete
+[1777869904949] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777869920390] INFO: ����������������������������������������ͻ
+[1777869920415] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777869920418] INFO: �   Online Bidding Platform              �
+[1777869920420] INFO: ����������������������������������������ͼ
+[1777869921152] INFO: ? LoginController initialized
+[1777869921949] INFO: ? Login screen displayed
+[1777869958075] INFO: ? SignupController initialized
+[1777869992217] INFO: ? Connecting to server: localhost:5000
+[1777869992254] ERROR: Failed to connect: Connection refused: connect
+[1777870014317] INFO: ? Connecting to server: localhost:5000
+[1777870014320] ERROR: Failed to connect: Connection refused: connect
+[1777870021313] INFO: ? Connecting to server: localhost:5000
+[1777870021316] ERROR: Failed to connect: Connection refused: connect
+[1777870025823] INFO: ? Connecting to server: localhost:5000
+[1777870025827] ERROR: Failed to connect: Connection refused: connect
+[1777870040492] INFO: ? LoginController initialized
+[1777870040554] INFO: Switched back to login screen
+[1777870062057] INFO: ? SignupController initialized
+[1777870087372] INFO: ? Connecting to server: localhost:5000
+[1777870087375] ERROR: Failed to connect: Connection refused: connect
+[1777870114573] INFO: ? Application closed
+[1777870126581] INFO: ╔════════════════════════════════════════╗
+[1777870126621] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870126623] INFO: ║   Online Bidding Platform              ║
+[1777870126626] INFO: ╚════════════════════════════════════════╝
+[1777870126633] INFO: AuctionServer initialized
+[1777870126636] INFO: Starting Auction Server...
+[1777870126639] INFO: Initializing JSON data files...
+[1777870126721] INFO: All JSON data files initialized successfully
+[1777870126725] INFO: 📊 Initializing default data (JSON only)...
+[1777870126759] INFO: Server shutdown complete
+[1777870126762] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870137871] INFO: ����������������������������������������ͻ
+[1777870137897] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777870137899] INFO: �   Online Bidding Platform              �
+[1777870137901] INFO: ����������������������������������������ͼ
+[1777870138618] INFO: ? LoginController initialized
+[1777870139349] INFO: ? Login screen displayed
+[1777870141448] INFO: ? SignupController initialized
+[1777870162591] INFO: ? Connecting to server: localhost:5000
+[1777870162623] ERROR: Failed to connect: Connection refused: connect
+[1777870287485] INFO: ╔════════════════════════════════════════╗
+[1777870287527] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870287529] INFO: ║   Online Bidding Platform              ║
+[1777870287530] INFO: ╚════════════════════════════════════════╝
+[1777870287538] INFO: AuctionServer initialized
+[1777870287541] INFO: Starting Auction Server...
+[1777870287544] INFO: Initializing JSON data files...
+[1777870287622] INFO: All JSON data files initialized successfully
+[1777870287626] INFO: 📊 Initializing default data (JSON only)...
+[1777870287661] INFO: Server shutdown complete
+[1777870287664] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870310628] INFO: ����������������������������������������ͻ
+[1777870310649] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777870310651] INFO: �   Online Bidding Platform              �
+[1777870310653] INFO: ����������������������������������������ͼ
+[1777870311375] INFO: ? LoginController initialized
+[1777870312100] INFO: ? Login screen displayed
+[1777870389540] INFO: ? Application closed
+[1777870399397] INFO: ? Application closed
+[1777870455315] INFO: ╔════════════════════════════════════════╗
+[1777870455358] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870455360] INFO: ║   Online Bidding Platform              ║
+[1777870455362] INFO: ╚════════════════════════════════════════╝
+[1777870455372] INFO: AuctionServer initialized
+[1777870455376] INFO: Starting Auction Server...
+[1777870455381] INFO: Initializing JSON data files...
+[1777870455462] INFO: All JSON data files initialized successfully
+[1777870455466] INFO: 📊 Initializing default data (JSON only)...
+[1777870455499] INFO: Server shutdown complete
+[1777870455503] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870505382] INFO: ╔════════════════════════════════════════╗
+[1777870505423] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870505425] INFO: ║   Online Bidding Platform              ║
+[1777870505440] INFO: ╚════════════════════════════════════════╝
+[1777870505449] INFO: AuctionServer initialized
+[1777870505452] INFO: Starting Auction Server...
+[1777870505455] INFO: Initializing JSON data files...
+[1777870505533] INFO: All JSON data files initialized successfully
+[1777870505538] INFO: 📊 Initializing default data (JSON only)...
+[1777870505573] INFO: Server shutdown complete
+[1777870505577] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870538882] INFO: ╔════════════════════════════════════════╗
+[1777870538922] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870538924] INFO: ║   Online Bidding Platform              ║
+[1777870538926] INFO: ╚════════════════════════════════════════╝
+[1777870538934] INFO: AuctionServer initialized
+[1777870538936] INFO: Starting Auction Server...
+[1777870538939] INFO: Initializing JSON data files...
+[1777870539036] INFO: All JSON data files initialized successfully
+[1777870539040] INFO: 📊 Initializing default data (JSON only)...
+[1777870539074] INFO: Server shutdown complete
+[1777870539077] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870590076] INFO: ����������������������������������������ͻ
+[1777870590101] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777870590102] INFO: �   Online Bidding Platform              �
+[1777870590104] INFO: ����������������������������������������ͼ
+[1777870590799] INFO: ? LoginController initialized
+[1777870591542] INFO: ? Login screen displayed
+[1777870607190] INFO: ? Application closed
+[1777870612670] INFO: ╔════════════════════════════════════════╗
+[1777870612716] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870612718] INFO: ║   Online Bidding Platform              ║
+[1777870612721] INFO: ╚════════════════════════════════════════╝
+[1777870612729] INFO: AuctionServer initialized
+[1777870612731] INFO: Starting Auction Server...
+[1777870612734] INFO: Initializing JSON data files...
+[1777870612812] INFO: All JSON data files initialized successfully
+[1777870612816] INFO: 📊 Initializing default data (JSON only)...
+[1777870612850] INFO: Server shutdown complete
+[1777870612853] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870624617] INFO: ����������������������������������������ͻ
+[1777870624649] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777870624651] INFO: �   Online Bidding Platform              �
+[1777870624653] INFO: ����������������������������������������ͼ
+[1777870625366] INFO: ? LoginController initialized
+[1777870626105] INFO: ? Login screen displayed
+[1777870627925] INFO: ? SignupController initialized
+[1777870655106] INFO: ? Connecting to server: localhost:5000
+[1777870655134] ERROR: Failed to connect: Connection refused: connect
+[1777870672368] INFO: ? Application closed
+[1777870688870] INFO: ╔════════════════════════════════════════╗
+[1777870688911] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870688913] INFO: ║   Online Bidding Platform              ║
+[1777870688915] INFO: ╚════════════════════════════════════════╝
+[1777870688921] INFO: AuctionServer initialized
+[1777870688924] INFO: Starting Auction Server...
+[1777870688927] INFO: Initializing JSON data files...
+[1777870689010] INFO: All JSON data files initialized successfully
+[1777870689015] INFO: 📊 Initializing default data (JSON only)...
+[1777870689057] INFO: Server shutdown complete
+[1777870689061] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870693341] INFO: ╔════════════════════════════════════════╗
+[1777870693384] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870693387] INFO: ║   Online Bidding Platform              ║
+[1777870693389] INFO: ╚════════════════════════════════════════╝
+[1777870693398] INFO: AuctionServer initialized
+[1777870693401] INFO: Starting Auction Server...
+[1777870693404] INFO: Initializing JSON data files...
+[1777870693486] INFO: All JSON data files initialized successfully
+[1777870693491] INFO: 📊 Initializing default data (JSON only)...
+[1777870693528] INFO: Server shutdown complete
+[1777870693532] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870773624] INFO: ╔════════════════════════════════════════╗
+[1777870773668] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870773671] INFO: ║   Online Bidding Platform              ║
+[1777870773673] INFO: ╚════════════════════════════════════════╝
+[1777870773685] INFO: AuctionServer initialized
+[1777870773687] INFO: Starting Auction Server...
+[1777870773691] INFO: Initializing JSON data files...
+[1777870773788] INFO: All JSON data files initialized successfully
+[1777870773794] INFO: 📊 Initializing default data (JSON only)...
+[1777870773831] INFO: Server shutdown complete
+[1777870773835] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870825585] INFO: ╔════════════════════════════════════════╗
+[1777870825640] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870825643] INFO: ║   Online Bidding Platform              ║
+[1777870825646] INFO: ╚════════════════════════════════════════╝
+[1777870825663] INFO: AuctionServer initialized
+[1777870825666] INFO: Starting Auction Server...
+[1777870825676] INFO: Initializing JSON data files...
+[1777870825786] INFO: All JSON data files initialized successfully
+[1777870825792] INFO: 📊 Initializing default data (JSON only)...
+[1777870825837] INFO: Server shutdown complete
+[1777870825841] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870841703] INFO: ����������������������������������������ͻ
+[1777870841731] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777870841733] INFO: �   Online Bidding Platform              �
+[1777870841735] INFO: ����������������������������������������ͼ
+[1777870842623] INFO: ? LoginController initialized
+[1777870843538] INFO: ? Login screen displayed
+[1777870845863] INFO: ? SignupController initialized
+[1777870866109] INFO: ? Connecting to server: localhost:5000
+[1777870866146] ERROR: Failed to connect: Connection refused: connect
+[1777870954392] INFO: ╔════════════════════════════════════════╗
+[1777870954432] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777870954435] INFO: ║   Online Bidding Platform              ║
+[1777870954444] INFO: ╚════════════════════════════════════════╝
+[1777870954454] INFO: AuctionServer initialized
+[1777870954458] INFO: Starting Auction Server...
+[1777870954462] INFO: Initializing JSON data files...
+[1777870954548] INFO: All JSON data files initialized successfully
+[1777870954552] INFO: 📊 Initializing default data (JSON only)...
+[1777870954589] INFO: Server shutdown complete
+[1777870954593] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777870979479] INFO: ����������������������������������������ͻ
+[1777870979498] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777870979499] INFO: �   Online Bidding Platform              �
+[1777870979501] INFO: ����������������������������������������ͼ
+[1777870980239] INFO: ? LoginController initialized
+[1777870981021] INFO: ? Login screen displayed
+[1777870984000] INFO: ? SignupController initialized
+[1777871004809] INFO: ? Connecting to server: localhost:5000
+[1777871004840] ERROR: Failed to connect: Connection refused: connect
+[1777871011762] INFO: ? Application closed
+[1777871018183] INFO: ? Application closed
+[1777871072875] INFO: ╔════════════════════════════════════════╗
+[1777871072913] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777871072916] INFO: ║   Online Bidding Platform              ║
+[1777871072918] INFO: ╚════════════════════════════════════════╝
+[1777871072925] INFO: AuctionServer initialized
+[1777871072928] INFO: Starting Auction Server...
+[1777871072931] INFO: Initializing JSON data files...
+[1777871073015] INFO: All JSON data files initialized successfully
+[1777871073019] INFO: 📊 Initializing default data (JSON only)...
+[1777871073055] INFO: Server shutdown complete
+[1777871073058] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777871090635] INFO: ����������������������������������������ͻ
+[1777871090662] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777871090664] INFO: �   Online Bidding Platform              �
+[1777871090666] INFO: ����������������������������������������ͼ
+[1777871091384] INFO: ? LoginController initialized
+[1777871092119] INFO: ? Login screen displayed
+[1777871120835] INFO: ╔════════════════════════════════════════╗
+[1777871120877] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777871120879] INFO: ║   Online Bidding Platform              ║
+[1777871120881] INFO: ╚════════════════════════════════════════╝
+[1777871120889] INFO: AuctionServer initialized
+[1777871120891] INFO: Starting Auction Server...
+[1777871120895] INFO: Initializing JSON data files...
+[1777871120975] INFO: All JSON data files initialized successfully
+[1777871120980] INFO: 📊 Initializing default data (JSON only)...
+[1777871121017] INFO: Server shutdown complete
+[1777871121021] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777871129376] INFO: ? SignupController initialized
+[1777871149062] INFO: ? Connecting to server: localhost:5000
+[1777871149091] ERROR: Failed to connect: Connection refused: connect
+[1777871155551] INFO: ? LoginController initialized
+[1777871155624] INFO: Switched back to login screen
+[1777871191841] INFO: ? Application closed
+[1777877677194] INFO: ╔════════════════════════════════════════╗
+[1777877677231] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777877677234] INFO: ║   Online Bidding Platform              ║
+[1777877677237] INFO: ╚════════════════════════════════════════╝
+[1777877677247] INFO: AuctionServer initialized
+[1777877677250] INFO: Starting Auction Server...
+[1777877677253] INFO: Initializing JSON data files...
+[1777877677350] INFO: All JSON data files initialized successfully
+[1777877677356] INFO: 📊 Initializing default data (JSON only)...
+[1777877677393] INFO: Server shutdown complete
+[1777877677397] ERROR: FATAL ERROR: Failed making field 'server.model.Admin#adminLevel' accessible; either increase its visibility or write a custom TypeAdapter for its declaring type.
+[1777877889547] INFO: ╔════════════════════════════════════════╗
+[1777877889594] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777877889596] INFO: ║   Online Bidding Platform              ║
+[1777877889599] INFO: ╚════════════════════════════════════════╝
+[1777877889606] INFO: AuctionServer initialized
+[1777877889609] INFO: Starting Auction Server...
+[1777877889612] INFO: Initializing JSON data files...
+[1777877889691] INFO: All JSON data files initialized successfully
+[1777877889696] INFO: 📊 Initializing default data (JSON only)...
+[1777877889731] INFO: Server shutdown complete
+[1777877889734] ERROR: FATAL ERROR: Unable to make field public static final common.UserRole common.UserRole.BIDDER accessible: module io.auctionsystem does not "exports common" to module com.google.gson
+[1777878752247] INFO: ╔════════════════════════════════════════╗
+[1777878752284] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777878752287] INFO: ║   Online Bidding Platform              ║
+[1777878752289] INFO: ╚════════════════════════════════════════╝
+[1777878752300] INFO: AuctionServer initialized
+[1777878752302] INFO: Starting Auction Server...
+[1777878752306] INFO: Initializing JSON data files...
+[1777878752413] INFO: All JSON data files initialized successfully
+[1777878752419] INFO: 📊 Initializing default data (JSON only)...
+[1777878752495] INFO: ℹ Admin account already exists
+[1777878752500] INFO: ✓ Default data initialized successfully
+[1777878752509] INFO: Scheduler started
+[1777878793729] INFO: ����������������������������������������ͻ
+[1777878793748] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777878793750] INFO: �   Online Bidding Platform              �
+[1777878793751] INFO: ����������������������������������������ͼ
+[1777878794453] INFO: ? LoginController initialized
+[1777878795252] INFO: ? Login screen displayed
+[1777878797279] INFO: ? SignupController initialized
+[1777878819284] INFO: ? Connecting to server: localhost:5000
+[1777878819354] INFO: ? ClientSocket initialized
+[1777878819356] INFO: ? Connected to server successfully
+[1777878819369] INFO: ClientHandler created for 127.0.0.1:61104
+[1777878819372] INFO: Client connected: 127.0.0.1 - Active clients: 1
+[1777878819375] DEBUG: ? Message sent: REGISTER
+[1777878819388] DEBUG: Received message: REGISTER from 127.0.0.1:61104
+[1777878819425] INFO: ✓ Saved to JSON: data/json/users.json
+[1777878819427] INFO: User registered in JSON: inhHNgn
+[1777878819429] INFO: ✓ User registered: inhHNgn (Role: BIDDER)
+[1777878819440] DEBUG: Sent message: SUCCESS to 127.0.0.1:61104
+[1777878819442] DEBUG: ? Message received: SUCCESS
+[1777878819442] INFO: User registered: inhHNgn
+[1777878819554] INFO: ? LoginController initialized
+[1777878819633] INFO: Switched back to login screen
+[1777878870536] DEBUG: ? Message sent: LOGIN
+[1777878870539] DEBUG: Received message: LOGIN from 127.0.0.1:61104
+[1777878870544] DEBUG: Sent message: SUCCESS to 127.0.0.1:61104
+[1777878870544] DEBUG: ? Message received: SUCCESS
+[1777878870546] INFO: User logged in: inhHNgn (Role: BIDDER)
+[1777878870656] INFO: ? Login th�nh c�ng cho user: inhHNgn (Role: BIDDER)
+[1777878870669] INFO: ?i?u h??ng: M�n h�nh Home (Bidder)
+[1777878870995] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1777878870996] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:61104
+[1777878871006] DEBUG: ? Message received: SUCCESS
+[1777878871005] DEBUG: Sent message: SUCCESS to 127.0.0.1:61104
+[1777879017608] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1777879017609] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:61104
+[1777879017613] DEBUG: ? Message received: SUCCESS
+[1777879017613] DEBUG: Sent message: SUCCESS to 127.0.0.1:61104
+[1777879083404] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1777879083404] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:61104
+[1777879083408] DEBUG: Sent message: SUCCESS to 127.0.0.1:61104
+[1777879083408] DEBUG: ? Message received: SUCCESS

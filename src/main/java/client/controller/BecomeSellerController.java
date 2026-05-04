@@ -1,7 +1,7 @@
 package client.controller;
 
-import client.network.ConnectionManager;
 import client.network.ClientSocket;
+import client.network.ConnectionManager;
 import common.Message;
 import common.MessageType;
 import javafx.application.Platform;

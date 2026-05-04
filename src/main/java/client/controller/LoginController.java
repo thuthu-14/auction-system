@@ -3,7 +3,6 @@ package client.controller;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import common.*;
-import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
