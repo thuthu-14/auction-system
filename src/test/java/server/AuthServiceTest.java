@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import server.exception.AuthenticationException;
 import server.model.User;
+import server.service.AuthService;
 
 public class AuthServiceTest {
 

@@ -11,6 +11,7 @@ import server.model.Electronics;
 import server.model.Item;
 import server.model.RegularUser;
 import util.DateTimeUtil;
+import java.util.Collections;
 
 public class AuctionTest {
 
@@ -22,7 +23,7 @@ public class AuctionTest {
     public void setUp() {
         seller = new RegularUser("U001", "seller", "pass123", "seller@test.com");
         item = new Electronics("IT001", "Laptop", "Good laptop",
-                500, seller.getUserId(), "Dell", "24 months");
+                500, seller.getUserId(), "Dell", "24 months", Collections.emptyList());
 
         auction = new Auction("AU001", "IT001", seller.getUserId(), "seller",
                 item, 500, 60);

@@ -9,9 +9,13 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import server.exception.PermissionDeniedException;
 import common.AuctionStatus;
+import server.model.Auction;
 import server.model.Electronics;
+import server.model.Item;
 import server.model.RegularUser;
 import server.service.AuctionService;
+import java.util.Collections;
+
 
 public class AuctionServiceTest {
 
@@ -23,7 +27,8 @@ public class AuctionServiceTest {
         seller = new RegularUser("U001", "seller", "pass123", "seller@test.com");
         seller.setWallet(10000);
         item = new Electronics("IT001", "Laptop", "Good laptop",
-                500, seller.getUserId(), "Dell", "24 months");
+                500, seller.getUserId(), "Dell", "24 months", Collections.emptyList());
+
     }
 
     @Test
@@ -86,7 +91,8 @@ public class AuctionServiceTest {
     public void testCreateAuctionZeroPrice() {
         try {
             Item zeroItem = new Electronics("IT002", "Free Item", "Desc",
-                    0, seller.getUserId(), "Brand", "12 months");
+                    0, seller.getUserId(), "Brand", "12 months", Collections.emptyList());
+
             AuctionService.createAuction(seller, zeroItem, 60);
             fail("Should throw PermissionDeniedException");
         } catch (PermissionDeniedException e) {

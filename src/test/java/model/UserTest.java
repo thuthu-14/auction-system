@@ -68,7 +68,7 @@ public class UserTest {
     public void testUpgradeToSeller() {
         assertFalse(regularUser.isSeller());
 
-        regularUser.upgradeSeller();
+        regularUser.upgradeSeller(null,null,null,null);
 
         assertTrue(regularUser.isSeller());
 

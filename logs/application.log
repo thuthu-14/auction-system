@@ -11973,3 +11973,15 @@
 [1777883357876] ERROR: ClientHandler IO error (127.0.0.1:53433): Connection reset
 [1777883357881] INFO: Client removed - Active clients: 0
 [1777883357884] INFO: Connection closed for user: inhHNgn
+[1777887234286] INFO: ╔════════════════════════════════════════╗
+[1777887234610] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777887234612] INFO: ║   Online Bidding Platform              ║
+[1777887234615] INFO: ╚════════════════════════════════════════╝
+[1777887235293] INFO: AuctionServer initialized
+[1777887235296] INFO: Starting Auction Server...
+[1777887235299] INFO: Initializing JSON data files...
+[1777887235451] INFO: All JSON data files initialized successfully
+[1777887235467] INFO: 📊 Initializing default data (JSON only)...
+[1777887235575] INFO: ℹ Admin account already exists
+[1777887235577] INFO: ✓ Default data initialized successfully
+[1777887235587] INFO: Scheduler started

@@ -4,13 +4,17 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import common.ItemCategory;
+import server.model.*;
+
+import java.util.Collections;
 
 public class ItemTest {
 
     @Test
     public void testElectronicsCreation() {
         Electronics electronics = new Electronics("IT001", "Laptop",
-                "High-performance laptop", 1000, "U001", "Dell", "24 months");
+                "High-performance laptop", 1000, "U001", "Dell", "24 months", Collections.emptyList());
+
 
         assertNotNull(electronics);
         assertEquals("IT001", electronics.getItemId());
@@ -25,7 +29,8 @@ public class ItemTest {
     @Test
     public void testArtCreation() {
         Art art = new Art("IT002", "Painting", "Beautiful painting",
-                500, "U001", "Van Gogh", "Oil on canvas");
+                500, "U001", "Van Gogh", "Oil on canvas", Collections.emptyList());
+
 
         assertNotNull(art);
         assertEquals("IT002", art.getItemId());
@@ -40,7 +45,8 @@ public class ItemTest {
     @Test
     public void testVehicleCreation() {
         Vehicle vehicle = new Vehicle("IT003", "Honda CB500F",
-                "Sports motorcycle", 3000, "U001", "Honda CB500F", 5200);
+                "Sports motorcycle", 3000, "U001", "Honda CB500F", 5200, Collections.emptyList());
+
 
         assertNotNull(vehicle);
         assertEquals("IT003", vehicle.getItemId());
@@ -55,7 +61,8 @@ public class ItemTest {
     @Test
     public void testFashionCreation() {
         Fashion fashion = new Fashion("IT004", "Nike Shoes",
-                "Running shoes", 150, "U001", "Nike", "Leather");
+                "Running shoes", 150, "U001", "Nike", "Leather", Collections.emptyList());
+
 
         assertNotNull(fashion);
         assertEquals("IT004", fashion.getItemId());
@@ -70,7 +77,8 @@ public class ItemTest {
     @Test
     public void testJewelryCreation() {
         Jewelry jewelry = new Jewelry("IT005", "Gold Ring",
-                "Beautiful gold ring", 500, "U001", "Gold", 5.5);
+                "Beautiful gold ring", 500, "U001", "Gold", 5.5, Collections.emptyList());
+
 
         assertNotNull(jewelry);
         assertEquals("IT005", jewelry.getItemId());
@@ -85,7 +93,9 @@ public class ItemTest {
     @Test
     public void testElectronicsDetailedInfo() {
         Electronics electronics = new Electronics("IT001", "Laptop",
-                "High-performance laptop", 1000, "U001", "Dell", "24 months");
+                "High-performance laptop", 1000, "U001", "Dell", "24 months", Collections.emptyList());
+
+
 
         String info = electronics.getDetailedInfo();
         assertNotNull(info);
@@ -100,7 +110,8 @@ public class ItemTest {
     @Test
     public void testElectronicsWithNullBrand() {
         Electronics electronics = new Electronics("IT001", "Laptop",
-                "Laptop", 1000, "U001", null, "12 months");
+                "Laptop", 1000, "U001", null, "12 months", Collections.emptyList());
+
 
         assertNull(electronics.getBrand());
 

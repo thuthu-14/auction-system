@@ -6,6 +6,13 @@ import org.junit.After;
 import static org.junit.Assert.*;
 
 import server.concurrency.ConcurrentBidManager;
+import server.exception.InvalidBidException;
+import server.model.Auction;
+import server.model.Electronics;
+import server.model.Item;
+import server.model.RegularUser;
+import java.util.Collections;
+
 
 import java.util.concurrent.*;
 
@@ -34,7 +41,8 @@ public class ConcurrentBidTest {
         bidder3.setWallet(10000);
 
         item = new Electronics("IT001", "Laptop", "Good laptop",
-                500, seller.getUserId(), "Dell", "24 months");
+                500, seller.getUserId(), "Dell", "24 months", Collections.emptyList());
+
 
         auction = new Auction("AU001", "IT001", seller.getUserId(), "seller",
                 item, 500, 60);

@@ -6,9 +6,13 @@ import org.junit.After;
 import static org.junit.Assert.*;
 
 import common.AuctionStatus;
-import server.model.Auction;
-import server.model.Item;
-import server.model.RegularUser;
+import server.exception.AuctionClosedException;
+import server.exception.InvalidBidException;
+import server.exception.PermissionDeniedException;
+import server.model.*;
+import server.service.BidService;
+import java.util.Collections;
+
 
 public class BidServiceTest {
 
@@ -26,7 +30,8 @@ public class BidServiceTest {
         bidder.setWallet(5000);
 
         item = new Electronics("IT001", "Laptop", "Good laptop",
-                500, seller.getUserId(), "Dell", "24 months");
+                500, seller.getUserId(), "Dell", "24 months", Collections.emptyList());
+
 
         // Tạo auction
         auction = new Auction("AU001", "IT001", seller.getUserId(), "seller",
