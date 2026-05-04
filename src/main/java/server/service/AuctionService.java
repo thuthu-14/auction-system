@@ -1,5 +1,7 @@
 package server.service;
 
+import server.model.*;
+import server.storage.*;
 import server.exception.PermissionDeniedException;
 import common.AuctionStatus;
 import server.model.Auction;
@@ -14,9 +16,19 @@ import java.io.IOException;
 import java.util.*;
 
 public class AuctionService {
+
+    /**
+     * Tạo auction mới
+     * Kiểm tra:
+     * 1. Seller hợp lệ
+     * 2. Item hợp lệ
+     * 3. Starting price >= minimum của category
+     * 4. Duration trong range của category
+     */
     public static Auction createAuction(RegularUser seller, Item item, int durationMinutes)
             throws PermissionDeniedException, IOException, ClassNotFoundException {
 
+        // Validate input
         if (seller == null) {
             throw new PermissionDeniedException("❌ Seller không hợp lệ!");
         }
@@ -25,11 +37,7 @@ public class AuctionService {
             throw new PermissionDeniedException("❌ Item không hợp lệ!");
         }
 
-        if (!item.getCategory().equals(common.ItemCategory.ELECTRONICS) &&
-                !item.getCategory().equals(common.ItemCategory.ART) &&
-                !item.getCategory().equals(common.ItemCategory.VEHICLE) &&
-                !item.getCategory().equals(common.ItemCategory.FASHION) &&
-                !item.getCategory().equals(common.ItemCategory.JEWELRY)) {
+        if (item.getCategory() == null) {
             throw new PermissionDeniedException("❌ Loại sản phẩm không hợp lệ!");
         }
 
@@ -52,6 +60,7 @@ public class AuctionService {
         String itemId = "IT" + System.currentTimeMillis();
         item.setItemId(itemId);
 
+        // ← SỬ DỤNG CONSTRUCTOR CỦA AUCTION (dùng cái cũ vì có durationMinutes)
         Auction auction = new Auction(auctionId, itemId, seller.getUserId(),
                 seller.getUsername(), item,
                 item.getStartingPrice(), durationMinutes);

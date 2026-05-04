@@ -109,3 +109,4 @@ public class BidService {
         return BidDAO.getBidsByBidderId(bidderId);
     }
 }
+
