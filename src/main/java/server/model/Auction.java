@@ -151,12 +151,19 @@ public class Auction implements Serializable {
         }
     }
 
-    public int getViewCount() { return viewCount; }
-    public void setViewCount(int viewCount) { this.viewCount = viewCount; }
+    public int getViewCount() {
+        return viewCount; }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount; }
 
     @Override
     public String toString() {
         return "Auction{" + "auctionId='" + auctionId + '\'' + ", item=" +
                 (item != null ? item.getName() : "null") + '}';
+    }
+
+    public void incrementViewCount() {
+        this.viewCount++;
     }
 }
