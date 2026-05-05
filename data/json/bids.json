@@ -7,5 +7,14 @@
     "amount": 2.000005E7,
     "bidTime": 1777880546393,
     "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1777942291834",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1777887117887",
+    "bidderName": "buingoc",
+    "amount": 2.020005E7,
+    "bidTime": 1777942291836,
+    "status": "ACTIVE"
   }
 ]

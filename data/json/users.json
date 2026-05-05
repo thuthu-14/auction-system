@@ -51,8 +51,12 @@
     "active": true
   },
   {
-    "ownedAuctionIds": [],
-    "bidIds": [],
+    "ownedAuctionIds": [
+      "AU1777941343347"
+    ],
+    "bidIds": [
+      "BID1777942291834"
+    ],
     "isSeller": true,
     "shopName": "Digi",
     "shopPhone": "0328718657",
@@ -65,6 +69,19 @@
     "wallet": 0.0,
     "role": "SELLER",
     "createdAt": 1777887117887,
+    "active": true
+  },
+  {
+    "ownedAuctionIds": [],
+    "bidIds": [],
+    "isSeller": false,
+    "userId": "U1777942394909",
+    "username": "nhipham",
+    "password": "123456",
+    "email": "nhi123@gmail.com",
+    "wallet": 0.0,
+    "role": "BIDDER",
+    "createdAt": 1777942394909,
     "active": true
   }
 ]

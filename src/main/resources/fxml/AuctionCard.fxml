@@ -11,11 +11,11 @@
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
     </padding>
     <children>
-        <Pane prefHeight="220.0" prefWidth="220.0" style="-fx-background-color: #f8fafc; -fx-background-radius: 8;">
+        <StackPane fx:id="imageContainer" maxWidth="1.7976931348623157E308" prefHeight="220.0" style="-fx-background-color: #f8fafc; -fx-background-radius: 8;" VBox.vgrow="NEVER">
             <children>
-                <ImageView fx:id="productImageView" fitHeight="193.0" fitWidth="220.0" pickOnBounds="true" preserveRatio="true" />
+                <ImageView fx:id="productImageView" fitHeight="220.0" fitWidth="220.0" pickOnBounds="true" preserveRatio="false" smooth="true" />
             </children>
-        </Pane>
+        </StackPane>
 
         <Label fx:id="productNameLabel" maxWidth="1.7976931348623157E308" text="MacBook Pro M3 Max 36GB" textFill="#113254" wrapText="true">
             <font>
