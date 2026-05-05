@@ -11985,3 +11985,85 @@
 [1777887235575] INFO: ℹ Admin account already exists
 [1777887235577] INFO: ✓ Default data initialized successfully
 [1777887235587] INFO: Scheduler started
+[1777904129666] INFO: ╔════════════════════════════════════════╗
+[1777904129670] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777904129671] INFO: ║   Online Bidding Platform              ║
+[1777904129671] INFO: ╚════════════════════════════════════════╝
+[1777904129681] INFO: AuctionServer initialized
+[1777904129682] INFO: Starting Auction Server...
+[1777904129683] INFO: Initializing JSON data files...
+[1777904129721] INFO: All JSON data files initialized successfully
+[1777904129723] INFO: 📊 Initializing default data (JSON only)...
+[1777904129748] INFO: ℹ Admin account already exists
+[1777904129748] INFO: ✓ Default data initialized successfully
+[1777904129751] INFO: Scheduler started
+[1777923021419] INFO: ╔════════════════════════════════════════╗
+[1777923021428] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1777923021429] INFO: ║   Online Bidding Platform              ║
+[1777923021430] INFO: ╚════════════════════════════════════════╝
+[1777923021451] INFO: AuctionServer initialized
+[1777923021452] INFO: Starting Auction Server...
+[1777923021454] INFO: Initializing JSON data files...
+[1777923021549] INFO: All JSON data files initialized successfully
+[1777923021552] INFO: 📊 Initializing default data (JSON only)...
+[1777923021600] INFO: ℹ Admin account already exists
+[1777923021602] INFO: ✓ Default data initialized successfully
+[1777923021606] INFO: Scheduler started
+[1777923031576] INFO: ����������������������������������������ͻ
+[1777923031595] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1777923031596] INFO: �   Online Bidding Platform              �
+[1777923031597] INFO: ����������������������������������������ͼ
+[1777923032172] INFO: ? LoginController initialized
+[1777923032713] INFO: ? Login screen displayed
+[1777923041696] INFO: ? Connecting to server: localhost:5000
+[1777923041725] INFO: ? ClientSocket initialized
+[1777923041725] INFO: ClientHandler created for 127.0.0.1:63702
+[1777923041725] INFO: ? Connected to server successfully
+[1777923041726] INFO: Client connected: 127.0.0.1 - Active clients: 1
+[1777923041733] DEBUG: ? Message sent: LOGIN
+[1777923041740] DEBUG: Received message: LOGIN from 127.0.0.1:63702
+[1777923041754] DEBUG: Sent message: SUCCESS to 127.0.0.1:63702
+[1777923041756] INFO: User logged in: buingoc (Role: SELLER)
+[1777923041757] DEBUG: ? Message received: SUCCESS
+[1777923041833] INFO: ? Login th�nh c�ng cho user: buingoc (Role: SELLER)
+[1777923041840] INFO: ? Saved to JSON: data/json/current_seller_id.json
+[1777923041936] INFO: SellerHomeController ?? nh?n data cho user: buingoc
+[1777923047932] DEBUG: ? Message sent: GET_SELLER_AUCTIONS
+[1777923047933] DEBUG: Received message: GET_SELLER_AUCTIONS from 127.0.0.1:63702
+[1777923047937] DEBUG: Sent message: SUCCESS to 127.0.0.1:63702
+[1777923047939] DEBUG: ? Message received: SUCCESS
+[1777923047940] INFO: ✓ Retrieved 0 seller auctions
+[1777923047940] DEBUG: ? Message sent: GET_SELLER_AUCTIONS
+[1777923047942] DEBUG: Received message: GET_SELLER_AUCTIONS from 127.0.0.1:63702
+[1777923047945] DEBUG: Sent message: SUCCESS to 127.0.0.1:63702
+[1777923047945] DEBUG: ? Message received: SUCCESS
+[1777923047946] INFO: ✓ Retrieved 0 seller auctions
+[1777923049023] DEBUG: ? Message sent: GET_SELLER_AUCTIONS
+[1777923049025] DEBUG: Received message: GET_SELLER_AUCTIONS from 127.0.0.1:63702
+[1777923049028] DEBUG: ? Message received: SUCCESS
+[1777923049028] DEBUG: Sent message: SUCCESS to 127.0.0.1:63702
+[1777923049030] INFO: ✓ Retrieved 0 seller auctions
+[1777923049164] INFO: ?? t?i xong d? li?u Th?ng k� cho Seller.
+[1777923050012] ERROR: Kh�ng t�m th?y file: /fxml/SellerNotifications.fxml
+[1777923052288] ERROR: Kh�ng t�m th?y file: /fxml/SellerNotifications.fxml
+[1777923054502] ERROR: Kh�ng t�m th?y file: /fxml/SellerNotifications.fxml
+[1777923057270] DEBUG: ? Message sent: GET_SELLER_AUCTIONS
+[1777923057270] DEBUG: Received message: GET_SELLER_AUCTIONS from 127.0.0.1:63702
+[1777923057274] DEBUG: ? Message received: SUCCESS
+[1777923057274] DEBUG: Sent message: SUCCESS to 127.0.0.1:63702
+[1777923057276] INFO: ✓ Retrieved 0 seller auctions
+[1777923057321] INFO: ?? t?i xong d? li?u Th?ng k� cho Seller.
+[1777923059812] DEBUG: ? Message sent: GET_SELLER_AUCTIONS
+[1777923059813] DEBUG: Received message: GET_SELLER_AUCTIONS from 127.0.0.1:63702
+[1777923059820] DEBUG: Sent message: SUCCESS to 127.0.0.1:63702
+[1777923059820] DEBUG: ? Message received: SUCCESS
+[1777923059822] INFO: ✓ Retrieved 0 seller auctions
+[1777923059823] DEBUG: ? Message sent: GET_SELLER_AUCTIONS
+[1777923059823] DEBUG: Received message: GET_SELLER_AUCTIONS from 127.0.0.1:63702
+[1777923059827] DEBUG: ? Message received: SUCCESS
+[1777923059827] DEBUG: Sent message: SUCCESS to 127.0.0.1:63702
+[1777923059828] INFO: ✓ Retrieved 0 seller auctions
+[1777923065199] INFO: ? Application closed
+[1777923065669] ERROR: ClientHandler IO error (127.0.0.1:63702): Connection reset
+[1777923065673] INFO: Client removed - Active clients: 0
+[1777923065674] INFO: Connection closed for user: buingoc
