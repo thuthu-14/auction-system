@@ -16,5 +16,77 @@
     "amount": 2.020005E7,
     "bidTime": 1777942291836,
     "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1777947233491",
+    "auctionId": "AU1777941343347",
+    "bidderId": "U1777943074443",
+    "bidderName": "hanpham",
+    "amount": 20000.0,
+    "bidTime": 1777947233492,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1777947263561",
+    "auctionId": "AU1777941343347",
+    "bidderId": "U1777943074443",
+    "bidderName": "hanpham",
+    "amount": 40000.0,
+    "bidTime": 1777947263561,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778002395331",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1777887117887",
+    "bidderName": "buingoc",
+    "amount": 2.035005E7,
+    "bidTime": 1778002395333,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778002402747",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1777887117887",
+    "bidderName": "buingoc",
+    "amount": 2.050005E7,
+    "bidTime": 1778002402747,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778002407404",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1777887117887",
+    "bidderName": "buingoc",
+    "amount": 2.065005E7,
+    "bidTime": 1778002407404,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778002414388",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1777887117887",
+    "bidderName": "buingoc",
+    "amount": 2.080005E7,
+    "bidTime": 1778002414388,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778002868362",
+    "auctionId": "AU1777941343347",
+    "bidderId": "U1777943074443",
+    "bidderName": "hanpham",
+    "amount": 50000.0,
+    "bidTime": 1778002868362,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778002872786",
+    "auctionId": "AU1777941343347",
+    "bidderId": "U1777943074443",
+    "bidderName": "hanpham",
+    "amount": 60000.0,
+    "bidTime": 1778002872786,
+    "status": "ACTIVE"
   }
 ]

@@ -51,27 +51,6 @@
     "active": true
   },
   {
-    "ownedAuctionIds": [
-      "AU1777941343347"
-    ],
-    "bidIds": [
-      "BID1777942291834"
-    ],
-    "isSeller": true,
-    "shopName": "Digi",
-    "shopPhone": "0328718657",
-    "shopAddress": "Hòa bình",
-    "shopEmail": "bhbngoc2@gmail.com",
-    "userId": "U1777887117887",
-    "username": "buingoc",
-    "password": "bhbnbhbn",
-    "email": "bhbngoc@gmail.com",
-    "wallet": 0.0,
-    "role": "SELLER",
-    "createdAt": 1777887117887,
-    "active": true
-  },
-  {
     "ownedAuctionIds": [],
     "bidIds": [],
     "isSeller": false,
@@ -82,6 +61,62 @@
     "wallet": 0.0,
     "role": "BIDDER",
     "createdAt": 1777942394909,
+    "active": true
+  },
+  {
+    "ownedAuctionIds": [],
+    "bidIds": [],
+    "isSeller": false,
+    "userId": "U1777943026744",
+    "username": "baohan",
+    "password": "1234566",
+    "email": "han@gmail.com",
+    "wallet": 0.0,
+    "role": "BIDDER",
+    "createdAt": 1777943026744,
+    "active": false
+  },
+  {
+    "ownedAuctionIds": [
+      "AU1777941343347"
+    ],
+    "bidIds": [
+      "BID1777942291834",
+      "BID1778002395331",
+      "BID1778002402747",
+      "BID1778002407404",
+      "BID1778002414388"
+    ],
+    "isSeller": true,
+    "shopName": "Digi",
+    "shopPhone": "0328718657",
+    "shopAddress": "Hòa bình",
+    "shopEmail": "bhbngoc2@gmail.com",
+    "userId": "U1777887117887",
+    "username": "buingoc",
+    "password": "bhbnbhbn",
+    "email": "bhbngoc@gmail.com",
+    "wallet": 29999.0,
+    "role": "SELLER",
+    "createdAt": 1777887117887,
+    "active": true
+  },
+  {
+    "ownedAuctionIds": [],
+    "bidIds": [
+      "BID1777947233491",
+      "BID1777947263561",
+      "BID1778002868362",
+      "BID1778002872786"
+    ],
+    "isSeller": false,
+    "userId": "U1777943074443",
+    "username": "hanpham",
+    "password": "123456",
+    "email": "baohan@gmail.com",
+    "wallet": 1.000322222E9,
+    "role": "BIDDER",
+    "createdAt": 1777943074443,
     "active": true
   }
 ]

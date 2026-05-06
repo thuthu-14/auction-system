@@ -8,6 +8,8 @@ import common.Message;
 import common.MessageType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -25,6 +27,8 @@ import javafx.util.Duration;
 import util.DateTimeUtil;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -43,12 +47,14 @@ public class AuctionDetailController {
     @FXML private Label minuteLabel;
     @FXML private Label secondLabel;
     @FXML private TextField bidAmountField;
+    @FXML private LineChart<String, Number> bidHistoryChart;
 
     @FXML private Button decreaseBidBtn;
     @FXML private Button increaseBidBtn;
     @FXML private Button confirmBidBtn;
 
     private double currentPrice;
+    private double startingPrice;
     private double minimumBidIncrement = 500000;
     private String currentAuctionId;
 
@@ -128,6 +134,7 @@ public class AuctionDetailController {
         rootData.add("item", json);
 
         loadAuctionData(rootData);
+        loadBidHistoryChart();
 
         // --- CHỈ SỬA Ở ĐÂY: GỌI HÀM TIMELINE ---
         startCountdown(auction.getEndTime());
@@ -143,8 +150,9 @@ public class AuctionDetailController {
         productNameLabel.setText(getString(productData, "name", "Chưa có tên sản phẩm"));
         descriptionLabel.setText(getString(productData, "description", "Chưa có mô tả"));
         currentAuctionId = getString(itemData, "auctionId", "");
+        startingPrice = getDouble(productData, "startingPrice", 0);
         if (currentPriceLabel != null) {
-            currentPrice = getDouble(itemData, "currentPrice", getDouble(productData, "startingPrice", 0));
+            currentPrice = getDouble(itemData, "currentPrice", startingPrice);
             currentPriceLabel.setText(formatVnd(currentPrice));
         }
         String type = getString(productData, "type", "");
@@ -235,6 +243,9 @@ public class AuctionDetailController {
                         currentPrice = amount;
                         currentPriceLabel.setText(formatVnd(currentPrice));
                         bidAmountField.setText(formatPlainNumber(currentPrice + minimumBidIncrement));
+                        if (response.getData() instanceof Bid bid) {
+                            appendBidToChart(bid);
+                        }
                     } else {
                         showAlert(Alert.AlertType.ERROR, "Thất bại", response != null ? response.getMessage() : "Lỗi server");
                     }
@@ -295,6 +306,81 @@ public class AuctionDetailController {
         dynamicDetailsGrid.add(vLabel, 1, rowIndex);
         return rowIndex + 1;
     }
+
+    private void loadBidHistoryChart() {
+        if (bidHistoryChart == null) {
+            return;
+        }
+
+        bidHistoryChart.setAnimated(false);
+        if (currentAuctionId == null || currentAuctionId.isBlank()) {
+            updateBidHistoryChart(List.of());
+            return;
+        }
+
+        ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
+        User currentUser = NavigationManager.getInstance().getCurrentUser();
+        if (socket == null || currentUser == null) {
+            updateBidHistoryChart(List.of());
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                Message request = new Message(MessageType.GET_BID_HISTORY, currentAuctionId, currentUser.getUsername());
+                socket.sendMessage(request);
+                Message response = socket.receiveMessage();
+
+                if (response != null && "SUCCESS".equals(response.getStatus())) {
+                    @SuppressWarnings("unchecked")
+                    List<Bid> bids = (List<Bid>) response.getData();
+                    Platform.runLater(() -> updateBidHistoryChart(bids != null ? bids : List.of()));
+                } else {
+                    Platform.runLater(() -> updateBidHistoryChart(List.of()));
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> updateBidHistoryChart(List.of()));
+            }
+        }).start();
+    }
+
+    private void updateBidHistoryChart(List<Bid> bids) {
+        if (bidHistoryChart == null) {
+            return;
+        }
+
+        List<Bid> sortedBids = new ArrayList<>(bids != null ? bids : List.of());
+        sortedBids.sort(Comparator.comparingLong(Bid::getBidTime));
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Giá theo lượt bid");
+
+        double firstValue = startingPrice > 0 ? startingPrice : currentPrice;
+        series.getData().add(new XYChart.Data<>("Giá đầu", firstValue));
+
+        for (int i = 0; i < sortedBids.size(); i++) {
+            Bid bid = sortedBids.get(i);
+            series.getData().add(new XYChart.Data<>("Lượt " + (i + 1), bid.getAmount()));
+        }
+
+        bidHistoryChart.getData().setAll(series);
+    }
+
+    private void appendBidToChart(Bid bid) {
+        if (bidHistoryChart == null || bid == null) {
+            return;
+        }
+
+        if (bidHistoryChart.getData().isEmpty()) {
+            updateBidHistoryChart(List.of(bid));
+            return;
+        }
+
+        XYChart.Series<String, Number> series = bidHistoryChart.getData().get(0);
+        int nextBidIndex = Math.max(1, series.getData().size());
+        series.getData().add(new XYChart.Data<>("Lượt " + nextBidIndex, bid.getAmount()));
+    }
+
     private double parseBidAmount() {
         try { return Double.parseDouble(bidAmountField.getText().replaceAll("[^0-9]", "")); }
         catch (Exception e) { return currentPrice + minimumBidIncrement; }

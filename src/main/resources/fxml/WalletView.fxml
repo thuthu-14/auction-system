@@ -126,7 +126,8 @@
                     <columns>
                         <TableColumn fx:id="dateColumn" prefWidth="150.0" text="Ngày giờ" />
                         <TableColumn fx:id="typeColumn" prefWidth="120.0" text="Loại giao dịch" />
-                        <TableColumn fx:id="amountColumn" prefWidth="120.0" text="Số tiền" />
+                        <TableColumn fx:id="moneyInColumn" prefWidth="120.0" text="Tiền vào" />
+                        <TableColumn fx:id="moneyOutColumn" prefWidth="120.0" text="Tiền ra" />
                         <TableColumn fx:id="balanceColumn" prefWidth="120.0" text="Số dư sau" />
                         <TableColumn fx:id="descriptionColumn" prefWidth="200.0" text="Mô tả" />
                     </columns>

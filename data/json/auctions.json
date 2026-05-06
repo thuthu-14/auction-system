@@ -1,31 +1,5 @@
 [
   {
-    "auctionId": "AU1777941343347",
-    "itemId": "IT1777941343348",
-    "sellerId": "U1777887117887",
-    "sellerName": "buingoc",
-    "item": {
-      "itemId": "IT1777941343348",
-      "name": "Lược Chải Đầu Đệm Khí Massage Da Đầu, Tạo Kiểu Tóc - Làm Phồng Chân Tóc Và Gỡ Rối Tóc Hiệu Quả",
-      "description": "❌GIỚI THIẾU SẢN PHẨM :\nLược có những sợi răng mềm mại với nhiều màu sắc khác nhau giúp bạn có thể sử dụng nó cho nhiều kiểu tóc từ ngắn, dài, dày, mỏng, tóc thẳng và cả tóc xoăn.\n- Gỡ rối cho mái tóc ướt\n- Vòng lược rộng giúp chải theo lọn sóng gọn và đẹp hơn.\n- Thiết kế khe hở giữa răng lượt, cho luồng gió đi qua dễ dàng, kết hợp với máy sấy để tạo kiểu tóc. \n- Tạo đồ phồng dày và sự mềm mượt, bồng bềnh cho mái tóc\n- Thiết kế răng lược bọc đầu massage silicone gỡ rối hiệu quả không để lại bất cứ tổn thương nào trên bề mặt thân sợi tóc. \n- Thúc đẩy lưu thông máu, kích hoạt các nang tóc và ngăn ngừa rụng tóc.\n- Trọng lượng nhẹ, thiết kế kẽ hở trên thân lược giúp hơi ẩm và nước từ tóc ướt được thoát hơi dễ dàng và làm tóc khô nhanh hơn, đồng thời thiết kế này cũng giúp dễ dàng vệ sinh lược\n - Nhẹ và Di động: Thiết kế Trọng lượng nhẹ, Cực kỳ Thuận tiện Mang theo Ở Nhà hoặc Đi Du lịch.Sử dụng các dịp:",
-      "startingPrice": 10000.0,
-      "sellerId": "U1777887117887",
-      "images": [
-        "file:/C:/Users/Admin/Downloads/vn-11134207-81ztc-mlpqzu8c2e4i28.jpg"
-      ],
-      "type": "FASHION",
-      "brand": "No brand",
-      "material": "Nhựa abs"
-    },
-    "currentPrice": 10000.0,
-    "status": "OPEN",
-    "startTime": 1777941343348,
-    "endTime": 1778060143348,
-    "createdAt": 1777941343348,
-    "bidIds": [],
-    "viewCount": 0
-  },
-  {
     "auctionId": "AU1777879942563",
     "itemId": "IT1777879942565",
     "sellerId": "U1777878819404",
@@ -43,7 +17,7 @@
       "brand": "Apple",
       "warrantyPeriod": "1 Year"
     },
-    "currentPrice": 2.020005E7,
+    "currentPrice": 2.080005E7,
     "highestBidderId": "U1777887117887",
     "highestBidderName": "buingoc",
     "status": "RUNNING",
@@ -52,7 +26,44 @@
     "createdAt": 1777879942566,
     "bidIds": [
       "BID1777880546392",
-      "BID1777942291834"
+      "BID1777942291834",
+      "BID1778002395331",
+      "BID1778002402747",
+      "BID1778002407404",
+      "BID1778002414388"
+    ],
+    "viewCount": 0
+  },
+  {
+    "auctionId": "AU1777941343347",
+    "itemId": "IT1777941343348",
+    "sellerId": "U1777887117887",
+    "sellerName": "buingoc",
+    "item": {
+      "itemId": "IT1777941343348",
+      "name": "Lược Chải Đầu Đệm Khí Massage Da Đầu, Tạo Kiểu Tóc - Làm Phồng Chân Tóc Và Gỡ Rối Tóc Hiệu Quả",
+      "description": "❌GIỚI THIẾU SẢN PHẨM :\nLược có những sợi răng mềm mại với nhiều màu sắc khác nhau giúp bạn có thể sử dụng nó cho nhiều kiểu tóc từ ngắn, dài, dày, mỏng, tóc thẳng và cả tóc xoăn.\n- Gỡ rối cho mái tóc ướt\n- Vòng lược rộng giúp chải theo lọn sóng gọn và đẹp hơn.\n- Thiết kế khe hở giữa răng lượt, cho luồng gió đi qua dễ dàng, kết hợp với máy sấy để tạo kiểu tóc. \n- Tạo đồ phồng dày và sự mềm mượt, bồng bềnh cho mái tóc\n- Thiết kế răng lược bọc đầu massage silicone gỡ rối hiệu quả không để lại bất cứ tổn thương nào trên bề mặt thân sợi tóc. \n- Thúc đẩy lưu thông máu, kích hoạt các nang tóc và ngăn ngừa rụng tóc.\n- Trọng lượng nhẹ, thiết kế kẽ hở trên thân lược giúp hơi ẩm và nước từ tóc ướt được thoát hơi dễ dàng và làm tóc khô nhanh hơn, đồng thời thiết kế này cũng giúp dễ dàng vệ sinh lược\n - Nhẹ và Di động: Thiết kế Trọng lượng nhẹ, Cực kỳ Thuận tiện Mang theo Ở Nhà hoặc Đi Du lịch.Sử dụng các dịp:",
+      "startingPrice": 10000.0,
+      "sellerId": "U1777887117887",
+      "images": [
+        "file:/C:/Users/Admin/Downloads/vn-11134207-81ztc-mlpqzu8c2e4i28.jpg"
+      ],
+      "type": "FASHION",
+      "brand": "No brand",
+      "material": "Nhựa abs"
+    },
+    "currentPrice": 60000.0,
+    "highestBidderId": "U1777943074443",
+    "highestBidderName": "hanpham",
+    "status": "RUNNING",
+    "startTime": 1777941343348,
+    "endTime": 1778060143348,
+    "createdAt": 1777941343348,
+    "bidIds": [
+      "BID1777947233491",
+      "BID1777947263561",
+      "BID1778002868362",
+      "BID1778002872786"
     ],
     "viewCount": 0
   }

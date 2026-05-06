@@ -35,8 +35,20 @@ public class Transaction {
         return amount;
     }
 
+    public String getMoneyIn() {
+        return "DEPOSIT".equals(type) ? formatVnd(amount) : "";
+    }
+
+    public String getMoneyOut() {
+        return "WITHDRAW".equals(type) ? formatVnd(amount) : "";
+    }
+
     public double getBalanceAfter() {
         return balanceAfter;
+    }
+
+    public String getFormattedBalanceAfter() {
+        return formatVnd(balanceAfter);
     }
 
     public String getDescription() {
@@ -49,5 +61,9 @@ public class Transaction {
 
     public String getType() {
         return type;
+    }
+
+    private String formatVnd(double value) {
+        return String.format("%,.0f đ", value);
     }
 }

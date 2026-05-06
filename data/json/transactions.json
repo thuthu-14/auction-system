@@ -16,5 +16,32 @@
     "balanceAfter": 3.0E7,
     "description": "Rút tiền về ngân hàng",
     "timestamp": 1777883293547
+  },
+  {
+    "id": "TXN_1777946515620",
+    "userId": "U1777943074443",
+    "type": "DEPOSIT",
+    "amount": 322222.0,
+    "balanceAfter": 322222.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1777946515621
+  },
+  {
+    "id": "TXN_1777946537565",
+    "userId": "U1777943074443",
+    "type": "DEPOSIT",
+    "amount": 1.0E9,
+    "balanceAfter": 1.000322222E9,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1777946537565
+  },
+  {
+    "id": "TXN_1777946724305",
+    "userId": "U1777887117887",
+    "type": "DEPOSIT",
+    "amount": 29999.0,
+    "balanceAfter": 29999.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1777946724306
   }
 ]

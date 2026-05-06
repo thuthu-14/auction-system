@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+    </padding>
+    <children>
+        <VBox spacing="5.0">
+            <children>
+                <Label text="Lịch sử đấu giá" textFill="#1a1a1a">
+                    <font>
+                        <Font name="System Bold" size="28.0" />
+                    </font>
+                </Label>
+                <Label text="Toàn bộ lịch sử đặt giá của bạn. Theo dõi trạng thái và đối chiếu các phiên đấu giá." textFill="#718096">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+            </children>
+        </VBox>
+
+        <Separator prefWidth="200.0" style="-fx-opacity: 0.3;" />
+
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <children>
+                <ComboBox prefHeight="45.0" prefWidth="160.0" promptText="Tất cả trạng thái" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px; -fx-cursor: hand;" />
+
+                <ComboBox prefHeight="45.0" prefWidth="160.0" promptText="Tháng này" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px; -fx-cursor: hand;" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <TextField prefHeight="45.0" prefWidth="280.0" promptText="Nhập tên sản phẩm..." style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-border-color: transparent; -fx-padding: 0 15 0 15;">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </TextField>
+
+                <Button prefHeight="45.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 10; -fx-cursor: hand;" text="Tìm kiếm" textFill="white">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                    <padding>
+                        <Insets left="20.0" right="20.0" />
+                    </padding>
+                </Button>
+            </children>
+        </HBox>
+
+        <TableView prefHeight="400.0" style="-fx-font-family: 'System'; -fx-font-size: 14px; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn prefWidth="160.0" text="Ngày đặt giá" />
+                <TableColumn prefWidth="280.0" text="Tên sản phẩm" />
+                <TableColumn prefWidth="160.0" text="Giá bạn đặt" />
+                <TableColumn prefWidth="150.0" text="Trạng thái" />
+                <TableColumn prefWidth="120.0" text="Thao tác" />
+            </columns>
+            <placeholder>
+                <Label text="Bạn chưa tham gia phiên đấu giá nào" textFill="#a0aec0">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Label>
+            </placeholder>
+        </TableView>
+    </children>
+</VBox>

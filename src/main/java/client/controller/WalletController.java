@@ -51,12 +51,14 @@ public class WalletController implements Initializable {
     @FXML private TableView<Transaction> transactionTable;
     @FXML private TableColumn<Transaction, String> dateColumn;
     @FXML private TableColumn<Transaction, String> typeColumn;
-    @FXML private TableColumn<Transaction, Double> amountColumn;
-    @FXML private TableColumn<Transaction, Double> balanceColumn;
+    @FXML private TableColumn<Transaction, String> moneyInColumn;
+    @FXML private TableColumn<Transaction, String> moneyOutColumn;
+    @FXML private TableColumn<Transaction, String> balanceColumn;
     @FXML private TableColumn<Transaction, String> descriptionColumn;
 
     private ClientSocket clientSocket;
     private User currentUser;
+    private List<Transaction> allTransactions = new ArrayList<>();
 
     private static final String BANK_FILE = "data/json/bank_accounts.json";
     private static final String TRANSACTIONS_FILE = "data/json/transactions.json";
@@ -79,8 +81,9 @@ public class WalletController implements Initializable {
 
         if (dateColumn != null) dateColumn.setCellValueFactory(new PropertyValueFactory<>("formattedDate"));
         if (typeColumn != null) typeColumn.setCellValueFactory(new PropertyValueFactory<>("typeLabel"));
-        if (amountColumn != null) amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-        if (balanceColumn != null) balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balanceAfter"));
+        if (moneyInColumn != null) moneyInColumn.setCellValueFactory(new PropertyValueFactory<>("moneyIn"));
+        if (moneyOutColumn != null) moneyOutColumn.setCellValueFactory(new PropertyValueFactory<>("moneyOut"));
+        if (balanceColumn != null) balanceColumn.setCellValueFactory(new PropertyValueFactory<>("formattedBalanceAfter"));
         if (descriptionColumn != null) descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
     }
 
@@ -335,9 +338,8 @@ public class WalletController implements Initializable {
             if (currentUser == null) return;
             List<Transaction> list = loadTransactionsForUser();
             Platform.runLater(() -> {
-                transactionTable.getItems().clear();
-                transactionTable.setItems(FXCollections.observableArrayList(list));
-                transactionTable.refresh();
+                allTransactions = new ArrayList<>(list);
+                showTransactions(allTransactions);
             });
         } catch (Exception e) {
             LoggerUtil.error("Lỗi load lịch sử GD: " + e.getMessage());
@@ -376,8 +378,45 @@ public class WalletController implements Initializable {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    @FXML private void handleSearch() {}
-    @FXML private void filterAll() {}
-    @FXML private void filterIn() {}
-    @FXML private void filterOut() {}
+    private void showTransactions(List<Transaction> list) {
+        transactionTable.getItems().clear();
+        transactionTable.setItems(FXCollections.observableArrayList(list));
+        transactionTable.refresh();
+    }
+
+    @FXML private void handleSearch() {
+        if (searchField == null) return;
+        String keyword = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
+        if (keyword.isEmpty()) {
+            showTransactions(allTransactions);
+            return;
+        }
+
+        List<Transaction> filtered = allTransactions.stream()
+                .filter(t -> {
+                    String description = t.description == null ? "" : t.description.toLowerCase();
+                    String typeLabel = t.getTypeLabel() == null ? "" : t.getTypeLabel().toLowerCase();
+                    return description.contains(keyword)
+                            || typeLabel.contains(keyword)
+                            || t.getFormattedDate().contains(keyword);
+                })
+                .collect(java.util.stream.Collectors.toList());
+        showTransactions(filtered);
+    }
+
+    @FXML private void filterAll() {
+        showTransactions(allTransactions);
+    }
+
+    @FXML private void filterIn() {
+        showTransactions(allTransactions.stream()
+                .filter(t -> "DEPOSIT".equals(t.type))
+                .collect(java.util.stream.Collectors.toList()));
+    }
+
+    @FXML private void filterOut() {
+        showTransactions(allTransactions.stream()
+                .filter(t -> "WITHDRAW".equals(t.type))
+                .collect(java.util.stream.Collectors.toList()));
+    }
 }
