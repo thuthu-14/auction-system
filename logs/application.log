@@ -12915,3 +12915,333 @@
 [1778002904236] ERROR: ClientHandler IO error (127.0.0.1:57911): Connection reset
 [1778002904237] INFO: Client removed - Active clients: 1
 [1778002904237] INFO: Connection closed for user: hanpham
+[1778140055686] INFO: โ•”โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•—
+[1778140055698] INFO: โ•‘   AUCTION SYSTEM SERVER v1.0           โ•‘
+[1778140055698] INFO: โ•‘   Online Bidding Platform              โ•‘
+[1778140055699] INFO: โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
+[1778140055703] INFO: AuctionServer initialized
+[1778140055704] INFO: Starting Auction Server...
+[1778140055705] INFO: Initializing JSON data files...
+[1778140055762] INFO: All JSON data files initialized successfully
+[1778140055764] INFO: ๐“ Initializing default data (JSON only)...
+[1778140055802] INFO: โน Admin account already exists
+[1778140055802] INFO: โ“ Default data initialized successfully
+[1778140055806] INFO: Scheduler started
+[1778140055824] INFO: โ“ Saved to JSON: data/json/auctions.json
+[1778140055825] INFO: Auction updated in JSON: AU1777941343347
+[1778140055827] INFO: Auction auto-finished: AU1777941343347 - Winner: hanpham
+[1778140070242] INFO: ษออออออออออออออออออออออออออออออออออออออออป
+[1778140070257] INFO: บ   AUCTION SYSTEM CLIENT v1.0           บ
+[1778140070258] INFO: บ   Online Bidding Platform              บ
+[1778140070259] INFO: ศออออออออออออออออออออออออออออออออออออออออผ
+[1778140070707] INFO: ? LoginController initialized
+[1778140071131] INFO: ? Login screen displayed
+[1778140080218] INFO: ? Connecting to server: localhost:5000
+[1778140080257] INFO: ? ClientSocket initialized
+[1778140080258] INFO: ClientHandler created for 127.0.0.1:60086
+[1778140080259] INFO: ? Connected to server successfully
+[1778140080260] INFO: Client connected: 127.0.0.1 - Active clients: 1
+[1778140080271] DEBUG: ? Message sent: LOGIN
+[1778140080273] DEBUG: Received message: LOGIN from 127.0.0.1:60086
+[1778140080285] DEBUG: Sent message: SUCCESS to 127.0.0.1:60086
+[1778140080286] INFO: User logged in: buingoc (Role: SELLER)
+[1778140080290] DEBUG: ? Message received: SUCCESS
+[1778140080332] INFO: ? Login th…nh c“ng cho user: buingoc (Role: SELLER)
+[1778140080335] INFO: ? Saved to JSON: data/json/current_seller_id.json
+[1778140080400] INFO: SellerHomeController ?? nh?n data cho user: buingoc
+[1778140082782] INFO: ?ang chuy?n v? m…n hnh Bidder (Home)
+[1778140082906] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:60086
+[1778140082905] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778140082912] DEBUG: Sent message: SUCCESS to 127.0.0.1:60086
+[1778140082913] DEBUG: ? Message received: SUCCESS
+[1778140089708] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778140089709] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:60086
+[1778140089720] DEBUG: ? Message received: SUCCESS
+[1778140089720] DEBUG: Sent message: SUCCESS to 127.0.0.1:60086
+[1778140095821] DEBUG: ? Message sent: PLACE_BID
+[1778140095821] DEBUG: Received message: PLACE_BID from 127.0.0.1:60086
+[1778140095833] INFO: โ“ Saved to JSON: data/json/bids.json
+[1778140095834] INFO: Bid saved to JSON: BID1778140095829
+[1778140095840] INFO: โ“ Saved to JSON: data/json/auctions.json
+[1778140095842] INFO: Auction updated in JSON: AU1777879942563
+[1778140095849] INFO: โ“ Saved to JSON: data/json/users.json
+[1778140095850] INFO: User updated in JSON: buingoc
+[1778140095855] INFO: โ“ Bid placed: $2.085005E7 by buingoc on auction AU1777879942563 (Increment: $50000.0)
+[1778140095857] DEBUG: Sent message: SUCCESS to 127.0.0.1:60086
+[1778140095857] DEBUG: ? Message received: SUCCESS
+[1778140095858] DEBUG: Sent message: UPDATE_PRICE_REALTIME to 127.0.0.1:60086
+[1778140105403] INFO: ? Application closed
+[1778140105825] ERROR: ClientHandler IO error (127.0.0.1:60086): Connection reset
+[1778140105826] INFO: Client removed - Active clients: 0
+[1778140105827] INFO: Connection closed for user: buingoc
+[1778140430357] INFO: โ•”โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•—
+[1778140430369] INFO: โ•‘   AUCTION SYSTEM SERVER v1.0           โ•‘
+[1778140430371] INFO: โ•‘   Online Bidding Platform              โ•‘
+[1778140430371] INFO: โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
+[1778140430376] INFO: AuctionServer initialized
+[1778140430376] INFO: Starting Auction Server...
+[1778140430378] INFO: Initializing JSON data files...
+[1778140430425] INFO: All JSON data files initialized successfully
+[1778140430427] INFO: ๐“ Initializing default data (JSON only)...
+[1778140430456] INFO: โน Admin account already exists
+[1778140430457] INFO: โ“ Default data initialized successfully
+[1778140430460] INFO: Scheduler started
+[1778140434095] INFO: ษออออออออออออออออออออออออออออออออออออออออป
+[1778140434106] INFO: บ   AUCTION SYSTEM CLIENT v1.0           บ
+[1778140434107] INFO: บ   Online Bidding Platform              บ
+[1778140434107] INFO: ศออออออออออออออออออออออออออออออออออออออออผ
+[1778140434448] INFO: ? LoginController initialized
+[1778140434776] INFO: ? Login screen displayed
+[1778140442867] INFO: ? Connecting to server: localhost:5000
+[1778140442899] INFO: ? ClientSocket initialized
+[1778140442899] INFO: ClientHandler created for 127.0.0.1:58966
+[1778140442923] INFO: ? Connected to server successfully
+[1778140442924] INFO: Client connected: 127.0.0.1 - Active clients: 1
+[1778140442934] DEBUG: ? Message sent: LOGIN
+[1778140442938] DEBUG: Received message: LOGIN from 127.0.0.1:58966
+[1778140442945] DEBUG: Sent message: SUCCESS to 127.0.0.1:58966
+[1778140442947] INFO: User logged in: buingoc (Role: SELLER)
+[1778140442949] DEBUG: ? Message received: SUCCESS
+[1778140442992] INFO: ? Login th…nh c“ng cho user: buingoc (Role: SELLER)
+[1778140442995] INFO: ? Saved to JSON: data/json/current_seller_id.json
+[1778140443065] INFO: SellerHomeController ?? nh?n data cho user: buingoc
+[1778140445014] INFO: ?ang chuy?n v? m…n hnh Bidder (Home)
+[1778140445162] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778140445163] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:58966
+[1778140445172] DEBUG: Sent message: SUCCESS to 127.0.0.1:58966
+[1778140445175] DEBUG: ? Message received: SUCCESS
+[1778140448907] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:58966
+[1778140448906] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778140448913] DEBUG: Sent message: SUCCESS to 127.0.0.1:58966
+[1778140448914] DEBUG: ? Message received: SUCCESS
+[1778140454990] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778140454992] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:58966
+[1778140454995] DEBUG: ? Message received: SUCCESS
+[1778140454995] DEBUG: Sent message: SUCCESS to 127.0.0.1:58966
+[1778140457679] INFO: ? Application closed
+[1778140458124] ERROR: ClientHandler IO error (127.0.0.1:58966): Connection reset
+[1778140458126] INFO: Client removed - Active clients: 0
+[1778140458126] INFO: Connection closed for user: buingoc
+[1778140517887] INFO: โ•”โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•—
+[1778140517892] INFO: โ•‘   AUCTION SYSTEM SERVER v1.0           โ•‘
+[1778140517892] INFO: โ•‘   Online Bidding Platform              โ•‘
+[1778140517893] INFO: โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
+[1778140517902] INFO: AuctionServer initialized
+[1778140517903] INFO: Starting Auction Server...
+[1778140517903] INFO: Initializing JSON data files...
+[1778140517941] INFO: All JSON data files initialized successfully
+[1778140517942] INFO: ๐“ Initializing default data (JSON only)...
+[1778140517966] INFO: โน Admin account already exists
+[1778140517967] INFO: โ“ Default data initialized successfully
+[1778140517970] INFO: Scheduler started
+[1778140521644] INFO: ษออออออออออออออออออออออออออออออออออออออออป
+[1778140521655] INFO: บ   AUCTION SYSTEM CLIENT v1.0           บ
+[1778140521655] INFO: บ   Online Bidding Platform              บ
+[1778140521655] INFO: ศออออออออออออออออออออออออออออออออออออออออผ
+[1778140522011] INFO: ? LoginController initialized
+[1778140522394] INFO: ? Login screen displayed
+[1778140532681] INFO: ? Connecting to server: localhost:5000
+[1778140532712] INFO: ? ClientSocket initialized
+[1778140532712] INFO: ClientHandler created for 127.0.0.1:62191
+[1778140532713] INFO: ? Connected to server successfully
+[1778140532714] INFO: Client connected: 127.0.0.1 - Active clients: 1
+[1778140532721] DEBUG: ? Message sent: LOGIN
+[1778140532723] DEBUG: Received message: LOGIN from 127.0.0.1:62191
+[1778140532731] DEBUG: Sent message: ERROR to 127.0.0.1:62191
+[1778140532732] DEBUG: ? Message received: ERROR
+[1778140548830] DEBUG: ? Message sent: LOGIN
+[1778140548830] DEBUG: Received message: LOGIN from 127.0.0.1:62191
+[1778140548839] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140548840] INFO: User logged in: buingoc (Role: SELLER)
+[1778140548843] DEBUG: ? Message received: SUCCESS
+[1778140548897] INFO: ? Login th…nh c“ng cho user: buingoc (Role: SELLER)
+[1778140548901] INFO: ? Saved to JSON: data/json/current_seller_id.json
+[1778140548969] INFO: SellerHomeController ?? nh?n data cho user: buingoc
+[1778140550605] INFO: ?ang chuy?n v? m…n hnh Bidder (Home)
+[1778140550738] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778140550739] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:62191
+[1778140550749] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140550755] DEBUG: ? Message received: SUCCESS
+[1778140587757] DEBUG: ? Message sent: ADD_FUNDS
+[1778140587758] DEBUG: Received message: ADD_FUNDS from 127.0.0.1:62191
+[1778140587768] INFO: โ“ Saved to JSON: data/json/users.json
+[1778140587768] INFO: User updated in JSON: buingoc
+[1778140587770] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140587770] DEBUG: ? Message received: SUCCESS
+[1778140587771] INFO: โ“ User added funds: buingoc +89999.0
+[1778140594320] DEBUG: ? Message sent: GET_NOTIFICATIONS
+[1778140594321] DEBUG: Received message: GET_NOTIFICATIONS from 127.0.0.1:62191
+[1778140594329] DEBUG: ? Message received: GET_NOTIFICATIONS
+[1778140594329] DEBUG: Sent message: GET_NOTIFICATIONS to 127.0.0.1:62191
+[1778140595774] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778140595774] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:62191
+[1778140595778] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140595779] DEBUG: ? Message received: SUCCESS
+[1778140595780] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778140595781] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:62191
+[1778140595784] DEBUG: ? Message received: SUCCESS
+[1778140595785] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140595838] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778140595838] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:62191
+[1778140595840] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140595841] DEBUG: ? Message received: SUCCESS
+[1778140599371] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778140599372] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:62191
+[1778140599377] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140599377] DEBUG: ? Message received: SUCCESS
+[1778140606426] DEBUG: ? Message sent: PLACE_BID
+[1778140606428] DEBUG: Received message: PLACE_BID from 127.0.0.1:62191
+[1778140606451] INFO: โ“ Saved to JSON: data/json/bids.json
+[1778140606454] INFO: Bid saved to JSON: BID1778140606436
+[1778140606482] INFO: โ“ Saved to JSON: data/json/auctions.json
+[1778140606485] INFO: Auction updated in JSON: AU1777879942563
+[1778140606492] INFO: โ“ Saved to JSON: data/json/users.json
+[1778140606493] INFO: User updated in JSON: buingoc
+[1778140606500] INFO: โ“ Bid placed: $2.090005E7 by buingoc on auction AU1777879942563 (Increment: $50000.0)
+[1778140606504] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140606506] DEBUG: ? Message received: SUCCESS
+[1778140606507] DEBUG: Sent message: UPDATE_PRICE_REALTIME to 127.0.0.1:62191
+[1778140610308] DEBUG: ? Message sent: PLACE_BID
+[1778140610308] DEBUG: Received message: PLACE_BID from 127.0.0.1:62191
+[1778140610311] DEBUG: ? Message received: UPDATE_PRICE_REALTIME
+[1778140610319] INFO: โ“ Saved to JSON: data/json/bids.json
+[1778140610320] INFO: Bid saved to JSON: BID1778140610313
+[1778140610326] INFO: โ“ Saved to JSON: data/json/auctions.json
+[1778140610328] INFO: Auction updated in JSON: AU1777879942563
+[1778140610332] INFO: โ“ Saved to JSON: data/json/users.json
+[1778140610332] INFO: User updated in JSON: buingoc
+[1778140610333] INFO: โ“ Bid placed: $2.095005E7 by buingoc on auction AU1777879942563 (Increment: $50000.0)
+[1778140610334] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140610336] DEBUG: Sent message: UPDATE_PRICE_REALTIME to 127.0.0.1:62191
+[1778140614316] DEBUG: ? Message sent: PLACE_BID
+[1778140614316] DEBUG: Received message: PLACE_BID from 127.0.0.1:62191
+[1778140614319] DEBUG: ? Message received: SUCCESS
+[1778140614327] INFO: โ“ Saved to JSON: data/json/bids.json
+[1778140614329] INFO: Bid saved to JSON: BID1778140614323
+[1778140614333] INFO: โ“ Saved to JSON: data/json/auctions.json
+[1778140614337] INFO: Auction updated in JSON: AU1777879942563
+[1778140614339] INFO: โ“ Saved to JSON: data/json/users.json
+[1778140614340] INFO: User updated in JSON: buingoc
+[1778140614340] INFO: โ“ Bid placed: $2.105005E7 by buingoc on auction AU1777879942563 (Increment: $50000.0)
+[1778140614340] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140614342] DEBUG: Sent message: UPDATE_PRICE_REALTIME to 127.0.0.1:62191
+[1778140616770] DEBUG: ? Message sent: PLACE_BID
+[1778140616771] DEBUG: Received message: PLACE_BID from 127.0.0.1:62191
+[1778140616773] DEBUG: ? Message received: UPDATE_PRICE_REALTIME
+[1778140616777] INFO: โ“ Saved to JSON: data/json/bids.json
+[1778140616778] INFO: Bid saved to JSON: BID1778140616775
+[1778140616783] INFO: โ“ Saved to JSON: data/json/auctions.json
+[1778140616784] INFO: Auction updated in JSON: AU1777879942563
+[1778140616788] INFO: โ“ Saved to JSON: data/json/users.json
+[1778140616788] INFO: User updated in JSON: buingoc
+[1778140616789] INFO: โ“ Bid placed: $2.110005E7 by buingoc on auction AU1777879942563 (Increment: $50000.0)
+[1778140616790] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140616790] DEBUG: Sent message: UPDATE_PRICE_REALTIME to 127.0.0.1:62191
+[1778140618739] DEBUG: ? Message sent: PLACE_BID
+[1778140618740] DEBUG: Received message: PLACE_BID from 127.0.0.1:62191
+[1778140618743] DEBUG: ? Message received: SUCCESS
+[1778140618750] INFO: โ“ Saved to JSON: data/json/bids.json
+[1778140618751] INFO: Bid saved to JSON: BID1778140618746
+[1778140618757] INFO: โ“ Saved to JSON: data/json/auctions.json
+[1778140618757] INFO: Auction updated in JSON: AU1777879942563
+[1778140618760] INFO: โ“ Saved to JSON: data/json/users.json
+[1778140618760] INFO: User updated in JSON: buingoc
+[1778140618761] INFO: โ“ Bid placed: $2.115005E7 by buingoc on auction AU1777879942563 (Increment: $50000.0)
+[1778140618762] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140618762] DEBUG: Sent message: UPDATE_PRICE_REALTIME to 127.0.0.1:62191
+[1778140620972] DEBUG: ? Message sent: PLACE_BID
+[1778140620972] DEBUG: Received message: PLACE_BID from 127.0.0.1:62191
+[1778140620976] DEBUG: ? Message received: UPDATE_PRICE_REALTIME
+[1778140620985] INFO: โ“ Saved to JSON: data/json/bids.json
+[1778140620987] INFO: Bid saved to JSON: BID1778140620980
+[1778140620992] INFO: โ“ Saved to JSON: data/json/auctions.json
+[1778140620994] INFO: Auction updated in JSON: AU1777879942563
+[1778140621000] INFO: โ“ Saved to JSON: data/json/users.json
+[1778140621001] INFO: User updated in JSON: buingoc
+[1778140621003] INFO: โ“ Bid placed: $2.120005E7 by buingoc on auction AU1777879942563 (Increment: $50000.0)
+[1778140621004] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140621005] DEBUG: Sent message: UPDATE_PRICE_REALTIME to 127.0.0.1:62191
+[1778140623671] DEBUG: ? Message sent: PLACE_BID
+[1778140623673] DEBUG: Received message: PLACE_BID from 127.0.0.1:62191
+[1778140623674] DEBUG: ? Message received: SUCCESS
+[1778140623683] INFO: โ“ Saved to JSON: data/json/bids.json
+[1778140623684] INFO: Bid saved to JSON: BID1778140623678
+[1778140623690] INFO: โ“ Saved to JSON: data/json/auctions.json
+[1778140623691] INFO: Auction updated in JSON: AU1777879942563
+[1778140623695] INFO: โ“ Saved to JSON: data/json/users.json
+[1778140623696] INFO: User updated in JSON: buingoc
+[1778140623697] INFO: โ“ Bid placed: $2.125005E7 by buingoc on auction AU1777879942563 (Increment: $50000.0)
+[1778140623698] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140623699] DEBUG: Sent message: UPDATE_PRICE_REALTIME to 127.0.0.1:62191
+[1778140632472] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778140632472] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:62191
+[1778140632474] DEBUG: ? Message received: UPDATE_PRICE_REALTIME
+[1778140632476] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140632476] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778140632476] DEBUG: ? Message received: SUCCESS
+[1778140632486] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:62191
+[1778140632491] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778140632522] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778140632524] DEBUG: ? Message received: UPDATE_PRICE_REALTIME
+[1778140632524] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:62191
+[1778140632530] DEBUG: Sent message: SUCCESS to 127.0.0.1:62191
+[1778141056812] INFO: ? Application closed
+[1778141057210] ERROR: ClientHandler IO error (127.0.0.1:62191): Connection reset
+[1778141057212] INFO: Client removed - Active clients: 0
+[1778141057213] INFO: Connection closed for user: buingoc
+[1778141165547] INFO: โ•”โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•—
+[1778141165556] INFO: โ•‘   AUCTION SYSTEM SERVER v1.0           โ•‘
+[1778141165557] INFO: โ•‘   Online Bidding Platform              โ•‘
+[1778141165557] INFO: โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•โ•
+[1778141165564] INFO: AuctionServer initialized
+[1778141165565] INFO: Starting Auction Server...
+[1778141165566] INFO: Initializing JSON data files...
+[1778141165605] INFO: All JSON data files initialized successfully
+[1778141165606] INFO: ๐“ Initializing default data (JSON only)...
+[1778141165630] INFO: โน Admin account already exists
+[1778141165630] INFO: โ“ Default data initialized successfully
+[1778141165633] INFO: Scheduler started
+[1778141180626] INFO: ษออออออออออออออออออออออออออออออออออออออออป
+[1778141180640] INFO: บ   AUCTION SYSTEM CLIENT v1.0           บ
+[1778141180642] INFO: บ   Online Bidding Platform              บ
+[1778141180643] INFO: ศออออออออออออออออออออออออออออออออออออออออผ
+[1778141181015] INFO: ? LoginController initialized
+[1778141181385] INFO: ? Login screen displayed
+[1778141190335] INFO: ? Connecting to server: localhost:5000
+[1778141190366] INFO: ? ClientSocket initialized
+[1778141190366] INFO: ClientHandler created for 127.0.0.1:61717
+[1778141190367] INFO: ? Connected to server successfully
+[1778141190368] INFO: Client connected: 127.0.0.1 - Active clients: 1
+[1778141190376] DEBUG: ? Message sent: LOGIN
+[1778141190377] DEBUG: Received message: LOGIN from 127.0.0.1:61717
+[1778141190386] DEBUG: Sent message: SUCCESS to 127.0.0.1:61717
+[1778141190387] INFO: User logged in: buingoc (Role: SELLER)
+[1778141190392] DEBUG: ? Message received: SUCCESS
+[1778141190447] INFO: ? Login th…nh c“ng cho user: buingoc (Role: SELLER)
+[1778141190450] INFO: ? Saved to JSON: data/json/current_seller_id.json
+[1778141190514] INFO: SellerHomeController ?? nh?n data cho user: buingoc
+[1778141192742] INFO: ?ang chuy?n v? m…n hnh Bidder (Home)
+[1778141192869] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778141192870] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:61717
+[1778141192878] DEBUG: Sent message: SUCCESS to 127.0.0.1:61717
+[1778141192879] DEBUG: ? Message received: SUCCESS
+[1778141223898] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778141223900] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:61717
+[1778141223908] DEBUG: ? Message received: SUCCESS
+[1778141223908] DEBUG: Sent message: SUCCESS to 127.0.0.1:61717
+[1778141223910] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778141223911] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:61717
+[1778141223915] DEBUG: ? Message received: SUCCESS
+[1778141223915] DEBUG: Sent message: SUCCESS to 127.0.0.1:61717
+[1778141223954] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778141223955] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:61717
+[1778141223963] DEBUG: Sent message: SUCCESS to 127.0.0.1:61717
+[1778141223963] DEBUG: ? Message received: SUCCESS
+[1778141227154] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778141227155] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:61717
+[1778141227162] DEBUG: ? Message received: SUCCESS
+[1778141227162] DEBUG: Sent message: SUCCESS to 127.0.0.1:61717
+[1778141230929] INFO: ? Application closed
+[1778141231341] ERROR: ClientHandler IO error (127.0.0.1:61717): Connection reset
+[1778141231342] INFO: Client removed - Active clients: 0
+[1778141231342] INFO: Connection closed for user: buingoc

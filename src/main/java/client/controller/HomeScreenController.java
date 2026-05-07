@@ -138,6 +138,7 @@ public class HomeScreenController {
             if (controller instanceof DashboardController && currentUser != null && clientSocket != null) {
                 DashboardController dashCtrl = (DashboardController) controller;
                 dashCtrl.setUserData(currentUser, clientSocket);
+                dashCtrl.setHomeScreenController(this);  // ← Truyền reference của Home screen
                 dashCtrl.refreshAuctions();  // ← Auto-refresh danh sách
             }
         });
@@ -174,6 +175,15 @@ public class HomeScreenController {
         loadView("/fxml/BecomeSeller.fxml", controller -> {
             if (controller instanceof BecomeSellerController) {
                 ((BecomeSellerController) controller).setCurrentUser(currentUser);
+            }
+        });
+    }
+
+    public void loadAuctionDetailView(server.model.Auction auction) {
+        updateMenuSelection(null);
+        loadView("/fxml/AuctionDetail.fxml", controller -> {
+            if (controller instanceof AuctionDetailController && auction != null) {
+                ((AuctionDetailController) controller).loadAuctionData(auction);
             }
         });
     }

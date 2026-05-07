@@ -39,12 +39,11 @@ public class AuctionCardController {
     private Auction currentAuction;
     private Timeline countdownTimer;
     private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
+    private HomeScreenController homeScreenController;
 
     @FXML
     public void initialize() {
-        if (bidButton != null) {
-            bidButton.setOnAction(event -> openAuctionDetail());
-        }
+        // KHÔNG set handler ở đây, sẽ set sau khi có homeScreenController
 
         if (imageContainer != null && productImageView != null) {
             imageContainer.prefHeightProperty().bind(imageContainer.widthProperty());
@@ -110,6 +109,14 @@ public class AuctionCardController {
         startCountdown();
     }
 
+    public void setHomeScreenController(HomeScreenController homeScreenController) {
+        this.homeScreenController = homeScreenController;
+        // Set handler của button KHI homeScreenController đã được truyền vào
+        if (bidButton != null) {
+            bidButton.setOnAction(event -> openAuctionDetail());
+        }
+    }
+
     private void updateImageViewport() {
         if (productImageView == null || imageContainer == null) return;
 
@@ -167,26 +174,32 @@ public class AuctionCardController {
     private void openAuctionDetail() {
         if (currentAuction == null) return;
 
-        try {
-            String fxmlPath = "/fxml/AuctionDetail.fxml";
+        // Nếu có reference đến HomeScreenController, load vào contentArea
+        if (homeScreenController != null) {
+            homeScreenController.loadAuctionDetailView(currentAuction);
+        } else {
+            // Fallback: Mở popup nếu không có reference (cho trường hợp debug)
+            try {
+                String fxmlPath = "/fxml/AuctionDetail.fxml";
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent root = loader.load();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                Parent root = loader.load();
 
-            AuctionDetailController detailController = loader.getController();
-            detailController.loadAuctionData(currentAuction);
+                AuctionDetailController detailController = loader.getController();
+                detailController.loadAuctionData(currentAuction);
 
-            Stage stage = new Stage();
-            stage.setTitle("Chi tiết: " + currentAuction.getItem().getName());
+                Stage stage = new Stage();
+                stage.setTitle("Chi tiết: " + currentAuction.getItem().getName());
 
-            stage.setScene(new Scene(root, 1000, 700));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
-            stage.show();
+                stage.setScene(new Scene(root, 1000, 700));
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setResizable(false);
+                stage.show();
 
-        } catch (Exception e) {
-            System.err.println("LỖI KHI MỞ CHI TIẾT: " + e.getMessage());
-            e.printStackTrace();
+            } catch (Exception e) {
+                System.err.println("LỖI KHI MỞ CHI TIẾT: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 

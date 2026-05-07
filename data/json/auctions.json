@@ -1,40 +1,5 @@
 [
   {
-    "auctionId": "AU1777879942563",
-    "itemId": "IT1777879942565",
-    "sellerId": "U1777878819404",
-    "sellerName": "inhHNgn",
-    "item": {
-      "itemId": "IT1777879942565",
-      "name": "Điện thoại iphone 20",
-      "description": "màu hồng",
-      "startingPrice": 2.0E7,
-      "sellerId": "U1777878819404",
-      "images": [
-        "file:/C:/Users/dodin/Downloads/he-dieu-hanh-one-ui-tren-dien-thoai-samsung.jpg"
-      ],
-      "type": "ELECTRONICS",
-      "brand": "Apple",
-      "warrantyPeriod": "1 Year"
-    },
-    "currentPrice": 2.080005E7,
-    "highestBidderId": "U1777887117887",
-    "highestBidderName": "buingoc",
-    "status": "RUNNING",
-    "startTime": 1777879942566,
-    "endTime": 1778369542566,
-    "createdAt": 1777879942566,
-    "bidIds": [
-      "BID1777880546392",
-      "BID1777942291834",
-      "BID1778002395331",
-      "BID1778002402747",
-      "BID1778002407404",
-      "BID1778002414388"
-    ],
-    "viewCount": 0
-  },
-  {
     "auctionId": "AU1777941343347",
     "itemId": "IT1777941343348",
     "sellerId": "U1777887117887",
@@ -55,7 +20,7 @@
     "currentPrice": 60000.0,
     "highestBidderId": "U1777943074443",
     "highestBidderName": "hanpham",
-    "status": "RUNNING",
+    "status": "FINISHED",
     "startTime": 1777941343348,
     "endTime": 1778060143348,
     "createdAt": 1777941343348,
@@ -64,6 +29,49 @@
       "BID1777947263561",
       "BID1778002868362",
       "BID1778002872786"
+    ],
+    "viewCount": 0
+  },
+  {
+    "auctionId": "AU1777879942563",
+    "itemId": "IT1777879942565",
+    "sellerId": "U1777878819404",
+    "sellerName": "inhHNgn",
+    "item": {
+      "itemId": "IT1777879942565",
+      "name": "Điện thoại iphone 20",
+      "description": "màu hồng",
+      "startingPrice": 2.0E7,
+      "sellerId": "U1777878819404",
+      "images": [
+        "file:/C:/Users/dodin/Downloads/he-dieu-hanh-one-ui-tren-dien-thoai-samsung.jpg"
+      ],
+      "type": "ELECTRONICS",
+      "brand": "Apple",
+      "warrantyPeriod": "1 Year"
+    },
+    "currentPrice": 2.125005E7,
+    "highestBidderId": "U1777887117887",
+    "highestBidderName": "buingoc",
+    "status": "RUNNING",
+    "startTime": 1777879942566,
+    "endTime": 1778369542566,
+    "createdAt": 1777879942566,
+    "bidIds": [
+      "BID1777880546392",
+      "BID1777942291834",
+      "BID1778002395331",
+      "BID1778002402747",
+      "BID1778002407404",
+      "BID1778002414388",
+      "BID1778140095829",
+      "BID1778140606436",
+      "BID1778140610313",
+      "BID1778140614323",
+      "BID1778140616775",
+      "BID1778140618746",
+      "BID1778140620980",
+      "BID1778140623678"
     ],
     "viewCount": 0
   }

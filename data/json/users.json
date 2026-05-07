@@ -77,31 +77,6 @@
     "active": false
   },
   {
-    "ownedAuctionIds": [
-      "AU1777941343347"
-    ],
-    "bidIds": [
-      "BID1777942291834",
-      "BID1778002395331",
-      "BID1778002402747",
-      "BID1778002407404",
-      "BID1778002414388"
-    ],
-    "isSeller": true,
-    "shopName": "Digi",
-    "shopPhone": "0328718657",
-    "shopAddress": "Hòa bình",
-    "shopEmail": "bhbngoc2@gmail.com",
-    "userId": "U1777887117887",
-    "username": "buingoc",
-    "password": "bhbnbhbn",
-    "email": "bhbngoc@gmail.com",
-    "wallet": 29999.0,
-    "role": "SELLER",
-    "createdAt": 1777887117887,
-    "active": true
-  },
-  {
     "ownedAuctionIds": [],
     "bidIds": [
       "BID1777947233491",
@@ -117,6 +92,39 @@
     "wallet": 1.000322222E9,
     "role": "BIDDER",
     "createdAt": 1777943074443,
+    "active": true
+  },
+  {
+    "ownedAuctionIds": [
+      "AU1777941343347"
+    ],
+    "bidIds": [
+      "BID1777942291834",
+      "BID1778002395331",
+      "BID1778002402747",
+      "BID1778002407404",
+      "BID1778002414388",
+      "BID1778140095829",
+      "BID1778140606436",
+      "BID1778140610313",
+      "BID1778140614323",
+      "BID1778140616775",
+      "BID1778140618746",
+      "BID1778140620980",
+      "BID1778140623678"
+    ],
+    "isSeller": true,
+    "shopName": "Digi",
+    "shopPhone": "0328718657",
+    "shopAddress": "Hòa bình",
+    "shopEmail": "bhbngoc2@gmail.com",
+    "userId": "U1777887117887",
+    "username": "buingoc",
+    "password": "bhbnbhbn",
+    "email": "bhbngoc@gmail.com",
+    "wallet": 119998.0,
+    "role": "SELLER",
+    "createdAt": 1777887117887,
     "active": true
   }
 ]

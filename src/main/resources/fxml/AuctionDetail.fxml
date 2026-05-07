@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionDetailController">
+<ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionDetailController">
     <content>
         <VBox spacing="20.0" style="-fx-background-color: #f8fafc;">
             <padding>

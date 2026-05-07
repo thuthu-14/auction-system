@@ -43,5 +43,14 @@
     "balanceAfter": 29999.0,
     "description": "Nạp tiền vào ví",
     "timestamp": 1777946724306
+  },
+  {
+    "id": "TXN_1778140587807",
+    "userId": "U1777887117887",
+    "type": "DEPOSIT",
+    "amount": 89999.0,
+    "balanceAfter": 119998.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778140587808
   }
 ]

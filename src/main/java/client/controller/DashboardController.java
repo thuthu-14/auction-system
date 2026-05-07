@@ -40,6 +40,7 @@ public class DashboardController implements Initializable {
 
     private User currentUser;
     private ClientSocket clientSocket;
+    private HomeScreenController homeScreenController;
 
     /**
      * Nhận dữ liệu người dùng và socket.
@@ -51,6 +52,10 @@ public class DashboardController implements Initializable {
 
         // Ưu tiên load dữ liệu ngay khi có socket
         loadAuctionsFromServer();
+    }
+
+    public void setHomeScreenController(HomeScreenController homeScreenController) {
+        this.homeScreenController = homeScreenController;
     }
 
     @Override
@@ -152,6 +157,9 @@ public class DashboardController implements Initializable {
             client.controller.AuctionCardController cardController = loader.getController();
             if (cardController != null) {
                 cardController.setAuctionData(auction);
+                if (homeScreenController != null) {
+                    cardController.setHomeScreenController(homeScreenController);
+                }
             }
 
             // Nếu root của AuctionCard.fxml là VBox thì ép kiểu trực tiếp
