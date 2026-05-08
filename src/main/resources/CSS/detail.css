@@ -107,3 +107,93 @@
     -fx-background-color: #f9fafb;
     -fx-border-color: #9ca3af;
 }
+
+.transparent-chart-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.transparent-chart-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.transparent-chart-scroll .scroll-bar:horizontal,
+.transparent-chart-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.transparent-chart-scroll .scroll-bar:horizontal .track,
+.transparent-chart-scroll .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.transparent-chart-scroll .scroll-bar:horizontal .thumb,
+.transparent-chart-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(17, 24, 39, 0.18);
+    -fx-background-radius: 999;
+}
+
+.transparent-chart-scroll .scroll-bar .increment-button,
+.transparent-chart-scroll .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.transparent-chart-scroll .scroll-bar .increment-arrow,
+.transparent-chart-scroll .scroll-bar .decrement-arrow {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-shape: "";
+}
+
+.bid-history-chart {
+    -fx-padding: 24 16 12 8;
+}
+
+.bid-history-chart .chart-plot-background {
+    -fx-background-color: #f4f4f4;
+}
+
+.bid-history-chart .chart-series-line {
+    -fx-stroke: #f15a24;
+    -fx-stroke-width: 2.5;
+}
+
+.bid-history-chart .chart-line-symbol {
+    -fx-background-color: #f15a24, white;
+    -fx-background-insets: 0, 3;
+    -fx-background-radius: 8px;
+    -fx-padding: 6px;
+}
+
+.bid-history-chart .chart-horizontal-grid-lines,
+.bid-history-chart .chart-vertical-grid-lines {
+    -fx-stroke: #d9d9d9;
+    -fx-stroke-width: 1.2;
+    -fx-stroke-dash-array: 8 6;
+}
+
+.bid-history-chart .axis {
+    -fx-tick-label-fill: #5f5f5f;
+    -fx-tick-label-font-size: 13px;
+}
+
+.bid-history-chart .axis-label {
+    -fx-text-fill: #111827;
+    -fx-font-size: 15px;
+}
+
+.bid-history-chart .axis-tick-mark,
+.bid-history-chart .axis-minor-tick-mark {
+    -fx-stroke: #c7c7c7;
+}
+
+.bid-history-chart .axis:bottom .axis-label {
+    -fx-padding: 12 0 0 0;
+}
+
+.bid-history-chart .axis:left .axis-label {
+    -fx-padding: 0 12 0 0;
+}

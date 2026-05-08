@@ -1,6 +1,7 @@
 package client.controller;
 
 import client.network.ClientSocket;
+import client.network.ConnectionManager;
 import navigation.NavigationManager;
 import server.model.RegularUser;
 import server.model.User;
@@ -8,8 +9,11 @@ import server.model.User;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -17,6 +21,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import util.LoggerUtil;
 
@@ -101,7 +106,19 @@ public class HomeScreenController {
     private void handleMenuClick(MouseEvent event) {
         if (event.getSource() instanceof HBox) {
             HBox clickedMenu = (HBox) event.getSource();
-            updateMenuSelection(clickedMenu);
+            if (clickedMenu == menuHome) {
+                loadDashboardView();
+            } else if (clickedMenu == menuRecent) {
+                loadAuctionHistoryView();
+            } else if (clickedMenu == menuMsg) {
+                loadNotificationsView();
+            } else if (clickedMenu == menuPay) {
+                loadWalletView();
+            } else if (clickedMenu == menuUpgrade) {
+                openBecomeSeller();
+            } else {
+                updateMenuSelection(clickedMenu);
+            }
         }
     }
 
@@ -170,6 +187,20 @@ public class HomeScreenController {
     }
 
     @FXML
+    public void loadAuctionHistoryView() {
+        updateMenuSelection(menuRecent);
+        loadView("/fxml/AuctionHistory.fxml", controller -> {
+            if (controller instanceof AuctionHistoryController historyController) {
+                User user = currentUser != null ? currentUser : NavigationManager.getInstance().getCurrentUser();
+                ClientSocket socket = clientSocket != null
+                        ? clientSocket
+                        : ConnectionManager.getInstance().getClientSocket();
+                historyController.setContext(user, socket, this);
+            }
+        });
+    }
+
+    @FXML
     private void openBecomeSeller() {
         updateMenuSelection(menuUpgrade);
         loadView("/fxml/BecomeSeller.fxml", controller -> {
@@ -180,10 +211,16 @@ public class HomeScreenController {
     }
 
     public void loadAuctionDetailView(server.model.Auction auction) {
+        loadAuctionDetailView(auction, false);
+    }
+
+    public void loadAuctionDetailView(server.model.Auction auction, boolean endedMode) {
         updateMenuSelection(null);
         loadView("/fxml/AuctionDetail.fxml", controller -> {
             if (controller instanceof AuctionDetailController && auction != null) {
-                ((AuctionDetailController) controller).loadAuctionData(auction);
+                AuctionDetailController detailController = (AuctionDetailController) controller;
+                detailController.setEndedMode(endedMode);
+                detailController.loadAuctionData(auction);
             }
         });
     }
@@ -207,11 +244,26 @@ public class HomeScreenController {
             }
 
             if (contentArea != null) {
+                prepareContentNode(viewNode);
                 contentArea.getChildren().setAll(viewNode);
             }
         } catch (IOException e) {
             LoggerUtil.error("Lỗi load giao diện " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void prepareContentNode(Node viewNode) {
+        StackPane.setAlignment(viewNode, Pos.TOP_LEFT);
+        if (viewNode instanceof Region region) {
+            region.setMinWidth(0);
+            region.setMinHeight(0);
+            region.setMaxWidth(Double.MAX_VALUE);
+            region.setMaxHeight(Double.MAX_VALUE);
+        }
+        if (viewNode instanceof ScrollPane scrollPane) {
+            scrollPane.setFitToWidth(true);
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         }
     }
 

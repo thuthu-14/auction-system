@@ -2,6 +2,7 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.util.ResponsiveSceneUtil;
 import common.Message;
 import common.MessageType;
 import javafx.application.Platform;
@@ -94,10 +95,9 @@ public class SignupController {
                 registerData.put("email", email);
 
                 Message message = new Message(MessageType.REGISTER, registerData, username);
-                clientSocket.sendMessage(message);
 
                 // Chờ Server phản hồi
-                Message response = clientSocket.receiveMessage();
+                Message response = clientSocket.sendAndReceive(message);
 
                 Platform.runLater(() -> {
                     if (response != null && "SUCCESS".equals(response.getStatus())) {
@@ -126,10 +126,11 @@ public class SignupController {
     private void switchToLogin() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-            Scene scene = new Scene(loader.load(), 1300, 800);
+            Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
 
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(scene);
+            stage.setFullScreen(true);
             stage.setTitle("Đăng nhập");
             stage.show();
 
@@ -166,11 +167,7 @@ public class SignupController {
 
     private void showAlert(Alert.AlertType type, String title, String header, String content) {
         Platform.runLater(() -> {
-            Alert alert = new Alert(type);
-            alert.setTitle(title);
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.showAndWait();
+            client.util.DialogUtil.showAlert(type, title, header, content);
         });
     }
 

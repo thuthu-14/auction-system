@@ -2,6 +2,7 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.util.ResponsiveSceneUtil;
 import common.*;
 import com.google.gson.Gson;
 import javafx.application.Platform;
@@ -78,9 +79,7 @@ public class LoginController {
 
                 LoginRequest loginRequest = new LoginRequest(email, password);
                 Message loginMsg = new Message(MessageType.LOGIN, loginRequest, email);
-                clientSocket.sendMessage(loginMsg);
-
-                Message response = clientSocket.receiveMessage();
+                Message response = clientSocket.sendAndReceive(loginMsg);
 
                 if (response != null && "SUCCESS".equals(response.getStatus())) {
                     try {
@@ -166,9 +165,10 @@ public class LoginController {
     private void switchToSignup() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SignUp.fxml"));
-            Scene scene = new Scene(loader.load(), 1300, 800);
+            Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
             Stage stage = (Stage) registerButton.getScene().getWindow();
             stage.setScene(scene);
+            stage.setFullScreen(true);
             stage.setTitle("Tạo tài khoản");
             stage.show();
         } catch (IOException e) {

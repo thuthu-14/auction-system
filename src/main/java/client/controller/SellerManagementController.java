@@ -141,8 +141,7 @@ public class SellerManagementController {
         new Thread(() -> {
             try {
                 Message req = new Message(MessageType.GET_SELLER_AUCTIONS, null, user.getUsername());
-                socket.sendMessage(req);
-                Message res = socket.receiveMessage();
+                Message res = socket.sendAndReceive(req);
 
                 if (res != null && "SUCCESS".equals(res.getStatus())) {
                     Object data = res.getData();

@@ -4,7 +4,9 @@ import client.controller.DashboardController;
 import client.controller.SellerHomeController;
 import client.controller.WalletController;
 import client.network.ClientSocket;
+import client.util.ResponsiveSceneUtil;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -85,10 +87,14 @@ public class NavigationManager {
 
             Scene currentScene = mainStage.getScene();
             Scene scene = (currentScene != null)
-                    ? new Scene(root, currentScene.getWidth(), currentScene.getHeight())
-                    : new Scene(root, 1300, 800);
+                    ? ResponsiveSceneUtil.createScaledScene(root, currentScene.getWidth(), currentScene.getHeight())
+                    : ResponsiveSceneUtil.createScaledScene(root);
 
             mainStage.setScene(scene);
+            mainStage.setMaximized(true);
+            mainStage.setFullScreenExitHint("");
+            mainStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+            mainStage.setFullScreen(true);
             mainStage.show();
 
         } catch (IOException e) {

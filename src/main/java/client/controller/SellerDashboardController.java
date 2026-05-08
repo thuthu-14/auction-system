@@ -3,10 +3,7 @@ package client.controller;
 import client.network.ClientSocket;
 import server.model.User;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import util.LoggerUtil;
 
@@ -21,16 +18,21 @@ public class SellerDashboardController {
     // ===== THÊM ĐỂ LINK SERVER =====
     private User currentUser;
     private ClientSocket clientSocket;
+    private SellerHomeController sellerHomeController;
 
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;
     }
 
+    public void setSellerHomeController(SellerHomeController sellerHomeController) {
+        this.sellerHomeController = sellerHomeController;
+    }
+
     private void loadView(String fxmlPath) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent newNode = loader.load();
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
+            javafx.scene.Parent newNode = loader.load();
 
             // ===== BƠM DỮ LIỆU SERVER SANG MÀN HÌNH MỚI =====
             Object controller = loader.getController();
@@ -43,7 +45,7 @@ public class SellerDashboardController {
                 // (Nếu sau này các trang Thống kê, Thông báo cần Server, bạn thêm else if vào đây)
             }
 
-            Pane contentArea = (Pane) cardTaoPhien.getScene().lookup("#contentArea");
+            javafx.scene.layout.Pane contentArea = (javafx.scene.layout.Pane) cardTaoPhien.getScene().lookup("#contentArea");
             if (contentArea != null) {
                 contentArea.getChildren().setAll(newNode);
             } else {
@@ -63,23 +65,28 @@ public class SellerDashboardController {
         switch (id) {
             case "cardTaoPhien":
                 LoggerUtil.info("Đang mở: Tạo phiên mới");
-                loadView("/fxml/AddAuctionProduct.fxml");
+                if (sellerHomeController != null) sellerHomeController.loadAddAuctionProductView();
+                else loadView("/fxml/AddAuctionProduct.fxml");
                 break;
             case "cardQuanLyPhien":
                 LoggerUtil.info("Đang mở: Quản lý phiên");
-                loadView("/fxml/SellerManageAuctions.fxml"); // Sửa lại tên file cho chuẩn với HomeController
+                if (sellerHomeController != null) sellerHomeController.loadManageAuctionsView();
+                else loadView("/fxml/SellerManageAuctions.fxml");
                 break;
             case "cardThongKe":
                 LoggerUtil.info("Đang mở: Thống kê");
-                loadView("/fxml/SellerStatistics.fxml");
+                if (sellerHomeController != null) sellerHomeController.loadSellerStatisticsView();
+                else loadView("/fxml/SellerStatistics.fxml");
                 break;
             case "cardThongBao":
                 LoggerUtil.info("Đang mở: Thông báo");
-                loadView("/fxml/SellerNotifications.fxml");
+                if (sellerHomeController != null) sellerHomeController.loadSellerNotificationsView();
+                else loadView("/fxml/SellerNotifications.fxml");
                 break;
             case "cardViTien":
                 LoggerUtil.info("Đang mở: Ví tiền");
-                loadView("/fxml/WalletView.fxml"); // Sửa lại tên file cho chuẩn với HomeController
+                if (sellerHomeController != null) sellerHomeController.loadWalletView();
+                else loadView("/fxml/WalletView.fxml");
                 break;
         }
     }

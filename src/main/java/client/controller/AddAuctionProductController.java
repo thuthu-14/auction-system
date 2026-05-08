@@ -377,8 +377,7 @@ public class AddAuctionProductController implements Initializable {
                     request.setData(payload); // Gán data rõ ràng
                     request.setSenderId(currentUser.getUsername());
 
-                    socket.sendMessage(request);
-                    Message response = socket.receiveMessage();
+                    Message response = socket.sendAndReceive(request);
 
                     Platform.runLater(() -> {
                         if (response != null && "SUCCESS".equals(response.getStatus())) {
@@ -424,11 +423,7 @@ public class AddAuctionProductController implements Initializable {
     }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
+        client.util.DialogUtil.showAlert(type, title, null, msg, productNameField);
     }
 
     private String getFieldValue(String fieldId, String defaultValue) {

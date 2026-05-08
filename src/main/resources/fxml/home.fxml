@@ -87,7 +87,8 @@
                                 <Button alignment="BASELINE_LEFT"
                                         maxWidth="Infinity" HBox.hgrow="ALWAYS"
                                         style="-fx-background-color: transparent;"
-                                        text="📈   Lịch sử đấu giá" textFill="#4a5568">
+                                        text="📈   Lịch sử đấu giá" textFill="#4a5568"
+                                        onAction="#loadAuctionHistoryView">
                                     <font>
                                         <Font size="17.0" />
                                     </font>
@@ -170,10 +171,12 @@
                     </children>
                 </VBox>
 
-                <VBox HBox.hgrow="ALWAYS">
+                <VBox minWidth="0.0" HBox.hgrow="ALWAYS">
                     <children>
 
                         <HBox alignment="CENTER_LEFT"
+                              minHeight="80.0"
+                              maxHeight="80.0"
                               prefHeight="80.0"
                               style="-fx-background-color: #ffffff; -fx-padding: 0 40 0 40; -fx-border-color: #f0f0f0; -fx-border-width: 0 0 1 0;">
                             <children>
@@ -230,7 +233,7 @@
                             </children>
                         </HBox>
 
-                        <StackPane fx:id="contentArea" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
+                        <StackPane fx:id="contentArea" minWidth="0.0" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
                             <children>
                                 <VBox alignment="CENTER" spacing="10.0">
                                     <children>

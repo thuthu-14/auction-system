@@ -99,17 +99,17 @@
 
                 <HBox alignment="CENTER_LEFT" spacing="15.0">
                     <children>
-                        <ComboBox fx:id="timeFilter" prefHeight="45.0" prefWidth="180.0" promptText="Tháng này" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
+                        <ComboBox fx:id="timeFilter" onAction="#applyTransactionFilters" prefHeight="45.0" prefWidth="180.0" promptText="Tháng này" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
 
-                        <Button onAction="#filterAll" prefHeight="45.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 10; -fx-cursor: hand;" text="Tất cả" textFill="white">
+                        <Button fx:id="filterAllBtn" onAction="#filterAll" prefHeight="45.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 10; -fx-cursor: hand;" text="Tất cả" textFill="white">
                             <font><Font name="System Bold" size="14.0" /></font>
                             <padding><Insets left="20.0" right="20.0" /></padding>
                         </Button>
-                        <Button onAction="#filterIn" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền vào" textFill="#4a5568">
+                        <Button fx:id="filterInBtn" onAction="#filterIn" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền vào" textFill="#4a5568">
                             <font><Font name="System Bold" size="14.0" /></font>
                             <padding><Insets left="20.0" right="20.0" /></padding>
                         </Button>
-                        <Button onAction="#filterOut" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền ra" textFill="#4a5568">
+                        <Button fx:id="filterOutBtn" onAction="#filterOut" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền ra" textFill="#4a5568">
                             <font><Font name="System Bold" size="14.0" /></font>
                             <padding><Insets left="20.0" right="20.0" /></padding>
                         </Button>

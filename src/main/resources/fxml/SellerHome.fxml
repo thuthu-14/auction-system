@@ -232,12 +232,13 @@
                     </children>
                 </VBox>
 
-                <VBox HBox.hgrow="ALWAYS">
+                <VBox minWidth="0.0" HBox.hgrow="ALWAYS">
                     <children>
 
                         <HBox alignment="CENTER_LEFT"
                               prefHeight="80.0"
                               minHeight="80.0"
+                              maxHeight="80.0"
                               style="-fx-background-color: #ffffff;
                               -fx-padding: 0 40 0 40;
                               -fx-border-color: #f0f0f0;
@@ -298,10 +299,12 @@
 
                         <ScrollPane fx:id="mainScrollPane"
                                     fitToWidth="true"
+                                    hbarPolicy="NEVER"
                                     style="-fx-background-color: transparent; -fx-background: #fcfcfc;"
                                     VBox.vgrow="ALWAYS">
                             <content>
                                 <StackPane fx:id="contentArea"
+                                           minWidth="0.0"
                                            style="-fx-background-color: #fcfcfc;">
                                     <children>
                                         <VBox alignment="CENTER" spacing="10.0" minHeight="600">

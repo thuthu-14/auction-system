@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionDetailController">
+<ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: #f8fafc;" stylesheets="@../CSS/detail.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionDetailController">
     <content>
         <VBox spacing="20.0" style="-fx-background-color: #f8fafc;">
             <padding>
@@ -74,7 +74,7 @@
 
                                         <Region prefHeight="1.0" style="-fx-background-color: #e2e8f0;" />
 
-                                        <VBox spacing="15.0" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-border-radius: 8; -fx-border-color: #e2e8f0;">
+                                        <VBox fx:id="bidActionBox" spacing="15.0" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-border-radius: 8; -fx-border-color: #e2e8f0;">
                                             <children>
                                                 <Label style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #111827;" text="Mức giá bạn muốn đặt" />
                                                 <HBox alignment="CENTER_LEFT" spacing="15.0">
@@ -86,9 +86,10 @@
                                                         <Button fx:id="increaseBidBtn" onAction="#handleIncreaseBid" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand;" text="+" />
                                                     </children>
                                                 </HBox>
-                                                <Button fx:id="confirmBidBtn" onAction="#handleConfirmBid" mnemonicParsing="false" prefHeight="55.0" maxWidth="1.7976931348623157E308" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="XÁC NHẬN ĐẶT GIÁ" />
+                                                <Button fx:id="confirmBidBtn" onAction="#handleConfirmBid" mnemonicParsing="false" prefHeight="55.0" maxWidth="1.7976931348623157E308" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="XÁC NHẬN ĐẤU GIÁ" />
                                             </children>
                                         </VBox>
+                                        <Label fx:id="endedAuctionLabel" alignment="CENTER" managed="false" maxWidth="1.7976931348623157E308" prefHeight="82.0" style="-fx-background-color: #fff1f2; -fx-border-color: #fecdd3; -fx-background-radius: 8; -fx-border-radius: 8; -fx-text-fill: #dc2626; -fx-font-size: 24px; -fx-font-weight: bold;" text="ĐÃ KẾT THÚC" visible="false" />
                                     </children>
                                 </VBox>
                             </children>
@@ -101,14 +102,18 @@
                         <VBox spacing="20.0">
                             <children>
                                 <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #111827; -fx-background-color: #f1f5f9; -fx-padding: 10 20; -fx-background-radius: 4;" text="BIỂU ĐỒ LƯỢT ĐẶT GIÁ" />
-                                <LineChart fx:id="bidHistoryChart" animated="false" createSymbols="true" legendVisible="false" prefHeight="320.0">
-                                    <xAxis>
-                                        <CategoryAxis label="Lượt đặt giá" side="BOTTOM" />
-                                    </xAxis>
-                                    <yAxis>
-                                        <NumberAxis forceZeroInRange="false" label="Giá (VNĐ)" side="LEFT" />
-                                    </yAxis>
-                                </LineChart>
+                                <ScrollPane fx:id="bidHistoryScrollPane" fitToHeight="true" fitToWidth="false" hbarPolicy="ALWAYS" pannable="true" prefHeight="430.0" styleClass="transparent-chart-scroll" vbarPolicy="NEVER">
+                                    <content>
+                                        <LineChart fx:id="bidHistoryChart" animated="false" createSymbols="true" legendVisible="false" minWidth="900.0" prefHeight="400.0" prefWidth="900.0" styleClass="bid-history-chart">
+                                            <xAxis>
+                                                <CategoryAxis fx:id="bidTurnAxis" label="Lượt đặt giá" side="BOTTOM" />
+                                            </xAxis>
+                                            <yAxis>
+                                                <NumberAxis fx:id="bidPriceAxis" forceZeroInRange="false" label="Giá (VNĐ)" side="LEFT" />
+                                            </yAxis>
+                                        </LineChart>
+                                    </content>
+                                </ScrollPane>
                             </children>
                         </VBox>
 

@@ -77,9 +77,7 @@ public class DashboardController implements Initializable {
         new Thread(() -> {
             try {
                 Message request = new Message(MessageType.GET_ALL_AUCTIONS, null, "client");
-                socket.sendMessage(request);
-
-                Message response = socket.receiveMessage();
+                Message response = socket.sendAndReceive(request);
 
                 if (response != null && "SUCCESS".equals(response.getStatus())) {
                     Object rawData = response.getData();

@@ -59,10 +59,9 @@ public class NotificationsController implements Initializable {
                 if (socket != null && user != null) {
                     // 1. Gửi lệnh lấy thông báo
                     Message request = new Message(MessageType.GET_NOTIFICATIONS, null, user.getUserId());
-                    socket.sendMessage(request);
 
                     // 2. Nhận phản hồi
-                    Message response = socket.receiveMessage();
+                    Message response = socket.sendAndReceive(request);
                     if (response != null && response.getData() instanceof List) {
                         List<Notification> realList = (List<Notification>) response.getData();
 
@@ -166,11 +165,7 @@ public class NotificationsController implements Initializable {
 
     private void showAlert(Alert.AlertType type, String title, String content) {
         Platform.runLater(() -> {
-            Alert alert = new Alert(type);
-            alert.setTitle(title);
-            alert.setHeaderText(null);
-            alert.setContentText(content);
-            alert.showAndWait();
+            client.util.DialogUtil.showAlert(type, title, null, content);
         });
     }
 }

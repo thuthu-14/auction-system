@@ -115,10 +115,9 @@ public class BecomeSellerController {
 
                     // 2. Gửi lệnh UPGRADE_SELLER
                     Message request = new Message(MessageType.UPGRADE_SELLER, payload, currentUser.getUsername());
-                    socket.sendMessage(request);
 
                     // 3. Chờ phản hồi
-                    Message response = socket.receiveMessage();
+                    Message response = socket.sendAndReceive(request);
 
                     Platform.runLater(() -> {
                         if (response != null && "SUCCESS".equals(response.getStatus())) {
@@ -196,10 +195,6 @@ public class BecomeSellerController {
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.initOwner(nameField.getScene().getWindow());
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        client.util.DialogUtil.showAlert(alertType, title, null, message, nameField);
     }
 }

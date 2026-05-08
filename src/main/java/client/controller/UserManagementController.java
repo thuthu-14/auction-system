@@ -126,11 +126,7 @@ public class UserManagementController {
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        client.util.DialogUtil.showAlert(type, title, null, content, userTable);
     }
 
     private static String value(String text) {

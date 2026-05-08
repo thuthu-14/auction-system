@@ -1,13 +1,17 @@
 package client.controller;
 
 import client.network.ClientSocket;
+import client.util.ResponsiveSceneUtil;
 import server.model.User;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -16,6 +20,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import util.LoggerUtil;
 
@@ -120,7 +125,8 @@ public class SellerHomeController {
             }
 
             javafx.stage.Stage stage = (javafx.stage.Stage) rootPane.getScene().getWindow();
-            stage.setScene(new javafx.scene.Scene(root, 1000, 700)); // Set size cố định tránh méo form
+            stage.setScene(ResponsiveSceneUtil.createScaledScene(root));
+            stage.setFullScreen(true);
             stage.show();
         } catch (Exception e) {
             LoggerUtil.error("Lỗi khi chuyển về màn hình Bidder: " + e.getMessage());
@@ -188,14 +194,35 @@ public class SellerHomeController {
             FXMLLoader loader = new FXMLLoader(resource);
             Parent node = loader.load();
 
-            if (controllerSetup != null) {
-                controllerSetup.accept(loader.getController());
+            Object controller = loader.getController();
+            if (controller instanceof SellerDashboardController) {
+                ((SellerDashboardController) controller).setSellerHomeController(this);
+                ((SellerDashboardController) controller).setUserData(currentUser, clientSocket);
             }
 
+            if (controllerSetup != null) {
+                controllerSetup.accept(controller);
+            }
+
+            prepareContentNode(node);
             contentArea.getChildren().setAll(node);
         } catch (Exception e) {
             LoggerUtil.error("Lỗi load giao diện " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void prepareContentNode(Node node) {
+        StackPane.setAlignment(node, Pos.TOP_LEFT);
+        if (node instanceof Region region) {
+            region.setMinWidth(0);
+            region.setMinHeight(0);
+            region.setMaxWidth(Double.MAX_VALUE);
+            region.setMaxHeight(Double.MAX_VALUE);
+        }
+        if (node instanceof ScrollPane scrollPane) {
+            scrollPane.setFitToWidth(true);
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         }
     }
 

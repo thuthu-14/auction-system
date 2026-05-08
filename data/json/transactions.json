@@ -52,5 +52,50 @@
     "balanceAfter": 119998.0,
     "description": "Nạp tiền vào ví",
     "timestamp": 1778140587808
+  },
+  {
+    "id": "TXN_1778230673987",
+    "userId": "U1777887117887",
+    "type": "WITHDRAW",
+    "amount": 90000.0,
+    "balanceAfter": 9918886.0,
+    "description": "Rút tiền về ngân hàng",
+    "timestamp": 1778230673989
+  },
+  {
+    "id": "TXN_1778230693787",
+    "userId": "U1777887117887",
+    "type": "WITHDRAW",
+    "amount": 900000.0,
+    "balanceAfter": 9018886.0,
+    "description": "Rút tiền về ngân hàng",
+    "timestamp": 1778230693787
+  },
+  {
+    "id": "TXN_1778230721344",
+    "userId": "U1777887117887",
+    "type": "DEPOSIT",
+    "amount": 9000.0,
+    "balanceAfter": 9027886.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778230721344
+  },
+  {
+    "id": "TXN_1778230734503",
+    "userId": "U1777887117887",
+    "type": "WITHDRAW",
+    "amount": 9000.0,
+    "balanceAfter": 9018886.0,
+    "description": "Rút tiền về ngân hàng",
+    "timestamp": 1778230734503
+  },
+  {
+    "id": "TXN_1778255678205",
+    "userId": "U1777887117887",
+    "type": "DEPOSIT",
+    "amount": 90000.0,
+    "balanceAfter": 9198886.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778255678206
   }
 ]

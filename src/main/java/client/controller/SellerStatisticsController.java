@@ -51,9 +51,7 @@ public class SellerStatisticsController implements Initializable {
             try {
                 // Tận dụng lệnh GET_SELLER_AUCTIONS đã có sẵn trên Server
                 Message request = new Message(MessageType.GET_SELLER_AUCTIONS, null, currentUser.getUsername());
-                socket.sendMessage(request);
-
-                Message response = socket.receiveMessage();
+                Message response = socket.sendAndReceive(request);
 
                 if (response != null && "SUCCESS".equals(response.getStatus())) {
                     @SuppressWarnings("unchecked")

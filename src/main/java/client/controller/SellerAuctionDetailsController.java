@@ -52,8 +52,7 @@ public class SellerAuctionDetailsController {
                 Message req = new Message(MessageType.GET_AUCTION_DETAIL, auctionId, user.getUsername());
 
                 // Sử dụng hàm gửi/nhận đồng bộ để tránh bị lẫn dữ liệu với các luồng khác
-                socket.sendMessage(req);
-                Message res = socket.receiveMessage();
+                Message res = socket.sendAndReceive(req);
 
                 if (res != null && "SUCCESS".equals(res.getStatus()) && res.getData() != null) {
 

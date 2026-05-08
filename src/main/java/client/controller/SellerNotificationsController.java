@@ -47,9 +47,7 @@ public class SellerNotificationsController implements Initializable {
             try {
                 // Yêu cầu Server trả về danh sách thông báo
                 Message request = new Message(MessageType.GET_NOTIFICATIONS, null, currentUser.getUsername());
-                socket.sendMessage(request);
-
-                Message response = socket.receiveMessage();
+                Message response = socket.sendAndReceive(request);
 
                 Platform.runLater(() -> {
                     if (response != null && "SUCCESS".equals(response.getStatus())) {
@@ -81,9 +79,7 @@ public class SellerNotificationsController implements Initializable {
             try {
                 // Gửi lệnh đánh dấu đã đọc lên Server
                 Message request = new Message(MessageType.MARK_NOTIFICATIONS_READ, null, currentUser.getUsername());
-                socket.sendMessage(request);
-
-                Message response = socket.receiveMessage();
+                Message response = socket.sendAndReceive(request);
 
                 Platform.runLater(() -> {
                     if (response != null && "SUCCESS".equals(response.getStatus())) {
@@ -117,10 +113,6 @@ public class SellerNotificationsController implements Initializable {
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        client.util.DialogUtil.showAlert(type, title, null, content);
     }
 }

@@ -1,10 +1,12 @@
 package client.controller;
 
 import client.network.ClientSocket;
+import client.network.ConnectionManager;
 import common.Message;
 import common.MessageType;
 import common.Transaction;
 import javafx.animation.FadeTransition;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -43,6 +45,9 @@ public class WalletController implements Initializable {
     @FXML private Label balanceLabel;
     @FXML private ComboBox<String> timeFilter;
     @FXML private TextField searchField;
+    @FXML private Button filterAllBtn;
+    @FXML private Button filterInBtn;
+    @FXML private Button filterOutBtn;
     @FXML private VBox addBankBox;
     @FXML private VBox linkedBankBox;
     @FXML private Label displayBankName;
@@ -59,6 +64,16 @@ public class WalletController implements Initializable {
     private ClientSocket clientSocket;
     private User currentUser;
     private List<Transaction> allTransactions = new ArrayList<>();
+    private TransactionFilter activeTransactionFilter = TransactionFilter.ALL;
+
+    private enum TransactionFilter {
+        ALL, IN, OUT
+    }
+
+    private static final String ACTIVE_FILTER_STYLE =
+            "-fx-background-color: #1a1a1a; -fx-background-radius: 10; -fx-cursor: hand;";
+    private static final String INACTIVE_FILTER_STYLE =
+            "-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;";
 
     private static final String BANK_FILE = "data/json/bank_accounts.json";
     private static final String TRANSACTIONS_FILE = "data/json/transactions.json";
@@ -78,6 +93,8 @@ public class WalletController implements Initializable {
             timeFilter.getItems().addAll("Tháng này", "Tháng trước", "3 tháng gần đây", "Tất cả thời gian");
             timeFilter.getSelectionModel().selectFirst();
         }
+
+        updateFilterButtons();
 
         if (dateColumn != null) dateColumn.setCellValueFactory(new PropertyValueFactory<>("formattedDate"));
         if (typeColumn != null) typeColumn.setCellValueFactory(new PropertyValueFactory<>("typeLabel"));
@@ -223,16 +240,23 @@ public class WalletController implements Initializable {
 
             new Thread(() -> {
                 try {
+                    ClientSocket socket = getActiveSocket();
+                    if (socket == null || !socket.isConnected()) {
+                        throw new java.io.IOException("Socket is not connected");
+                    }
+
                     Map<String, Object> data = new HashMap<>();
                     data.put("username", currentUser.getUsername());
                     data.put("amount", amount);
 
                     MessageType msgType = type.equals("DEPOSIT") ? MessageType.ADD_FUNDS : MessageType.WITHDRAW;
 
-                    clientSocket.sendMessage(new Message(msgType, data, currentUser.getUsername()));
-                    Message response = clientSocket.receiveMessage();
+                    Message response = socket.sendAndReceive(new Message(msgType, data, currentUser.getUsername()));
 
                     if (response != null && "SUCCESS".equals(response.getStatus())) {
+                        if (!(response.getData() instanceof User)) {
+                            throw new IllegalStateException("Invalid wallet response data: " + response.getData());
+                        }
                         User updatedUser = (User) response.getData();
 
                         Platform.runLater(() -> {
@@ -254,6 +278,7 @@ public class WalletController implements Initializable {
                     }
 
                 } catch (Exception e) {
+                    LoggerUtil.error("Wallet transaction failed: " + e.getMessage());
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Không thể gửi yêu cầu tới Server"));
                 }
             }).start();
@@ -261,6 +286,26 @@ public class WalletController implements Initializable {
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng nhập số tiền hợp lệ");
         }
+    }
+
+    private ClientSocket getActiveSocket() {
+        if (clientSocket != null && clientSocket.isConnected()) {
+            return clientSocket;
+        }
+
+        ClientSocket managerSocket = ConnectionManager.getInstance().getClientSocket();
+        if (managerSocket != null && managerSocket.isConnected()) {
+            clientSocket = managerSocket;
+            return managerSocket;
+        }
+
+        ClientSocket navigationSocket = NavigationManager.getInstance().getClientSocket();
+        if (navigationSocket != null && navigationSocket.isConnected()) {
+            clientSocket = navigationSocket;
+            return navigationSocket;
+        }
+
+        return null;
     }
 
     @FXML private void handleDeposit() {
@@ -272,6 +317,7 @@ public class WalletController implements Initializable {
         // ĐÃ SỬA: Set Header về null để xóa dòng số dư ngân hàng
         d.setHeaderText(null);
         d.setContentText("Nhập số tiền muốn nạp vào ví:");
+        client.util.DialogUtil.prepareDialog(d, rootPane != null ? rootPane : balanceLabel);
         d.showAndWait().ifPresent(s -> processTransaction("DEPOSIT", s, bankEntry));
     }
 
@@ -283,13 +329,14 @@ public class WalletController implements Initializable {
         d.setTitle("Rút tiền");
         d.setHeaderText("Ví hiện có: " + formatVnd(currentUser.getWallet()));
         d.setContentText("Nhập số tiền muốn rút về ngân hàng:");
+        client.util.DialogUtil.prepareDialog(d, rootPane != null ? rootPane : balanceLabel);
         d.showAndWait().ifPresent(s -> processTransaction("WITHDRAW", s, bankEntry));
     }
 
     private String formatVnd(double value) { return String.format("%,.0f đ", value); }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {
-        Alert a = new Alert(type); a.setTitle(title); a.setHeaderText(null); a.setContentText(msg); a.showAndWait();
+        client.util.DialogUtil.showAlert(type, title, null, msg, rootPane != null ? rootPane : balanceLabel);
     }
 
     private void saveBankAccountForCurrentUser(String bank, String account, double amount) throws Exception {
@@ -339,7 +386,7 @@ public class WalletController implements Initializable {
             List<Transaction> list = loadTransactionsForUser();
             Platform.runLater(() -> {
                 allTransactions = new ArrayList<>(list);
-                showTransactions(allTransactions);
+                applyTransactionFilters();
             });
         } catch (Exception e) {
             LoggerUtil.error("Lỗi load lịch sử GD: " + e.getMessage());
@@ -384,39 +431,117 @@ public class WalletController implements Initializable {
         transactionTable.refresh();
     }
 
-    @FXML private void handleSearch() {
-        if (searchField == null) return;
-        String keyword = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase();
-        if (keyword.isEmpty()) {
-            showTransactions(allTransactions);
-            return;
-        }
-
+    @FXML public void applyTransactionFilters() {
+        updateFilterButtons();
+        String keyword = searchField == null || searchField.getText() == null
+                ? ""
+                : searchField.getText().trim().toLowerCase();
         List<Transaction> filtered = allTransactions.stream()
-                .filter(t -> {
-                    String description = t.description == null ? "" : t.description.toLowerCase();
-                    String typeLabel = t.getTypeLabel() == null ? "" : t.getTypeLabel().toLowerCase();
-                    return description.contains(keyword)
-                            || typeLabel.contains(keyword)
-                            || t.getFormattedDate().contains(keyword);
-                })
+                .filter(this::matchesActiveTypeFilter)
+                .filter(this::matchesTimeFilter)
+                .filter(t -> keyword.isEmpty() || matchesSearchKeyword(t, keyword))
                 .collect(java.util.stream.Collectors.toList());
         showTransactions(filtered);
     }
 
+    @FXML private void handleSearch() {
+        applyTransactionFilters();
+    }
+
     @FXML private void filterAll() {
-        showTransactions(allTransactions);
+        setActiveTransactionFilter(TransactionFilter.ALL);
     }
 
     @FXML private void filterIn() {
-        showTransactions(allTransactions.stream()
-                .filter(t -> "DEPOSIT".equals(t.type))
-                .collect(java.util.stream.Collectors.toList()));
+        setActiveTransactionFilter(TransactionFilter.IN);
     }
 
     @FXML private void filterOut() {
-        showTransactions(allTransactions.stream()
-                .filter(t -> "WITHDRAW".equals(t.type))
-                .collect(java.util.stream.Collectors.toList()));
+        setActiveTransactionFilter(TransactionFilter.OUT);
+    }
+
+    private void setActiveTransactionFilter(TransactionFilter filter) {
+        activeTransactionFilter = filter;
+        animateActiveFilterButton();
+        applyTransactionFilters();
+    }
+
+    private boolean matchesActiveTypeFilter(Transaction transaction) {
+        if (activeTransactionFilter == TransactionFilter.IN) {
+            return "DEPOSIT".equals(transaction.type);
+        }
+        if (activeTransactionFilter == TransactionFilter.OUT) {
+            return "WITHDRAW".equals(transaction.type);
+        }
+        return true;
+    }
+
+    private boolean matchesTimeFilter(Transaction transaction) {
+        if (timeFilter == null || timeFilter.getSelectionModel().getSelectedIndex() < 0) {
+            return true;
+        }
+
+        int selectedIndex = timeFilter.getSelectionModel().getSelectedIndex();
+        if (selectedIndex == 3) {
+            return true;
+        }
+
+        Calendar transactionDate = Calendar.getInstance();
+        transactionDate.setTimeInMillis(transaction.timestamp);
+
+        Calendar now = Calendar.getInstance();
+        if (selectedIndex == 0) {
+            return transactionDate.get(Calendar.YEAR) == now.get(Calendar.YEAR)
+                    && transactionDate.get(Calendar.MONTH) == now.get(Calendar.MONTH);
+        }
+
+        if (selectedIndex == 1) {
+            now.add(Calendar.MONTH, -1);
+            return transactionDate.get(Calendar.YEAR) == now.get(Calendar.YEAR)
+                    && transactionDate.get(Calendar.MONTH) == now.get(Calendar.MONTH);
+        }
+
+        Calendar threeMonthsAgo = Calendar.getInstance();
+        threeMonthsAgo.add(Calendar.MONTH, -3);
+        return transaction.timestamp >= threeMonthsAgo.getTimeInMillis();
+    }
+
+    private boolean matchesSearchKeyword(Transaction transaction, String keyword) {
+        String description = transaction.description == null ? "" : transaction.description.toLowerCase();
+        String typeLabel = transaction.getTypeLabel() == null ? "" : transaction.getTypeLabel().toLowerCase();
+        return description.contains(keyword)
+                || typeLabel.contains(keyword)
+                || transaction.getFormattedDate().contains(keyword);
+    }
+
+    private void updateFilterButtons() {
+        styleFilterButton(filterAllBtn, activeTransactionFilter == TransactionFilter.ALL);
+        styleFilterButton(filterInBtn, activeTransactionFilter == TransactionFilter.IN);
+        styleFilterButton(filterOutBtn, activeTransactionFilter == TransactionFilter.OUT);
+    }
+
+    private void styleFilterButton(Button button, boolean active) {
+        if (button == null) {
+            return;
+        }
+        button.setStyle(active ? ACTIVE_FILTER_STYLE : INACTIVE_FILTER_STYLE);
+        button.setTextFill(active ? Color.WHITE : Color.web("#4a5568"));
+    }
+
+    private void animateActiveFilterButton() {
+        Button activeButton = switch (activeTransactionFilter) {
+            case IN -> filterInBtn;
+            case OUT -> filterOutBtn;
+            default -> filterAllBtn;
+        };
+        if (activeButton == null) {
+            return;
+        }
+        ScaleTransition transition = new ScaleTransition(Duration.millis(110), activeButton);
+        transition.setFromX(0.96);
+        transition.setFromY(0.96);
+        transition.setToX(1);
+        transition.setToY(1);
+        transition.play();
     }
 }
