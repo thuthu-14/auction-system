@@ -83,6 +83,12 @@ public class ClientHandler implements Runnable {
                 case GET_BID_HISTORY:
                     handleGetBidHistory(message);
                     break;
+                case GET_USER_BIDS:
+                    handleGetUserBids();
+                    break;
+                case GET_SELLER_CONTACT:
+                    handleGetSellerContact(message);
+                    break;
                 case GET_ALL_USERS:
                     handleGetAllUsers(message);
                     break;
@@ -285,6 +291,7 @@ public class ClientHandler implements Runnable {
 
             // Phát sóng Real-time cho mọi người đang xem
             server.broadcastMessage(new Message(MessageType.UPDATE_PRICE_REALTIME, auction, currentUser.getUserId()));
+            server.broadcastMessage(new Message(MessageType.UPDATE_PRICE_REALTIME, bid, currentUser.getUserId()));
 
             // =========================================================
             // ĐÂY LÀ PHẦN QUAN TRỌNG NHẤT ĐÃ ĐƯỢC BỔ SUNG:
@@ -328,6 +335,64 @@ public class ClientHandler implements Runnable {
         } catch (Exception e) {
             sendError("❌" + e.getMessage());
         }
+    }
+
+    private void handleGetUserBids() throws IOException, ClassNotFoundException {
+        if (currentUser == null) {
+            sendError("Bạn phải đăng nhập!");
+            return;
+        }
+
+        try {
+            List<Bid> bids = BidService.getUserBids(currentUser.getUserId());
+            Message response = new Message(MessageType.SUCCESS, "SUCCESS", "User bids retrieved");
+            response.setData(new ArrayList<>(bids));
+            sendMessage(response);
+        } catch (Exception e) {
+            sendError("Không thể tải lịch sử đặt giá: " + e.getMessage());
+        }
+    }
+
+    private void handleGetSellerContact(Message message) throws IOException, ClassNotFoundException {
+        if (currentUser == null) {
+            sendError("Bạn phải đăng nhập!");
+            return;
+        }
+
+        String sellerId = message.getData() != null ? message.getData().toString() : "";
+        if (sellerId.isBlank()) {
+            sendError("Không tìm thấy người bán!");
+            return;
+        }
+
+        try {
+            User seller = UserService.getUserById(sellerId);
+            if (seller == null) {
+                sendError("Không tìm thấy người bán!");
+                return;
+            }
+
+            Map<String, String> contact = new HashMap<>();
+            contact.put("name", nonBlank(seller.getUsername(), "Người bán"));
+            contact.put("email", nonBlank(seller.getEmail(), "Chưa cập nhật"));
+            contact.put("phone", "Chưa cập nhật");
+
+            if (seller instanceof RegularUser regularSeller) {
+                contact.put("name", nonBlank(regularSeller.getShopName(), seller.getUsername()));
+                contact.put("email", nonBlank(regularSeller.getShopEmail(), seller.getEmail()));
+                contact.put("phone", nonBlank(regularSeller.getShopPhone(), "Chưa cập nhật"));
+            }
+
+            Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Seller contact retrieved");
+            response.setData(contact);
+            sendMessage(response);
+        } catch (Exception e) {
+            sendError("Không thể tải thông tin liên hệ: " + e.getMessage());
+        }
+    }
+
+    private String nonBlank(String value, String fallback) {
+        return value != null && !value.isBlank() ? value : fallback;
     }
 
     private void handleGetAllUsers(Message message) throws IOException, ClassNotFoundException {
@@ -645,6 +710,7 @@ public class ClientHandler implements Runnable {
 
     public synchronized void sendMessage(Message message) throws IOException {
         if (isConnected && socket.isConnected()) {
+            oos.reset();
             oos.writeObject(message);
             oos.flush();
             LoggerUtil.debug("Sent message: " + message.getType() + " to " + clientId);

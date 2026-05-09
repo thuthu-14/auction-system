@@ -50,7 +50,7 @@
       "brand": "Apple",
       "warrantyPeriod": "1 Year"
     },
-    "currentPrice": 2.950005E7,
+    "currentPrice": 2.955005E7,
     "highestBidderId": "U1777887117887",
     "highestBidderName": "buingoc",
     "status": "RUNNING",
@@ -180,7 +180,8 @@
       "BID1778263822970",
       "BID1778263959156",
       "BID1778263964336",
-      "BID1778264110626"
+      "BID1778264110626",
+      "BID1778338308638"
     ],
     "viewCount": 0
   }

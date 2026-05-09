@@ -22,6 +22,8 @@ public enum MessageType implements Serializable {
     // --- BIDDING ---
     PLACE_BID,
     GET_BID_HISTORY,
+    GET_USER_BIDS,
+    GET_SELLER_CONTACT,
 
     // --- USER & ADMIN ---
     UPGRADE_SELLER,

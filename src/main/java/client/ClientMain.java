@@ -8,6 +8,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import client.util.ResponsiveSceneUtil;
+import javafx.scene.input.KeyCombination;
 import navigation.NavigationManager; // <-- Import thêm cái này để đồng bộ
 import util.LoggerUtil;
 
@@ -24,6 +26,8 @@ public class ClientMain extends Application {
 
         // BẮT BUỘC CÓ ĐỂ ĐỒNG BỘ: Cấp phát main stage cho NavigationManager
         NavigationManager.getInstance().setMainStage(primaryStage);
+        primaryStage.setFullScreenExitHint("");
+        primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
 
         LoggerUtil.info("╔════════════════════════════════════════╗");
         LoggerUtil.info("║   AUCTION SYSTEM CLIENT v1.0           ║");
@@ -46,7 +50,7 @@ public class ClientMain extends Application {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
 
             // SỬA: Đồng bộ kích thước màn hình giống như trong SignupController (1300x800)
-            Scene scene = new Scene(loader.load(), 1300, 800);
+            Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
 
             loginController = loader.getController();
             loginController.setOnAdminLoginSuccess(this::showAdminPanel);
@@ -54,6 +58,8 @@ public class ClientMain extends Application {
 
             primaryStage.setTitle("🏪 Hệ thống Đấu giá - Đăng nhập");
             primaryStage.setScene(scene);
+            primaryStage.setMaximized(true);
+            primaryStage.setFullScreen(true);
             primaryStage.show();
 
             LoggerUtil.info("✓ Login screen displayed");
@@ -73,7 +79,7 @@ public class ClientMain extends Application {
             }
 
             Parent root = loader.load();
-            Scene scene = new Scene(root, 1000, 700);
+            Scene scene = ResponsiveSceneUtil.createScaledScene(root);
             AdminHomeController adminController = loader.getController();
 
             if (adminController != null && loginController != null) {
@@ -87,6 +93,8 @@ public class ClientMain extends Application {
 
             primaryStage.setTitle("⚙️ Bảng điều khiển Admin");
             primaryStage.setScene(scene);
+            primaryStage.setMaximized(true);
+            primaryStage.setFullScreen(true);
             primaryStage.show();
 
             LoggerUtil.info("✓ Admin panel displayed");
@@ -105,7 +113,7 @@ public class ClientMain extends Application {
                 return;
             }
 
-            Scene scene = new Scene(loader.load(), 1000, 700);
+            Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
             HomeScreenController homeController = loader.getController();
 
             if (homeController != null && loginController != null) {
@@ -119,6 +127,8 @@ public class ClientMain extends Application {
 
             primaryStage.setTitle("🏪 Chợ Đấu giá");
             primaryStage.setScene(scene);
+            primaryStage.setMaximized(true);
+            primaryStage.setFullScreen(true);
             primaryStage.show();
 
             LoggerUtil.info("✓ Home screen displayed");

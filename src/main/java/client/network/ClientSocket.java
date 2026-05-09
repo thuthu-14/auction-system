@@ -4,6 +4,8 @@ import common.Message;
 import util.LoggerUtil;
 import java.io.*;
 import java.net.Socket;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ClientSocket {
 
@@ -11,6 +13,7 @@ public class ClientSocket {
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private volatile boolean isConnected;
+    private final Queue<Message> asyncMessages = new ConcurrentLinkedQueue<>();
 
     public ClientSocket(Socket socket) throws IOException {
         this.socket = socket;
@@ -66,8 +69,41 @@ public class ClientSocket {
         }
     }
 
+    public synchronized Message sendAndReceive(Message message) throws IOException, ClassNotFoundException {
+        sendMessage(message);
+        Message response;
+        do {
+            response = receiveMessage();
+            if (isAsyncBroadcast(response)) {
+                asyncMessages.offer(response);
+            }
+        } while (isAsyncBroadcast(response));
+        return response;
+    }
+
+    public Message pollAsyncMessage() {
+        return asyncMessages.poll();
+    }
+
+    private boolean isAsyncBroadcast(Message message) {
+        if (message == null || message.getType() == null) {
+            return false;
+        }
+
+        return switch (message.getType()) {
+            case UPDATE,
+                 NOTIFICATION,
+                 OUTBID_NOTIFICATION,
+                 AUCTION_FINISHED_NOTIFICATION,
+                 AUCTION_EXTENDED_NOTIFICATION,
+                 UPDATE_PRICE_REALTIME,
+                 SELLER_AUCTIONS_UPDATED -> true;
+            default -> false;
+        };
+    }
+
     public boolean isConnected() {
-        return isConnected && socket != null && socket.isConnected();
+        return isConnected && socket != null && socket.isConnected() && !socket.isClosed();
     }
 
     public void close() {

@@ -98,7 +98,33 @@ public class BidService {
      */
     public static List<Bid> getBidHistory(String auctionId)
             throws IOException, ClassNotFoundException {
-        return BidDAO.getBidsByAuctionId(auctionId);
+        List<Bid> bids = new ArrayList<>(BidDAO.getBidsByAuctionId(auctionId));
+
+        Auction auction = AuctionDAO.getAuctionById(auctionId);
+        if (auction != null) {
+            for (String bidId : auction.getBidIds()) {
+                Bid bid = BidDAO.getBidById(bidId);
+                if (bid != null && bids.stream().noneMatch(existing -> isSameBid(existing, bid))) {
+                    bids.add(bid);
+                }
+            }
+        }
+
+        bids.sort(Comparator.comparingLong(Bid::getBidTime));
+        return bids;
+    }
+
+    private static boolean isSameBid(Bid existingBid, Bid newBid) {
+        if (existingBid == null || newBid == null) {
+            return false;
+        }
+        if (existingBid.getBidId() != null && newBid.getBidId() != null) {
+            return existingBid.getBidId().equals(newBid.getBidId());
+        }
+        return Objects.equals(existingBid.getAuctionId(), newBid.getAuctionId())
+                && Objects.equals(existingBid.getBidderId(), newBid.getBidderId())
+                && existingBid.getBidTime() == newBid.getBidTime()
+                && Double.compare(existingBid.getAmount(), newBid.getAmount()) == 0;
     }
 
     /**
