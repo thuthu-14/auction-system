@@ -49,6 +49,8 @@ public class AddAuctionProductController implements Initializable {
     private VBox categoryFormPane;
     @FXML
     private HBox imagePreviewContainer;
+    @FXML
+    private ScrollPane formScrollPane;
 
     private String currentCategory;
     private javafx.collections.ObservableList<String> timeOptions;
@@ -402,13 +404,39 @@ public class AddAuctionProductController implements Initializable {
     private void clearForm() {
         productNameField.clear();
         descriptionArea.clear();
-        categoryComboBox.setValue(null);
-        categoryFormPane.getChildren().clear();
+        currentCategory = null;
+        categoryComboBox.getSelectionModel().clearSelection();
+        resetCategoryPlaceholder();
 
         if (imagePreviewContainer != null) {
             imagePreviewContainer.getChildren().clear();
         }
         selectedImagePaths.clear();
+
+        Platform.runLater(() -> {
+            if (formScrollPane != null) {
+                formScrollPane.setVvalue(0);
+            }
+            productNameField.requestFocus();
+        });
+    }
+
+    private void resetCategoryPlaceholder() {
+        if (categoryFormPane == null) return;
+
+        categoryFormPane.getChildren().clear();
+
+        VBox placeholder = new VBox(10);
+        placeholder.setAlignment(javafx.geometry.Pos.CENTER);
+        placeholder.setPadding(new javafx.geometry.Insets(20));
+
+        Label label = new Label("Ch\u1ecdn ng\u00e0nh h\u00e0ng \u0111\u1ec3 b\u1eaft \u0111\u1ea7u");
+        label.setTextFill(javafx.scene.paint.Color.web("#a0aec0"));
+        label.getStyleClass().add("field-label");
+        label.setFont(javafx.scene.text.Font.font(14));
+
+        placeholder.getChildren().add(label);
+        categoryFormPane.getChildren().add(placeholder);
     }
 
     @FXML

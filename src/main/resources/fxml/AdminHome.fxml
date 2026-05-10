@@ -70,7 +70,7 @@
 
                         <HBox fx:id="menuUpgrade" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadLogOutView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
                             <children>
-                                <Button alignment="BASELINE_LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" text="🚪  Đăng xuất" textFill="#e53e3e" HBox.hgrow="ALWAYS">
+                                <Button alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#loadLogOutView" style="-fx-background-color: transparent;" text="🚪  Đăng xuất" textFill="#e53e3e" HBox.hgrow="ALWAYS">
                                     <font>
                                         <Font name="System Bold" size="16.0" />
                                     </font>

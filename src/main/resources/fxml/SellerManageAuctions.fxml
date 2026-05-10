@@ -63,7 +63,7 @@
         <Button onAction="#handleResetFilter" styleClass="btn-outline-small" text="Reset" />
     </HBox>
 
-    <ScrollPane fitToWidth="true" style="-fx-padding: 12 24 0 24; -fx-background-color: white;" VBox.vgrow="ALWAYS">
+    <ScrollPane fitToWidth="true" style="-fx-padding: 12 24 0 24; -fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
         <TableView fx:id="auctionTable" prefHeight="420" styleClass="auction-table">
             <columns>
                 <TableColumn fx:id="colSelect" maxWidth="40" minWidth="40" prefWidth="40" resizable="false" text="" />

@@ -2,7 +2,8 @@ package client.controller;
 
 import common.Message;
 import common.MessageType;
-import server.model.Notification; // Dùng class thật bạn vừa tạo
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,10 +16,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
 import navigation.NavigationManager;
+import server.model.Notification; // Dùng class thật bạn vừa tạo
 import util.LoggerUtil;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -28,6 +32,8 @@ public class NotificationsController implements Initializable {
     @FXML private VBox notificationsContainer;
 
     private HomeScreenController homeController;
+    private Timeline timeRefreshTimer;
+    private final List<Runnable> timeLabelUpdaters = new ArrayList<>();
 
     public void setHomeController(HomeScreenController homeController) {
         this.homeController = homeController;
@@ -41,6 +47,7 @@ public class NotificationsController implements Initializable {
                 loadNotifications();
             });
         }
+        startTimeRefreshTimer();
         loadNotifications();
     }
 
@@ -50,6 +57,7 @@ public class NotificationsController implements Initializable {
     public void loadNotifications() {
         if (notificationsContainer == null) return;
         notificationsContainer.getChildren().clear();
+        timeLabelUpdaters.clear();
 
         new Thread(() -> {
             try {
@@ -108,9 +116,10 @@ public class NotificationsController implements Initializable {
         // Action Box
         VBox actionBox = new VBox(10);
         actionBox.setAlignment(Pos.CENTER_RIGHT);
-        Label timeLabel = new Label(data.getTimeAgo());
+        Label timeLabel = new Label(data.formatTimeAgo());
         timeLabel.setFont(Font.font("System", 12));
         timeLabel.setStyle("-fx-text-fill: #9ca3af;");
+        timeLabelUpdaters.add(() -> timeLabel.setText(data.formatTimeAgo()));
         Button actionBtn = new Button(data.getButtonText());
         actionBtn.setFont(Font.font("System", FontWeight.BOLD, 14));
 
@@ -147,6 +156,20 @@ public class NotificationsController implements Initializable {
 
         iconBox.getChildren().add(iconLabel);
         return container;
+    }
+
+    private void startTimeRefreshTimer() {
+        if (timeRefreshTimer != null) {
+            timeRefreshTimer.stop();
+        }
+
+        timeRefreshTimer = new Timeline(new KeyFrame(Duration.seconds(30), event -> {
+            for (Runnable updater : timeLabelUpdaters) {
+                updater.run();
+            }
+        }));
+        timeRefreshTimer.setCycleCount(Timeline.INDEFINITE);
+        timeRefreshTimer.play();
     }
 
     private void sendSocketRequest(MessageType type, Object data, String successPopup) {

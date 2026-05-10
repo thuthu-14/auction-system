@@ -22,6 +22,7 @@ import navigation.NavigationManager;
 import server.model.Auction;
 import server.model.Bid;
 import server.model.Item;
+import server.model.RegularUser;
 import server.model.User;
 import util.JsonUtil;
 import util.LoggerUtil;
@@ -43,8 +44,8 @@ import java.util.Map;
 public class AuctionHistoryController {
     private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-    private static final String STATUS_ALL = "Tất cả trạng thái";
-    private static final String TIME_ALL = "Tất cả thời gian";
+    private static final String STATUS_ALL = "T\u1ea5t c\u1ea3 tr\u1ea1ng th\u00e1i";
+    private static final String TIME_ALL = "T\u1ea5t c\u1ea3 th\u1eddi gian";
 
     @FXML private ComboBox<String> statusFilter;
     @FXML private ComboBox<String> timeFilter;
@@ -86,13 +87,13 @@ public class AuctionHistoryController {
 
         if (statusFilter != null) {
             statusFilter.setItems(FXCollections.observableArrayList(
-                    STATUS_ALL, "Đang đấu", "Trúng thầu", "Trượt", "Đã kết thúc"));
+                    STATUS_ALL, "\u0110ang \u0111\u1ea5u", "Tr\u00fang th\u1ea7u", "Tr\u01b0\u1ee3t", "\u0110\u00e3 k\u1ebft th\u00fac"));
             statusFilter.getSelectionModel().selectFirst();
             statusFilter.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
         }
         if (timeFilter != null) {
             timeFilter.setItems(FXCollections.observableArrayList(
-                    TIME_ALL, "Tháng này", "Tháng trước", "3 tháng gần đây"));
+                    TIME_ALL, "Th\u00e1ng n\u00e0y", "Th\u00e1ng tr\u01b0\u1edbc", "3 th\u00e1ng g\u1ea7n \u0111\u00e2y"));
             timeFilter.getSelectionModel().selectFirst();
             timeFilter.valueProperty().addListener((obs, oldValue, newValue) -> applyFilters());
         }
@@ -102,7 +103,7 @@ public class AuctionHistoryController {
 
         Platform.runLater(() -> {
             if (!contextInjected && visibleRows.isEmpty()) {
-                loadHistoryFromLocalFiles(List.of(), false);
+                loadHistoryFromLocalFiles(List.of(), true);
             }
         });
     }
@@ -123,7 +124,7 @@ public class AuctionHistoryController {
     private void loadHistory() {
         if (currentUser == null) {
             LoggerUtil.warn("Auction history has no current user");
-            loadHistoryFromLocalFiles(List.of(), false);
+            loadHistoryFromLocalFiles(List.of(), true);
             return;
         }
         if (clientSocket == null || !clientSocket.isConnected()) {
@@ -147,12 +148,16 @@ public class AuctionHistoryController {
                     if (bid == null || bid.getAuctionId() == null || bid.getAuctionId().isBlank()) {
                         continue;
                     }
+                    if (!isBidFromCurrentUser(bid)) {
+                        continue;
+                    }
 
                     Auction auction = auctionCache.computeIfAbsent(bid.getAuctionId(), this::fetchAuction);
                     if (auction != null) {
                         rows.add(new HistoryRow(bid, auction));
                     }
                 }
+                addWonAuctionRows(rows, loadLocalAuctionsById(), loadLocalBids(false));
 
                 rows.sort(Comparator.comparingLong((HistoryRow row) -> row.bid.getBidTime()).reversed());
                 Platform.runLater(() -> {
@@ -173,10 +178,8 @@ public class AuctionHistoryController {
                 List<Bid> bids = preferredBids == null || preferredBids.isEmpty()
                         ? loadLocalBids(filterByCurrentUser)
                         : preferredBids;
-                if (bids.isEmpty() && filterByCurrentUser) {
-                    bids = loadLocalBids(false);
-                }
                 Map<String, Auction> auctionCache = loadLocalAuctionsById();
+                List<Bid> allLocalBids = loadLocalBids(false);
                 List<HistoryRow> rows = new ArrayList<>();
 
                 for (Bid bid : bids) {
@@ -192,6 +195,7 @@ public class AuctionHistoryController {
                         rows.add(new HistoryRow(bid, auction));
                     }
                 }
+                addWonAuctionRows(rows, auctionCache, allLocalBids);
 
                 rows.sort(Comparator.comparingLong((HistoryRow row) -> row.bid.getBidTime()).reversed());
                 Platform.runLater(() -> {
@@ -204,9 +208,9 @@ public class AuctionHistoryController {
                 LoggerUtil.error("Load local auction history failed: " + e.getMessage());
                 Platform.runLater(() -> DialogUtil.showAlert(
                         Alert.AlertType.ERROR,
-                        "Lỗi",
+                        "L\u1ed7i",
                         null,
-                        "Không thể tải lịch sử đấu giá",
+                        "Kh\u00f4ng th\u1ec3 t\u1ea3i l\u1ecbch s\u1eed \u0111\u1ea5u gi\u00e1",
                         historyTable));
             }
         }, "AuctionHistoryLocalLoader").start();
@@ -241,20 +245,31 @@ public class AuctionHistoryController {
         LocalDate bidDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(bidTime), ZoneId.systemDefault()).toLocalDate();
         LocalDate today = LocalDate.now();
         return switch (selectedTime) {
-            case "Tháng này" -> bidDate.getYear() == today.getYear()
+            case "Th\u00e1ng n\u00e0y" -> bidDate.getYear() == today.getYear()
                     && bidDate.getMonthValue() == today.getMonthValue();
-            case "Tháng trước" -> {
+            case "Th\u00e1ng tr\u01b0\u1edbc" -> {
                 LocalDate previousMonth = today.minusMonths(1);
                 yield bidDate.getYear() == previousMonth.getYear()
                         && bidDate.getMonthValue() == previousMonth.getMonthValue();
             }
-            case "3 tháng gần đây" -> !bidDate.isBefore(today.minusMonths(3));
+            case "3 th\u00e1ng g\u1ea7n \u0111\u00e2y" -> !bidDate.isBefore(today.minusMonths(3));
             default -> true;
         };
     }
 
     private void showSellerContact(Auction auction) {
-        if (auction == null || clientSocket == null || currentUser == null) {
+        if (auction == null || currentUser == null) {
+            return;
+        }
+
+        Map<String, String> localContact = findLocalSellerContact(auction);
+        if (localContact != null && hasUsefulContact(localContact)) {
+            showContactDialog(localContact, auction);
+            return;
+        }
+
+        if (clientSocket == null || !clientSocket.isConnected()) {
+            showContactDialog(localContact, auction);
             return;
         }
 
@@ -263,33 +278,87 @@ public class AuctionHistoryController {
                 Message response = clientSocket.sendAndReceive(
                         new Message(MessageType.GET_SELLER_CONTACT, auction.getSellerId(), currentUser.getUsername()));
                 if (response != null && "SUCCESS".equals(response.getStatus()) && response.getData() instanceof Map<?, ?> data) {
-                    String name = asText(data.get("name"), auction.getSellerName());
-                    String email = asText(data.get("email"), "Chưa cập nhật");
-                    String phone = asText(data.get("phone"), "Chưa cập nhật");
-                    Platform.runLater(() -> DialogUtil.showAlert(
-                            Alert.AlertType.INFORMATION,
-                            "Liên hệ người bán",
-                            null,
-                            "Tên: " + name + "\nEmail: " + email + "\nSĐT: " + phone,
-                            historyTable));
+                    Map<String, String> contact = new HashMap<>();
+                    contact.put("name", asText(data.get("name"), auction.getSellerName()));
+                    contact.put("email", asText(data.get("email"), "Ch\u01b0a c\u1eadp nh\u1eadt"));
+                    contact.put("phone", asText(data.get("phone"), "Ch\u01b0a c\u1eadp nh\u1eadt"));
+                    Platform.runLater(() -> showContactDialog(contact, auction));
                 } else {
-                    Platform.runLater(() -> DialogUtil.showAlert(
-                            Alert.AlertType.WARNING,
-                            "Liên hệ người bán",
-                            null,
-                            response != null ? response.getMessage() : "Chưa có thông tin liên hệ",
-                            historyTable));
+                    Platform.runLater(() -> showContactDialog(localContact, auction));
                 }
             } catch (Exception e) {
                 LoggerUtil.error("Load seller contact failed: " + e.getMessage());
-                Platform.runLater(() -> DialogUtil.showAlert(
-                        Alert.AlertType.ERROR,
-                        "Lỗi",
-                        null,
-                        "Không thể tải thông tin liên hệ",
-                        historyTable));
+                Platform.runLater(() -> showContactDialog(localContact, auction));
             }
         }, "SellerContactLoader").start();
+    }
+
+    private void showContactDialog(Map<String, String> contact, Auction auction) {
+        String name = contact != null ? contact.get("name") : null;
+        String email = contact != null ? contact.get("email") : null;
+        String phone = contact != null ? contact.get("phone") : null;
+        String address = contact != null ? contact.get("address") : null;
+
+        DialogUtil.showAlert(
+                Alert.AlertType.INFORMATION,
+                "Li\u00ean h\u1ec7 ng\u01b0\u1eddi b\u00e1n",
+                null,
+                "T\u00ean: " + safeContact(name, auction != null ? auction.getSellerName() : "Ng\u01b0\u1eddi b\u00e1n")
+                        + "\nEmail: " + safeContact(email, "Ch\u01b0a c\u1eadp nh\u1eadt")
+                        + "\nS\u0110T: " + safeContact(phone, "Ch\u01b0a c\u1eadp nh\u1eadt")
+                        + "\n\u0110\u1ecba ch\u1ec9: " + safeContact(address, "Ch\u01b0a c\u1eadp nh\u1eadt"),
+                historyTable);
+    }
+
+    private Map<String, String> findLocalSellerContact(Auction auction) {
+        if (auction == null) {
+            return null;
+        }
+
+        File usersFile = findDataFile("users.json");
+        if (!usersFile.exists()) {
+            return null;
+        }
+
+        try {
+            List<User> users = JsonUtil.loadListFromJson(usersFile.getPath(), User.class);
+            for (User user : users != null ? users : List.<User>of()) {
+                if (user == null) {
+                    continue;
+                }
+                boolean sameSeller = (auction.getSellerId() != null && auction.getSellerId().equals(user.getUserId()))
+                        || (auction.getSellerName() != null && auction.getSellerName().equalsIgnoreCase(user.getUsername()));
+                if (!sameSeller) {
+                    continue;
+                }
+
+                Map<String, String> contact = new HashMap<>();
+                contact.put("name", safeContact(user.getUsername(), auction.getSellerName()));
+                contact.put("email", safeContact(user.getEmail(), "Ch\u01b0a c\u1eadp nh\u1eadt"));
+                contact.put("phone", "Ch\u01b0a c\u1eadp nh\u1eadt");
+                contact.put("address", "Ch\u01b0a c\u1eadp nh\u1eadt");
+                if (user instanceof RegularUser regularUser) {
+                    contact.put("name", safeContact(regularUser.getShopName(), user.getUsername()));
+                    contact.put("email", safeContact(regularUser.getShopEmail(), user.getEmail()));
+                    contact.put("phone", safeContact(regularUser.getShopPhone(), "Ch\u01b0a c\u1eadp nh\u1eadt"));
+                    contact.put("address", safeContact(regularUser.getShopAddress(), "Ch\u01b0a c\u1eadp nh\u1eadt"));
+                }
+                return contact;
+            }
+        } catch (Exception e) {
+            LoggerUtil.error("Load local seller contact failed: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private boolean hasUsefulContact(Map<String, String> contact) {
+        return contact != null
+                && (!"Ch\u01b0a c\u1eadp nh\u1eadt".equals(contact.get("phone"))
+                || !"Ch\u01b0a c\u1eadp nh\u1eadt".equals(contact.get("email")));
+    }
+
+    private String safeContact(String value, String fallback) {
+        return value != null && !value.isBlank() ? value : fallback;
     }
 
     private List<Bid> extractBidList(Object rawData) {
@@ -335,9 +404,7 @@ public class AuctionHistoryController {
             return false;
         }
         String userId = currentUser.getUserId();
-        String username = currentUser.getUsername();
-        return (userId != null && userId.equals(bid.getBidderId()))
-                || (username != null && username.equalsIgnoreCase(bid.getBidderName()));
+        return userId != null && userId.equals(bid.getBidderId());
     }
 
     private Map<String, Auction> loadLocalAuctionsById() {
@@ -360,6 +427,70 @@ public class AuctionHistoryController {
             LoggerUtil.error("Local auctions load failed: " + e.getMessage());
             return Map.of();
         }
+    }
+
+    private void addWonAuctionRows(List<HistoryRow> rows, Map<String, Auction> auctionsById, List<Bid> allBids) {
+        if (currentUser == null || auctionsById == null || auctionsById.isEmpty()) {
+            return;
+        }
+
+        for (Auction auction : auctionsById.values()) {
+            if (!isAuctionWonByCurrentUser(auction) || hasRowForAuction(rows, auction.getAuctionId())) {
+                continue;
+            }
+
+            Bid winningBid = findLatestUserBidForAuction(auction.getAuctionId(), allBids);
+            if (winningBid == null) {
+                winningBid = createWinningBidFromAuction(auction);
+            }
+            rows.add(new HistoryRow(winningBid, auction));
+        }
+    }
+
+    private boolean hasRowForAuction(List<HistoryRow> rows, String auctionId) {
+        if (auctionId == null) {
+            return false;
+        }
+        for (HistoryRow row : rows) {
+            if (row != null && row.auction != null && auctionId.equals(row.auction.getAuctionId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Bid findLatestUserBidForAuction(String auctionId, List<Bid> allBids) {
+        if (auctionId == null || allBids == null) {
+            return null;
+        }
+        Bid latest = null;
+        for (Bid bid : allBids) {
+            if (bid != null && auctionId.equals(bid.getAuctionId()) && isBidFromCurrentUser(bid)) {
+                if (latest == null || bid.getBidTime() > latest.getBidTime()) {
+                    latest = bid;
+                }
+            }
+        }
+        return latest;
+    }
+
+    private Bid createWinningBidFromAuction(Auction auction) {
+        Bid bid = new Bid();
+        bid.setAuctionId(auction.getAuctionId());
+        bid.setBidderId(auction.getHighestBidderId());
+        bid.setBidderName(auction.getHighestBidderName());
+        bid.setAmount(auction.getCurrentPrice());
+        bid.setBidTime(auction.getEndTime() > 0 ? auction.getEndTime() : auction.getCreatedAt());
+        bid.setStatus("ACTIVE");
+        return bid;
+    }
+
+    private boolean isAuctionWonByCurrentUser(Auction auction) {
+        if (auction == null || currentUser == null) {
+            return false;
+        }
+        String userId = currentUser.getUserId();
+        return userId != null && userId.equals(auction.getHighestBidderId());
     }
 
     private File findDataFile(String fileName) {
@@ -404,15 +535,15 @@ public class AuctionHistoryController {
 
             HistoryRow row = getTableView().getItems().get(getIndex());
             if (row.isActive()) {
-                button.setText(row.isOutbid() ? "Trả giá tiếp" : "Đấu giá ngay");
+                button.setText(row.isOutbid() ? "Tr\u1ea3 gi\u00e1 ti\u1ebfp" : "\u0110\u1ea5u gi\u00e1 ngay");
                 button.setStyle("-fx-background-color: #111827; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-weight: 700; -fx-cursor: hand;");
                 button.setOnAction(event -> homeController.loadAuctionDetailView(row.auction, false));
             } else if (row.isWinner()) {
-                button.setText("Liên hệ");
+                button.setText("Li\u00ean h\u1ec7");
                 button.setStyle("-fx-background-color: #2563eb; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-weight: 700; -fx-cursor: hand;");
                 button.setOnAction(event -> showSellerContact(row.auction));
             } else {
-                button.setText("Xem chi tiết");
+                button.setText("Xem chi ti\u1ebft");
                 button.setStyle("-fx-background-color: #e5e7eb; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-font-weight: 700; -fx-cursor: hand;");
                 button.setOnAction(event -> homeController.loadAuctionDetailView(row.auction, true));
             }
@@ -431,21 +562,21 @@ public class AuctionHistoryController {
 
         private String productName() {
             Item item = auction.getItem();
-            return item != null && item.getName() != null ? item.getName() : "Sản phẩm";
+            return item != null && item.getName() != null ? item.getName() : "S\u1ea3n ph\u1ea9m";
         }
 
         private String statusText() {
             if (isActive()) {
-                return "Đang đấu";
+                return "\u0110ang \u0111\u1ea5u";
             }
             if (isWinner()) {
-                return "Trúng thầu";
+                return "Tr\u00fang th\u1ea7u";
             }
             AuctionStatus status = auction.getStatus();
             if (status == AuctionStatus.CANCELLED || status == AuctionStatus.CLOSED || status == AuctionStatus.FINISHED) {
-                return "Trượt";
+                return "Tr\u01b0\u1ee3t";
             }
-            return "Đã kết thúc";
+            return "\u0110\u00e3 k\u1ebft th\u00fac";
         }
 
         private boolean isActive() {
@@ -455,12 +586,7 @@ public class AuctionHistoryController {
         }
 
         private boolean isWinner() {
-            if (currentUser == null) {
-                return false;
-            }
-            return !isActive()
-                    && auction.getHighestBidderId() != null
-                    && auction.getHighestBidderId().equals(currentUser.getUserId());
+            return !isActive() && isAuctionWonByCurrentUser(auction);
         }
 
         private boolean isOutbid() {
@@ -469,7 +595,7 @@ public class AuctionHistoryController {
             }
             return isActive()
                     && auction.getHighestBidderId() != null
-                    && !auction.getHighestBidderId().equals(currentUser.getUserId());
+                    && !isAuctionWonByCurrentUser(auction);
         }
     }
 }

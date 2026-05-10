@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: #fcfcfc;" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardController">
+<ScrollPane fx:id="dashboardRoot" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardController">
 
     <VBox alignment="TOP_LEFT" spacing="35.0" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
         <padding>
@@ -59,10 +59,10 @@
                         </children>
                     </HBox>
 
-                    <GridPane fx:id="endingSoonGrid" hgap="25.0" vgap="25.0">
+                    <GridPane fx:id="endingSoonGrid" alignment="CENTER_LEFT" hgap="20.0" maxWidth="580.0" vgap="20.0">
                         <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
-                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0" />
+                            <ColumnConstraints maxWidth="280.0" minWidth="280.0" prefWidth="280.0" />
+                            <ColumnConstraints maxWidth="280.0" minWidth="280.0" prefWidth="280.0" />
                         </columnConstraints>
                     </GridPane>
                 </children>

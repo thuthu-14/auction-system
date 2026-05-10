@@ -13,6 +13,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -43,13 +44,11 @@ public class AuctionCardController {
 
     @FXML
     public void initialize() {
-        // KHÔNG set handler ở đây, sẽ set sau khi có homeScreenController
+        if (bidButton != null) {
+            bidButton.setOnAction(event -> openAuctionDetail());
+        }
 
         if (imageContainer != null && productImageView != null) {
-            imageContainer.prefHeightProperty().bind(imageContainer.widthProperty());
-            productImageView.fitWidthProperty().bind(imageContainer.widthProperty());
-            productImageView.fitHeightProperty().bind(imageContainer.heightProperty());
-
             Rectangle clip = new Rectangle();
             clip.setArcWidth(16);
             clip.setArcHeight(16);
@@ -70,6 +69,8 @@ public class AuctionCardController {
         Item item = auction.getItem();
         productNameLabel.setText(item.getName());
         priceLabel.setText(VND_FORMATTER.format(Math.round(auction.getCurrentPrice())) + " đ");
+        forceVisibleTextColors();
+        Platform.runLater(this::forceVisibleTextColors);
 
         // --- PHẦN LOAD ẢNH CỰC KỲ AN TOÀN (GIỮ NGUYÊN) ---
         if (productImageView != null) {
@@ -81,14 +82,14 @@ public class AuctionCardController {
 
                     // 1. Nếu đường dẫn đã có định dạng URL (bắt đầu bằng file: hoặc http:)
                     if (rawPath.startsWith("file:") || rawPath.startsWith("http")) {
-                        img = new Image(rawPath, 250, 0, true, true);
+                        img = new Image(rawPath, 500, 500, true, true);
                     }
                     // 2. Nếu là đường dẫn ổ đĩa thuần (C:\...)
                     else {
                         File file = new File(rawPath);
                         if (file.exists()) {
                             String imageUrl = file.toURI().toURL().toString();
-                            img = new Image(imageUrl, 250, 0, true, true);
+                            img = new Image(imageUrl, 500, 500, true, true);
                         }
                     }
 
@@ -146,6 +147,25 @@ public class AuctionCardController {
         productImageView.setViewport(new Rectangle2D(viewportX, viewportY, viewportWidth, viewportHeight));
     }
 
+    private void forceVisibleTextColors() {
+        if (productNameLabel != null) {
+            productNameLabel.setTextFill(Color.web("#113254"));
+            productNameLabel.setOpacity(1.0);
+            productNameLabel.setStyle("-fx-text-fill: #113254; -fx-font-weight: bold; -fx-font-size: 14px;");
+        }
+        if (timerLabel != null) {
+            String timerColor = timerLabel.getText() != null && timerLabel.getText().contains("Đã") ? "#6b7280" : "#e53e3e";
+            timerLabel.setTextFill(Color.web(timerColor));
+            timerLabel.setOpacity(1.0);
+            timerLabel.setStyle("-fx-text-fill: " + timerColor + "; -fx-font-weight: bold; -fx-font-size: 12px;");
+        }
+        if (priceLabel != null) {
+            priceLabel.setTextFill(Color.web("#111827"));
+            priceLabel.setOpacity(1.0);
+            priceLabel.setStyle("-fx-text-fill: #111827; -fx-font-weight: bold; -fx-font-size: 13px;");
+        }
+    }
+
     // =========================================
     // ĐÃ SỬA LẠI: CHỈ LINK VỚI DATETIMEUTIL VÀ AUCTION
     // =========================================
@@ -160,8 +180,20 @@ public class AuctionCardController {
                 // Tính khoảng cách (miligiây) và link với formatTimestamp để hiển thị
                 long remainingMs = endTime - System.currentTimeMillis();
                 timerLabel.setText("⏱ Còn " + DateTimeUtil.formatTimestamp(remainingMs));
+                timerLabel.setTextFill(Color.web("#e53e3e"));
+                forceVisibleTextColors();
             } else {
                 timerLabel.setText("⏱ Đã kết thúc");
+                timerLabel.setTextFill(Color.web("#6b7280"));
+                timerLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-weight: bold; -fx-font-size: 12px;");
+                if (productNameLabel != null) {
+                    productNameLabel.setTextFill(Color.web("#113254"));
+                    productNameLabel.setStyle("-fx-text-fill: #113254; -fx-font-weight: bold; -fx-font-size: 14px;");
+                }
+                if (priceLabel != null) {
+                    priceLabel.setTextFill(Color.web("#111827"));
+                    priceLabel.setStyle("-fx-text-fill: #111827; -fx-font-weight: bold; -fx-font-size: 13px;");
+                }
                 bidButton.setDisable(true);
                 countdownTimer.stop();
             }
@@ -218,6 +250,7 @@ public class AuctionCardController {
         // Cập nhật giao diện (Bắt buộc chạy trong Platform.runLater đối với JavaFX)
         Platform.runLater(() -> {
             priceLabel.setText(VND_FORMATTER.format(Math.round(newPrice)) + " đ");
+            forceVisibleTextColors();
         });
     }
 

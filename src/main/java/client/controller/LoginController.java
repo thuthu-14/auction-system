@@ -3,6 +3,7 @@ package client.controller;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.util.ResponsiveSceneUtil;
+import client.util.StageUtil;
 import common.*;
 import com.google.gson.Gson;
 import javafx.application.Platform;
@@ -168,9 +169,8 @@ public class LoginController {
             Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
             Stage stage = (Stage) registerButton.getScene().getWindow();
             stage.setScene(scene);
-            stage.setFullScreen(true);
             stage.setTitle("Tạo tài khoản");
-            stage.show();
+            StageUtil.showMaximized(stage);
         } catch (IOException e) {
             showError("❌ Không mở được màn hình đăng ký.");
         }

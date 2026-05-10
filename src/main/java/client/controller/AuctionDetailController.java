@@ -10,9 +10,12 @@ import common.MessageType;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.geometry.Bounds;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
@@ -60,7 +63,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class AuctionDetailController {
     private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
     private static final Map<String, List<Bid>> BID_HISTORY_CACHE = new ConcurrentHashMap<>();
-    private static final Duration BID_HISTORY_REFRESH_INTERVAL = Duration.millis(350);
+    private static final Duration BID_HISTORY_REFRESH_INTERVAL = Duration.millis(500);
 
     @FXML private ImageView mainImageView;
     @FXML private GridPane dynamicDetailsGrid;
@@ -89,10 +92,15 @@ public class AuctionDetailController {
     private final AtomicBoolean bidHistoryRequestInFlight = new AtomicBoolean(false);
     private boolean endedMode;
     private boolean initialBidHistoryPositioned;
+    private boolean bidPriceAxisPinInstalled;
+    private boolean fallbackBidHistoryRendered;
+    private String lastBidHistorySignature;
 
     public void loadAuctionData(Auction auction) {
         stopBidHistoryRefresh();
         initialBidHistoryPositioned = false;
+        fallbackBidHistoryRendered = false;
+        lastBidHistorySignature = null;
         if (auction == null) {
             clearView();
             return;
@@ -297,7 +305,6 @@ public class AuctionDetailController {
 
     private void loadBidHistoryGraph() {
         configureBidHistoryGraph();
-        currentAuctionId = resolveAuctionIdForHistory(currentAuctionId);
         if (currentAuctionId == null || currentAuctionId.isBlank()) {
             showFallbackCurrentPriceGraph();
             return;
@@ -348,6 +355,37 @@ public class AuctionDetailController {
             bidPriceAxis.setForceZeroInRange(false);
             bidPriceAxis.setMinorTickVisible(true);
             bidPriceAxis.setMinorTickCount(4);
+        }
+        installPinnedBidPriceAxis();
+    }
+
+    private void installPinnedBidPriceAxis() {
+        if (bidPriceAxisPinInstalled || bidHistoryScrollPane == null || bidHistoryChart == null || bidPriceAxis == null) {
+            return;
+        }
+
+        bidPriceAxisPinInstalled = true;
+        ChangeListener<Object> axisPositionUpdater = (observable, oldValue, newValue) -> updatePinnedBidPriceAxis();
+        bidHistoryScrollPane.hvalueProperty().addListener(axisPositionUpdater);
+        bidHistoryScrollPane.viewportBoundsProperty().addListener(axisPositionUpdater);
+        bidHistoryChart.widthProperty().addListener(axisPositionUpdater);
+        bidHistoryChart.sceneProperty().addListener((observable, oldScene, newScene) -> Platform.runLater(this::updatePinnedBidPriceAxis));
+        Platform.runLater(this::updatePinnedBidPriceAxis);
+    }
+
+    private void updatePinnedBidPriceAxis() {
+        if (bidHistoryScrollPane == null || bidHistoryChart == null || bidPriceAxis == null) {
+            return;
+        }
+
+        Bounds viewportBounds = bidHistoryScrollPane.getViewportBounds();
+        double scrollableWidth = Math.max(0, bidHistoryChart.getBoundsInLocal().getWidth() - viewportBounds.getWidth());
+        bidPriceAxis.setTranslateX(bidHistoryScrollPane.getHvalue() * scrollableWidth);
+
+        bidPriceAxis.toFront();
+        Node axisNode = bidHistoryChart.lookup(".axis:left");
+        if (axisNode != null) {
+            axisNode.toFront();
         }
     }
 
@@ -470,18 +508,36 @@ public class AuctionDetailController {
 
         List<Bid> sortedBids = new ArrayList<>(bids != null ? bids : List.of());
         sortedBids.sort(Comparator.comparingLong(Bid::getBidTime));
+        double firstValue = startingPrice > 0 ? startingPrice : currentPrice;
+        String newSignature = buildBidHistorySignature(sortedBids, firstValue);
+        if (newSignature.equals(lastBidHistorySignature)) {
+            if (bidHistoryScrollPane != null && scrollToLatest) {
+                Platform.runLater(() -> bidHistoryScrollPane.setHvalue(1.0));
+            }
+            return;
+        }
+        if (sortedBids.isEmpty() && fallbackBidHistoryRendered) {
+            return;
+        }
         if (sortedBids.isEmpty() && shouldKeepExistingBidGraph()) {
             return;
         }
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Giá theo lượt đặt");
-        double firstValue = startingPrice > 0 ? startingPrice : currentPrice;
 
-        if (sortedBids.isEmpty()) {
+        XYChart.Data<String, Number> basePoint = new XYChart.Data<>("GiÃ¡ Ä‘áº§u", firstValue);
+        basePoint.setNode(createBidPoint("GiÃ¡ Ä‘áº§u\n" + formatVnd(firstValue)));
+        series.getData().add(basePoint);
+        basePoint.setXValue("\u0110i\u1ec3m kh\u1edfi \u0111\u1ea7u");
+        basePoint.setNode(createBidPoint("\u0110i\u1ec3m kh\u1edfi \u0111\u1ea7u\n" + formatVnd(firstValue)));
+        fallbackBidHistoryRendered = sortedBids.isEmpty();
+
+        if (sortedBids.isEmpty() && series.getData().isEmpty()) {
             XYChart.Data<String, Number> startingPoint = new XYChart.Data<>("Giá đầu", firstValue);
             startingPoint.setNode(createBidPoint("Giá đầu\n" + formatVnd(firstValue)));
             series.getData().add(startingPoint);
+            fallbackBidHistoryRendered = true;
         } else {
             for (int i = 0; i < sortedBids.size(); i++) {
                 Bid bid = sortedBids.get(i);
@@ -494,11 +550,17 @@ public class AuctionDetailController {
             }
         }
 
+        if (bidTurnAxis != null) {
+            bidTurnAxis.getCategories().setAll(series.getData().stream()
+                    .map(XYChart.Data::getXValue)
+                    .toList());
+        }
         bidHistoryChart.getData().setAll(series);
         bidHistoryChart.setPrefWidth(calculateBidChartWidth(series.getData().size()));
         bidHistoryChart.setMinWidth(calculateBidChartWidth(series.getData().size()));
         bidHistoryChart.setMaxWidth(Region.USE_PREF_SIZE);
         updateBidPriceAxis(sortedBids, firstValue);
+        lastBidHistorySignature = newSignature;
 
         if (!sortedBids.isEmpty()) {
             syncPriceFromBidHistory(sortedBids);
@@ -509,6 +571,27 @@ public class AuctionDetailController {
         if (bidHistoryScrollPane != null && scrollToLatest) {
             Platform.runLater(() -> bidHistoryScrollPane.setHvalue(1.0));
         }
+    }
+
+    private String buildBidHistorySignature(List<Bid> sortedBids, double firstValue) {
+        StringBuilder signature = new StringBuilder();
+        signature.append(Math.round(firstValue)).append('|');
+        for (Bid bid : sortedBids != null ? sortedBids : List.<Bid>of()) {
+            if (bid == null) {
+                continue;
+            }
+            signature.append(safeText(bid.getBidId(), ""))
+                    .append(':')
+                    .append(safeText(bid.getAuctionId(), ""))
+                    .append(':')
+                    .append(safeText(bid.getBidderId(), ""))
+                    .append(':')
+                    .append(bid.getBidTime())
+                    .append(':')
+                    .append(Math.round(bid.getAmount()))
+                    .append('|');
+        }
+        return signature.toString();
     }
 
     private boolean shouldKeepExistingBidGraph() {
@@ -528,6 +611,9 @@ public class AuctionDetailController {
         if (bidHistoryChart == null) {
             return;
         }
+        if (fallbackBidHistoryRendered) {
+            return;
+        }
 
         double firstValue = startingPrice > 0 ? startingPrice : currentPrice;
         XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -540,6 +626,8 @@ public class AuctionDetailController {
         bidHistoryChart.setMinWidth(calculateBidChartWidth(series.getData().size()));
         bidHistoryChart.setMaxWidth(Region.USE_PREF_SIZE);
         updateBidPriceAxis(List.of(), firstValue);
+        fallbackBidHistoryRendered = true;
+        lastBidHistorySignature = buildBidHistorySignature(List.of(), firstValue);
     }
 
     private double calculateBidChartWidth(int pointCount) {
@@ -587,6 +675,7 @@ public class AuctionDetailController {
         cachedBids.add(bid);
         cachedBids.sort(Comparator.comparingLong(Bid::getBidTime));
         BID_HISTORY_CACHE.put(currentAuctionId, cachedBids);
+        fallbackBidHistoryRendered = false;
         updateBidHistoryGraph(cachedBids, scrollToLatest);
     }
 
@@ -663,35 +752,6 @@ public class AuctionDetailController {
         }
     }
 
-    private String resolveAuctionIdForHistory(String auctionId) {
-        if (auctionId != null && !auctionId.isBlank() && !loadLocalBidHistory(auctionId).isEmpty()) {
-            return auctionId;
-        }
-        if (auctionId != null && !auctionId.isBlank() && (currentItemId == null || currentItemId.isBlank())) {
-            return auctionId;
-        }
-
-        File auctionsFile = findDataFile("auctions.json");
-        if (!auctionsFile.exists()) {
-            return auctionId;
-        }
-
-        try {
-            List<Auction> auctions = JsonUtil.loadListFromJson(auctionsFile.getPath(), Auction.class);
-            for (Auction auction : auctions != null ? auctions : List.<Auction>of()) {
-                boolean sameAuction = auctionId != null && !auctionId.isBlank() && auctionId.equals(auction.getAuctionId());
-                boolean sameItem = currentItemId != null && !currentItemId.isBlank() && currentItemId.equals(auction.getItemId());
-                if (sameAuction || sameItem) {
-                    LoggerUtil.info("Resolved auction history id: " + auction.getAuctionId());
-                    return auction.getAuctionId();
-                }
-            }
-        } catch (Exception e) {
-            LoggerUtil.error("Resolve auction id for history failed: " + e.getMessage());
-        }
-        return auctionId;
-    }
-
     private File findDataFile(String fileName) {
         File current = new File(System.getProperty("user.dir")).getAbsoluteFile();
         for (int i = 0; i < 8 && current != null; i++) {
@@ -732,6 +792,7 @@ public class AuctionDetailController {
         bidPriceAxis.setLowerBound(lowerBound);
         bidPriceAxis.setUpperBound(upperBound);
         bidPriceAxis.setTickUnit(tickUnit);
+        Platform.runLater(this::updatePinnedBidPriceAxis);
     }
 
     private double choosePriceTickUnit(double spread) {
@@ -876,6 +937,7 @@ public class AuctionDetailController {
         if (productNameLabel != null) productNameLabel.setText("Khong co du lieu");
         if (dynamicDetailsGrid != null) dynamicDetailsGrid.getChildren().clear();
         if (bidHistoryChart != null) bidHistoryChart.getData().clear();
+        lastBidHistorySignature = null;
     }
 
     private void applyEndedMode() {

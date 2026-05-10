@@ -3,6 +3,21 @@
 ════════════════════════════════════════════════════════ */
 
 /* Xóa viền và nền mặc định của toàn bộ TabPane */
+.scroll-pane,
+.scroll-pane > .viewport,
+.scroll-pane > .corner {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.scroll-pane .scroll-bar:horizontal,
+.scroll-pane .scroll-bar:vertical,
+.scroll-pane .scroll-bar:horizontal .track,
+.scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
 .tab-pane {
     -fx-background-color: transparent;
 }
@@ -196,4 +211,9 @@
 
 .bid-history-chart .axis:left .axis-label {
     -fx-padding: 0 12 0 0;
+}
+
+.bid-history-chart .axis:left {
+    -fx-background-color: white;
+    -fx-background-insets: -24 0 -52 -260;
 }

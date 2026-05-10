@@ -2,6 +2,7 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.util.ResponsiveSceneUtil;
+import client.util.StageUtil;
 import server.model.User;
 
 import javafx.application.Platform;
@@ -96,6 +97,11 @@ public class SellerHomeController {
                 return;
             }
 
+            if (clickedMenu == menuSettings) {
+                handleLogout();
+                return;
+            }
+
             updateMenuSelection(clickedMenu);
         }
     }
@@ -124,12 +130,37 @@ public class SellerHomeController {
                 controller.setUserData(currentUser, clientSocket);
             }
 
+            navigation.NavigationManager.getInstance().setCurrentUser(currentUser);
+            navigation.NavigationManager.getInstance().setClientSocket(clientSocket);
+
             javafx.stage.Stage stage = (javafx.stage.Stage) rootPane.getScene().getWindow();
-            stage.setScene(ResponsiveSceneUtil.createScaledScene(root));
-            stage.setFullScreen(true);
-            stage.show();
+            javafx.scene.Scene currentScene = stage.getScene();
+            javafx.scene.Scene scene = currentScene != null
+                    ? ResponsiveSceneUtil.createScaledScene(root, currentScene.getWidth(), currentScene.getHeight())
+                    : ResponsiveSceneUtil.createScaledScene(root);
+            stage.setTitle("🏪 Chợ Đấu giá");
+            stage.setScene(scene);
+            StageUtil.showMaximized(stage);
         } catch (Exception e) {
             LoggerUtil.error("Lỗi khi chuyển về màn hình Bidder: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleLogout() {
+        try {
+            navigation.NavigationManager.getInstance().setCurrentUser(null);
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+            Parent root = loader.load();
+
+            javafx.stage.Stage stage = (javafx.stage.Stage) rootPane.getScene().getWindow();
+            javafx.scene.Scene scene = ResponsiveSceneUtil.createScaledScene(root);
+            stage.setScene(scene);
+            StageUtil.showMaximized(stage);
+        } catch (Exception e) {
+            LoggerUtil.error("Lỗi khi đăng xuất: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

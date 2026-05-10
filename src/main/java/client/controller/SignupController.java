@@ -3,6 +3,7 @@ package client.controller;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.util.ResponsiveSceneUtil;
+import client.util.StageUtil;
 import common.Message;
 import common.MessageType;
 import javafx.application.Platform;
@@ -130,9 +131,8 @@ public class SignupController {
 
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(scene);
-            stage.setFullScreen(true);
             stage.setTitle("Đăng nhập");
-            stage.show();
+            StageUtil.showMaximized(stage);
 
             LoggerUtil.info("Switched back to login screen");
         } catch (IOException e) {

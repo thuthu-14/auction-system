@@ -81,9 +81,12 @@ public class HomeScreenController {
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;
+        NavigationManager.getInstance().setCurrentUser(user);
+        NavigationManager.getInstance().setClientSocket(socket);
 
         // Gọi ở đây mới đúng, vì lúc này user đã được truyền từ Login/Signup sang
         updateMenuBasedOnSellerStatus();
+        loadDashboardView();
     }
 
     public void setOnLogout(Runnable onLogout) {
@@ -91,11 +94,18 @@ public class HomeScreenController {
     }
 
     private void updateMenuBasedOnSellerStatus() {
-        if (currentUser instanceof RegularUser) {
-            RegularUser regularUser = (RegularUser) currentUser;
-            if (regularUser.isSeller()) {
-                menuUpgrade.setVisible(false);
-                menuUpgrade.setManaged(false);
+        if (menuUpgrade == null || menuUpgrade.getChildren().isEmpty()) {
+            return;
+        }
+
+        menuUpgrade.setVisible(true);
+        menuUpgrade.setManaged(true);
+
+        if (menuUpgrade.getChildren().get(0) instanceof Button upgradeButton) {
+            if (currentUser instanceof RegularUser regularUser && regularUser.isSeller()) {
+                upgradeButton.setText("👨‍🏫  Trở về Seller");
+            } else {
+                upgradeButton.setText("👨‍🏫  Trở thành Seller");
             }
         }
     }
@@ -115,7 +125,13 @@ public class HomeScreenController {
             } else if (clickedMenu == menuPay) {
                 loadWalletView();
             } else if (clickedMenu == menuUpgrade) {
-                openBecomeSeller();
+                if (currentUser instanceof RegularUser regularUser && regularUser.isSeller()) {
+                    goToSellerHome();
+                } else {
+                    openBecomeSeller();
+                }
+            } else if (clickedMenu == menuSettings) {
+                handleLogout();
             } else {
                 updateMenuSelection(clickedMenu);
             }
@@ -130,11 +146,11 @@ public class HomeScreenController {
                 Button btn = (Button) menu.getChildren().get(0);
                 if (menu == selectedMenu) {
                     menu.setStyle("-fx-background-color: #edf2f7; -fx-background-radius: 8; -fx-cursor: hand;");
-                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0; -fx-font-weight: bold;");
+                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0;");
                 } else {
                     menu.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-cursor: hand;");
-                    if (menu == menuUpgrade) {
-                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e; -fx-font-weight: bold;");
+                    if (menu == menuUpgrade || menu == menuSettings) {
+                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e;");
                     } else {
                         btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #4a5568;");
                     }
@@ -154,9 +170,8 @@ public class HomeScreenController {
             // ← THÊM: Refresh data khi load
             if (controller instanceof DashboardController && currentUser != null && clientSocket != null) {
                 DashboardController dashCtrl = (DashboardController) controller;
-                dashCtrl.setUserData(currentUser, clientSocket);
                 dashCtrl.setHomeScreenController(this);  // ← Truyền reference của Home screen
-                dashCtrl.refreshAuctions();  // ← Auto-refresh danh sách
+                dashCtrl.setUserData(currentUser, clientSocket);
             }
         });
     }
@@ -208,6 +223,12 @@ public class HomeScreenController {
                 ((BecomeSellerController) controller).setCurrentUser(currentUser);
             }
         });
+    }
+
+    private void goToSellerHome() {
+        NavigationManager.getInstance().setCurrentUser(currentUser);
+        NavigationManager.getInstance().setClientSocket(clientSocket);
+        NavigationManager.getInstance().goToSellerHome();
     }
 
     public void loadAuctionDetailView(server.model.Auction auction) {

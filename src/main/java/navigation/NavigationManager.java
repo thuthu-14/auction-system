@@ -5,6 +5,7 @@ import client.controller.SellerHomeController;
 import client.controller.WalletController;
 import client.network.ClientSocket;
 import client.util.ResponsiveSceneUtil;
+import client.util.StageUtil;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.Parent;
@@ -91,11 +92,9 @@ public class NavigationManager {
                     : ResponsiveSceneUtil.createScaledScene(root);
 
             mainStage.setScene(scene);
-            mainStage.setMaximized(true);
             mainStage.setFullScreenExitHint("");
             mainStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
-            mainStage.setFullScreen(true);
-            mainStage.show();
+            StageUtil.showMaximized(mainStage);
 
         } catch (IOException e) {
             System.err.println("❌ Navigation Error [" + fxmlPath + "]: " + e.getMessage());

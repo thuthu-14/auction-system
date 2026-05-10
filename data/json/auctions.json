@@ -50,10 +50,10 @@
       "brand": "Apple",
       "warrantyPeriod": "1 Year"
     },
-    "currentPrice": 2.955005E7,
+    "currentPrice": 2.960005E7,
     "highestBidderId": "U1777887117887",
     "highestBidderName": "buingoc",
-    "status": "RUNNING",
+    "status": "FINISHED",
     "startTime": 1777879942566,
     "endTime": 1778369542566,
     "createdAt": 1777879942566,
@@ -181,7 +181,82 @@
       "BID1778263959156",
       "BID1778263964336",
       "BID1778264110626",
-      "BID1778338308638"
+      "BID1778338308638",
+      "BID1778340276954"
+    ],
+    "viewCount": 0
+  },
+  {
+    "auctionId": "AU1778403491811",
+    "itemId": "IT1778403491811",
+    "sellerId": "U1777887117887",
+    "sellerName": "buingoc",
+    "item": {
+      "itemId": "IT1778403491811",
+      "name": "Son Kem Bóng Lì Lilybyred Bloody Liar Coating Tint 4g",
+      "description": "Son Kem Bóng Lì Lilybyred Bloody Liar Coating Tint 4g \n\n\n\n1. ƯU ĐIỂM SẢN PHẨM:\n\n- Son kem bóng mang lại đôi môi căng mướt, mềm mại\n\n- Chứa tinh dầu jojoba giúp nuôi dưỡng bờ môi khô bong tróc\n\n- Chất son hòa quyện mang lại màu sắc môi tự nhiên\n\n- Không gây nặng môi, hỗ trợ che phủ vân môi\n\n- Son Lilybyred Bloody Liar Coating Tint mang mùi hương trái cây dịu ngọt khiến bạn\n\nyêu thích.",
+      "startingPrice": 80000.0,
+      "sellerId": "U1777887117887",
+      "images": [
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20155623.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20155631.png"
+      ],
+      "type": "FASHION",
+      "brand": "Lilibyred",
+      "material": "tint bóng"
+    },
+    "currentPrice": 180000.0,
+    "highestBidderId": "U1778403578742",
+    "highestBidderName": "thunguyen",
+    "status": "RUNNING",
+    "startTime": 1778403491811,
+    "endTime": 1778522291811,
+    "createdAt": 1778403491811,
+    "bidIds": [
+      "BID1778404884138",
+      "BID1778404909276",
+      "BID1778405261249",
+      "BID1778405263906",
+      "BID1778405266950",
+      "BID1778405278499",
+      "BID1778405282642",
+      "BID1778405286157",
+      "BID1778405289763",
+      "BID1778405292536"
+    ],
+    "viewCount": 0
+  },
+  {
+    "auctionId": "AU1778402863464",
+    "itemId": "IT1778402863464",
+    "sellerId": "U1777887117887",
+    "sellerName": "buingoc",
+    "item": {
+      "itemId": "IT1778402863464",
+      "name": "Củ Sạc GaN Anker Zolo 20W 30W PD Sạc Nhanh Không Nóng, Chân Gập Gọn",
+      "description": "Sạc nhanh không nóng – An toàn cho thiết bị của bạn! ⚡️\n\nCủ sạc GaN Anker Zolo nổi bật với công nghệ PD giúp sạc nhanh chóng mà vẫn giữ thiết bị luôn mát mẻ. Dù bạn sử dụng iPhone hay Samsung, sản phẩm đều hỗ trợ tối ưu, đảm bảo trải nghiệm sạc an tâm mỗi ngày.\n\n\n\nThiết kế nhỏ gọn, tiện lợi mang theo mọi lúc mọi nơi\n\n- Chân sạc gập gọn, dễ dàng bỏ túi hoặc balo.\n\n- Trọng lượng nhẹ, phù hợp cho người thường xuyên di chuyển.\n\n- Nhiều màu sắc trẻ trung để bạn lựa chọn, đáp ứng mọi phong cách cá nhân.\n\n\n\nThông tin về các phiên bản\n\n- Sản phẩm có hai mức công suất: 20W và 30W, đáp ứng nhu cầu sạc đa dạng.\n\n- Mỗi phiên bản đều đi kèm củ sạc GaN và cáp USB-C, tiện lợi ngay khi nhận hàng.",
+      "startingPrice": 100000.0,
+      "sellerId": "U1777887117887",
+      "images": [
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20154640.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20154657.png"
+      ],
+      "type": "ELECTRONICS",
+      "brand": "Anker",
+      "warrantyPeriod": "1 Year"
+    },
+    "currentPrice": 300000.0,
+    "highestBidderId": "U1778403578742",
+    "highestBidderName": "thunguyen",
+    "status": "RUNNING",
+    "startTime": 1778402863464,
+    "endTime": 1778521663464,
+    "createdAt": 1778402863464,
+    "bidIds": [
+      "BID1778406367563",
+      "BID1778406370835",
+      "BID1778406374464",
+      "BID1778406377358"
     ],
     "viewCount": 0
   }

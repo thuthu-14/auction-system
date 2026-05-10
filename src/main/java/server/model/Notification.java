@@ -12,6 +12,7 @@ public class Notification implements Serializable {
     private String title;       // Tiêu đề
     private String description; // Nội dung chi tiết
     private String timeAgo;     // Thời gian hiển thị (VD: "Vừa xong", "10 phút trước")
+    private long createdAt = System.currentTimeMillis(); // Thời điểm tạo thông báo
     private String buttonText;  // Chữ trên nút bấm (VD: "Thanh toán ngay")
     private String referenceId; // ID tham chiếu (Mã đấu giá, mã giao dịch...)
     private boolean isRead;     // Trạng thái đã đọc hay chưa
@@ -29,6 +30,7 @@ public class Notification implements Serializable {
         this.title = title;
         this.description = description;
         this.timeAgo = timeAgo;
+        this.createdAt = System.currentTimeMillis();
         this.buttonText = buttonText;
         this.referenceId = referenceId;
         this.isRead = false; // Mặc định khi mới tạo là chưa đọc
@@ -77,11 +79,52 @@ public class Notification implements Serializable {
     }
 
     public String getTimeAgo() {
-        return timeAgo;
+        return formatTimeAgo();
     }
 
     public void setTimeAgo(String timeAgo) {
         this.timeAgo = timeAgo;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String formatTimeAgo() {
+        if (createdAt <= 0) {
+            return timeAgo != null ? timeAgo : "V\u1eeba xong";
+        }
+
+        long diffSeconds = Math.max(0, (System.currentTimeMillis() - createdAt) / 1000);
+        if (diffSeconds < 60) {
+            return "V\u1eeba xong";
+        }
+
+        long minutes = diffSeconds / 60;
+        if (minutes < 60) {
+            return minutes + " ph\u00fat tr\u01b0\u1edbc";
+        }
+
+        long hours = minutes / 60;
+        if (hours < 24) {
+            return hours + " gi\u1edd tr\u01b0\u1edbc";
+        }
+
+        long days = hours / 24;
+        if (days < 30) {
+            return days + " ng\u00e0y tr\u01b0\u1edbc";
+        }
+
+        long months = days / 30;
+        if (months < 12) {
+            return months + " th\u00e1ng tr\u01b0\u1edbc";
+        }
+
+        return (months / 12) + " n\u0103m tr\u01b0\u1edbc";
     }
 
     public String getButtonText() {

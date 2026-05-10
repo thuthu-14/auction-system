@@ -6,37 +6,33 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox prefHeight="351.0" prefWidth="252.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionCardController">
+<VBox maxWidth="280.0" minWidth="280.0" prefHeight="390.0" prefWidth="280.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionCardController">
     <padding>
         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
     </padding>
     <children>
-        <StackPane fx:id="imageContainer" maxWidth="1.7976931348623157E308" prefHeight="220.0" style="-fx-background-color: #f8fafc; -fx-background-radius: 8;" VBox.vgrow="NEVER">
+        <StackPane fx:id="imageContainer" maxHeight="250.0" maxWidth="250.0" minHeight="250.0" minWidth="250.0" prefHeight="250.0" prefWidth="250.0" style="-fx-background-color: #f8fafc; -fx-background-radius: 8;" VBox.vgrow="NEVER">
             <children>
-                <ImageView fx:id="productImageView" fitHeight="220.0" fitWidth="220.0" pickOnBounds="true" preserveRatio="false" smooth="true" />
+                <ImageView fx:id="productImageView" fitHeight="250.0" fitWidth="250.0" pickOnBounds="true" preserveRatio="false" smooth="true" />
             </children>
         </StackPane>
 
-        <Label fx:id="productNameLabel" maxWidth="1.7976931348623157E308" text="MacBook Pro M3 Max 36GB" textFill="#113254" wrapText="true">
+        <Label fx:id="productNameLabel" maxHeight="42.0" maxWidth="1.7976931348623157E308" minHeight="42.0" text="MacBook Pro M3 Max 36GB" textFill="#113254" wrapText="true">
             <font>
-                <Font name="System Bold" size="16.0" />
+                <Font name="System Bold" size="14.0" />
             </font>
         </Label>
 
         <HBox alignment="CENTER_LEFT" spacing="5.0">
             <children>
                 <Label fx:id="timerLabel" text="⏱ Còn 00:05:12" textFill="#e53e3e">
-                    <font>
-                        <Font name="System Bold" size="13.0" />
-                    </font>
+                    <font><Font name="System Bold" size="12.0" /></font>
                 </Label>
 
                 <Region HBox.hgrow="ALWAYS" />
 
                 <Label fx:id="priceLabel" text="55.500.000 đ" textFill="#000000">
-                    <font>
-                        <Font name="System Bold" size="16.0" />
-                    </font>
+                    <font><Font name="System Bold" size="13.0" /></font>
                 </Label>
             </children>
         </HBox>

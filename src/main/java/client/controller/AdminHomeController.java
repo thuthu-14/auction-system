@@ -97,11 +97,11 @@ public class AdminHomeController {
                 Button btn = (Button) menu.getChildren().get(0);
                 if (menu == selectedMenu) {
                     menu.setStyle("-fx-background-color: #edf2f7; -fx-background-radius: 8; -fx-cursor: hand;");
-                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0; -fx-font-weight: bold;");
+                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0;");
                 } else {
                     menu.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-cursor: hand;");
                     if (menu == menuUpgrade) { // Đổi menuUpgrade thành menuLogOut cho nút màu đỏ
-                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e; -fx-font-weight: bold;");
+                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e;");
                     } else {
                         btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #4a5568;");
                     }

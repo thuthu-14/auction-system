@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox fx:id="profileRoot" alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="profileRoot" alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ProfileController">
 
     <padding>
         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
@@ -61,7 +61,7 @@
 
                         <Region VBox.vgrow="ALWAYS" />
 
-                        <Button maxWidth="1.7976931348623157E308" prefHeight="45.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Đăng xuất" textFill="white">
+                        <Button maxWidth="1.7976931348623157E308" onAction="#handleLogout" prefHeight="45.0" style="-fx-background-color: transparent; -fx-background-radius: 22.5; -fx-border-color: #e53e3e; -fx-border-radius: 22.5; -fx-cursor: hand;" text="Đăng xuất" textFill="#e53e3e">
                             <font><Font name="System Bold" size="14.0" /></font>
                         </Button>
                     </children>

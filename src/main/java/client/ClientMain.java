@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import client.util.ResponsiveSceneUtil;
+import client.util.StageUtil;
 import javafx.scene.input.KeyCombination;
 import navigation.NavigationManager; // <-- Import thêm cái này để đồng bộ
 import util.LoggerUtil;
@@ -58,9 +59,7 @@ public class ClientMain extends Application {
 
             primaryStage.setTitle("🏪 Hệ thống Đấu giá - Đăng nhập");
             primaryStage.setScene(scene);
-            primaryStage.setMaximized(true);
-            primaryStage.setFullScreen(true);
-            primaryStage.show();
+            StageUtil.showMaximized(primaryStage);
 
             LoggerUtil.info("✓ Login screen displayed");
         } catch (IOException e) {
@@ -93,9 +92,7 @@ public class ClientMain extends Application {
 
             primaryStage.setTitle("⚙️ Bảng điều khiển Admin");
             primaryStage.setScene(scene);
-            primaryStage.setMaximized(true);
-            primaryStage.setFullScreen(true);
-            primaryStage.show();
+            StageUtil.showMaximized(primaryStage);
 
             LoggerUtil.info("✓ Admin panel displayed");
         } catch (Exception e) {
@@ -127,9 +124,7 @@ public class ClientMain extends Application {
 
             primaryStage.setTitle("🏪 Chợ Đấu giá");
             primaryStage.setScene(scene);
-            primaryStage.setMaximized(true);
-            primaryStage.setFullScreen(true);
-            primaryStage.show();
+            StageUtil.showMaximized(primaryStage);
 
             LoggerUtil.info("✓ Home screen displayed");
         } catch (Exception e) {

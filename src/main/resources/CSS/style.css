@@ -6,6 +6,21 @@
     -fx-font-family: "System";
 }
 
+.scroll-pane,
+.scroll-pane > .viewport,
+.scroll-pane > .corner {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.scroll-pane .scroll-bar:horizontal,
+.scroll-pane .scroll-bar:vertical,
+.scroll-pane .scroll-bar:horizontal .track,
+.scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
 .my-darley {
     -fx-font-family: "Darley Sans" !important;
     -fx-font-smoothing-type: lcd;
@@ -28,8 +43,6 @@
 
 .menu-item-active .button {
     -fx-text-fill: #3b82f6;
-    -fx-font-family: "System";
-    -fx-font-weight: bold;
 }
 
 .eye-button {
