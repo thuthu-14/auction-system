@@ -1,7 +1,6 @@
 package server.service;
 
 import server.model.Auction;
-import server.storage.AuctionDAO;
 import common.AuctionStatus;
 import util.LoggerUtil;
 import java.io.IOException;
@@ -28,7 +27,7 @@ public class SchedulerService {
 
 
     private static void checkExpiredAuctions() throws IOException, ClassNotFoundException {
-        List<Auction> auctions = AuctionDAO.getAllAuctions();
+        List<Auction> auctions = AuctionService.getAllAuctions();
         long now = System.currentTimeMillis();
 
         for (Auction auction : auctions) {
@@ -36,8 +35,7 @@ public class SchedulerService {
                     auction.getStatus() == AuctionStatus.RUNNING) &&
                     now > auction.getEndTime()) {
 
-                auction.setStatus(AuctionStatus.FINISHED);
-                AuctionDAO.saveAuction(auction);
+                AuctionService.finishAuction(auction.getAuctionId());
 
                 String winner = auction.getHighestBidderName() != null ?
                         auction.getHighestBidderName() : "Không có";
