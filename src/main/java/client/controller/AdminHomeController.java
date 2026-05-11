@@ -33,8 +33,6 @@ public class AdminHomeController {
     @FXML
     public void initialize() {
         allMenus = Arrays.asList(menuRecent, menuMsg, menuUpgrade);
-
-        loadUserManagementView();
     }
     // ← THÊM: Nhận dữ liệu từ ClientMain
     private User currentUser;
@@ -44,6 +42,7 @@ public class AdminHomeController {
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;
+        loadUserManagementView();
     }
 
     public void setOnLogout(Runnable onLogout) {
@@ -92,18 +91,22 @@ public class AdminHomeController {
     private void updateMenuSelection(HBox selectedMenu) {
         for (HBox menu : allMenus) {
             if (menu == null) continue;
+            menu.getStyleClass().remove("menu-item-active");
 
             try {
                 Button btn = (Button) menu.getChildren().get(0);
                 if (menu == selectedMenu) {
-                    menu.setStyle("-fx-background-color: #edf2f7; -fx-background-radius: 8; -fx-cursor: hand;");
-                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0;");
+                    if (!menu.getStyleClass().contains("menu-item-active")) {
+                        menu.getStyleClass().add("menu-item-active");
+                    }
+                    menu.setStyle("-fx-background-radius: 8; -fx-cursor: hand;");
+                    btn.setStyle("-fx-background-color: transparent;");
                 } else {
-                    menu.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-cursor: hand;");
+                    menu.setStyle("-fx-background-radius: 8; -fx-cursor: hand;");
                     if (menu == menuUpgrade) { // Đổi menuUpgrade thành menuLogOut cho nút màu đỏ
-                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e;");
+                        btn.setStyle("-fx-background-color: transparent;");
                     } else {
-                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #4a5568;");
+                        btn.setStyle("-fx-background-color: transparent;");
                     }
                 }
             } catch (Exception e) {
@@ -114,7 +117,14 @@ public class AdminHomeController {
     private void loadViewIntoContentArea(String fxmlPath) {
         try {
             if (contentArea != null) {
-                Parent view = FXMLLoader.load(getClass().getResource(fxmlPath));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                Parent view = loader.load();
+                Object controller = loader.getController();
+                if (controller instanceof UserManagementController userManagementController) {
+                    userManagementController.setContext(currentUser, clientSocket);
+                } else if (controller instanceof AdminAuctionManagementController auctionManagementController) {
+                    auctionManagementController.setContext(currentUser, clientSocket);
+                }
                 contentArea.getChildren().clear();
                 contentArea.getChildren().add(view);
             }

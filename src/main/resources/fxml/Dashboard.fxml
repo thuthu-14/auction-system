@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<ScrollPane fx:id="dashboardRoot" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardController">
+<ScrollPane fx:id="dashboardRoot" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardController">
 
     <VBox alignment="TOP_LEFT" spacing="35.0" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
         <padding>
@@ -73,7 +73,7 @@
                     <Label text="🛍 Gợi ý dành riêng cho bạn" textFill="#1a1a1a">
                         <font><Font name="System Bold" size="20.0" /></font>
                     </Label>
-                    <ScrollPane fitToHeight="true" prefHeight="230.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                    <ScrollPane fitToHeight="true" hbarPolicy="NEVER" prefHeight="230.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
                         <content>
                             <HBox fx:id="suggestedHBox" spacing="15.0">
                             </HBox>

@@ -76,6 +76,40 @@
     -fx-font-weight: bold;
 }
 
+/* ================= WALLET VIEW ================= */
+.wallet-view,
+.wallet-view .label {
+    -fx-opacity: 1;
+}
+
+.wallet-view .label {
+    -fx-text-fill: #718096;
+}
+
+.wallet-view .wallet-title {
+    -fx-text-fill: #1a1a1a;
+}
+
+.wallet-view .wallet-title-small {
+    -fx-text-fill: #1a1a1a;
+}
+
+.wallet-view .wallet-strong {
+    -fx-text-fill: #1a1a1a;
+}
+
+.wallet-view .wallet-muted {
+    -fx-text-fill: #718096;
+}
+
+.wallet-view .wallet-action-label {
+    -fx-text-fill: #4a5568;
+}
+
+.wallet-view .wallet-placeholder {
+    -fx-text-fill: #a0aec0;
+}
+
 /* ================= SCROLL BAR ================= */
 .table-view .scroll-bar:vertical, .table-view .scroll-bar:horizontal {
     -fx-background-color: transparent;

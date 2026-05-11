@@ -2,6 +2,7 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AuctionBidClientService;
 import com.google.gson.JsonObject;
 import common.AuctionStatus;
 import common.ItemCategory;
@@ -30,6 +31,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -46,14 +48,12 @@ import server.model.Jewelry;
 import server.model.User;
 import server.model.Vehicle;
 import util.DateTimeUtil;
-import util.JsonUtil;
 import util.LoggerUtil;
 
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -66,6 +66,7 @@ public class AuctionDetailController {
     private static final Duration BID_HISTORY_REFRESH_INTERVAL = Duration.millis(500);
 
     @FXML private ImageView mainImageView;
+    @FXML private HBox thumbnailBox;
     @FXML private GridPane dynamicDetailsGrid;
     @FXML private Label descriptionLabel;
     @FXML private Label productNameLabel;
@@ -95,6 +96,13 @@ public class AuctionDetailController {
     private boolean bidPriceAxisPinInstalled;
     private boolean fallbackBidHistoryRendered;
     private String lastBidHistorySignature;
+    private final AuctionBidClientService bidClientService = new AuctionBidClientService();
+    private final Map<String, DetailRenderer> detailRenderers = createDetailRenderers();
+
+    @FunctionalInterface
+    private interface DetailRenderer {
+        int render(JsonObject productData, int rowIndex);
+    }
 
     public void loadAuctionData(Auction auction) {
         stopBidHistoryRefresh();
@@ -234,17 +242,16 @@ public class AuctionDetailController {
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng đăng nhập lại!");
             return;
         }
+        if (currentUser.getWallet() <= 0) {
+            showAlert(Alert.AlertType.WARNING, "Chưa thể đấu giá", "Bạn cần liên kết ngân hàng và nạp tiền vào ví trước khi đấu giá.");
+            return;
+        }
 
         confirmBidBtn.setDisable(true);
         confirmBidBtn.setText("ĐANG XỬ LÝ...");
         new Thread(() -> {
             try {
-                Map<String, Object> payload = new HashMap<>();
-                payload.put("auctionId", currentAuctionId);
-                payload.put("amount", amount);
-
-                Message request = new Message(MessageType.PLACE_BID, payload, currentUser.getUsername());
-                Message response = socket.sendAndReceive(request);
+                Message response = bidClientService.placeBid(socket, currentUser, currentAuctionId, amount);
 
                 Platform.runLater(() -> {
                     if (response != null && "SUCCESS".equals(response.getStatus())) {
@@ -310,7 +317,7 @@ public class AuctionDetailController {
             return;
         }
 
-        List<Bid> localBids = loadLocalBidHistory(currentAuctionId);
+        List<Bid> localBids = bidClientService.loadLocalBidHistory(currentAuctionId);
         if (!localBids.isEmpty()) {
             updateBidHistoryGraph(localBids, shouldAutoScrollInitialBidHistory());
         }
@@ -416,7 +423,7 @@ public class AuctionDetailController {
         ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
         User currentUser = NavigationManager.getInstance().getCurrentUser();
         if (socket == null || !socket.isConnected()) {
-            List<Bid> localBids = loadLocalBidHistory(requestedAuctionId);
+            List<Bid> localBids = bidClientService.loadLocalBidHistory(requestedAuctionId);
             if (!localBids.isEmpty()) {
                 Platform.runLater(() -> updateBidHistoryGraph(localBids, false));
             } else if (allowFallbackWhenEmpty) {
@@ -430,13 +437,11 @@ public class AuctionDetailController {
 
         new Thread(() -> {
             try {
-                String sender = currentUser != null ? currentUser.getUsername() : "CLIENT";
-                Message request = new Message(MessageType.GET_BID_HISTORY, requestedAuctionId, sender);
-                Message response = socket.sendAndReceive(request);
+                Message response = bidClientService.fetchBidHistory(socket, currentUser, requestedAuctionId);
                 if (response != null && "SUCCESS".equals(response.getStatus())) {
-                    List<Bid> bids = extractBidList(response.getData());
+                    List<Bid> bids = bidClientService.extractBidList(response.getData());
                     if (bids.isEmpty()) {
-                        bids = loadLocalBidHistory(requestedAuctionId);
+                        bids = bidClientService.loadLocalBidHistory(requestedAuctionId);
                     }
                     List<Bid> loadedBids = bids;
                     LoggerUtil.info("Bid history loaded for " + requestedAuctionId + ": " + bids.size() + " bids");
@@ -449,7 +454,7 @@ public class AuctionDetailController {
                         }
                     });
                 } else if (allowFallbackWhenEmpty) {
-                    List<Bid> localBids = loadLocalBidHistory(requestedAuctionId);
+                    List<Bid> localBids = bidClientService.loadLocalBidHistory(requestedAuctionId);
                     Platform.runLater(() -> {
                         if (!localBids.isEmpty()) {
                             updateBidHistoryGraph(localBids, allowFallbackWhenEmpty && shouldAutoScrollInitialBidHistory());
@@ -461,7 +466,7 @@ public class AuctionDetailController {
             } catch (Exception e) {
                 LoggerUtil.error("Bid history refresh failed: " + e.getMessage());
                 if (allowFallbackWhenEmpty) {
-                    List<Bid> localBids = loadLocalBidHistory(requestedAuctionId);
+                    List<Bid> localBids = bidClientService.loadLocalBidHistory(requestedAuctionId);
                     Platform.runLater(() -> {
                         if (!localBids.isEmpty()) {
                             updateBidHistoryGraph(localBids, allowFallbackWhenEmpty && shouldAutoScrollInitialBidHistory());
@@ -710,60 +715,6 @@ public class AuctionDetailController {
                 && Double.compare(existingBid.getAmount(), newBid.getAmount()) == 0;
     }
 
-    private List<Bid> extractBidList(Object rawData) {
-        if (!(rawData instanceof List<?> rawList)) {
-            return List.of();
-        }
-
-        List<Bid> bids = new ArrayList<>();
-        for (Object item : rawList) {
-            if (item instanceof Bid bid) {
-                bids.add(bid);
-            }
-        }
-        return bids;
-    }
-
-    private List<Bid> loadLocalBidHistory(String auctionId) {
-        if (auctionId == null || auctionId.isBlank()) {
-            return List.of();
-        }
-
-        File bidsFile = findDataFile("bids.json");
-        if (!bidsFile.exists()) {
-            LoggerUtil.warn("Local bids.json not found from: " + new File(".").getAbsolutePath());
-            return List.of();
-        }
-
-        try {
-            List<Bid> allBids = JsonUtil.loadListFromJson(bidsFile.getPath(), Bid.class);
-            List<Bid> auctionBids = new ArrayList<>();
-            for (Bid bid : allBids != null ? allBids : List.<Bid>of()) {
-                if (auctionId.equals(bid.getAuctionId())) {
-                    auctionBids.add(bid);
-                }
-            }
-            auctionBids.sort(Comparator.comparingLong(Bid::getBidTime));
-            LoggerUtil.info("Local bid history loaded for " + auctionId + ": " + auctionBids.size() + " bids");
-            return auctionBids;
-        } catch (Exception e) {
-            LoggerUtil.error("Local bid history load failed: " + e.getMessage());
-            return List.of();
-        }
-    }
-
-    private File findDataFile(String fileName) {
-        File current = new File(System.getProperty("user.dir")).getAbsoluteFile();
-        for (int i = 0; i < 8 && current != null; i++) {
-            File candidate = new File(current, "data/json/" + fileName);
-            if (candidate.exists()) {
-                return candidate;
-            }
-            current = current.getParentFile();
-        }
-        return new File("data/json/" + fileName);
-    }
-
     private String safeText(String value, String fallback) {
         return value != null && !value.isBlank() ? value : fallback;
     }
@@ -856,18 +807,93 @@ public class AuctionDetailController {
 
     private void loadMainImage(Item item) {
         if (mainImageView == null || item == null || item.getImages() == null || item.getImages().isEmpty()) {
+            if (thumbnailBox != null) {
+                thumbnailBox.getChildren().clear();
+            }
             return;
         }
 
+        renderImageGallery(item.getImages());
+    }
+
+    private void renderImageGallery(List<String> imagePaths) {
+        if (mainImageView == null || imagePaths == null || imagePaths.isEmpty()) {
+            return;
+        }
+
+        if (thumbnailBox != null) {
+            thumbnailBox.getChildren().clear();
+            thumbnailBox.setAlignment(Pos.CENTER_LEFT);
+        }
+
+        List<StackPane> thumbnailFrames = new ArrayList<>();
         try {
-            String formattedPath = item.getImages().get(0).replace("\\", "/");
-            if (!formattedPath.startsWith("file:")) {
-                formattedPath = "file:/" + formattedPath;
+            Image firstImage = new Image(toImageUrl(imagePaths.get(0)), true);
+            mainImageView.setImage(firstImage);
+
+            if (thumbnailBox == null) {
+                return;
             }
-            mainImageView.setImage(new Image(formattedPath, true));
+
+            for (int i = 0; i < imagePaths.size(); i++) {
+                String imageUrl = toImageUrl(imagePaths.get(i));
+                Image thumbnailImage = new Image(imageUrl, 90, 90, true, true, true);
+
+                ImageView thumbnailView = new ImageView(thumbnailImage);
+                thumbnailView.setFitWidth(78);
+                thumbnailView.setFitHeight(78);
+                thumbnailView.setPreserveRatio(true);
+                thumbnailView.setSmooth(true);
+
+                StackPane thumbnailFrame = new StackPane(thumbnailView);
+                thumbnailFrame.setPrefSize(88, 88);
+                thumbnailFrame.setMinSize(88, 88);
+                thumbnailFrame.setMaxSize(88, 88);
+                thumbnailFrame.setStyle(getThumbnailStyle(i == 0));
+                thumbnailFrame.setOnMouseEntered(event -> {
+                    mainImageView.setImage(new Image(imageUrl, true));
+                    selectThumbnail(thumbnailFrames, thumbnailFrame);
+                });
+
+                thumbnailFrames.add(thumbnailFrame);
+                thumbnailBox.getChildren().add(thumbnailFrame);
+            }
         } catch (Exception e) {
             LoggerUtil.error("Image load failed: " + e.getMessage());
         }
+    }
+
+    private void selectThumbnail(List<StackPane> thumbnailFrames, StackPane selectedFrame) {
+        for (StackPane frame : thumbnailFrames) {
+            frame.setStyle(getThumbnailStyle(frame == selectedFrame));
+        }
+    }
+
+    private String getThumbnailStyle(boolean selected) {
+        String borderColor = selected ? "#ef4444" : "#e5e7eb";
+        int borderWidth = selected ? 3 : 1;
+        return "-fx-background-color: white;"
+                + "-fx-border-color: " + borderColor + ";"
+                + "-fx-border-width: " + borderWidth + ";"
+                + "-fx-border-radius: 4;"
+                + "-fx-background-radius: 4;"
+                + "-fx-padding: 4;"
+                + "-fx-cursor: hand;";
+    }
+
+    private String toImageUrl(String imagePath) {
+        if (imagePath == null || imagePath.isBlank()) {
+            return "";
+        }
+
+        String formattedPath = imagePath.replace("\\", "/");
+        if (formattedPath.startsWith("file:")
+                || formattedPath.startsWith("http://")
+                || formattedPath.startsWith("https://")) {
+            return formattedPath;
+        }
+
+        return new File(formattedPath).toURI().toString();
     }
 
     private void renderProductDetails(JsonObject itemData, JsonObject productData) {
@@ -881,29 +907,35 @@ public class AuctionDetailController {
         rowIndex = addDetailRowIfPresent("Ma san pham", productData, "itemId", rowIndex);
         rowIndex = addDetailRowIfPresent("Gia khoi diem", formatVnd(getDouble(productData, "startingPrice", 0)), rowIndex);
 
-        switch (getString(productData, "type", "")) {
-            case "VEHICLE" -> {
-                rowIndex = addDetailRowIfPresent("Doi xe", productData, "model", rowIndex);
-                addDetailRowIfPresent("So km", getInt(productData, "odometer", 0) + " km", rowIndex);
-            }
-            case "FASHION" -> {
-                rowIndex = addDetailRowIfPresent("Thuong hieu", productData, "brand", rowIndex);
-                addDetailRowIfPresent("Chat lieu", productData, "material", rowIndex);
-            }
-            case "ART" -> {
-                rowIndex = addDetailRowIfPresent("Tac gia", productData, "creator", rowIndex);
-                addDetailRowIfPresent("Chat lieu", productData, "material", rowIndex);
-            }
-            case "JEWELRY" -> {
-                rowIndex = addDetailRowIfPresent("Chat lieu", productData, "material", rowIndex);
-                addDetailRowIfPresent("Khoi luong", getDouble(productData, "weight", 0) + " gr", rowIndex);
-            }
-            case "ELECTRONICS" -> {
-                rowIndex = addDetailRowIfPresent("Thuong hieu", productData, "brand", rowIndex);
-                addDetailRowIfPresent("Bao hanh", productData, "warrantyPeriod", rowIndex);
-            }
-            default -> { }
+        DetailRenderer renderer = detailRenderers.get(getString(productData, "type", ""));
+        if (renderer != null) {
+            renderer.render(productData, rowIndex);
         }
+    }
+
+    private Map<String, DetailRenderer> createDetailRenderers() {
+        Map<String, DetailRenderer> renderers = new java.util.HashMap<>();
+        renderers.put("VEHICLE", (data, row) -> {
+            row = addDetailRowIfPresent("Doi xe", data, "model", row);
+            return addDetailRowIfPresent("So km", getInt(data, "odometer", 0) + " km", row);
+        });
+        renderers.put("FASHION", (data, row) -> {
+            row = addDetailRowIfPresent("Thuong hieu", data, "brand", row);
+            return addDetailRowIfPresent("Chat lieu", data, "material", row);
+        });
+        renderers.put("ART", (data, row) -> {
+            row = addDetailRowIfPresent("Tac gia", data, "creator", row);
+            return addDetailRowIfPresent("Chat lieu", data, "material", row);
+        });
+        renderers.put("JEWELRY", (data, row) -> {
+            row = addDetailRowIfPresent("Chat lieu", data, "material", row);
+            return addDetailRowIfPresent("Khoi luong", getDouble(data, "weight", 0) + " gr", row);
+        });
+        renderers.put("ELECTRONICS", (data, row) -> {
+            row = addDetailRowIfPresent("Thuong hieu", data, "brand", row);
+            return addDetailRowIfPresent("Bao hanh", data, "warrantyPeriod", row);
+        });
+        return renderers;
     }
 
     private int addDetailRowIfPresent(String title, JsonObject data, String key, int rowIndex) {

@@ -103,10 +103,10 @@ public class ClientMain extends Application {
 
     private void showHomeScreen() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/BidderHome.fxml"));
 
             if (loader.getLocation() == null) {
-                LoggerUtil.error("❌ Cannot find home.fxml");
+                LoggerUtil.error("❌ Cannot find BidderHome.fxml");
                 return;
             }
 

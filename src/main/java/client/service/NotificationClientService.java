@@ -142,4 +142,3 @@ public class NotificationClientService {
                 : notification.getType().toUpperCase();
     }
 }
-

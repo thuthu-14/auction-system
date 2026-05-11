@@ -7,6 +7,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import util.LoggerUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SellerDashboardController {
 
     @FXML private VBox cardTaoPhien;
@@ -15,10 +18,20 @@ public class SellerDashboardController {
     @FXML private VBox cardThongBao;
     @FXML private VBox cardViTien;
 
-    // ===== THÊM ĐỂ LINK SERVER =====
+    // ===== THÃƒÅ M Ã„ÂÃ¡Â»â€š LINK SERVER =====
     private User currentUser;
     private ClientSocket clientSocket;
     private SellerHomeController sellerHomeController;
+    private final Map<String, Runnable> cardActions = new HashMap<>();
+
+    @FXML
+    private void initialize() {
+        cardActions.put("cardTaoPhien", () -> { if (sellerHomeController != null) sellerHomeController.loadAddAuctionProductView(); else loadView("/fxml/AddAuctionProduct.fxml"); });
+        cardActions.put("cardQuanLyPhien", () -> { if (sellerHomeController != null) sellerHomeController.loadManageAuctionsView(); else loadView("/fxml/SellerManageAuctions.fxml"); });
+        cardActions.put("cardThongKe", () -> { if (sellerHomeController != null) sellerHomeController.loadSellerStatisticsView(); else loadView("/fxml/SellerStatistics.fxml"); });
+        cardActions.put("cardThongBao", () -> { if (sellerHomeController != null) sellerHomeController.loadSellerNotificationsView(); else loadView("/fxml/SellerNotifications.fxml"); });
+        cardActions.put("cardViTien", () -> { if (sellerHomeController != null) sellerHomeController.loadWalletView(); else loadView("/fxml/WalletView.fxml"); });
+    }
 
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
@@ -34,25 +47,28 @@ public class SellerDashboardController {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
             javafx.scene.Parent newNode = loader.load();
 
-            // ===== BƠM DỮ LIỆU SERVER SANG MÀN HÌNH MỚI =====
+            // ===== BÃ†Â M DÃ¡Â»Â® LIÃ¡Â»â€ U SERVER SANG MÃƒâ‚¬N HÃƒÅ’NH MÃ¡Â»Å¡I =====
             Object controller = loader.getController();
             if (controller != null) {
                 if (controller instanceof WalletController) {
                     ((WalletController) controller).setUserData(currentUser, clientSocket);
                 } else if (controller instanceof SellerManagementController) {
                     ((SellerManagementController) controller).refreshAuctions();
+                } else if (controller instanceof SellerStatisticsController) {
+                    ((SellerStatisticsController) controller).setUserData(currentUser, clientSocket);
+                } else if (controller instanceof SellerNotificationsController) {
+                    ((SellerNotificationsController) controller).setUserData(currentUser, clientSocket);
                 }
-                // (Nếu sau này các trang Thống kê, Thông báo cần Server, bạn thêm else if vào đây)
             }
 
             javafx.scene.layout.Pane contentArea = (javafx.scene.layout.Pane) cardTaoPhien.getScene().lookup("#contentArea");
             if (contentArea != null) {
                 contentArea.getChildren().setAll(newNode);
             } else {
-                LoggerUtil.error("Lỗi: Không tìm thấy fx:id='contentArea' ở trang chính!");
+                LoggerUtil.error("LÃ¡Â»â€”i: KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y fx:id='contentArea' Ã¡Â»Å¸ trang chÃƒÂ­nh!");
             }
         } catch (Exception e) {
-            LoggerUtil.error("Không thể load file FXML: " + fxmlPath + " - " + e.getMessage());
+            LoggerUtil.error("KhÃƒÂ´ng thÃ¡Â»Æ’ load file FXML: " + fxmlPath + " - " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -62,41 +78,16 @@ public class SellerDashboardController {
         VBox source = (VBox) event.getSource();
         String id = source.getId();
 
-        switch (id) {
-            case "cardTaoPhien":
-                LoggerUtil.info("Đang mở: Tạo phiên mới");
-                if (sellerHomeController != null) sellerHomeController.loadAddAuctionProductView();
-                else loadView("/fxml/AddAuctionProduct.fxml");
-                break;
-            case "cardQuanLyPhien":
-                LoggerUtil.info("Đang mở: Quản lý phiên");
-                if (sellerHomeController != null) sellerHomeController.loadManageAuctionsView();
-                else loadView("/fxml/SellerManageAuctions.fxml");
-                break;
-            case "cardThongKe":
-                LoggerUtil.info("Đang mở: Thống kê");
-                if (sellerHomeController != null) sellerHomeController.loadSellerStatisticsView();
-                else loadView("/fxml/SellerStatistics.fxml");
-                break;
-            case "cardThongBao":
-                LoggerUtil.info("Đang mở: Thông báo");
-                if (sellerHomeController != null) sellerHomeController.loadSellerNotificationsView();
-                else loadView("/fxml/SellerNotifications.fxml");
-                break;
-            case "cardViTien":
-                LoggerUtil.info("Đang mở: Ví tiền");
-                if (sellerHomeController != null) sellerHomeController.loadWalletView();
-                else loadView("/fxml/WalletView.fxml");
-                break;
+        Runnable action = cardActions.get(id);
+        if (action != null) {
+            action.run();
         }
     }
 
     @FXML
     private void onCardEnter(MouseEvent event) {
         VBox source = (VBox) event.getSource();
-        source.setScaleX(1.02);
-        source.setScaleY(1.02);
-        source.setStyle(source.getStyle() + "; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 8);");
+        source.setStyle("-fx-cursor: hand;");
     }
 
     @FXML
@@ -104,5 +95,6 @@ public class SellerDashboardController {
         VBox source = (VBox) event.getSource();
         source.setScaleX(1.0);
         source.setScaleY(1.0);
+        source.setStyle("");
     }
 }

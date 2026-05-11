@@ -2,21 +2,20 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 
-<VBox minWidth="0" spacing="0" stylesheets="@../CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerDashboardController">
+<VBox spacing="0" stylesheets="@/CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerDashboardController">
 
 
     <!-- CARDS GRID -->
-    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="bar" VBox.vgrow="ALWAYS">
-        <VBox minWidth="0" maxWidth="1.7976931348623157E308" styleClass="dashboard-cards-container">
+    <ScrollPane vbarPolicy="NEVER" fitToWidth="true" styleClass="bar" VBox.vgrow="ALWAYS">
+        <VBox styleClass="dashboard-cards-container">
 
             <!-- ROW 1: Tạo phiên + Quản lý phiên -->
-            <HBox minWidth="0" maxWidth="1.7976931348623157E308" spacing="16">
+            <HBox spacing="16">
 
-                <VBox fx:id="cardTaoPhien" minWidth="0" maxWidth="1.7976931348623157E308" minHeight="120" prefHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+                <VBox fx:id="cardTaoPhien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label styleClass="card-icon-badge card-icon-purple" style="-fx-font-size: 20px;" text="➕" />
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-purple" text="+" />
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label styleClass="card-title" text="Tạo phiên mới" />
                             <Label styleClass="card-desc" text="Khởi tạo phiên đấu giá với sản phẩm của bạn" wrapText="true" />
@@ -28,9 +27,9 @@
                     </HBox>
                 </VBox>
 
-                <VBox fx:id="cardQuanLyPhien" minWidth="0" maxWidth="1.7976931348623157E308" minHeight="120" prefHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+                <VBox fx:id="cardQuanLyPhien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label styleClass="card-icon-badge card-icon-teal" style="-fx-font-size: 20px;" text="⚖" />
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-teal" text="⚖" />
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label styleClass="card-title" text="Quản lý phiên" />
                             <Label styleClass="card-desc" text="Theo dõi và điều phối các phiên đang diễn ra" wrapText="true" />
@@ -45,11 +44,11 @@
             </HBox>
 
             <!-- ROW 2: Thống kê + Thông báo -->
-            <HBox minWidth="0" maxWidth="1.7976931348623157E308" spacing="16">
+            <HBox spacing="16">
 
-                <VBox fx:id="cardThongKe" minWidth="0" maxWidth="1.7976931348623157E308" minHeight="120" prefHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+                <VBox fx:id="cardThongKe" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label styleClass="card-icon-badge card-icon-orange" style="-fx-font-size: 20px;" text="📊" />
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-orange" text="📊" />
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label styleClass="card-title" text="Thống kê" />
                             <Label styleClass="card-desc" text="Xem báo cáo doanh thu và hiệu suất bán hàng" wrapText="true" />
@@ -61,12 +60,9 @@
                     </HBox>
                 </VBox>
 
-                <VBox fx:id="cardThongBao" minWidth="0" maxWidth="1.7976931348623157E308" minHeight="120" prefHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+                <VBox fx:id="cardThongBao" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label styleClass="card-icon-badge card-icon-pink" style="-fx-font-size: 20px;" text="🔔">
-                            <font>
-                                <Font size="22.0" />
-                            </font></Label>
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-pink" text="🔔" />
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label styleClass="card-title" text="Thông báo" />
                             <Label styleClass="card-desc" text="Cập nhật tin tức về các phiên và người đấu giá" wrapText="true" />
@@ -81,10 +77,10 @@
             </HBox>
 
             <!-- ROW 3: Ví tiền full width -->
-            <HBox minWidth="0" maxWidth="1.7976931348623157E308">
-                <VBox fx:id="cardViTien" minWidth="0" maxWidth="1.7976931348623157E308" minHeight="120" prefHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+            <HBox>
+                <VBox fx:id="cardViTien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label styleClass="card-icon-badge card-icon-blue" style="-fx-font-size: 20px;" text="💳" />
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-blue" text="💳" />
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
                             <Label styleClass="card-title" text="Ví tiền" />
                             <Label styleClass="card-desc" text="Quản lý số dư, nạp tiền và lịch sử giao dịch của bạn" wrapText="true" />

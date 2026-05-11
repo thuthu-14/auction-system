@@ -3,6 +3,7 @@ package client.controller;
 import client.network.ClientSocket;
 import client.util.ResponsiveSceneUtil;
 import client.util.StageUtil;
+import navigation.NavigationManager;
 import server.model.User;
 
 import javafx.application.Platform;
@@ -121,28 +122,15 @@ public class SellerHomeController {
 
     private void switchToBidderMode() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/home.fxml"));
-            Parent root = loader.load();
-
-            HomeScreenController controller = loader.getController();
-            if (controller != null) {
-                // Truyền lại user và socket để không bị rớt mạng
-                controller.setUserData(currentUser, clientSocket);
-            }
-
-            navigation.NavigationManager.getInstance().setCurrentUser(currentUser);
-            navigation.NavigationManager.getInstance().setClientSocket(clientSocket);
-
             javafx.stage.Stage stage = (javafx.stage.Stage) rootPane.getScene().getWindow();
-            javafx.scene.Scene currentScene = stage.getScene();
-            javafx.scene.Scene scene = currentScene != null
-                    ? ResponsiveSceneUtil.createScaledScene(root, currentScene.getWidth(), currentScene.getHeight())
-                    : ResponsiveSceneUtil.createScaledScene(root);
-            stage.setTitle("🏪 Chợ Đấu giá");
-            stage.setScene(scene);
-            StageUtil.showMaximized(stage);
+            NavigationManager navigation = NavigationManager.getInstance();
+            navigation.setMainStage(stage);
+            navigation.setCurrentUser(currentUser);
+            navigation.setClientSocket(clientSocket);
+            navigation.goToHome();
         } catch (Exception e) {
-            LoggerUtil.error("Lỗi khi chuyển về màn hình Bidder: " + e.getMessage());
+            LoggerUtil.error("Loi khi chuyen ve man hinh Bidder: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -178,7 +166,11 @@ public class SellerHomeController {
 
     @FXML
     public void loadSellerStatisticsView() {
-        loadView("/fxml/SellerStatistics.fxml", menuAuctionStatistic, null);
+        loadView("/fxml/SellerStatistics.fxml", menuAuctionStatistic, controller -> {
+            if (controller instanceof SellerStatisticsController statisticsController) {
+                statisticsController.setUserData(currentUser, clientSocket);
+            }
+        });
     }
 
     @FXML
@@ -192,7 +184,12 @@ public class SellerHomeController {
 
     @FXML
     public void loadSellerNotificationsView() {
-        loadView("/fxml/SellerNotifications.fxml", menuMsg, null);
+        loadView("/fxml/SellerNotifications.fxml", menuMsg, controller -> {
+            if (controller instanceof SellerNotificationsController notificationsController) {
+                notificationsController.setSellerHomeController(this);
+                notificationsController.setUserData(currentUser, clientSocket);
+            }
+        });
     }
 
     @FXML
@@ -217,6 +214,8 @@ public class SellerHomeController {
     private void loadView(String fxmlPath, HBox menuToSelect, Consumer<Object> controllerSetup) {
         updateMenuSelection(menuToSelect);
         try {
+            clearStaleWalletOverlays();
+
             URL resource = getClass().getResource(fxmlPath);
             if (resource == null) {
                 LoggerUtil.error("Không tìm thấy file: " + fxmlPath);
@@ -237,6 +236,10 @@ public class SellerHomeController {
 
             prepareContentNode(node);
             contentArea.getChildren().setAll(node);
+            clearStaleWalletOverlays();
+            if (controller instanceof WalletController walletController) {
+                Platform.runLater(walletController::refreshVisualState);
+            }
         } catch (Exception e) {
             LoggerUtil.error("Lỗi load giao diện " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();
@@ -255,6 +258,34 @@ public class SellerHomeController {
             scrollPane.setFitToWidth(true);
             scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         }
+    }
+
+    private void clearStaleWalletOverlays() {
+        if (rootPane == null) {
+            return;
+        }
+
+        rootPane.getChildren().removeIf(this::isStaleWalletOverlay);
+        if (contentArea != null) {
+            contentArea.getChildren().removeIf(this::isStaleWalletOverlay);
+            contentArea.setOpacity(1);
+            contentArea.setDisable(false);
+        }
+    }
+
+    private boolean isStaleWalletOverlay(Node node) {
+        if (node == null) {
+            return false;
+        }
+
+        if (node.getStyleClass().contains("wallet-modal-overlay")) {
+            return true;
+        }
+
+        String style = node.getStyle();
+        return node instanceof Region
+                && style != null
+                && (style.contains("rgba(229, 231, 235") || style.contains("rgba(255, 255, 255"));
     }
 
     // ================= UTILITIES =================

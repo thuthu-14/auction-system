@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<ScrollPane fitToWidth="true" pannable="true"
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" vbarPolicy="NEVER"
             prefHeight="800.0" prefWidth="1000.0"
             style="-fx-background-color: transparent; -fx-background: transparent;"
             xmlns="http://javafx.com/javafx/17.0.12"

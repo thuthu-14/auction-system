@@ -2,10 +2,7 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
-import common.Message;
-import common.MessageType;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import client.service.SellerClientService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -14,13 +11,8 @@ import navigation.NavigationManager;
 import server.model.Auction;
 import server.model.User;
 import util.LoggerUtil;
-import util.JsonUtil; // Thêm import JsonUtil
-
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class SellerAuctionDetailsController {
 
@@ -32,9 +24,10 @@ public class SellerAuctionDetailsController {
     @FXML private ImageView productImage;
 
     private String auctionId;
+    private final SellerClientService sellerClientService = new SellerClientService();
 
     /**
-     * Tải chi tiết phiên đấu giá từ Server
+     * TÃ¡ÂºÂ£i chi tiÃ¡ÂºÂ¿t phiÃƒÂªn Ã„â€˜Ã¡ÂºÂ¥u giÃƒÂ¡ tÃ¡Â»Â« Server
      */
     public void loadSellerAuctionDetails(String auctionId) {
         this.auctionId = auctionId;
@@ -42,83 +35,37 @@ public class SellerAuctionDetailsController {
         User user = NavigationManager.getInstance().getCurrentUser();
 
         if (socket == null || user == null) {
-            LoggerUtil.error("Socket hoặc User bị null trong loadSellerAuctionDetails");
+            LoggerUtil.error("Socket hoÃ¡ÂºÂ·c User bÃ¡Â»â€¹ null trong loadSellerAuctionDetails");
             return;
         }
 
         new Thread(() -> {
             try {
-                // Gửi yêu cầu lấy chi tiết
-                Message req = new Message(MessageType.GET_AUCTION_DETAIL, auctionId, user.getUsername());
-
-                // Sử dụng hàm gửi/nhận đồng bộ để tránh bị lẫn dữ liệu với các luồng khác
-                Message res = socket.sendAndReceive(req);
-
-                if (res != null && "SUCCESS".equals(res.getStatus()) && res.getData() != null) {
-
-                    // --- ĐIỂM CHỐT LÀ Ở ĐÂY ---
-                    // KHÔNG dùng new Gson() nữa. Phải dùng Gson đã đăng ký TypeAdapter!
-                    Gson gson = JsonUtil.getGson();
-
-                    String json = gson.toJson(res.getData());
-                    Auction auction = null;
-
-                    // FIX LỖI "Expected BEGIN_OBJECT but was BEGIN_ARRAY"
-                    // Kiểm tra xem dữ liệu trả về là Mảng (List) hay Đối tượng (Object)
-                    if (json.trim().startsWith("[")) {
-                        // Nếu là mảng (Array/List)
-                        Type listType = new TypeToken<ArrayList<Auction>>(){}.getType();
-                        List<Auction> auctionList = gson.fromJson(json, listType);
-                        if (auctionList != null && !auctionList.isEmpty()) {
-                            auction = auctionList.get(0); // Lấy phần tử đầu tiên
-                        }
-                    } else {
-                        // Nếu là đối tượng đơn lẻ
-                        auction = gson.fromJson(json, Auction.class);
-                    }
-
-                    final Auction finalAuction = auction;
-                    Platform.runLater(() -> {
-                        try {
-                            if (finalAuction != null) {
-                                updateUI(finalAuction);
-                            } else {
-                                LoggerUtil.warn("Không parse được dữ liệu Auction từ Server.");
-                            }
-                        } catch (Exception e) {
-                            LoggerUtil.error("Lỗi khi cập nhật giao diện: " + e.getMessage());
-                        }
-                    });
-                } else {
-                    String errorReason = (res != null && res.getData() != null) ? res.getData().toString() : "Không có phản hồi từ Server";
-                    LoggerUtil.warn("Không tìm thấy chi tiết phiên: " + errorReason);
-                    Platform.runLater(() -> {
-                        if (productName != null) productName.setText("Lỗi: " + errorReason);
-                    });
-                }
+                Auction auction = sellerClientService.fetchAuctionDetail(socket, user, auctionId);
+                Platform.runLater(() -> updateUI(auction));
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi kết nối khi lấy chi tiết phiên: " + e.getMessage());
+                LoggerUtil.error("LÃ¡Â»â€”i kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i khi lÃ¡ÂºÂ¥y chi tiÃ¡ÂºÂ¿t phiÃƒÂªn: " + e.getMessage());
                 e.printStackTrace();
             }
         }).start();
     }
 
     /**
-     * Cập nhật thông tin lên giao diện
+     * CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t thÃƒÂ´ng tin lÃƒÂªn giao diÃ¡Â»â€¡n
      */
     private void updateUI(Auction auction) {
         if (auction == null) return;
 
-        // Thông tin sản phẩm cơ bản (Kiểm tra null cho từng Label để tránh NullPointerException)
+        // ThÃƒÂ´ng tin sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m cÃ†Â¡ bÃ¡ÂºÂ£n (KiÃ¡Â»Æ’m tra null cho tÃ¡Â»Â«ng Label Ã„â€˜Ã¡Â»Æ’ trÃƒÂ¡nh NullPointerException)
         if (productName != null) productName.setText(auction.getItem() != null ? auction.getItem().getName() : "N/A");
-        if (productId != null) productId.setText("Mã phiên: " + auction.getAuctionId());
+        if (productId != null) productId.setText("MÃƒÂ£ phiÃƒÂªn: " + auction.getAuctionId());
         if (productDesc != null) productDesc.setText(auction.getItem() != null ? auction.getItem().getDescription() : "");
 
-        // Giá cả
-        if (startPrice != null) startPrice.setText(auction.getItem() != null ? formatVnd(auction.getItem().getStartingPrice()) : "0 đ");
+        // GiÃƒÂ¡ cÃ¡ÂºÂ£
+        if (startPrice != null) startPrice.setText(auction.getItem() != null ? formatVnd(auction.getItem().getStartingPrice()) : "0 Ã„â€˜");
         if (currentPrice != null) currentPrice.setText(formatVnd(auction.getCurrentPrice()));
 
-        // Thời gian
+        // ThÃ¡Â»Âi gian
         if (startTime != null) startTime.setText(formatDate(auction.getStartTime()));
         if (endTime != null) endTime.setText(formatDate(auction.getEndTime()));
 
@@ -126,38 +73,38 @@ public class SellerAuctionDetailsController {
             long remain = auction.getTimeRemainingSeconds();
             if (remain > 0) {
                 timeLeft.setText(formatRemain(remain));
-                timeLeft.setStyle("-fx-text-fill: #185fa5;"); // Màu xanh nếu còn thời gian
+                timeLeft.setStyle("-fx-text-fill: #185fa5;"); // MÃƒÂ u xanh nÃ¡ÂºÂ¿u cÃƒÂ²n thÃ¡Â»Âi gian
             } else {
-                timeLeft.setText("Đã kết thúc");
-                timeLeft.setStyle("-fx-text-fill: #dc2626;"); // Màu đỏ nếu đã hết
+                timeLeft.setText("Ã„ÂÃƒÂ£ kÃ¡ÂºÂ¿t thÃƒÂºc");
+                timeLeft.setStyle("-fx-text-fill: #dc2626;"); // MÃƒÂ u Ã„â€˜Ã¡Â»Â nÃ¡ÂºÂ¿u Ã„â€˜ÃƒÂ£ hÃ¡ÂºÂ¿t
             }
         }
 
-        // Trạng thái
+        // TrÃ¡ÂºÂ¡ng thÃƒÂ¡i
         if (status != null) {
             String statusStr = auction.getStatus() != null ? auction.getStatus().toString() : "UNKNOWN";
             status.setText(statusStr);
-            // Thêm màu sắc cho trạng thái sinh động hơn
+            // ThÃƒÂªm mÃƒÂ u sÃ¡ÂºÂ¯c cho trÃ¡ÂºÂ¡ng thÃƒÂ¡i sinh Ã„â€˜Ã¡Â»â„¢ng hÃ†Â¡n
             if (statusStr.equals("ACTIVE")) status.setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-padding: 4 10; -fx-background-radius: 15;");
             else status.setStyle("-fx-background-color: #f3f4f6; -fx-text-fill: #374151; -fx-padding: 4 10; -fx-background-radius: 15;");
         }
 
-        // Lượt đặt và người dẫn đầu
-        if (bidCount != null) bidCount.setText((auction.getBidIds() != null ? auction.getBidIds().size() : 0) + " lượt");
-        if (topBidderName != null) topBidderName.setText(auction.getHighestBidderName() != null ? auction.getHighestBidderName() : "Chưa có");
+        // LÃ†Â°Ã¡Â»Â£t Ã„â€˜Ã¡ÂºÂ·t vÃƒÂ  ngÃ†Â°Ã¡Â»Âi dÃ¡ÂºÂ«n Ã„â€˜Ã¡ÂºÂ§u
+        if (bidCount != null) bidCount.setText((auction.getBidIds() != null ? auction.getBidIds().size() : 0) + " lÃ†Â°Ã¡Â»Â£t");
+        if (topBidderName != null) topBidderName.setText(auction.getHighestBidderName() != null ? auction.getHighestBidderName() : "ChÃ†Â°a cÃƒÂ³");
         if (topBidAmount != null) topBidAmount.setText(formatVnd(auction.getCurrentPrice()));
     }
 
-    @FXML private void handleEdit() { LoggerUtil.info("Chỉnh sửa: " + auctionId); }
-    @FXML private void handlePause() { LoggerUtil.info("Tạm dừng: " + auctionId); }
-    @FXML private void handleCancel() { LoggerUtil.info("Hủy phiên: " + auctionId); }
+    @FXML private void handleEdit() { LoggerUtil.info("ChÃ¡Â»â€°nh sÃ¡Â»Â­a: " + auctionId); }
+    @FXML private void handlePause() { LoggerUtil.info("TÃ¡ÂºÂ¡m dÃ¡Â»Â«ng: " + auctionId); }
+    @FXML private void handleCancel() { LoggerUtil.info("HÃ¡Â»Â§y phiÃƒÂªn: " + auctionId); }
 
-    private String formatVnd(double a) { return String.format("%,.0f đ", a).replace(',', '.'); }
+    private String formatVnd(double a) { return String.format("%,.0f Ã„â€˜", a).replace(',', '.'); }
     private String formatDate(long m) { return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date(m)); }
     private String formatRemain(long s) {
         long h = s / 3600;
         long m = (s % 3600) / 60;
-        if (h > 0) return h + " giờ " + m + " phút";
-        return m + " phút";
+        if (h > 0) return h + " giÃ¡Â»Â " + m + " phÃƒÂºt";
+        return m + " phÃƒÂºt";
     }
 }

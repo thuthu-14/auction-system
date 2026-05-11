@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ClientSocket {
+public class ClientSocket implements MessageTransport {
 
     private Socket socket;
     private ObjectOutputStream oos;
@@ -69,6 +69,7 @@ public class ClientSocket {
         }
     }
 
+    @Override
     public synchronized Message sendAndReceive(Message message) throws IOException, ClassNotFoundException {
         sendMessage(message);
         Message response;
@@ -102,6 +103,7 @@ public class ClientSocket {
         };
     }
 
+    @Override
     public boolean isConnected() {
         return isConnected && socket != null && socket.isConnected() && !socket.isClosed();
     }

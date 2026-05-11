@@ -1,6 +1,7 @@
 package navigation;
 
 import client.controller.DashboardController;
+import client.controller.HomeScreenController;
 import client.controller.SellerHomeController;
 import client.controller.WalletController;
 import client.network.ClientSocket;
@@ -69,7 +70,12 @@ public class NavigationManager {
             Object controller = loader.getController();
 
             // 🔥 FIX CỐT LÕI: Truyền dữ liệu cho Dashboard (Trang chủ) để load hàng
-            if (controller instanceof DashboardController dc) {
+            if (controller instanceof HomeScreenController hsc) {
+                hsc.setUserData(currentUser, clientSocket);
+                System.out.println("Navigation: Data passed to HomeScreenController");
+            }
+
+            else if (controller instanceof DashboardController dc) {
                 dc.setUserData(currentUser, clientSocket);
                 System.out.println("✓ Navigation: Data passed to DashboardController");
             }
@@ -109,7 +115,7 @@ public class NavigationManager {
      */
     public void goToHome() {
         // Đảm bảo đường dẫn này khớp với tên file FXML của bạn
-        navigateTo("/fxml/home.fxml");
+        navigateTo("/fxml/BidderHome.fxml");
     }
 
     /**
@@ -123,6 +129,6 @@ public class NavigationManager {
      * Chuyển sang giao diện ví tiền
      */
     public void goToWallet() {
-        navigateTo("/fxml/Wallet.fxml");
+        navigateTo("/fxml/WalletView.fxml");
     }
 }

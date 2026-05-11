@@ -187,46 +187,6 @@
     "viewCount": 0
   },
   {
-    "auctionId": "AU1778403491811",
-    "itemId": "IT1778403491811",
-    "sellerId": "U1777887117887",
-    "sellerName": "buingoc",
-    "item": {
-      "itemId": "IT1778403491811",
-      "name": "Son Kem Bóng Lì Lilybyred Bloody Liar Coating Tint 4g",
-      "description": "Son Kem Bóng Lì Lilybyred Bloody Liar Coating Tint 4g \n\n\n\n1. ƯU ĐIỂM SẢN PHẨM:\n\n- Son kem bóng mang lại đôi môi căng mướt, mềm mại\n\n- Chứa tinh dầu jojoba giúp nuôi dưỡng bờ môi khô bong tróc\n\n- Chất son hòa quyện mang lại màu sắc môi tự nhiên\n\n- Không gây nặng môi, hỗ trợ che phủ vân môi\n\n- Son Lilybyred Bloody Liar Coating Tint mang mùi hương trái cây dịu ngọt khiến bạn\n\nyêu thích.",
-      "startingPrice": 80000.0,
-      "sellerId": "U1777887117887",
-      "images": [
-        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20155623.png",
-        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20155631.png"
-      ],
-      "type": "FASHION",
-      "brand": "Lilibyred",
-      "material": "tint bóng"
-    },
-    "currentPrice": 180000.0,
-    "highestBidderId": "U1778403578742",
-    "highestBidderName": "thunguyen",
-    "status": "RUNNING",
-    "startTime": 1778403491811,
-    "endTime": 1778522291811,
-    "createdAt": 1778403491811,
-    "bidIds": [
-      "BID1778404884138",
-      "BID1778404909276",
-      "BID1778405261249",
-      "BID1778405263906",
-      "BID1778405266950",
-      "BID1778405278499",
-      "BID1778405282642",
-      "BID1778405286157",
-      "BID1778405289763",
-      "BID1778405292536"
-    ],
-    "viewCount": 0
-  },
-  {
     "auctionId": "AU1778402863464",
     "itemId": "IT1778402863464",
     "sellerId": "U1777887117887",
@@ -245,7 +205,7 @@
       "brand": "Anker",
       "warrantyPeriod": "1 Year"
     },
-    "currentPrice": 300000.0,
+    "currentPrice": 500000.0,
     "highestBidderId": "U1778403578742",
     "highestBidderName": "thunguyen",
     "status": "RUNNING",
@@ -256,7 +216,89 @@
       "BID1778406367563",
       "BID1778406370835",
       "BID1778406374464",
-      "BID1778406377358"
+      "BID1778406377358",
+      "BID1778410202966",
+      "BID1778410207048",
+      "BID1778410209740",
+      "BID1778410214755"
+    ],
+    "viewCount": 0
+  },
+  {
+    "auctionId": "AU1778403491811",
+    "itemId": "IT1778403491811",
+    "sellerId": "U1777887117887",
+    "sellerName": "buingoc",
+    "item": {
+      "itemId": "IT1778403491811",
+      "name": "Son Kem Bóng Lì Lilybyred Bloody Liar Coating Tint 4g",
+      "description": "Son Kem Bóng Lì Lilybyred Bloody Liar Coating Tint 4g \n\n\n\n1. ƯU ĐIỂM SẢN PHẨM:\n\n- Son kem bóng mang lại đôi môi căng mướt, mềm mại\n\n- Chứa tinh dầu jojoba giúp nuôi dưỡng bờ môi khô bong tróc\n\n- Chất son hòa quyện mang lại màu sắc môi tự nhiên\n\n- Không gây nặng môi, hỗ trợ che phủ vân môi\n\n- Son Lilybyred Bloody Liar Coating Tint mang mùi hương trái cây dịu ngọt khiến bạn\n\nyêu thích.",
+      "startingPrice": 80000.0,
+      "sellerId": "U1777887117887",
+      "images": [
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20155623.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20155631.png"
+      ],
+      "type": "FASHION",
+      "brand": "Lilibyred",
+      "material": "tint bóng"
+    },
+    "currentPrice": 200000.0,
+    "highestBidderId": "U1778403578742",
+    "highestBidderName": "thunguyen",
+    "status": "RUNNING",
+    "startTime": 1778403491811,
+    "endTime": 1778522291811,
+    "createdAt": 1778403491811,
+    "bidIds": [
+      "BID1778404884138",
+      "BID1778404909276",
+      "BID1778405261249",
+      "BID1778405263906",
+      "BID1778405266950",
+      "BID1778405278499",
+      "BID1778405282642",
+      "BID1778405286157",
+      "BID1778405289763",
+      "BID1778405292536",
+      "BID1778409942581",
+      "BID1778463233994"
+    ],
+    "viewCount": 0
+  },
+  {
+    "auctionId": "AU1778485932110",
+    "itemId": "IT1778485932110",
+    "sellerId": "U1777887117887",
+    "sellerName": "buingoc",
+    "item": {
+      "itemId": "IT1778485932110",
+      "name": "Áo Thun Tay Ngắn TRAFFY \"HEART GIRL-HOT GIRL\" In Trái Tim",
+      "description": "Áo Thun Tay DàI TRAFFY \"HEART GIRL - HOT GIRL\" l TRAFFY HEART GIRL - HOT GIRL Long-Sleeves T-Shirt\n\n\n\n• CHẤT LƯỢNG VƯỢT TRỘI\n\nChất liệu vải cao cấp (80% cotton/ 20% spandex), mềm mại, thoáng mát, thấm hút mồ hôi, cotton pha spandex không dễ bị nhão áo, mang lại cảm giác dễ chịu tối đa khi mặc – đặc biệt thích hợp với khí hậu nóng ẩm Việt Nam. Áo giữ form chuẩn, không bị bai nhão hay chảy xệ sau nhiều lần giặt, hạn chế co rút và có độ bền cao kể cả khi giặt máy.\n\n\n\n• THIẾT KẾ ĐỘC ĐÁO\n\nForm Regular tay dài mang lại cảm giác thoải mái, dễ mặc và dễ phối đồ. Details nổi bật: Hình cô gái nằm dưới trái tim sử dụng công nghệ in DTF cao cấp, mặt trước in decal ngôi sao kim tuyến StarGirl/ Starboy, công nghệ in chất lượng không bong tróc kể cả giặt máy. Thiết kế vừa cổ điển vừa độc đáo và cá tính thời trang riêng biệt.\n\nMọi chi tiết từ đường may, cổ áo đến form dáng đều được gia công tỉ mỉ, đảm bảo sự chỉn chu trong từng sản phẩm.",
+      "startingPrice": 100000.0,
+      "sellerId": "U1777887117887",
+      "images": [
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-11%20091649.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-11%20091749.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-11%20091734.png"
+      ],
+      "type": "FASHION",
+      "brand": "Traffy",
+      "material": "Cotton"
+    },
+    "currentPrice": 160000.0,
+    "highestBidderId": "U1778403578742",
+    "highestBidderName": "thunguyen",
+    "status": "RUNNING",
+    "startTime": 1778485932110,
+    "endTime": 1778604732110,
+    "createdAt": 1778485932110,
+    "bidIds": [
+      "BID1778485975469",
+      "BID1778485977664",
+      "BID1778485980359",
+      "BID1778485982360",
+      "BID1778485988272"
     ],
     "viewCount": 0
   }

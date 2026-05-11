@@ -2,10 +2,10 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AuthClientService;
 import client.util.ResponsiveSceneUtil;
 import client.util.StageUtil;
-import common.*;
-import com.google.gson.Gson;
+import common.UserRole;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,11 +15,9 @@ import javafx.stage.Stage;
 import navigation.NavigationManager;
 import util.LoggerUtil;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * LoginController - Xử lý màn hình Login qua Server Socket
+ * LoginController - XÃ¡Â»Â­ lÃƒÂ½ mÃƒÂ n hÃƒÂ¬nh Login qua Server Socket
  */
 public class LoginController {
 
@@ -36,6 +34,7 @@ public class LoginController {
     private server.model.User currentUser;
     private Runnable onLoginSuccess;
     private Runnable onAdminLoginSuccess;
+    private final AuthClientService authClientService = new AuthClientService();
 
     @FXML
     public void initialize() {
@@ -50,7 +49,7 @@ public class LoginController {
         passwordField.setOnAction(e -> handleLogin());
         mkShow.setOnAction(e -> handleLogin());
 
-        LoggerUtil.info("✓ LoginController initialized");
+        LoggerUtil.info("Ã¢Å“â€œ LoginController initialized");
     }
 
     @FXML
@@ -59,7 +58,7 @@ public class LoginController {
         String password = getEnteredPassword();
 
         if (email.isEmpty() || password.isEmpty()) {
-            showError("❌ Email và mật khẩu không được rỗng!");
+            showError("Ã¢ÂÅ’ Email vÃƒÂ  mÃ¡ÂºÂ­t khÃ¡ÂºÂ©u khÃƒÂ´ng Ã„â€˜Ã†Â°Ã¡Â»Â£c rÃ¡Â»â€”ng!");
             return;
         }
 
@@ -67,49 +66,16 @@ public class LoginController {
 
         new Thread(() -> {
             try {
-                if (clientSocket == null) {
-                    connectionManager = ConnectionManager.getInstance();
-                    if (!connectionManager.isConnected()) {
-                        if (!connectionManager.connect()) {
-                            showError("❌ Không thể kết nối tới server!");
-                            return;
-                        }
-                    }
-                    clientSocket = connectionManager.getClientSocket();
-                }
-
-                LoginRequest loginRequest = new LoginRequest(email, password);
-                Message loginMsg = new Message(MessageType.LOGIN, loginRequest, email);
-                Message response = clientSocket.sendAndReceive(loginMsg);
-
-                if (response != null && "SUCCESS".equals(response.getStatus())) {
-                    try {
-                        com.google.gson.Gson contextGson = util.JsonUtil.getGson();
-
-                        String json = contextGson.toJson(response.getData());
-
-                        currentUser = contextGson.fromJson(json, server.model.User.class);
-
-                        LoggerUtil.info("✓ Login thành công cho user: " + currentUser.getUsername() + " (Role: " + currentUser.getRole() + ")");
-                    } catch (Exception e) {
-                        LoggerUtil.error("Lỗi parse dữ liệu User: " + e.getMessage());
-                        if (response.getData() instanceof server.model.User) {
-                            currentUser = (server.model.User) response.getData();
-                        }
-                    }
-
-                    Platform.runLater(() -> {
-                        showSuccess("✓ Đăng nhập thành công!");
-                        proceedToDashboard();
-                    });
-                } else {
-                    String errorMsg = (response != null) ? response.getMessage() : "Sai tài khoản hoặc mật khẩu!";
-                    showError("❌ " + errorMsg);
-                }
-
+                clientSocket = (ClientSocket) authClientService.ensureConnected(clientSocket);
+                currentUser = authClientService.login(clientSocket, email, password);
+                LoggerUtil.info("Login thanh cong cho user: " + currentUser.getUsername());
+                Platform.runLater(() -> {
+                    showSuccess("Dang nhap thanh cong!");
+                    proceedToDashboard();
+                });
             } catch (Exception e) {
                 LoggerUtil.error("Login error: " + e.getMessage());
-                showError("❌ Lỗi hệ thống: " + e.getMessage());
+                showError("Ã¢ÂÅ’ LÃ¡Â»â€”i hÃ¡Â»â€¡ thÃ¡Â»â€˜ng: " + e.getMessage());
             } finally {
                 setLoading(false);
             }
@@ -129,19 +95,19 @@ public class LoginController {
             if (onAdminLoginSuccess != null) {
                 onAdminLoginSuccess.run();
             } else {
-                // SỬ DỤNG navigateTo cho Admin
-                nav.navigateTo("/fxml/AdminHome.fxml");
+                // SÃ¡Â»Â¬ DÃ¡Â»Â¤NG navigateTo cho Admin
+                nav.navigateTo("/fxml/AdminDashboard.fxml");
             }
         } else if (currentUser instanceof server.model.RegularUser) {
             server.model.RegularUser regUser = (server.model.RegularUser) currentUser;
 
             if (regUser.isSeller()) {
-                // Lưu thông tin Seller cục bộ để tiện truy xuất
-                saveSellerContext(regUser);
+                // LÃ†Â°u thÃƒÂ´ng tin Seller cÃ¡Â»Â¥c bÃ¡Â»â„¢ Ã„â€˜Ã¡Â»Æ’ tiÃ¡Â»â€¡n truy xuÃ¡ÂºÂ¥t
+                authClientService.saveSellerContext(regUser);
                 nav.goToSellerHome();
             } else {
-                // ĐÂY LÀ NHÁNH CHO TÀI KHOẢN MỚI HOẶC NGƯỜI CHỈ CÓ QUYỀN MUA/BID
-                LoggerUtil.info("Điều hướng: Màn hình Home (Bidder)");
+                // Ã„ÂÃƒâ€šY LÃƒâ‚¬ NHÃƒÂNH CHO TÃƒâ‚¬I KHOÃ¡ÂºÂ¢N MÃ¡Â»Å¡I HOÃ¡ÂºÂ¶C NGÃ†Â¯Ã¡Â»Å“I CHÃ¡Â»Ë† CÃƒâ€œ QUYÃ¡Â»â‚¬N MUA/BID
+                LoggerUtil.info("Ã„ÂiÃ¡Â»Âu hÃ†Â°Ã¡Â»â€ºng: MÃƒÂ n hÃƒÂ¬nh Home (Bidder)");
                 if (onLoginSuccess != null) {
                     onLoginSuccess.run();
                 } else {
@@ -151,28 +117,17 @@ public class LoginController {
         }
     }
 
-    private void saveSellerContext(server.model.RegularUser seller) {
-        try {
-            Map<String, String> sellerIdMap = new HashMap<>();
-            sellerIdMap.put("sellerId", seller.getUserId());
-            sellerIdMap.put("sellerName", seller.getShopName());
-            util.JsonUtil.saveToJson("data/json/current_seller_id.json", sellerIdMap);
-        } catch (Exception e) {
-            System.err.println("⚠️ Warning: Could not save seller context.");
-        }
-    }
-
     @FXML
     private void switchToSignup() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SignUp.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Signup.fxml"));
             Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
             Stage stage = (Stage) registerButton.getScene().getWindow();
             stage.setScene(scene);
-            stage.setTitle("Tạo tài khoản");
+            stage.setTitle("TÃ¡ÂºÂ¡o tÃƒÂ i khoÃ¡ÂºÂ£n");
             StageUtil.showMaximized(stage);
         } catch (IOException e) {
-            showError("❌ Không mở được màn hình đăng ký.");
+            showError("Ã¢ÂÅ’ KhÃƒÂ´ng mÃ¡Â»Å¸ Ã„â€˜Ã†Â°Ã¡Â»Â£c mÃƒÂ n hÃƒÂ¬nh Ã„â€˜Ã„Æ’ng kÃƒÂ½.");
         }
     }
 

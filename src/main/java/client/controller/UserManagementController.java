@@ -1,6 +1,9 @@
 package client.controller;
 
+import client.network.ClientSocket;
+import client.service.AdminClientService;
 import common.UserRole;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,13 +14,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import server.model.User;
-import util.JsonUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserManagementController {
-    private static final String USERS_FILE = "data/json/users.json";
 
     @FXML private TextField searchUserInput;
     @FXML private Button btnRefresh;
@@ -30,11 +31,19 @@ public class UserManagementController {
     @FXML private TableColumn<UserRow, String> colStatus;
 
     private final ObservableList<User> allUsers = FXCollections.observableArrayList();
+    private final AdminClientService adminClientService = new AdminClientService();
+    private User currentUser;
+    private ClientSocket clientSocket;
 
     @FXML
     public void initialize() {
         setupColumns();
         setupEvents();
+    }
+
+    public void setContext(User user, ClientSocket socket) {
+        this.currentUser = user;
+        this.clientSocket = socket;
         loadUsers();
     }
 
@@ -53,16 +62,21 @@ public class UserManagementController {
     }
 
     private void loadUsers() {
-        try {
-            List<User> users = JsonUtil.loadListFromJson(USERS_FILE, User.class);
-            allUsers.setAll(users);
-            applySearch();
-        } catch (Exception e) {
-            e.printStackTrace();
-            allUsers.clear();
-            userTable.setItems(FXCollections.observableArrayList());
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đọc data/json/users.json");
-        }
+        new Thread(() -> {
+            try {
+                List<User> users = adminClientService.fetchAllUsers(clientSocket, currentUser);
+                Platform.runLater(() -> {
+                    allUsers.setAll(users);
+                    applySearch();
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    allUsers.clear();
+                    userTable.setItems(FXCollections.observableArrayList());
+                    showAlert(Alert.AlertType.ERROR, "Loi", "Khong the tai danh sach nguoi dung tu server.");
+                });
+            }
+        }, "AdminLoadUsersThread").start();
     }
 
     private void applySearch() {
@@ -104,25 +118,27 @@ public class UserManagementController {
     private void updateSelectedUserStatus(boolean active) {
         UserRow selectedRow = userTable.getSelectionModel().getSelectedItem();
         if (selectedRow == null) {
-            showAlert(Alert.AlertType.WARNING, "Chưa chọn người dùng", "Hãy chọn một người dùng trong bảng trước.");
+            showAlert(Alert.AlertType.WARNING, "Chua chon nguoi dung", "Hay chon mot nguoi dung trong bang truoc.");
             return;
         }
 
         User user = selectedRow.getUser();
-        user.setActive(active);
-
-        try {
-            JsonUtil.saveToJson(USERS_FILE, allUsers);
-            applySearch();
-            showAlert(
-                    Alert.AlertType.INFORMATION,
-                    "Thành công",
-                    (active ? "Đã mở khóa " : "Đã khóa ") + user.getUsername()
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể lưu thay đổi vào data/json/users.json");
-        }
+        new Thread(() -> {
+            try {
+                adminClientService.updateUserStatus(clientSocket, currentUser, user.getUserId(), active);
+                Platform.runLater(() -> {
+                    user.setActive(active);
+                    applySearch();
+                    showAlert(
+                            Alert.AlertType.INFORMATION,
+                            "Thanh cong",
+                            (active ? "Da mo khoa " : "Da khoa ") + user.getUsername()
+                    );
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi", "Khong the cap nhat trang thai nguoi dung tren server."));
+            }
+        }, "AdminUpdateUserStatusThread").start();
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
@@ -138,14 +154,14 @@ public class UserManagementController {
             return "-";
         }
         return switch (role) {
-            case ADMIN -> "Quản trị viên";
-            case SELLER -> "Người bán";
-            case BIDDER -> "Người đấu giá";
+            case ADMIN -> "Quan tri vien";
+            case SELLER -> "Nguoi ban";
+            case BIDDER -> "Nguoi dau gia";
         };
     }
 
     private static String statusText(boolean active) {
-        return active ? "Đang hoạt động" : "Đã khóa";
+        return active ? "Dang hoat dong" : "Da khoa";
     }
 
     public static class UserRow {

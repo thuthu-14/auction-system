@@ -1,6 +1,9 @@
 package client.controller;
 
+import client.network.ClientSocket;
+import client.service.AdminClientService;
 import common.AuctionStatus;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,7 +17,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import server.model.Auction;
 import server.model.Item;
-import util.JsonUtil;
+import server.model.User;
 
 import java.text.NumberFormat;
 import java.time.Instant;
@@ -27,7 +30,6 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class AdminAuctionManagementController {
-    private static final String AUCTIONS_FILE = "data/json/auctions.json";
     private static final ZoneId ZONE_ID = ZoneId.systemDefault();
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -51,12 +53,20 @@ public class AdminAuctionManagementController {
     @FXML private Label totalLabel;
 
     private final ObservableList<AdminAuctionRow> allRows = FXCollections.observableArrayList();
+    private final AdminClientService adminClientService = new AdminClientService();
+    private User currentUser;
+    private ClientSocket clientSocket;
 
     @FXML
     public void initialize() {
         setupColumns();
         setupFilters();
         setupEvents();
+    }
+
+    public void setContext(User user, ClientSocket socket) {
+        this.currentUser = user;
+        this.clientSocket = socket;
         loadAuctions();
     }
 
@@ -92,17 +102,22 @@ public class AdminAuctionManagementController {
     }
 
     private void loadAuctions() {
-        try {
-            List<Auction> auctions = JsonUtil.loadListFromJson(AUCTIONS_FILE, Auction.class);
-            allRows.setAll(auctions.stream()
-                    .map(AdminAuctionRow::fromAuction)
-                    .collect(Collectors.toList()));
-            applyFilters();
-        } catch (Exception e) {
-            e.printStackTrace();
-            tableBids.setItems(FXCollections.observableArrayList());
-            updateTotal(0);
-        }
+        new Thread(() -> {
+            try {
+                List<Auction> auctions = adminClientService.fetchAllAuctions(clientSocket, currentUser);
+                Platform.runLater(() -> {
+                    allRows.setAll(auctions.stream()
+                            .map(AdminAuctionRow::fromAuction)
+                            .collect(Collectors.toList()));
+                    applyFilters();
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    tableBids.setItems(FXCollections.observableArrayList());
+                    updateTotal(0);
+                });
+            }
+        }, "AdminLoadAuctionsThread").start();
     }
 
     private void applyFilters() {

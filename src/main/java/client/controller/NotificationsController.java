@@ -1,7 +1,12 @@
 package client.controller;
 
+import client.network.ClientSocket;
+import client.network.ConnectionManager;
+import client.service.NotificationClientService;
+import client.service.NotificationClientService.NotificationAction;
+import client.service.NotificationClientService.NotificationPresentation;
+import client.service.NotificationClientService.NotificationScope;
 import common.Message;
-import common.MessageType;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -18,7 +23,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 import navigation.NavigationManager;
-import server.model.Notification; // Dùng class thật bạn vừa tạo
+import server.model.Auction;
+import server.model.Notification;
+import server.model.User;
 import util.LoggerUtil;
 
 import java.net.URL;
@@ -28,9 +35,13 @@ import java.util.ResourceBundle;
 
 public class NotificationsController implements Initializable {
 
+    private final NotificationClientService notificationService = new NotificationClientService();
+
     @FXML private Button markAllReadBtn;
     @FXML private VBox notificationsContainer;
 
+    private User currentUser;
+    private ClientSocket clientSocket;
     private HomeScreenController homeController;
     private Timeline timeRefreshTimer;
     private final List<Runnable> timeLabelUpdaters = new ArrayList<>();
@@ -39,123 +50,218 @@ public class NotificationsController implements Initializable {
         this.homeController = homeController;
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        if (markAllReadBtn != null) {
-            markAllReadBtn.setOnAction(event -> {
-                sendSocketRequest(MessageType.MARK_NOTIFICATIONS_READ, "READ_ALL", "🔔 Đã cập nhật trạng thái đã đọc!");
-                loadNotifications();
-            });
-        }
-        startTimeRefreshTimer();
+    public void setUserData(User user, ClientSocket socket) {
+        this.currentUser = user;
+        this.clientSocket = socket;
         loadNotifications();
     }
 
-    /**
-     * Gửi yêu cầu lên Server để lấy danh sách thông báo THẬT
-     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        if (markAllReadBtn != null) {
+            markAllReadBtn.setOnAction(event -> markAllRead());
+        }
+        startTimeRefreshTimer();
+    }
+
     public void loadNotifications() {
         if (notificationsContainer == null) return;
-        notificationsContainer.getChildren().clear();
-        timeLabelUpdaters.clear();
+
+        showLoadingState();
 
         new Thread(() -> {
             try {
-                var socket = NavigationManager.getInstance().getClientSocket();
-                var user = NavigationManager.getInstance().getCurrentUser();
+                ClientSocket socket = resolveSocket();
+                User user = resolveUser();
 
-                if (socket != null && user != null) {
-                    // 1. Gửi lệnh lấy thông báo
-                    Message request = new Message(MessageType.GET_NOTIFICATIONS, null, user.getUserId());
-
-                    // 2. Nhận phản hồi
-                    Message response = socket.sendAndReceive(request);
-                    if (response != null && response.getData() instanceof List) {
-                        List<Notification> realList = (List<Notification>) response.getData();
-
-                        // 3. Hiển thị lên giao diện
-                        Platform.runLater(() -> {
-                            for (Notification noti : realList) {
-                                notificationsContainer.getChildren().add(createNotificationRow(noti));
-                            }
-                        });
-                    }
+                if (socket == null || user == null) {
+                    Platform.runLater(() -> showEmptyState("Khong co du lieu nguoi dung hoac ket noi server."));
+                    return;
                 }
+
+                Message response = notificationService.fetchNotifications(socket, user);
+
+                Platform.runLater(() -> {
+                    if (response != null && response.getData() instanceof List<?> rawList) {
+                        renderNotifications(rawList);
+                    } else {
+                        showEmptyState("Chua co thong bao nao.");
+                    }
+                });
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi load notifications: " + e.getMessage());
+                LoggerUtil.error("Loi load bidder notifications: " + e.getMessage());
+                Platform.runLater(() -> showEmptyState("Khong tai duoc thong bao."));
             }
         }).start();
     }
 
-    /**
-     * Tạo giao diện dòng thông báo dựa trên Class Notification
-     */
+    private void renderNotifications(List<?> rawList) {
+        notificationsContainer.getChildren().clear();
+        timeLabelUpdaters.clear();
+
+        for (Object item : rawList) {
+            if (item instanceof Notification notification && notificationService.isVisible(notification, NotificationScope.BIDDER)) {
+                notificationsContainer.getChildren().add(createNotificationRow(notification));
+            }
+        }
+
+        if (notificationsContainer.getChildren().isEmpty()) {
+            showEmptyState("Chua co thong bao nao.");
+        }
+    }
+
     private HBox createNotificationRow(Notification data) {
         HBox container = new HBox(20);
         container.setAlignment(Pos.CENTER_LEFT);
+        container.setStyle(getContainerStyle(data));
 
-        // Icon Box
         VBox iconBox = new VBox();
         iconBox.setAlignment(Pos.CENTER);
         iconBox.setPrefSize(60, 60);
         iconBox.setMinSize(60, 60);
-        Label iconLabel = new Label();
-        iconLabel.setFont(Font.font(28));
+        iconBox.setStyle(getIconBoxStyle(data));
 
-        // Content Box
+        Label iconLabel = new Label(getIcon(data));
+        iconLabel.setFont(Font.font(28));
+        iconLabel.setStyle("-fx-text-fill: " + getIconColor(data) + ";");
+        iconBox.getChildren().add(iconLabel);
+
         VBox contentBox = new VBox(5);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
-        Label titleLabel = new Label(data.getTitle()); // getTitle() từ class
+
+        Label titleLabel = new Label(defaultText(data.getTitle(), "Thong bao"));
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
-        Label descLabel = new Label(data.getDescription()); // getDescription() từ class
+        titleLabel.setStyle("-fx-text-fill: " + getTitleColor(data) + ";");
+
+        Label descLabel = new Label(defaultText(data.getDescription(), ""));
         descLabel.setFont(Font.font("System", 14));
         descLabel.setWrapText(true);
         descLabel.setStyle("-fx-text-fill: #4a5568;");
+
         contentBox.getChildren().addAll(titleLabel, descLabel);
 
-        // Action Box
         VBox actionBox = new VBox(10);
         actionBox.setAlignment(Pos.CENTER_RIGHT);
+
         Label timeLabel = new Label(data.formatTimeAgo());
         timeLabel.setFont(Font.font("System", 12));
         timeLabel.setStyle("-fx-text-fill: #9ca3af;");
         timeLabelUpdaters.add(() -> timeLabel.setText(data.formatTimeAgo()));
-        Button actionBtn = new Button(data.getButtonText());
+
+        Button actionBtn = new Button(defaultText(data.getButtonText(), "Xem chi tiet"));
         actionBtn.setFont(Font.font("System", FontWeight.BOLD, 14));
+        actionBtn.setStyle(getButtonStyle(data));
+        actionBtn.setOnAction(event -> handleNotificationAction(data));
 
         actionBox.getChildren().addAll(timeLabel, actionBtn);
         container.getChildren().addAll(iconBox, contentBox, actionBox);
 
-        // Styling & Logic
-        switch (data.getType()) {
-            case "WIN" -> {
-                container.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: #fde047; -fx-border-radius: 15; -fx-border-width: 2; -fx-padding: 20;");
-                iconBox.setStyle("-fx-background-color: #fef08a; -fx-background-radius: 30;");
-                iconLabel.setText("🏆");
-                actionBtn.setStyle("-fx-background-color: #facc15; -fx-text-fill: #1a1a1a; -fx-background-radius: 20; -fx-cursor: hand;");
+        return container;
+    }
 
-                actionBtn.setOnAction(event -> NavigationManager.getInstance().navigateTo("/fxml/Wallet.fxml"));
-            }
-            case "OUTBID" -> {
-                container.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: #f3f4f6; -fx-border-radius: 15; -fx-border-width: 1; -fx-padding: 20;");
-                iconBox.setStyle("-fx-background-color: #fee2e2; -fx-background-radius: 30;");
-                iconLabel.setText("⚠");
-                actionBtn.setStyle("-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;");
+    private void markAllRead() {
+        new Thread(() -> {
+            try {
+                ClientSocket socket = resolveSocket();
+                User user = resolveUser();
+                if (socket == null || user == null) {
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi", "Mat ket noi toi server."));
+                    return;
+                }
 
-                actionBtn.setOnAction(event -> showAlert(Alert.AlertType.WARNING, "Chú ý", "Đang quay lại phiên đấu giá..."));
+                Message response = notificationService.markAllRead(socket, user, NotificationScope.BIDDER);
+                Platform.runLater(() -> {
+                    if (response != null && "SUCCESS".equals(response.getStatus())) {
+                        loadNotifications();
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Loi", "Khong the danh dau da doc.");
+                    }
+                });
+            } catch (Exception e) {
+                LoggerUtil.error("Loi mark bidder notifications read: " + e.getMessage());
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi", "Khong the danh dau da doc."));
             }
-            case "SYSTEM" -> {
-                container.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: #f3f4f6; -fx-border-radius: 15; -fx-border-width: 1; -fx-padding: 20;");
-                iconBox.setStyle("-fx-background-color: #e0f2fe; -fx-background-radius: 30;");
-                iconLabel.setText("✨");
-                actionBtn.setStyle("-fx-background-color: #f3f4f6; -fx-text-fill: #4a5568; -fx-background-radius: 20; -fx-cursor: hand;");
+        }).start();
+    }
 
-                actionBtn.setOnAction(event -> { if(homeController != null) homeController.loadProfileView(); });
-            }
+    private void handleNotificationAction(Notification data) {
+        NotificationAction action = notificationService.actionFor(data, NotificationScope.BIDDER);
+        if (homeController == null) {
+            return;
         }
 
-        iconBox.getChildren().add(iconLabel);
-        return container;
+        switch (action) {
+            case WALLET -> homeController.loadWalletView();
+            case AUCTION_DETAIL -> openReferencedAuction(data.getReferenceId());
+            case AUCTION_HISTORY -> homeController.loadAuctionHistoryView();
+            case PROFILE -> homeController.loadProfileView();
+            default -> homeController.loadProfileView();
+        }
+    }
+
+    private void openReferencedAuction(String auctionId) {
+        if (auctionId == null || auctionId.isBlank()) {
+            if (homeController != null) {
+                homeController.loadAuctionHistoryView();
+            }
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                ClientSocket socket = resolveSocket();
+                if (socket == null) {
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi", "Mat ket noi toi server."));
+                    return;
+                }
+
+                Message response = notificationService.fetchAuctionDetail(socket, auctionId);
+                Platform.runLater(() -> {
+                    if (response != null && response.getData() instanceof Auction auction && homeController != null) {
+                        homeController.loadAuctionDetailView(auction);
+                    } else if (homeController != null) {
+                        homeController.loadAuctionHistoryView();
+                    }
+                });
+            } catch (Exception e) {
+                LoggerUtil.error("Loi mo phien tu notification: " + e.getMessage());
+                Platform.runLater(() -> {
+                    if (homeController != null) {
+                        homeController.loadAuctionHistoryView();
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void showLoadingState() {
+        notificationsContainer.getChildren().setAll(createStateLabel("Đang tải thông báo..."));
+    }
+
+    private void showEmptyState(String text) {
+        notificationsContainer.getChildren().setAll(createStateLabel(text));
+        timeLabelUpdaters.clear();
+    }
+
+    private Label createStateLabel(String text) {
+        Label label = new Label(text);
+        label.setTextFill(javafx.scene.paint.Color.web("#a0aec0"));
+        label.setFont(Font.font("System", 15));
+        label.setStyle("-fx-text-fill: #a0aec0;");
+        return label;
+    }
+
+    private ClientSocket resolveSocket() {
+        if (clientSocket != null) return clientSocket;
+        if (NavigationManager.getInstance().getClientSocket() != null) {
+            return NavigationManager.getInstance().getClientSocket();
+        }
+        return ConnectionManager.getInstance().getClientSocket();
+    }
+
+    private User resolveUser() {
+        if (currentUser != null) return currentUser;
+        return NavigationManager.getInstance().getCurrentUser();
     }
 
     private void startTimeRefreshTimer() {
@@ -172,23 +278,39 @@ public class NotificationsController implements Initializable {
         timeRefreshTimer.play();
     }
 
-    private void sendSocketRequest(MessageType type, Object data, String successPopup) {
-        try {
-            var socket = NavigationManager.getInstance().getClientSocket();
-            var user = NavigationManager.getInstance().getCurrentUser();
-            if (socket != null && user != null) {
-                Message msg = new Message(type, data, user.getUserId());
-                socket.sendMessage(msg);
-                showAlert(Alert.AlertType.INFORMATION, "Thành công", successPopup);
-            }
-        } catch (Exception e) {
-            LoggerUtil.error("Lỗi gửi request: " + e.getMessage());
-        }
+    private String getContainerStyle(Notification data) {
+        return notificationService.containerStyle(data);
+    }
+
+    private String getIconBoxStyle(Notification data) {
+        return presentation(data).iconBoxStyle();
+    }
+
+    private String getIcon(Notification data) {
+        return presentation(data).icon();
+    }
+
+    private String getIconColor(Notification data) {
+        return presentation(data).iconColor();
+    }
+
+    private String getTitleColor(Notification data) {
+        return presentation(data).titleColor();
+    }
+
+    private String getButtonStyle(Notification data) {
+        return presentation(data).buttonStyle();
+    }
+
+    private NotificationPresentation presentation(Notification data) {
+        return notificationService.presentation(data);
+    }
+
+    private String defaultText(String value, String fallback) {
+        return value == null || value.isBlank() ? fallback : value;
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
-        Platform.runLater(() -> {
-            client.util.DialogUtil.showAlert(type, title, null, content);
-        });
+        client.util.DialogUtil.showAlert(type, title, null, content);
     }
 }

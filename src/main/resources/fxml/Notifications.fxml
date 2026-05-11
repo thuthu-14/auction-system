@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="AS_NEEDED" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.NotificationsController">
+<ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: #fcfcfc;" hbarPolicy="NEVER" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.NotificationsController">
 
     <VBox spacing="25.0" style="-fx-background-color: #fcfcfc;">
         <padding>
@@ -14,7 +14,7 @@
 
         <HBox alignment="CENTER_LEFT">
             <children>
-                <Label text="🔔 Thông báo của bạn" textFill="#1a1a1a">
+                <Label style="-fx-text-fill: #1a1a1a;" text="Thông báo của bạn" textFill="#1a1a1a">
                     <font>
                         <Font name="System Bold" size="28.0" />
                     </font>
@@ -28,8 +28,6 @@
             </children>
         </HBox>
 
-        <VBox fx:id="notificationsContainer" spacing="15.0">
-        </VBox>
-
+        <VBox fx:id="notificationsContainer" spacing="15.0" />
     </VBox>
 </ScrollPane>

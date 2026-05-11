@@ -39,7 +39,8 @@
                     <font>
                         <Font size="14.0" />
                     </font>
-                </TextField>            </children>
+                </TextField>
+            </children>
         </VBox>
 
         <VBox spacing="8.0">

@@ -1285,5 +1285,104 @@
     "amount": 300000.0,
     "bidTime": 1778406377358,
     "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778409942581",
+    "auctionId": "AU1778403491811",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 190000.0,
+    "bidTime": 1778409942581,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778410202966",
+    "auctionId": "AU1778402863464",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 350000.0,
+    "bidTime": 1778410202966,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778410207048",
+    "auctionId": "AU1778402863464",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 400000.0,
+    "bidTime": 1778410207048,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778410209740",
+    "auctionId": "AU1778402863464",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 450000.0,
+    "bidTime": 1778410209740,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778410214755",
+    "auctionId": "AU1778402863464",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 500000.0,
+    "bidTime": 1778410214755,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778463233994",
+    "auctionId": "AU1778403491811",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 200000.0,
+    "bidTime": 1778463233997,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778485975469",
+    "auctionId": "AU1778485932110",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 110000.0,
+    "bidTime": 1778485975469,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778485977664",
+    "auctionId": "AU1778485932110",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 120000.0,
+    "bidTime": 1778485977664,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778485980359",
+    "auctionId": "AU1778485932110",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 130000.0,
+    "bidTime": 1778485980359,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778485982360",
+    "auctionId": "AU1778485932110",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 140000.0,
+    "bidTime": 1778485982360,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778485988272",
+    "auctionId": "AU1778485932110",
+    "bidderId": "U1778403578742",
+    "bidderName": "thunguyen",
+    "amount": 160000.0,
+    "bidTime": 1778485988272,
+    "status": "ACTIVE"
   }
 ]

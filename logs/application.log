@@ -214824,3 +214824,195 @@
 [1778408108405] INFO: Local bid history loaded for AU1778403491811: 10 bids
 [1778408108748] INFO: Local bid history loaded for AU1778403491811: 10 bids
 [1778408109092] INFO: Local bid history loaded for AU1778403491811: 10 bids
+[1778506301501] INFO: ╔════════════════════════════════════════╗
+[1778506301511] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1778506301512] INFO: ║   Online Bidding Platform              ║
+[1778506301512] INFO: ╚════════════════════════════════════════╝
+[1778506301516] INFO: AuctionServer initialized
+[1778506301517] INFO: Starting Auction Server...
+[1778506301517] INFO: Initializing JSON data files...
+[1778506301556] INFO: All JSON data files initialized successfully
+[1778506301557] INFO: 📊 Initializing default data (JSON only)...
+[1778506301583] INFO: ℹ Admin account already exists
+[1778506301584] INFO: ✓ Default data initialized successfully
+[1778506301587] INFO: Scheduler started
+[1778507712994] INFO: ╔════════════════════════════════════════╗
+[1778507713008] INFO: ║   AUCTION SYSTEM SERVER v1.0           ║
+[1778507713008] INFO: ║   Online Bidding Platform              ║
+[1778507713009] INFO: ╚════════════════════════════════════════╝
+[1778507713012] INFO: AuctionServer initialized
+[1778507713014] INFO: Starting Auction Server...
+[1778507713015] INFO: Initializing JSON data files...
+[1778507713063] INFO: All JSON data files initialized successfully
+[1778507713064] INFO: 📊 Initializing default data (JSON only)...
+[1778507713094] INFO: ℹ Admin account already exists
+[1778507713095] INFO: ✓ Default data initialized successfully
+[1778507713098] INFO: Scheduler started
+[1778507725245] INFO: ����������������������������������������ͻ
+[1778507725259] INFO: �   AUCTION SYSTEM CLIENT v1.0           �
+[1778507725260] INFO: �   Online Bidding Platform              �
+[1778507725260] INFO: ����������������������������������������ͼ
+[1778507725598] INFO: ?��?�?? LoginController initialized
+[1778507725951] INFO: ? Login screen displayed
+[1778507737616] INFO: ? Connecting to server: localhost:5000
+[1778507737645] INFO: ? ClientSocket initialized
+[1778507737645] INFO: ClientHandler created for 127.0.0.1:53958
+[1778507737646] INFO: ? Connected to server successfully
+[1778507737647] INFO: Client connected: 127.0.0.1 - Active clients: 1
+[1778507737654] DEBUG: ? Message sent: LOGIN
+[1778507737658] DEBUG: Received message: LOGIN from 127.0.0.1:53958
+[1778507737677] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507737680] INFO: User logged in: buingoc (Role: SELLER)
+[1778507737681] DEBUG: ? Message received: SUCCESS
+[1778507737683] INFO: Login thanh cong cho user: buingoc
+[1778507737714] INFO: ? Saved to JSON: data/json/current_seller_id.json
+[1778507737785] INFO: SellerHomeController ?? nh?n data cho user: buingoc
+[1778507740998] INFO: ?ang chuy?n v? m�n h�nh Bidder (Home)
+[1778507741174] DEBUG: ? Message sent: GET_ALL_AUCTIONS
+[1778507741175] DEBUG: Received message: GET_ALL_AUCTIONS from 127.0.0.1:53958
+[1778507741206] DEBUG: ? Message received: SUCCESS
+[1778507741206] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507746815] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507746815] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507746842] DEBUG: ? Message received: SUCCESS
+[1778507746842] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507746847] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507747323] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507747323] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507747337] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507747337] DEBUG: ? Message received: SUCCESS
+[1778507747340] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507747816] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507747817] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507747828] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507747828] DEBUG: ? Message received: SUCCESS
+[1778507747832] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507748330] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507748332] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507748341] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507748342] DEBUG: ? Message received: SUCCESS
+[1778507748344] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507748827] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507748827] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507748844] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507748844] DEBUG: ? Message received: SUCCESS
+[1778507748848] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507749321] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507749321] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507749326] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507749327] DEBUG: ? Message received: SUCCESS
+[1778507749329] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507749818] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507749822] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507749830] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507749830] DEBUG: ? Message received: SUCCESS
+[1778507749833] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507750330] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507750330] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507750335] DEBUG: ? Message received: SUCCESS
+[1778507750334] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507750338] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507750823] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507750823] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507750830] DEBUG: ? Message received: SUCCESS
+[1778507750831] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507750832] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507751324] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507751322] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507751330] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507751331] DEBUG: ? Message received: SUCCESS
+[1778507751334] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507751817] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507751817] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507751821] DEBUG: ? Message received: SUCCESS
+[1778507751821] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507751823] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507752331] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507752331] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507752339] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507752339] DEBUG: ? Message received: SUCCESS
+[1778507752342] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507752826] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507752827] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507752834] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507752835] DEBUG: ? Message received: SUCCESS
+[1778507752838] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507753322] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507753322] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507753326] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507753326] DEBUG: ? Message received: SUCCESS
+[1778507753328] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507753821] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507753821] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507753829] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507753829] DEBUG: ? Message received: SUCCESS
+[1778507753832] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507754330] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507754333] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507754342] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507754343] DEBUG: ? Message received: SUCCESS
+[1778507754346] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507754827] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507754828] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507754834] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507754836] DEBUG: ? Message received: SUCCESS
+[1778507754839] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507755325] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507755327] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507755341] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507755342] DEBUG: ? Message received: SUCCESS
+[1778507755348] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507755819] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507755820] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507755825] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507755825] DEBUG: ? Message received: SUCCESS
+[1778507755827] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507756330] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507756334] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507756340] DEBUG: ? Message received: SUCCESS
+[1778507756342] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507756340] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507756825] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507756826] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507756829] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507756829] DEBUG: ? Message received: SUCCESS
+[1778507756830] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507757321] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507757324] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507757328] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507757329] DEBUG: ? Message received: SUCCESS
+[1778507757331] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507757817] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507757817] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507757820] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507757822] DEBUG: ? Message received: SUCCESS
+[1778507757822] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507758329] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507758329] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507758339] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507758339] DEBUG: ? Message received: SUCCESS
+[1778507758374] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507758826] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507758827] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507758832] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507758832] DEBUG: ? Message received: SUCCESS
+[1778507758834] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507759323] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507759323] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507759328] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507759329] DEBUG: ? Message received: SUCCESS
+[1778507759330] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507759819] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507759819] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507759825] DEBUG: ? Message received: SUCCESS
+[1778507759824] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507759827] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507760331] DEBUG: ? Message sent: GET_BID_HISTORY
+[1778507760332] DEBUG: Received message: GET_BID_HISTORY from 127.0.0.1:53958
+[1778507760339] DEBUG: Sent message: SUCCESS to 127.0.0.1:53958
+[1778507760340] DEBUG: ? Message received: SUCCESS
+[1778507760342] INFO: Bid history loaded for AU1778485932110: 5 bids
+[1778507760568] INFO: ? Application closed
+[1778507760930] ERROR: ClientHandler IO error (127.0.0.1:53958): Connection reset
+[1778507760933] INFO: Client removed - Active clients: 0
+[1778507760934] INFO: Connection closed for user: buingoc

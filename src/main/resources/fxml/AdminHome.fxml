@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane fx:id="rootPane" minHeight="600.0" minWidth="900.0" prefHeight="900.0" prefWidth="1440.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AdminHomeController">
+<StackPane fx:id="rootPane" minHeight="600.0" minWidth="900.0" prefHeight="900.0" prefWidth="1440.0" stylesheets="@/CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AdminHomeController">
     <children>
         <HBox style="-fx-background-color: #ffffff;">
             <children>
@@ -40,7 +40,7 @@
                             </VBox.margin>
                         </Label>
 
-                        <HBox fx:id="menuRecent" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadUserManagementView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuRecent" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadUserManagementView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
                                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" text="👥  Quản lý User" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
@@ -53,7 +53,7 @@
                             </children>
                         </HBox>
 
-                        <HBox fx:id="menuMsg" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadAuctionManagementView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuMsg" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadAuctionManagementView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
                                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" style="-fx-background-color: transparent;" text="⚖  Quản lý Phiên đấu" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
@@ -68,7 +68,7 @@
 
                         <Region VBox.vgrow="ALWAYS" />
 
-                        <HBox fx:id="menuUpgrade" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadLogOutView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuUpgrade" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#loadLogOutView" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
                                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#loadLogOutView" style="-fx-background-color: transparent;" text="🚪  Đăng xuất" textFill="#e53e3e" HBox.hgrow="ALWAYS">
                                     <font>

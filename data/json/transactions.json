@@ -97,5 +97,95 @@
     "balanceAfter": 9198886.0,
     "description": "Nạp tiền vào ví",
     "timestamp": 1778255678206
+  },
+  {
+    "id": "TXN_1778464407165",
+    "userId": "U1778403578742",
+    "type": "DEPOSIT",
+    "amount": 9000000.0,
+    "balanceAfter": 9000000.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778464407166
+  },
+  {
+    "id": "TXN_1778464555405",
+    "userId": "U1778403578742",
+    "type": "DEPOSIT",
+    "amount": 90000.0,
+    "balanceAfter": 9090000.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778464555405
+  },
+  {
+    "id": "TXN_1778464559096",
+    "userId": "U1778403578742",
+    "type": "DEPOSIT",
+    "amount": 90000.0,
+    "balanceAfter": 9180000.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778464559096
+  },
+  {
+    "id": "TXN_1778465450944",
+    "userId": "U1778403578742",
+    "type": "DEPOSIT",
+    "amount": 9000000.0,
+    "balanceAfter": 1.818E7,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778465450945
+  },
+  {
+    "id": "TXN_1778465458998",
+    "userId": "U1778403578742",
+    "type": "WITHDRAW",
+    "amount": 90000.0,
+    "balanceAfter": 1.809E7,
+    "description": "Rút tiền về ngân hàng",
+    "timestamp": 1778465458998
+  },
+  {
+    "id": "TXN_1778465676292",
+    "userId": "U1778403578742",
+    "type": "DEPOSIT",
+    "amount": 90000.0,
+    "balanceAfter": 1.818E7,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778465676292
+  },
+  {
+    "id": "TXN_1778465682251",
+    "userId": "U1778403578742",
+    "type": "WITHDRAW",
+    "amount": 90000.0,
+    "balanceAfter": 1.809E7,
+    "description": "Rút tiền về ngân hàng",
+    "timestamp": 1778465682251
+  },
+  {
+    "id": "TXN_1778465704504",
+    "userId": "U1778403578742",
+    "type": "WITHDRAW",
+    "amount": 100000.0,
+    "balanceAfter": 1.799E7,
+    "description": "Rút tiền về ngân hàng",
+    "timestamp": 1778465704504
+  },
+  {
+    "id": "TXN_1778465715677",
+    "userId": "U1778403578742",
+    "type": "DEPOSIT",
+    "amount": 29999.0,
+    "balanceAfter": 1.8019999E7,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778465715677
+  },
+  {
+    "id": "TXN_1778486011212",
+    "userId": "U1778403578742",
+    "type": "DEPOSIT",
+    "amount": 9000000.0,
+    "balanceAfter": 2.7019999E7,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778486011212
   }
 ]

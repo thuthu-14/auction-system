@@ -1,118 +1,279 @@
 package client.controller;
 
 import client.network.ClientSocket;
-import client.network.ConnectionManager;
+import client.service.NotificationClientService;
+import client.service.NotificationClientService.NotificationAction;
+import client.service.NotificationClientService.NotificationPresentation;
+import client.service.NotificationClientService.NotificationScope;
 import common.Message;
-import common.MessageType;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
 import navigation.NavigationManager;
+import server.model.Notification;
 import server.model.User;
 import util.LoggerUtil;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class SellerNotificationsController implements Initializable {
 
-    @FXML private Button markAllReadBtn;
-    @FXML private Button shipOrderBtn;
-    @FXML private Button viewAuctionBtn;
-    @FXML private Button relistBtn;
+    private final NotificationClientService notificationService = new NotificationClientService();
 
-    // TODO: Khi thiết kế xong FXML, bạn nên có một VBox hoặc ListView để hiển thị danh sách Thông báo
-    // @FXML private ListView<Notification> notificationListView;
+    @FXML private Button markAllReadBtn;
+    @FXML private VBox notificationsContainer;
+
+    private User currentUser;
+    private ClientSocket clientSocket;
+    private SellerHomeController sellerHomeController;
+    private Timeline timeRefreshTimer;
+    private final List<Runnable> timeLabelUpdaters = new ArrayList<>();
+
+    public void setUserData(User user, ClientSocket socket) {
+        this.currentUser = user;
+        this.clientSocket = socket;
+        loadNotifications();
+    }
+
+    public void setSellerHomeController(SellerHomeController sellerHomeController) {
+        this.sellerHomeController = sellerHomeController;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if (markAllReadBtn != null) markAllReadBtn.setOnAction(event -> handleMarkAllRead());
-        if (shipOrderBtn != null) shipOrderBtn.setOnAction(event -> handleShipOrder());
-        if (viewAuctionBtn != null) viewAuctionBtn.setOnAction(event -> handleViewAuction());
-        if (relistBtn != null) relistBtn.setOnAction(event -> handleRelist());
+        if (markAllReadBtn != null) {
+            markAllReadBtn.setOnAction(event -> markAllRead());
+        }
 
-        // Gọi Server lấy thông báo khi vừa load xong UI
-        loadNotificationsFromServer();
+        startTimeRefreshTimer();
     }
 
-    private void loadNotificationsFromServer() {
-        User currentUser = NavigationManager.getInstance().getCurrentUser();
-        ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
+    public void loadNotifications() {
+        if (notificationsContainer == null) return;
 
-        if (currentUser == null || socket == null) return;
+        showLoadingState();
 
         new Thread(() -> {
             try {
-                // Yêu cầu Server trả về danh sách thông báo
-                Message request = new Message(MessageType.GET_NOTIFICATIONS, null, currentUser.getUsername());
-                Message response = socket.sendAndReceive(request);
+                ClientSocket socket = resolveSocket();
+                User user = resolveUser();
+
+                if (socket == null || user == null) {
+                    Platform.runLater(() -> showEmptyState("KhÃ´ng cÃ³ dá»¯ liá»‡u ngÆ°á»i dÃ¹ng hoáº·c káº¿t ná»‘i server."));
+                    return;
+                }
+
+                Message response = notificationService.fetchNotifications(socket, user);
 
                 Platform.runLater(() -> {
-                    if (response != null && "SUCCESS".equals(response.getStatus())) {
-                        LoggerUtil.info("Tải danh sách thông báo thành công!");
-
-                        // TODO: Sau này bạn lấy data từ response.getData() và nhét vào ListView ở đây
-                        // List<Notification> list = (List<Notification>) response.getData();
-                        // notificationListView.getItems().addAll(list);
+                    if (response != null && response.getData() instanceof List<?> rawList) {
+                        renderNotifications(rawList);
                     } else {
-                        LoggerUtil.error("Không thể tải thông báo: " + (response != null ? response.getMessage() : ""));
+                        showEmptyState("ChÆ°a cÃ³ thÃ´ng bÃ¡o nÃ o.");
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi kết nối mạng khi tải thông báo: " + e.getMessage());
+                LoggerUtil.error("Lá»—i load seller notifications: " + e.getMessage());
+                Platform.runLater(() -> showEmptyState("KhÃ´ng táº£i Ä‘Æ°á»£c thÃ´ng bÃ¡o."));
             }
         }).start();
     }
 
-    private void handleMarkAllRead() {
-        User currentUser = NavigationManager.getInstance().getCurrentUser();
-        ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
+    private void renderNotifications(List<?> rawList) {
+        notificationsContainer.getChildren().clear();
+        timeLabelUpdaters.clear();
 
-        if (currentUser == null || socket == null) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Mất kết nối tới Server!");
+        for (Object item : rawList) {
+            if (item instanceof Notification notification && notificationService.isVisible(notification, NotificationScope.SELLER)) {
+                notificationsContainer.getChildren().add(createNotificationRow(notification));
+            }
+        }
+
+        if (notificationsContainer.getChildren().isEmpty()) {
+            showEmptyState("ChÆ°a cÃ³ thÃ´ng bÃ¡o nÃ o.");
+        }
+    }
+
+    private HBox createNotificationRow(Notification data) {
+        HBox container = new HBox(20);
+        container.setAlignment(Pos.CENTER_LEFT);
+        container.setStyle(getContainerStyle(data));
+
+        VBox iconBox = new VBox();
+        iconBox.setAlignment(Pos.CENTER);
+        iconBox.setPrefSize(60, 60);
+        iconBox.setMinSize(60, 60);
+        iconBox.setStyle(getIconBoxStyle(data));
+
+        Label iconLabel = new Label(getIcon(data));
+        iconLabel.setFont(Font.font(28));
+        iconLabel.setStyle("-fx-text-fill: " + getIconColor(data) + ";");
+        iconBox.getChildren().add(iconLabel);
+
+        VBox contentBox = new VBox(5);
+        HBox.setHgrow(contentBox, Priority.ALWAYS);
+
+        Label titleLabel = new Label(defaultText(data.getTitle(), "ThÃ´ng bÃ¡o"));
+        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        titleLabel.setStyle("-fx-text-fill: " + getTitleColor(data) + ";");
+
+        Label descLabel = new Label(defaultText(data.getDescription(), ""));
+        descLabel.setFont(Font.font("System", 14));
+        descLabel.setWrapText(true);
+        descLabel.setStyle("-fx-text-fill: #4a5568;");
+
+        contentBox.getChildren().addAll(titleLabel, descLabel);
+
+        VBox actionBox = new VBox(10);
+        actionBox.setAlignment(Pos.CENTER_RIGHT);
+
+        Label timeLabel = new Label(data.formatTimeAgo());
+        timeLabel.setFont(Font.font("System", 12));
+        timeLabel.setStyle("-fx-text-fill: #9ca3af;");
+        timeLabelUpdaters.add(() -> timeLabel.setText(data.formatTimeAgo()));
+
+        Button actionBtn = new Button(defaultText(data.getButtonText(), "Xem chi tiáº¿t"));
+        actionBtn.setFont(Font.font("System", FontWeight.BOLD, 14));
+        actionBtn.setStyle(getButtonStyle(data));
+        actionBtn.setOnAction(event -> handleNotificationAction(data));
+
+        actionBox.getChildren().addAll(timeLabel, actionBtn);
+        container.getChildren().addAll(iconBox, contentBox, actionBox);
+
+        return container;
+    }
+
+    private void markAllRead() {
+        new Thread(() -> {
+            try {
+                ClientSocket socket = resolveSocket();
+                User user = resolveUser();
+                if (socket == null || user == null) {
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lá»—i", "Máº¥t káº¿t ná»‘i tá»›i server."));
+                    return;
+                }
+
+                Message response = notificationService.markAllRead(socket, user, NotificationScope.SELLER);
+                Platform.runLater(() -> {
+                    if (response != null && "SUCCESS".equals(response.getStatus())) {
+                        loadNotifications();
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Lá»—i", "KhÃ´ng thá»ƒ Ä‘Ã¡nh dáº¥u Ä‘Ã£ Ä‘á»c.");
+                    }
+                });
+            } catch (Exception e) {
+                LoggerUtil.error("Lá»—i mark seller notifications read: " + e.getMessage());
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lá»—i", "KhÃ´ng thá»ƒ Ä‘Ã¡nh dáº¥u Ä‘Ã£ Ä‘á»c."));
+            }
+        }).start();
+    }
+
+    private void handleNotificationAction(Notification data) {
+        if (sellerHomeController == null) {
             return;
         }
 
-        new Thread(() -> {
-            try {
-                // Gửi lệnh đánh dấu đã đọc lên Server
-                Message request = new Message(MessageType.MARK_NOTIFICATIONS_READ, null, currentUser.getUsername());
-                Message response = socket.sendAndReceive(request);
+        NotificationAction action = notificationService.actionFor(data, NotificationScope.SELLER);
+        switch (action) {
+            case SELLER_MANAGE_AUCTIONS -> sellerHomeController.loadManageAuctionsView();
+            case WALLET -> sellerHomeController.loadWalletView();
+            case SELLER_DASHBOARD -> sellerHomeController.loadSellerDashboardView();
+            default -> sellerHomeController.loadSellerDashboardView();
+        }
+    }
 
-                Platform.runLater(() -> {
-                    if (response != null && "SUCCESS".equals(response.getStatus())) {
-                        LoggerUtil.info("Đã đánh dấu đọc tất cả thông báo trên Server.");
-                        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Toàn bộ thông báo đã được đánh dấu là đã đọc!");
-                        // Load lại list nếu cần thiết
-                        // loadNotificationsFromServer();
-                    } else {
-                        showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể cập nhật trạng thái thông báo.");
-                    }
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Vui lòng thử lại sau."));
-                LoggerUtil.error("Lỗi khi gửi lệnh mark-read: " + e.getMessage());
+    private void showLoadingState() {
+        notificationsContainer.getChildren().setAll(createStateLabel("Äang táº£i thÃ´ng bÃ¡o..."));
+    }
+
+    private void showEmptyState(String text) {
+        notificationsContainer.getChildren().setAll(createStateLabel(text));
+        timeLabelUpdaters.clear();
+    }
+
+    private Label createStateLabel(String text) {
+        Label label = new Label(text);
+        label.setTextFill(javafx.scene.paint.Color.web("#a0aec0"));
+        label.setFont(Font.font("System", 15));
+        label.setStyle("-fx-text-fill: #a0aec0;");
+        return label;
+    }
+
+    private ClientSocket resolveSocket() {
+        if (clientSocket != null) return clientSocket;
+        if (NavigationManager.getInstance().getClientSocket() != null) {
+            return NavigationManager.getInstance().getClientSocket();
+        }
+        return client.network.ConnectionManager.getInstance().getClientSocket();
+    }
+
+    private User resolveUser() {
+        if (currentUser != null) return currentUser;
+        return NavigationManager.getInstance().getCurrentUser();
+    }
+
+    private void startTimeRefreshTimer() {
+        if (timeRefreshTimer != null) {
+            timeRefreshTimer.stop();
+        }
+
+        timeRefreshTimer = new Timeline(new KeyFrame(Duration.seconds(30), event -> {
+            for (Runnable updater : timeLabelUpdaters) {
+                updater.run();
             }
-        }).start();
+        }));
+        timeRefreshTimer.setCycleCount(Timeline.INDEFINITE);
+        timeRefreshTimer.play();
     }
 
-    private void handleShipOrder() {
-        LoggerUtil.info("Đang mở màn hình quản lý giao hàng...");
-        // TODO: Gọi NavigationManager để chuyển qua form giao hàng
+    private String getContainerStyle(Notification data) {
+        return notificationService.containerStyle(data);
     }
 
-    private void handleViewAuction() {
-        LoggerUtil.info("Đang mở trang chi tiết phiên đấu giá...");
-        // TODO: Chuyển sang form chi tiết, hoặc mở dialog như bên SellerManagementController
+    private String getIconBoxStyle(Notification data) {
+        return presentation(data).iconBoxStyle();
     }
 
-    private void handleRelist() {
-        LoggerUtil.info("Đang chuyển sang form đăng lại sản phẩm...");
+    private String getIcon(Notification data) {
+        return presentation(data).icon();
+    }
+
+    private String getIconColor(Notification data) {
+        return presentation(data).iconColor();
+    }
+
+    private String getTitleColor(Notification data) {
+        return presentation(data).titleColor();
+    }
+
+    private String getButtonStyle(Notification data) {
+        return presentation(data).buttonStyle();
+    }
+
+    private NotificationPresentation presentation(Notification data) {
+        return notificationService.presentation(data);
+    }
+    private String defaultText(String value, String fallback) {
+        return value == null || value.isBlank() ? fallback : value;
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
         client.util.DialogUtil.showAlert(type, title, null, content);
     }
 }
+

@@ -2,6 +2,8 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.util.ResponsiveSceneUtil;
+import client.util.StageUtil;
 import navigation.NavigationManager;
 import server.model.RegularUser;
 import server.model.User;
@@ -23,6 +25,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import util.LoggerUtil;
 
 import java.io.IOException;
@@ -141,18 +144,22 @@ public class HomeScreenController {
     private void updateMenuSelection(HBox selectedMenu) {
         for (HBox menu : allMenus) {
             if (menu == null || menu.getChildren().isEmpty()) continue;
+            menu.getStyleClass().remove("menu-item-active");
 
             try {
                 Button btn = (Button) menu.getChildren().get(0);
                 if (menu == selectedMenu) {
-                    menu.setStyle("-fx-background-color: #edf2f7; -fx-background-radius: 8; -fx-cursor: hand;");
-                    btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #2b6cb0;");
+                    if (!menu.getStyleClass().contains("menu-item-active")) {
+                        menu.getStyleClass().add("menu-item-active");
+                    }
+                    menu.setStyle("-fx-background-radius: 8; -fx-cursor: hand;");
+                    btn.setStyle("-fx-background-color: transparent;");
                 } else {
-                    menu.setStyle("-fx-background-color: transparent; -fx-background-radius: 8; -fx-cursor: hand;");
+                    menu.setStyle("-fx-background-radius: 8; -fx-cursor: hand;");
                     if (menu == menuUpgrade || menu == menuSettings) {
-                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e53e3e;");
+                        btn.setStyle("-fx-background-color: transparent;");
                     } else {
-                        btn.setStyle("-fx-background-color: transparent; -fx-text-fill: #4a5568;");
+                        btn.setStyle("-fx-background-color: transparent;");
                     }
                 }
             } catch (ClassCastException e) {
@@ -186,8 +193,9 @@ public class HomeScreenController {
     public void loadNotificationsView() {
         updateMenuSelection(menuMsg);
         loadView("/fxml/Notifications.fxml", controller -> {
-            if (controller instanceof NotificationsController) {
-                ((NotificationsController) controller).setHomeController(this);
+            if (controller instanceof NotificationsController notificationsController) {
+                notificationsController.setHomeController(this);
+                notificationsController.setUserData(currentUser, clientSocket);
             }
         });
     }
@@ -330,6 +338,22 @@ public class HomeScreenController {
     private void handleLogout() {
         if (onLogout != null) {
             onLogout.run();
+            return;
+        }
+
+        try {
+            NavigationManager.getInstance().setCurrentUser(null);
+            NavigationManager.getInstance().setClientSocket(null);
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) rootPane.getScene().getWindow();
+            stage.setScene(ResponsiveSceneUtil.createScaledScene(root));
+            StageUtil.showMaximized(stage);
+        } catch (Exception e) {
+            LoggerUtil.error("Loi khi dang xuat tu Home: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

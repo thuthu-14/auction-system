@@ -2,128 +2,443 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
-import common.Message;
-import common.MessageType;
+import client.service.SellerClientService;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.chart.Axis;
+import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.paint.Color;
 import navigation.NavigationManager;
 import server.model.Auction;
 import server.model.User;
 import util.LoggerUtil;
 
 import java.net.URL;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.TreeMap;
 
 public class SellerStatisticsController implements Initializable {
 
-    // Khai báo các thành phần UI từ file FXML
+    private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
+
     @FXML private Label totalRevenueLabel;
     @FXML private Label avgBidLabel;
     @FXML private Label successRateLabel;
     @FXML private LineChart<String, Number> revenueChart;
 
+    private User currentUser;
+    private ClientSocket clientSocket;
+    private boolean statisticsLoaded;
+    private final SellerClientService sellerClientService = new SellerClientService();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Khởi tạo biểu đồ trống
-        revenueChart.getData().clear();
-        revenueChart.setAnimated(false); // Tắt animation mặc định để tránh giật khi load data
+        setupChart();
+        showEmptyStatistics();
+        Platform.runLater(this::applyReadableStyles);
 
-        // Gọi dữ liệu thật từ Server
+        User navigationUser = NavigationManager.getInstance().getCurrentUser();
+        ClientSocket navigationSocket = getActiveSocket();
+        if (navigationUser != null && navigationSocket != null) {
+            setUserData(navigationUser, navigationSocket);
+        }
+    }
+
+    public void setUserData(User user, ClientSocket socket) {
+        currentUser = user;
+        clientSocket = socket;
+
+        if (user != null) {
+            NavigationManager.getInstance().setCurrentUser(user);
+        }
+        if (socket != null) {
+            NavigationManager.getInstance().setClientSocket(socket);
+        }
+
+        if (statisticsLoaded) {
+            return;
+        }
+        statisticsLoaded = true;
         loadStatisticsFromServer();
     }
 
-    private void loadStatisticsFromServer() {
-        User currentUser = NavigationManager.getInstance().getCurrentUser();
-        ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
-
-        if (currentUser == null || socket == null) {
-            LoggerUtil.error("Chưa đăng nhập hoặc mất kết nối Server!");
+    private void setupChart() {
+        if (revenueChart == null) {
             return;
         }
 
-        // Tạo luồng riêng để giao tiếp mạng, tránh đơ UI
+        revenueChart.setAnimated(false);
+        revenueChart.setLegendVisible(false);
+        revenueChart.setCreateSymbols(true);
+        revenueChart.setHorizontalGridLinesVisible(true);
+        revenueChart.setVerticalGridLinesVisible(false);
+        revenueChart.setAlternativeColumnFillVisible(false);
+        revenueChart.setAlternativeRowFillVisible(false);
+        revenueChart.setMinHeight(350);
+        revenueChart.setPrefHeight(350);
+        revenueChart.getData().clear();
+        configureChartAxesVisible();
+        showEmptyRevenueChart();
+    }
+
+    private void loadStatisticsFromServer() {
+        User user = currentUser != null ? currentUser : NavigationManager.getInstance().getCurrentUser();
+        ClientSocket socket = getActiveSocket();
+
+        if (user == null || socket == null || !socket.isConnected()) {
+            LoggerUtil.warn("Seller statistics: missing user or socket");
+            Platform.runLater(this::showEmptyStatistics);
+            statisticsLoaded = false;
+            return;
+        }
+
         new Thread(() -> {
             try {
-                // Tận dụng lệnh GET_SELLER_AUCTIONS đã có sẵn trên Server
-                Message request = new Message(MessageType.GET_SELLER_AUCTIONS, null, currentUser.getUsername());
-                Message response = socket.sendAndReceive(request);
-
-                if (response != null && "SUCCESS".equals(response.getStatus())) {
-                    @SuppressWarnings("unchecked")
-                    List<Auction> auctions = (List<Auction>) response.getData();
-
-                    // Xử lý tính toán số liệu và cập nhật giao diện
-                    Platform.runLater(() -> processAndDisplayStatistics(auctions));
-                } else {
-                    LoggerUtil.error("Lỗi lấy dữ liệu thống kê: " + (response != null ? response.getMessage() : ""));
-                }
+                List<Auction> auctions = sellerClientService.fetchSellerAuctions(socket, user);
+                Platform.runLater(() -> processAndDisplayStatistics(auctions));
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi giao tiếp mạng khi lấy thống kê: " + e.getMessage());
+                LoggerUtil.error("Seller statistics load failed: " + e.getMessage());
+                Platform.runLater(this::showEmptyStatistics);
             }
-        }).start();
+        }, "SellerStatisticsLoadThread").start();
+    }
+
+    private ClientSocket getActiveSocket() {
+        if (clientSocket != null && clientSocket.isConnected()) {
+            return clientSocket;
+        }
+
+        ClientSocket navigationSocket = NavigationManager.getInstance().getClientSocket();
+        if (navigationSocket != null && navigationSocket.isConnected()) {
+            clientSocket = navigationSocket;
+            return navigationSocket;
+        }
+
+        ClientSocket managerSocket = ConnectionManager.getInstance().getClientSocket();
+        if (managerSocket != null && managerSocket.isConnected()) {
+            clientSocket = managerSocket;
+            return managerSocket;
+        }
+
+        return null;
     }
 
     private void processAndDisplayStatistics(List<Auction> auctions) {
+        List<Auction> safeAuctions = auctions != null ? auctions : List.of();
+
         double totalRevenue = 0;
         int totalBids = 0;
         int endedAuctions = 0;
-        int successfulAuctions = 0; // Số phiên đấu giá kết thúc có người mua
-
-        // Dùng TreeMap để tự động sắp xếp các tháng tăng dần
+        int successfulAuctions = 0;
         Map<String, Double> revenueByMonth = new TreeMap<>();
         SimpleDateFormat monthFormat = new SimpleDateFormat("MM/yyyy");
 
-        for (Auction auc : auctions) {
-            int bidsCount = (auc.getBidIds() != null) ? auc.getBidIds().size() : 0;
-            totalBids += bidsCount;
+        for (Auction auction : safeAuctions) {
+            if (auction == null) {
+                continue;
+            }
 
-            // Kiểm tra xem phiên đấu giá đã kết thúc chưa
-            if (auc.getTimeRemainingSeconds() <= 0) {
+            int bidCount = auction.getBidIds() != null ? auction.getBidIds().size() : 0;
+            totalBids += bidCount;
+
+            if (auction.getTimeRemainingSeconds() <= 0) {
                 endedAuctions++;
-
-                // Nếu có người đặt giá -> Đấu giá thành công
-                if (bidsCount > 0) {
+                if (bidCount > 0) {
                     successfulAuctions++;
-                    totalRevenue += auc.getCurrentPrice();
+                    totalRevenue += auction.getCurrentPrice();
 
-                    // Cộng dồn doanh thu theo tháng
-                    String monthKey = monthFormat.format(new Date(auc.getEndTime()));
-                    revenueByMonth.put(monthKey, revenueByMonth.getOrDefault(monthKey, 0.0) + auc.getCurrentPrice());
+                    String monthKey = monthFormat.format(new Date(auction.getEndTime()));
+                    revenueByMonth.merge(monthKey, auction.getCurrentPrice(), Double::sum);
                 }
             }
         }
 
-        // 1. Cập nhật các Label số liệu tổng quan
-        totalRevenueLabel.setText(String.format("%,.0f đ", totalRevenue).replace(",", "."));
+        setLabel(totalRevenueLabel, formatVnd(totalRevenue));
 
-        double avgBid = auctions.isEmpty() ? 0 : (double) totalBids / auctions.size();
-        avgBidLabel.setText(String.format("%.1f", avgBid));
+        double averageBid = safeAuctions.isEmpty() ? 0 : (double) totalBids / safeAuctions.size();
+        setLabel(avgBidLabel, String.format(Locale.US, "%.1f", averageBid));
 
-        double successRate = endedAuctions == 0 ? 0 : ((double) successfulAuctions / endedAuctions) * 100;
-        successRateLabel.setText(String.format("%.1f %%", successRate));
+        double successRate = endedAuctions == 0 ? 0 : successfulAuctions * 100.0 / endedAuctions;
+        setLabel(successRateLabel, String.format(Locale.US, "%.1f%%", successRate));
 
-        // 2. Cập nhật Biểu đồ doanh thu
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Doanh thu thực tế");
+        updateRevenueChart(revenueByMonth);
+        applyReadableStyles();
+        LoggerUtil.info("Seller statistics loaded: " + safeAuctions.size() + " auctions");
+    }
 
-        if (revenueByMonth.isEmpty()) {
-            // Nếu chưa có doanh thu, hiển thị 1 mốc 0 đồng cho khỏi trống
-            series.getData().add(new XYChart.Data<>("Chưa có", 0));
-        } else {
-            // Nạp dữ liệu từng tháng vào biểu đồ
-            for (Map.Entry<String, Double> entry : revenueByMonth.entrySet()) {
-                series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
-            }
+    private void updateRevenueChart(Map<String, Double> revenueByMonth) {
+        if (revenueChart == null) {
+            return;
         }
 
-        revenueChart.getData().clear();
-        revenueChart.getData().add(series);
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        if (revenueByMonth == null || revenueByMonth.isEmpty()) {
+            showEmptyRevenueChart();
+            return;
+        }
 
-        LoggerUtil.info("Đã tải xong dữ liệu Thống kê cho Seller.");
+        for (Map.Entry<String, Double> entry : revenueByMonth.entrySet()) {
+            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        }
+
+        configureDataYAxis(revenueByMonth);
+        revenueChart.getData().setAll(series);
+        Platform.runLater(() -> styleChartNodes(false));
+    }
+
+    private void showEmptyRevenueChart() {
+        configureEmptyAxes();
+
+        XYChart.Series<String, Number> emptySeries = new XYChart.Series<>();
+        emptySeries.getData().add(new XYChart.Data<>(" ", 0));
+        emptySeries.getData().add(new XYChart.Data<>("  ", 0));
+
+        revenueChart.getData().setAll(emptySeries);
+        Platform.runLater(() -> styleChartNodes(true));
+    }
+
+    private void configureEmptyAxes() {
+        Axis<String> xAxis = revenueChart == null ? null : revenueChart.getXAxis();
+        if (xAxis instanceof CategoryAxis categoryAxis) {
+            categoryAxis.setAutoRanging(false);
+            categoryAxis.setCategories(FXCollections.observableArrayList(" ", "  "));
+            categoryAxis.setTickLabelsVisible(true);
+            categoryAxis.setTickMarkVisible(true);
+        }
+
+        Axis<Number> yAxis = revenueChart == null ? null : revenueChart.getYAxis();
+        if (yAxis instanceof NumberAxis numberAxis) {
+            numberAxis.setAutoRanging(false);
+            numberAxis.setLowerBound(0);
+            numberAxis.setUpperBound(110);
+            numberAxis.setTickUnit(10);
+            numberAxis.setMinorTickCount(4);
+        }
+        configureChartAxesVisible();
+    }
+
+    private void configureDataYAxis(Map<String, Double> revenueByMonth) {
+        Axis<String> xAxis = revenueChart == null ? null : revenueChart.getXAxis();
+        if (xAxis instanceof CategoryAxis categoryAxis) {
+            categoryAxis.setAutoRanging(true);
+            categoryAxis.setTickLabelsVisible(true);
+            categoryAxis.setTickMarkVisible(true);
+        }
+
+        Axis<Number> axis = revenueChart == null ? null : revenueChart.getYAxis();
+        if (!(axis instanceof NumberAxis numberAxis)) {
+            return;
+        }
+
+        double max = revenueByMonth.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .max()
+                .orElse(100);
+        double tickUnit = calculateTickUnit(max);
+        double upperBound = Math.max(tickUnit, Math.ceil(max / tickUnit) * tickUnit + tickUnit);
+        numberAxis.setAutoRanging(false);
+        numberAxis.setLowerBound(0);
+        numberAxis.setUpperBound(upperBound);
+        numberAxis.setTickUnit(tickUnit);
+        numberAxis.setMinorTickCount(4);
+        configureChartAxesVisible();
+    }
+
+    private void configureChartAxesVisible() {
+        if (revenueChart == null) {
+            return;
+        }
+
+        Axis<String> xAxis = revenueChart.getXAxis();
+        Axis<Number> yAxis = revenueChart.getYAxis();
+
+        xAxis.setVisible(true);
+        xAxis.setOpacity(1);
+        xAxis.setTickLabelsVisible(true);
+        xAxis.setTickMarkVisible(true);
+        xAxis.setTickLabelFill(Color.web("#4a5568"));
+        xAxis.setStyle("-fx-border-color: #718096 transparent transparent transparent; -fx-border-width: 1 0 0 0;");
+
+        yAxis.setVisible(true);
+        yAxis.setOpacity(1);
+        yAxis.setTickLabelsVisible(true);
+        yAxis.setTickMarkVisible(true);
+        yAxis.setTickLabelFill(Color.web("#4a5568"));
+        yAxis.setStyle("-fx-border-color: transparent #718096 transparent transparent; -fx-border-width: 0 1 0 0;");
+    }
+
+    private double calculateTickUnit(double max) {
+        if (max <= 0) {
+            return 10;
+        }
+        double roughTick = max / 6.0;
+        double magnitude = Math.pow(10, Math.floor(Math.log10(roughTick)));
+        double normalized = roughTick / magnitude;
+
+        if (normalized <= 1) {
+            return magnitude;
+        }
+        if (normalized <= 2) {
+            return 2 * magnitude;
+        }
+        if (normalized <= 5) {
+            return 5 * magnitude;
+        }
+        return 10 * magnitude;
+    }
+
+    private void styleChartNodes(boolean hideSeries) {
+        if (revenueChart == null) {
+            return;
+        }
+
+        Node plotBackground = revenueChart.lookup(".chart-plot-background");
+        if (plotBackground != null) {
+            plotBackground.setStyle("-fx-background-color: white;");
+        }
+
+        Node horizontalGrid = revenueChart.lookup(".chart-horizontal-grid-lines");
+        if (horizontalGrid != null) {
+            horizontalGrid.setStyle("-fx-stroke: #e2e8f0; -fx-stroke-dash-array: 8 6;");
+        }
+
+        Node verticalGrid = revenueChart.lookup(".chart-vertical-grid-lines");
+        if (verticalGrid != null) {
+            verticalGrid.setStyle("-fx-stroke: transparent;");
+        }
+
+        for (Node axis : revenueChart.lookupAll(".axis")) {
+            axis.setVisible(true);
+            axis.setOpacity(1);
+        }
+        for (Node tickLabel : revenueChart.lookupAll(".axis .text")) {
+            tickLabel.setVisible(true);
+            tickLabel.setOpacity(1);
+            tickLabel.setStyle("-fx-fill: #4a5568;");
+        }
+        for (Node tickMark : revenueChart.lookupAll(".axis-tick-mark")) {
+            tickMark.setVisible(true);
+            tickMark.setOpacity(1);
+            tickMark.setStyle("-fx-stroke: #718096;");
+        }
+        for (Node axisLine : revenueChart.lookupAll(".axis .axis-line")) {
+            axisLine.setVisible(true);
+            axisLine.setOpacity(1);
+            axisLine.setStyle("-fx-stroke: #718096;");
+        }
+
+        if (hideSeries) {
+            for (Node line : revenueChart.lookupAll(".chart-series-line")) {
+                line.setStyle("-fx-stroke: transparent;");
+            }
+            for (Node symbol : revenueChart.lookupAll(".chart-line-symbol")) {
+                symbol.setVisible(false);
+                symbol.setManaged(false);
+            }
+        }
+    }
+
+    private void showEmptyStatistics() {
+        setLabel(totalRevenueLabel, formatVnd(0));
+        setLabel(avgBidLabel, "0.0");
+        setLabel(successRateLabel, "0.0%");
+        updateRevenueChart(Map.of());
+    }
+
+    private void setLabel(Label label, String value) {
+        if (label != null) {
+            label.setText(value);
+        }
+    }
+
+    private String formatVnd(double amount) {
+        if (Math.abs(amount) >= 1_000_000) {
+            return String.format(Locale.US, "%.1fM \u0111", amount / 1_000_000.0);
+        }
+        return VND_FORMATTER.format(Math.round(amount)) + " \u0111";
+    }
+
+    private void applyReadableStyles() {
+        Parent statisticsRoot = findStatisticsRoot();
+        if (statisticsRoot == null) {
+            return;
+        }
+
+        applyReadableStyles(statisticsRoot);
+        setLabelColor(totalRevenueLabel, "#ffffff");
+        setLabelColor(avgBidLabel, "#2d3748");
+        setLabelColor(successRateLabel, "#2d3748");
+    }
+
+    private Parent findStatisticsRoot() {
+        Node node = revenueChart != null ? revenueChart : totalRevenueLabel;
+        while (node != null) {
+            if (node instanceof ScrollPane scrollPane) {
+                Node content = scrollPane.getContent();
+                return content instanceof Parent parent ? parent : scrollPane;
+            }
+            node = node.getParent();
+        }
+        return null;
+    }
+
+    private void applyReadableStyles(Parent parent) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof Label label) {
+                styleLabelByContext(label);
+            }
+            if (child instanceof Parent childParent) {
+                applyReadableStyles(childParent);
+            }
+        }
+    }
+
+    private void styleLabelByContext(Label label) {
+        String parentStyle = label.getParent() == null || label.getParent().getStyle() == null
+                ? ""
+                : label.getParent().getStyle();
+
+        if (parentStyle.contains("#3182ce")) {
+            setLabelColor(label, "#ffffff");
+            return;
+        }
+
+        double fontSize = label.getFont() != null ? label.getFont().getSize() : 14;
+        if (fontSize >= 18) {
+            setLabelColor(label, "#1a1a1a");
+        } else if (label == avgBidLabel || label == successRateLabel) {
+            setLabelColor(label, "#2d3748");
+        } else {
+            setLabelColor(label, "#718096");
+        }
+    }
+
+    private void setLabelColor(Label label, String color) {
+        if (label == null) {
+            return;
+        }
+
+        String style = label.getStyle() == null ? "" : label.getStyle();
+        style = style.replaceAll("-fx-text-fill\\s*:\\s*[^;]+;?", "").trim();
+        if (!style.isEmpty() && !style.endsWith(";")) {
+            style += ";";
+        }
+        label.setStyle(style + " -fx-text-fill: " + color + ";");
     }
 }

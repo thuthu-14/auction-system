@@ -24,7 +24,7 @@
         <Label text="✓ Đặt mức giá mong muốn hợp lý" textFill="#718096" />
     </VBox>
 
-    <ScrollPane fx:id="formScrollPane" fitToWidth="true" vbarPolicy="AS_NEEDED" style="-fx-background-color: transparent; -fx-background: transparent;" HBox.hgrow="ALWAYS">
+    <ScrollPane fx:id="formScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" HBox.hgrow="ALWAYS">
         <content>
             <VBox maxWidth="1.7976931348623157E308" spacing="25.0">
 

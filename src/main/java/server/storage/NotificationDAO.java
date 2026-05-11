@@ -31,13 +31,19 @@ public class NotificationDAO {
      * Đánh dấu tất cả thông báo của User là đã đọc
      */
     public static void markAllAsRead(String username) {
+        markAllAsRead(username, null);
+    }
+
+    public static void markAllAsRead(String username, java.util.Set<String> allowedTypes) {
         try {
             List<Notification> all = JsonUtil.loadListFromJson(FILE_PATH, Notification.class);
             if (all == null) return;
 
             boolean hasChanged = false;
             for (Notification n : all) {
-                if (n.getUserId().equals(username) && !n.isRead()) {
+                String type = n.getType() == null ? "" : n.getType().toUpperCase();
+                boolean typeMatches = allowedTypes == null || allowedTypes.contains(type);
+                if (n.getUserId().equals(username) && typeMatches && !n.isRead()) {
                     n.setRead(true);
                     hasChanged = true;
                 }

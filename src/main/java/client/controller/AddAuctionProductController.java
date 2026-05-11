@@ -2,8 +2,9 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AddAuctionProductClientService;
+import client.service.AddAuctionProductClientService.CategoryFormConfig;
 import common.Message;
-import common.MessageType;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -28,11 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -55,37 +52,35 @@ public class AddAuctionProductController implements Initializable {
     private String currentCategory;
     private javafx.collections.ObservableList<String> timeOptions;
     private List<String> selectedImagePaths = new ArrayList<>();
+    private final AddAuctionProductClientService productService = new AddAuctionProductClientService();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        categoryComboBox.setItems(FXCollections.observableArrayList(
-                "Đồ điện tử", "Thời trang", "Trang sức", "Sưu tầm", "Xe cộ"
-        ));
-
+        categoryComboBox.setItems(FXCollections.observableArrayList(productService.categoryLabels()));
         timeOptions = generateTimeOptions();
     }
 
     @FXML
     public void handleSelectImage(ActionEvent event) {
         if (selectedImagePaths.size() >= 5) {
-            showAlert(Alert.AlertType.WARNING, "Giới hạn ảnh", "Chỉ được chọn tối đa 5 ảnh thôi nha!");
+            showAlert(Alert.AlertType.WARNING, "Giá»›i háº¡n áº£nh", "Chá»‰ Ä‘Æ°á»£c chá»n tá»‘i Ä‘a 5 áº£nh thÃ´i nha!");
             return;
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chọn ảnh sản phẩm (Tối đa 5 ảnh)");
+        fileChooser.setTitle("Chá»n áº£nh sáº£n pháº©m (Tá»‘i Ä‘a 5 áº£nh)");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
         );
 
-        // Lấy cửa sổ an toàn từ nút bấm kích hoạt sự kiện
+        // Láº¥y cá»­a sá»• an toÃ n tá»« nÃºt báº¥m kÃ­ch hoáº¡t sá»± kiá»‡n
         Window window = ((Node) event.getSource()).getScene().getWindow();
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(window);
 
         if (selectedFiles != null) {
             for (File file : selectedFiles) {
                 if (selectedImagePaths.size() >= 5) {
-                    showAlert(Alert.AlertType.INFORMATION, "Thông báo", "Đã đạt giới hạn 5 ảnh, các ảnh dư sẽ bị bỏ qua.");
+                    showAlert(Alert.AlertType.INFORMATION, "ThÃ´ng bÃ¡o", "ÄÃ£ Ä‘áº¡t giá»›i háº¡n 5 áº£nh, cÃ¡c áº£nh dÆ° sáº½ bá»‹ bá» qua.");
                     break;
                 }
 
@@ -109,7 +104,7 @@ public class AddAuctionProductController implements Initializable {
                         }
                     });
 
-                    Tooltip.install(imagePane, new Tooltip("Click đúp chuột để xóa ảnh này"));
+                    Tooltip.install(imagePane, new Tooltip("Click Ä‘Ãºp chuá»™t Ä‘á»ƒ xÃ³a áº£nh nÃ y"));
                     imagePreviewContainer.getChildren().add(imagePane);
                 }
             }
@@ -125,77 +120,27 @@ public class AddAuctionProductController implements Initializable {
         categoryFormPane.getChildren().clear();
 
         try {
-            Parent formNode = null;
-
-            switch (selectedCategory) {
-                case "Đồ điện tử":
-                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Electronics.fxml"));
-                    break;
-                case "Thời trang":
-                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Fashion.fxml"));
-                    break;
-                case "Trang sức":
-                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Jewelry.fxml"));
-                    break;
-                case "Sưu tầm":
-                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Art.fxml"));
-                    break;
-                case "Xe cộ":
-                    formNode = FXMLLoader.load(getClass().getResource("/fxml/AddAuctionProduct_Vehicle.fxml"));
-                    break;
-            }
+            CategoryFormConfig config = productService.findCategoryForm(selectedCategory);
+            Parent formNode = config != null ? FXMLLoader.load(getClass().getResource(config.fxmlPath())) : null;
 
             if (formNode != null) {
                 applyCalendarStylesheet(formNode);
                 categoryFormPane.getChildren().add(formNode);
-                setupTimeOptions(formNode);
+                setupTimeOptions(formNode, config);
             }
         } catch (IOException e) {
-            LoggerUtil.error("Lỗi tải form danh mục: " + e.getMessage());
+            LoggerUtil.error("Loi tai form danh muc: " + e.getMessage());
         }
     }
 
-    private void setupTimeOptions(Parent formNode) {
+    private void setupTimeOptions(Parent formNode, CategoryFormConfig config) {
         LocalDate today = LocalDate.now();
         LocalDate tomorrow = today.plusDays(1);
 
-        ComboBox<?> startHourCombo = null;
-        ComboBox<?> endHourCombo = null;
-        DatePicker startDatePicker = null;
-        DatePicker endDatePicker = null;
-
-        switch (currentCategory) {
-            case "Đồ điện tử":
-                startHourCombo = (ComboBox<?>) formNode.lookup("#elecStartHourCombo");
-                endHourCombo = (ComboBox<?>) formNode.lookup("#elecEndHourCombo");
-                startDatePicker = (DatePicker) formNode.lookup("#elecStartDatePicker");
-                endDatePicker = (DatePicker) formNode.lookup("#elecEndDatePicker");
-                break;
-            case "Thời trang":
-                startHourCombo = (ComboBox<?>) formNode.lookup("#fashionStartHourCombo");
-                endHourCombo = (ComboBox<?>) formNode.lookup("#fashionEndHourCombo");
-                startDatePicker = (DatePicker) formNode.lookup("#fashionStartDatePicker");
-                endDatePicker = (DatePicker) formNode.lookup("#fashionEndDatePicker");
-                break;
-            case "Trang sức":
-                startHourCombo = (ComboBox<?>) formNode.lookup("#jewelryStartHourCombo");
-                endHourCombo = (ComboBox<?>) formNode.lookup("#jewelryEndHourCombo");
-                startDatePicker = (DatePicker) formNode.lookup("#jewelryStartDatePicker");
-                endDatePicker = (DatePicker) formNode.lookup("#jewelryEndDatePicker");
-                break;
-            case "Sưu tầm":
-                startHourCombo = (ComboBox<?>) formNode.lookup("#artStartHourCombo");
-                endHourCombo = (ComboBox<?>) formNode.lookup("#artEndHourCombo");
-                startDatePicker = (DatePicker) formNode.lookup("#artStartDatePicker");
-                endDatePicker = (DatePicker) formNode.lookup("#artEndDatePicker");
-                break;
-            case "Xe cộ":
-                startHourCombo = (ComboBox<?>) formNode.lookup("#vehicleStartHourCombo");
-                endHourCombo = (ComboBox<?>) formNode.lookup("#vehicleEndHourCombo");
-                startDatePicker = (DatePicker) formNode.lookup("#vehicleStartDatePicker");
-                endDatePicker = (DatePicker) formNode.lookup("#vehicleEndDatePicker");
-                break;
-        }
+        ComboBox<?> startHourCombo = (ComboBox<?>) formNode.lookup(config.startHourId());
+        ComboBox<?> endHourCombo = (ComboBox<?>) formNode.lookup(config.endHourId());
+        DatePicker startDatePicker = (DatePicker) formNode.lookup(config.startDateId());
+        DatePicker endDatePicker = (DatePicker) formNode.lookup(config.endDateId());
 
         if (startDatePicker != null) startDatePicker.setValue(today);
         if (endDatePicker != null) endDatePicker.setValue(tomorrow);
@@ -212,7 +157,6 @@ public class AddAuctionProductController implements Initializable {
             comboBox.getSelectionModel().select("17:00");
         }
     }
-
     private void applyCalendarStyles(DatePicker... datePickers) {
         String calendarCss = getCalendarStylesheet();
         if (calendarCss == null) return;
@@ -251,7 +195,7 @@ public class AddAuctionProductController implements Initializable {
     private String getCalendarStylesheet() {
         URL calendarCssUrl = getClass().getResource("/CSS/calendar.css");
         if (calendarCssUrl == null) {
-            LoggerUtil.error("Không tìm thấy CSS lịch: /CSS/calendar.css");
+            LoggerUtil.error("KhÃ´ng tÃ¬m tháº¥y CSS lá»‹ch: /CSS/calendar.css");
             return null;
         }
         return calendarCssUrl.toExternalForm();
@@ -268,136 +212,63 @@ public class AddAuctionProductController implements Initializable {
 
     @FXML
     private void handleSaveAndPublish(ActionEvent event) {
-        if (productNameField.getText().isEmpty() || descriptionArea.getText().isEmpty() || categoryComboBox.getValue() == null) {
-            showAlert(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ tên sản phẩm, mô tả và chọn ngành hàng!");
-            return;
-        }
+        handleSaveAndPublishViaService();
+    }
 
-        if (selectedImagePaths.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Thiếu ảnh", "Vui lòng chọn ít nhất 1 ảnh cho sản phẩm!");
-            return;
-        }
-
+    private void handleSaveAndPublishViaService() {
         User currentUser = NavigationManager.getInstance().getCurrentUser();
         ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
 
-        if (currentUser == null || socket == null) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Bạn chưa đăng nhập hoặc mất kết nối máy chủ!");
+        if (currentUser == null || socket == null || !socket.isConnected()) {
+            showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i mÃ¡ÂºÂ¡ng", "BÃ¡ÂºÂ¡n chÃ†Â°a Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p hoÃ¡ÂºÂ·c mÃ¡ÂºÂ¥t kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i mÃƒÂ¡y chÃ¡Â»Â§!");
             return;
         }
 
         try {
-            String name = productNameField.getText().trim();
-            String description = descriptionArea.getText().trim();
-            String category = categoryComboBox.getValue();
+            Map<String, Object> payload = productService.buildPayload(
+                    currentUser,
+                    productNameField.getText(),
+                    descriptionArea.getText(),
+                    categoryComboBox.getValue(),
+                    selectedImagePaths,
+                    new AddAuctionProductClientService.CategoryFieldReader() {
+                        @Override
+                        public String fieldValue(String fieldId, String defaultValue) {
+                            return getFieldValue(fieldId, defaultValue);
+                        }
 
-            Map<String, Object> payload = new HashMap<>();
-            // THÊM 2 DÒNG NÀY ĐỂ SERVER KHÔNG BỊ NULL
-            payload.put("itemId", "");
-            payload.put("sellerId", currentUser.getUsername());
+                        @Override
+                        public LocalDate dateValue(String fieldId) {
+                            return getDateValue(fieldId);
+                        }
 
-            payload.put("name", name);
-            payload.put("description", description);
-            payload.put("images", new ArrayList<>(selectedImagePaths));
+                        @Override
+                        public String comboValue(String fieldId) {
+                            return getComboValue(fieldId);
+                        }
+                    });
 
-            double startPrice = 0;
-            int durationMinutes = 0;
-
-            switch (category) {
-                case "Đồ điện tử":
-                    payload.put("type", "ELECTRONICS"); // SỬA THÀNH CHỮ THƯỜNG
-                    startPrice = validateAndParsePrice(getFieldValue("#elecStartPriceField", ""), "Giá khởi điểm", 50000.0);
-                    if (startPrice < 0) return;
-                    durationMinutes = (int) calculateDuration("#elecStartDatePicker", "#elecStartHourCombo", "#elecEndDatePicker", "#elecEndHourCombo");
-                    if (durationMinutes < 1440 || durationMinutes > 10080) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-7 ngày"); return; }
-                    payload.put("brand", getFieldValue("#elecBrandField", ""));
-                    payload.put("warrantyPeriod", getFieldValue("#elecWarrantyField", "")); // Sửa warranty thành warrantyPeriod
-                    break;
-
-                case "Thời trang":
-                    payload.put("type", "FASHION"); // SỬA THÀNH CHỮ THƯỜNG
-                    startPrice = validateAndParsePrice(getFieldValue("#fashionStartPriceField", ""), "Giá khởi điểm", 10000.0);
-                    if (startPrice < 0) return;
-                    durationMinutes = (int) calculateDuration("#fashionStartDatePicker", "#fashionStartHourCombo", "#fashionEndDatePicker", "#fashionEndHourCombo");
-                    if (durationMinutes < 1440 || durationMinutes > 4320) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-3 ngày"); return; }
-                    payload.put("brand", getFieldValue("#fashionBrandField", ""));
-                    payload.put("material", getFieldValue("#fashionMaterialField", ""));
-                    break;
-
-                case "Trang sức":
-                    payload.put("type", "JEWELRY"); // SỬA THÀNH CHỮ THƯỜNG
-                    startPrice = validateAndParsePrice(getFieldValue("#jewelryStartPriceField", ""), "Giá khởi điểm", 25000.0);
-                    if (startPrice < 0) return;
-                    durationMinutes = (int) calculateDuration("#jewelryStartDatePicker", "#jewelryStartHourCombo", "#jewelryEndDatePicker", "#jewelryEndHourCombo");
-                    if (durationMinutes < 1440 || durationMinutes > 7200) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-5 ngày"); return; }
-                    payload.put("material", getFieldValue("#jewelryMaterialField", ""));
-                    double jewelryWeight = validateAndParseDouble(getFieldValue("#jewelryWeightField", ""), "Trọng lượng", 0.1, 100000);
-                    if (jewelryWeight < 0) return;
-                    payload.put("weight", jewelryWeight);
-                    break;
-
-                case "Sưu tầm":
-                    payload.put("type", "ART"); // SỬA THÀNH CHỮ THƯỜNG
-                    startPrice = validateAndParsePrice(getFieldValue("#artStartPriceField", ""), "Giá khởi điểm", 100000.0);
-                    if (startPrice < 0) return;
-                    durationMinutes = (int) calculateDuration("#artStartDatePicker", "#artStartHourCombo", "#artEndDatePicker", "#artEndHourCombo");
-                    if (durationMinutes < 1440 || durationMinutes > 20160) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-14 ngày"); return; }
-                    payload.put("creator", getFieldValue("#artCreatorField", ""));
-                    payload.put("material", getFieldValue("#artMaterialField", ""));
-                    break;
-
-                case "Xe cộ":
-                    payload.put("type", "VEHICLE"); // SỬA THÀNH CHỮ THƯỜNG
-                    startPrice = validateAndParsePrice(getFieldValue("#vehicleStartPriceField", ""), "Giá khởi điểm", 500000.0);
-                    if (startPrice < 0) return;
-                    durationMinutes = (int) calculateDuration("#vehicleStartDatePicker", "#vehicleStartHourCombo", "#vehicleEndDatePicker", "#vehicleEndHourCombo");
-                    if (durationMinutes < 1440 || durationMinutes > 10080) { showAlert(Alert.AlertType.ERROR, "Lỗi thời gian", "Thời gian phải từ 1-7 ngày"); return; }
-                    int odometer = validateAndParseInt(getFieldValue("#vehicleOdometerField", ""), "Số km", 0, 10000000);
-                    if (odometer < 0) return;
-                    payload.put("model", getFieldValue("#vehicleYearField", ""));
-                    payload.put("odometer", odometer);
-                    break;
-
-                default:
-                    showAlert(Alert.AlertType.ERROR, "Lỗi", "Category không hợp lệ!");
-                    return;
-            }
-
-            if (durationMinutes <= 0) {
-                showAlert(Alert.AlertType.ERROR, "Lỗi", "Thời gian kết thúc phải sau thời gian bắt đầu!");
-                return;
-            }
-
-            payload.put("startingPrice", startPrice); // SỬA TỪ price THÀNH startingPrice
-            payload.put("duration", durationMinutes);
-
-            // Gửi dữ liệu cho Server (ĐÃ SỬA CÁCH TẠO MESSAGE ĐỂ KHÔNG BỊ NULL DATA)
             new Thread(() -> {
                 try {
-                    Message request = new Message();
-                    request.setType(MessageType.CREATE_SELLER_ITEM);
-                    request.setData(payload); // Gán data rõ ràng
-                    request.setSenderId(currentUser.getUsername());
-
-                    Message response = socket.sendAndReceive(request);
-
+                    Message response = productService.publish(socket, currentUser, payload);
                     Platform.runLater(() -> {
                         if (response != null && "SUCCESS".equals(response.getStatus())) {
-                            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Sản phẩm đã được đẩy lên Sàn Đấu Giá!");
+                            showAlert(Alert.AlertType.INFORMATION, "ThÃƒÂ nh cÃƒÂ´ng", "SÃ¡ÂºÂ£n phÃ¡ÂºÂ©m Ã„â€˜ÃƒÂ£ Ã„â€˜Ã†Â°Ã¡Â»Â£c Ã„â€˜Ã¡ÂºÂ©y lÃƒÂªn SÃƒÂ n Ã„ÂÃ¡ÂºÂ¥u GiÃƒÂ¡!");
                             clearForm();
                         } else {
-                            showAlert(Alert.AlertType.ERROR, "Thất bại", "Server từ chối: " + (response != null ? response.getMessage() : ""));
+                            showAlert(Alert.AlertType.ERROR, "ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i", "Server tÃ¡Â»Â« chÃ¡Â»â€˜i: " + (response != null ? response.getMessage() : ""));
                         }
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi kết nối", "Mất kết nối tới Server."));
-                    LoggerUtil.error("Lỗi khi tạo sản phẩm đấu giá: " + e.getMessage());
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i", "MÃ¡ÂºÂ¥t kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i tÃ¡Â»â€ºi Server."));
+                    LoggerUtil.error("LÃ¡Â»â€”i khi tÃ¡ÂºÂ¡o sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m Ã„â€˜Ã¡ÂºÂ¥u giÃƒÂ¡: " + e.getMessage());
                 }
-            }).start();
-
+            }, "PublishAuctionProductThread").start();
+        } catch (AddAuctionProductClientService.ValidationException e) {
+            showAlert(Alert.AlertType.ERROR, e.getTitle(), e.getMessage());
         } catch (Exception e) {
-            LoggerUtil.error("Lỗi xử lý UI: " + e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi: " + e.getMessage());
+            LoggerUtil.error("LÃ¡Â»â€”i xÃ¡Â»Â­ lÃƒÂ½ UI: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i", "LÃ¡Â»â€”i: " + e.getMessage());
         }
     }
 
@@ -441,12 +312,12 @@ public class AddAuctionProductController implements Initializable {
 
     @FXML
     private void handleSaveHidden(ActionEvent event) {
-        LoggerUtil.info("Lưu nháp sản phẩm...");
+        LoggerUtil.info("LÆ°u nhÃ¡p sáº£n pháº©m...");
     }
 
     @FXML
     private void handleCancel(ActionEvent event) {
-        LoggerUtil.info("Hủy thao tác...");
+        LoggerUtil.info("Há»§y thao tÃ¡c...");
         clearForm();
     }
 
@@ -468,90 +339,28 @@ public class AddAuctionProductController implements Initializable {
         return defaultValue;
     }
 
-    private double validateAndParsePrice(String value, String fieldName, double minValue) {
-        if (value == null || value.trim().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Thiếu thông tin", "Vui lòng nhập " + fieldName + "!");
-            return -1;
-        }
-        try {
-            double price = Double.parseDouble(value);
-            if (price < minValue) {
-                showAlert(Alert.AlertType.ERROR, "Lỗi giá", fieldName + " phải tối thiểu " + minValue);
-                return -1;
-            }
-            return price;
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", fieldName + " phải là số!");
-            return -1;
-        }
+    private LocalDate getDateValue(String fieldId) {
+        Node node = lookupCategoryNode(fieldId);
+        return node instanceof DatePicker datePicker ? datePicker.getValue() : null;
     }
 
-    private double validateAndParseDouble(String value, String fieldName, double minValue, double maxValue) {
-        if (value == null || value.trim().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Thiếu thông tin", "Vui lòng nhập " + fieldName + "!");
-            return -1;
-        }
-        try {
-            double val = Double.parseDouble(value);
-            if (val < minValue || val > maxValue) {
-                showAlert(Alert.AlertType.ERROR, "Lỗi giá trị", fieldName + " phải từ " + minValue + " đến " + maxValue);
-                return -1;
-            }
-            return val;
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", fieldName + " phải là số!");
-            return -1;
-        }
+    private String getComboValue(String fieldId) {
+        Node node = lookupCategoryNode(fieldId);
+        return node instanceof ComboBox<?> comboBox && comboBox.getValue() != null
+                ? comboBox.getValue().toString()
+                : null;
     }
 
-    private int validateAndParseInt(String value, String fieldName, int minValue, int maxValue) {
-        if (value == null || value.trim().isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Thiếu thông tin", "Vui lòng nhập " + fieldName + "!");
-            return -1;
-        }
-        try {
-            int val = Integer.parseInt(value);
-            if (val < minValue || val > maxValue) {
-                showAlert(Alert.AlertType.ERROR, "Lỗi giá trị", fieldName + " phải từ " + minValue + " đến " + maxValue);
-                return -1;
+    private Node lookupCategoryNode(String fieldId) {
+        if (categoryFormPane != null && !categoryFormPane.getChildren().isEmpty()) {
+            Node node = categoryFormPane.getChildren().get(0);
+            if (node instanceof Parent form) {
+                return form.lookup(fieldId);
             }
-            return val;
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", fieldName + " phải là số!");
-            return -1;
         }
+        return null;
     }
 
-    private long calculateDuration(String startDateId, String startHourId, String endDateId, String endHourId) {
-        try {
-            if (categoryFormPane != null && !categoryFormPane.getChildren().isEmpty()) {
-                Node node = categoryFormPane.getChildren().get(0);
-                if (node instanceof Parent) {
-                    Parent form = (Parent) node;
-                    DatePicker startDatePicker = (DatePicker) form.lookup(startDateId);
-                    ComboBox<String> startHourCombo = (ComboBox<String>) form.lookup(startHourId);
-                    DatePicker endDatePicker = (DatePicker) form.lookup(endDateId);
-                    ComboBox<String> endHourCombo = (ComboBox<String>) form.lookup(endHourId);
-
-                    if (startDatePicker == null || startHourCombo == null || endDatePicker == null || endHourCombo == null)
-                        return 1440;
-
-                    LocalDate startDate = startDatePicker.getValue();
-                    String startHourStr = startHourCombo.getValue();
-                    LocalDate endDate = endDatePicker.getValue();
-                    String endHourStr = endHourCombo.getValue();
-
-                    if (startDate == null || startHourStr == null || endDate == null || endHourStr == null) return 1440;
-
-                    LocalDateTime startTime = LocalDateTime.of(startDate, LocalTime.parse(startHourStr));
-                    LocalDateTime endTime = LocalDateTime.of(endDate, LocalTime.parse(endHourStr));
-
-                    return Duration.between(startTime, endTime).toMinutes();
-                }
-            }
-        } catch (Exception e) {
-            LoggerUtil.error("Lỗi tính thời gian: " + e.getMessage());
-        }
-        return 1440;
-    }
 }
+
+

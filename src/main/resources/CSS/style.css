@@ -34,6 +34,12 @@
 
 .menu-item:hover {
     -fx-background-color: #f3f4f6;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.08), 10, 0, 0, 2);
+}
+
+.menu-item:hover .button {
+    -fx-text-fill: #1a1a1a;
+    -fx-font-weight: bold;
 }
 
 .menu-item-active {
@@ -131,32 +137,31 @@
 /* ── Card base ── */
 .dashboard-card {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 12;
-    -fx-border-color: #e5e7eb;
+    -fx-background-radius: 16;
+    -fx-border-color: #edf2f7;
     -fx-border-width: 1;
-    -fx-border-radius: 12;
-    -fx-padding: 20 22 16 22;
+    -fx-border-radius: 16;
+    -fx-padding: 24 30 20 30;
     -fx-spacing: 12;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.03), 8, 0, 0, 2);
 }
 
 .dashboard-card:hover {
-    -fx-background-color: #fafafa;
-    -fx-border-color: #d1d5db;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.09), 12, 0, 0, 3);
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dbe4ef;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.08), 14, 0, 0, 5);
 }
 
 /* ── Icon badges — monochrome ── */
 .card-icon-badge {
-    -fx-background-color: #f3f4f6;
-    -fx-background-radius: 8;
-    -fx-padding: 6 8 6 8;
-    -fx-font-size: 22px;
-    -fx-min-width: 36;
-    -fx-min-height: 36;
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-font-size: 32px;
+    -fx-min-width: 42;
+    -fx-min-height: 42;
     -fx-alignment: CENTER;
-    -fx-text-fill: #111827;
+    -fx-text-fill: #1f2937;
 }
 
 .card-icon-purple,
@@ -170,24 +175,24 @@
 /* ── Text ── */
 .card-title {
     -fx-font-family: "System";
-    -fx-font-size: 20px;
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #111827;
+    -fx-text-fill: #0f172a;
 }
 
 .card-desc {
     -fx-font-family: "System";
     -fx-font-size: 17px;
-    -fx-text-fill: #6b7280;
+    -fx-text-fill: #718096;
     -fx-wrap-text: true;
 }
 
 /* ── CTA ── */
 .card-cta {
     -fx-font-family: "System";
-    -fx-font-size: 17px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #374151;
+    -fx-font-size: 15px;
+    -fx-font-weight: normal;
+    -fx-text-fill: #1a1a1a;
 }
 
 .card-cta-purple,
@@ -195,7 +200,7 @@
 .card-cta-orange,
 .card-cta-pink,
 .card-cta-blue {
-    -fx-text-fill: #374151;
+    -fx-text-fill: #1a1a1a;
 }
 
 /* ════════════════════════════════════════════════════════

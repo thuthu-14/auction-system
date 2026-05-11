@@ -101,6 +101,9 @@ public class ClientHandler implements Runnable {
                 case BAN_USER:
                     handleBanUser(message);
                     break;
+                case UPDATE_USER_STATUS:
+                    handleUpdateUserStatus(message);
+                    break;
                 case DELETE_AUCTION_ADMIN:
                     handleDeleteAuctionAdmin(message);
                     break;
@@ -182,7 +185,6 @@ public class ClientHandler implements Runnable {
         Map<String, Object> auctionData = (Map<String, Object>) message.getData();
 
         try {
-
             String itemType = (String) auctionData.get("itemType");
             Item item = createItemFromData(itemType, auctionData);
             RegularUser seller = (RegularUser) currentUser;
@@ -205,7 +207,9 @@ public class ClientHandler implements Runnable {
 
     private void handleGetAuctions(Message message) throws IOException, ClassNotFoundException {
         try {
-            List<Auction> auctions = AuctionService.getActiveAuctions();
+            List<Auction> auctions = message.getType() == MessageType.GET_ALL_AUCTIONS
+                    ? AuctionService.getAllAuctions()
+                    : AuctionService.getActiveAuctions();
             Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Auctions retrieved");
             response.setData(new ArrayList<>(auctions));
             sendMessage(response);
@@ -276,6 +280,11 @@ public class ClientHandler implements Runnable {
             }
 
             RegularUser bidder = (RegularUser) currentUser;
+            User latestUser = UserDAO.getUserById(currentUser.getUserId());
+            if (latestUser instanceof RegularUser latestRegularUser) {
+                bidder = latestRegularUser;
+                currentUser = latestRegularUser;
+            }
             String previousHighestBidderId = auction.getHighestBidderId();
 
             // Thực hiện đặt giá
@@ -293,6 +302,19 @@ public class ClientHandler implements Runnable {
             // Phát sóng Real-time cho mọi người đang xem
             server.broadcastMessage(new Message(MessageType.UPDATE_PRICE_REALTIME, auction, currentUser.getUserId()));
             server.broadcastMessage(new Message(MessageType.UPDATE_PRICE_REALTIME, bid, currentUser.getUserId()));
+
+            if (auction.getSellerId() != null && !auction.getSellerId().equals(bidder.getUserId())) {
+                Notification sellerNoti = new Notification(
+                        auction.getSellerId(),
+                        "SELLER_BID",
+                        "Phiên đấu giá có lượt đặt giá mới",
+                        "Sản phẩm " + auction.getItem().getName() + " vừa được đặt giá " + amount + "đ.",
+                        "Vừa xong",
+                        "Xem phiên",
+                        auctionId
+                );
+                NotificationDAO.addNotification(sellerNoti);
+            }
 
             // =========================================================
             // ĐÂY LÀ PHẦN QUAN TRỌNG NHẤT ĐÃ ĐƯỢC BỔ SUNG:
@@ -420,6 +442,28 @@ public class ClientHandler implements Runnable {
         try {
             UserService.banUser(userId);
             sendMessage(new Message(MessageType.SUCCESS, "SUCCESS", "User banned successfully"));
+        } catch (Exception e) {
+            sendError("❌" + e.getMessage());
+        }
+    }
+
+    private void handleUpdateUserStatus(Message message) throws IOException {
+        if (currentUser == null || !(currentUser instanceof Admin)) {
+            sendError("Chỉ Admin có quyền!");
+            return;
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) message.getData();
+            String userId = (String) data.get("userId");
+            Object activeValue = data.get("active");
+            boolean active = activeValue instanceof Boolean
+                    ? (Boolean) activeValue
+                    : Boolean.parseBoolean(String.valueOf(activeValue));
+
+            UserService.updateUserStatus(userId, active);
+            sendMessage(new Message(MessageType.SUCCESS, "SUCCESS", "User status updated successfully"));
         } catch (Exception e) {
             sendError("❌" + e.getMessage());
         }
@@ -730,6 +774,7 @@ public class ClientHandler implements Runnable {
     private void handleAddFunds(Message message) throws IOException, ClassNotFoundException {
         @SuppressWarnings("unchecked")
         Map<String, Object> data = (Map<String, Object>) message.getData();
+        String userId = (String) data.get("userId");
         String username = (String) data.get("username");
         double amount = ((Number) data.get("amount")).doubleValue();
 
@@ -739,7 +784,10 @@ public class ClientHandler implements Runnable {
         }
 
         // Cố gắng tìm User từ Database
-        User user = UserDAO.getUserByUsername(username);
+        User user = userId != null ? UserDAO.getUserById(userId) : null;
+        if (user == null) {
+            user = UserDAO.getUserByUsername(username);
+        }
 
         // Fallback an toàn: Nếu Database trễ nhịp, lấy ngay phiên bản hiện tại trên bộ nhớ đệm
         if (user == null && currentUser != null && currentUser.getUsername().equals(username)) {
@@ -770,6 +818,7 @@ public class ClientHandler implements Runnable {
     private void handleWithdraw(Message message) throws IOException, ClassNotFoundException {
         @SuppressWarnings("unchecked")
         Map<String, Object> data = (Map<String, Object>) message.getData();
+        String userId = (String) data.get("userId");
         String username = (String) data.get("username");
         double amount = ((Number) data.get("amount")).doubleValue();
 
@@ -779,7 +828,10 @@ public class ClientHandler implements Runnable {
         }
 
         // Cố gắng tìm User từ Database
-        User user = UserDAO.getUserByUsername(username);
+        User user = userId != null ? UserDAO.getUserById(userId) : null;
+        if (user == null) {
+            user = UserDAO.getUserByUsername(username);
+        }
 
         // Fallback an toàn
         if (user == null && currentUser != null && currentUser.getUsername().equals(username)) {
@@ -840,9 +892,22 @@ public class ClientHandler implements Runnable {
 
     private void handleMarkNotificationsRead(Message message) throws IOException {
         String userId = currentUser.getUserId();
-        NotificationDAO.markAllAsRead(userId);
+        Set<String> allowedTypes = resolveNotificationTypes(message.getData());
+        NotificationDAO.markAllAsRead(userId, allowedTypes);
 
         Message response = new Message(MessageType.MARK_NOTIFICATIONS_READ, "SUCCESS", "Đã đọc tất cả");
         sendMessage(response);
+    }
+
+    private Set<String> resolveNotificationTypes(Object data) {
+        if (!(data instanceof String scope)) {
+            return null;
+        }
+
+        return switch (scope.toUpperCase()) {
+            case "SELLER" -> Set.of("SELLER_BID", "AUCTION_FINISHED", "SALE", "PAYMENT");
+            case "BIDDER" -> Set.of("WIN", "OUTBID", "SYSTEM", "PAYMENT");
+            default -> null;
+        };
     }
 }

@@ -2,8 +2,7 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
-import common.Message;
-import common.MessageType;
+import client.service.SellerClientService;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,7 +17,7 @@ import navigation.NavigationManager;
 import server.model.User;
 import util.LoggerUtil;
 
-// --- THÊM IMPORT CHO THỜI GIAN ---
+// --- THÃƒÅ M IMPORT CHO THÃ¡Â»Å“I GIAN ---
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 
 public class SellerManagementController {
 
-    // --- Các ID từ FXML ---
+    // --- CÃƒÂ¡c ID tÃ¡Â»Â« FXML ---
     @FXML private Label statTotal, statActive, statSuccessRate;
     @FXML private HBox tabAll, tabActive, tabPending, tabEnded, tabCancelled;
     @FXML private Label countAll, countActive, countPending, countEnded, countCancelled;
@@ -45,8 +44,9 @@ public class SellerManagementController {
     private String currentTab = "all";
     private ObservableList<AuctionItem> allItems = FXCollections.observableArrayList();
     private List<HBox> allTabs;
+    private final SellerClientService sellerClientService = new SellerClientService();
 
-    // THÊM BIẾN ĐẾM NGƯỢC CHO BẢNG
+    // THÃƒÅ M BIÃ¡ÂºÂ¾N Ã„ÂÃ¡ÂºÂ¾M NGÃ†Â¯Ã¡Â»Â¢C CHO BÃ¡ÂºÂ¢NG
     private Timeline countdownTimer;
 
     @FXML
@@ -54,12 +54,12 @@ public class SellerManagementController {
         allTabs = Arrays.asList(tabAll, tabActive, tabPending, tabEnded, tabCancelled);
         setupTableColumns();
 
-        if (sortCombo != null) sortCombo.setItems(FXCollections.observableArrayList("Mới nhất", "Cũ nhất", "Giá cao", "Giá thấp"));
-        if (categoryCombo != null) categoryCombo.setItems(FXCollections.observableArrayList("Tất cả", "Điện tử", "Thời trang", "Gia dụng"));
+        if (sortCombo != null) sortCombo.setItems(FXCollections.observableArrayList("MÃ¡Â»â€ºi nhÃ¡ÂºÂ¥t", "CÃ…Â© nhÃ¡ÂºÂ¥t", "GiÃƒÂ¡ cao", "GiÃƒÂ¡ thÃ¡ÂºÂ¥p"));
+        if (categoryCombo != null) categoryCombo.setItems(FXCollections.observableArrayList("TÃ¡ÂºÂ¥t cÃ¡ÂºÂ£", "Ã„ÂiÃ¡Â»â€¡n tÃ¡Â»Â­", "ThÃ¡Â»Âi trang", "Gia dÃ¡Â»Â¥ng"));
 
         refreshAuctions();
 
-        // --- GỌI TIMELINE KHI KHỞI TẠO ---
+        // --- GÃ¡Â»Å’I TIMELINE KHI KHÃ¡Â»Å¾I TÃ¡ÂºÂ O ---
         startTableCountdown();
     }
 
@@ -93,7 +93,7 @@ public class SellerManagementController {
                 VBox box = new VBox(2);
                 Label cur = new Label(formatVnd(ai.getCurrentPrice()));
                 cur.setStyle("-fx-font-weight: bold; -fx-text-fill: #111827;");
-                Label start = new Label("Gốc: " + formatVnd(ai.getStartPrice()));
+                Label start = new Label("GÃ¡Â»â€˜c: " + formatVnd(ai.getStartPrice()));
                 start.setStyle("-fx-font-size: 10px; -fx-text-fill: #9ca3af;");
                 box.getChildren().addAll(cur, start);
                 setGraphic(box);
@@ -102,7 +102,7 @@ public class SellerManagementController {
 
         colBids.setCellValueFactory(cell -> new SimpleStringProperty(String.valueOf(cell.getValue().getBids())));
 
-        // --- SỬA LẠI LINK CỘT THỜI GIAN VỚI PROPERTY TỰ ĐỘNG CẬP NHẬT ---
+        // --- SÃ¡Â»Â¬A LÃ¡ÂºÂ I LINK CÃ¡Â»ËœT THÃ¡Â»Å“I GIAN VÃ¡Â»Å¡I PROPERTY TÃ¡Â»Â° Ã„ÂÃ¡Â»ËœNG CÃ¡ÂºÂ¬P NHÃ¡ÂºÂ¬T ---
         colTimeLeft.setCellValueFactory(cell -> cell.getValue().timeLeftStrProperty());
 
         colStatus.setCellFactory(col -> new TableCell<>() {
@@ -126,7 +126,7 @@ public class SellerManagementController {
             protected void updateItem(Void v, boolean empty) {
                 super.updateItem(v, empty);
                 if (empty) { setGraphic(null); return; }
-                Button btn = new Button("Chi tiết");
+                Button btn = new Button("Chi tiÃ¡ÂºÂ¿t");
                 btn.setStyle("-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-radius: 5; -fx-cursor: hand;");
                 setGraphic(btn);
             }
@@ -140,34 +140,17 @@ public class SellerManagementController {
 
         new Thread(() -> {
             try {
-                Message req = new Message(MessageType.GET_SELLER_AUCTIONS, null, user.getUsername());
-                Message res = socket.sendAndReceive(req);
-
-                if (res != null && "SUCCESS".equals(res.getStatus())) {
-                    Object data = res.getData();
-
-                    final List<server.model.Auction> auctionList = new java.util.ArrayList<>();
-
-                    if (data instanceof List) {
-                        @SuppressWarnings("unchecked")
-                        List<server.model.Auction> dataList = (List<server.model.Auction>) data;
-                        auctionList.addAll(dataList);
-                    } else if (data instanceof server.model.Auction) {
-                        auctionList.add((server.model.Auction) data);
+                List<server.model.Auction> auctionList = sellerClientService.fetchSellerAuctions(socket, user);
+                Platform.runLater(() -> {
+                    allItems.clear();
+                    for (server.model.Auction a : auctionList) {
+                        allItems.add(new AuctionItem(a.getAuctionId(), a.getItem().getName(),
+                                (long)a.getItem().getStartingPrice(), (long)a.getCurrentPrice(),
+                                a.getBidIds().size(), a.getStatus().toString(), a.getEndTime()));
                     }
-
-                    Platform.runLater(() -> {
-                        allItems.clear();
-                        for (server.model.Auction a : auctionList) {
-                            // --- TRUYỀN a.getEndTime() THAY VÌ getTimeRemainingSeconds() ---
-                            allItems.add(new AuctionItem(a.getAuctionId(), a.getItem().getName(),
-                                    (long)a.getItem().getStartingPrice(), (long)a.getCurrentPrice(),
-                                    a.getBidIds().size(), a.getStatus().toString(), a.getEndTime()));
-                        }
-                        updateStats();
-                        refreshTable();
-                    });
-                }
+                    updateStats();
+                    refreshTable();
+                });
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -175,14 +158,14 @@ public class SellerManagementController {
     }
 
     // =========================================
-    // --- THÊM HÀM CHẠY NGẦM ĐỂ CẬP NHẬT TỪNG DÒNG TRONG BẢNG ---
+    // --- THÃƒÅ M HÃƒâ‚¬M CHÃ¡ÂºÂ Y NGÃ¡ÂºÂ¦M Ã„ÂÃ¡Â»â€š CÃ¡ÂºÂ¬P NHÃ¡ÂºÂ¬T TÃ¡Â»ÂªNG DÃƒâ€™NG TRONG BÃ¡ÂºÂ¢NG ---
     // =========================================
     private void startTableCountdown() {
         if (countdownTimer != null) countdownTimer.stop();
 
         countdownTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             for (AuctionItem item : allItems) {
-                item.updateTime(); // Cập nhật thời gian từng đối tượng
+                item.updateTime(); // CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t thÃ¡Â»Âi gian tÃ¡Â»Â«ng Ã„â€˜Ã¡Â»â€˜i tÃ†Â°Ã¡Â»Â£ng
             }
         }));
         countdownTimer.setCycleCount(Timeline.INDEFINITE);
@@ -201,7 +184,7 @@ public class SellerManagementController {
         countPending.setText(String.valueOf(allItems.stream().filter(i -> i.getStatus().equalsIgnoreCase("PENDING")).count()));
         countEnded.setText(String.valueOf(allItems.stream().filter(i -> i.getStatus().equalsIgnoreCase("CLOSED")).count()));
         countCancelled.setText(String.valueOf(allItems.stream().filter(i -> i.getStatus().equalsIgnoreCase("CANCELLED")).count()));
-        pageInfoLabel.setText("Hiển thị " + allItems.size() + " phiên của bạn");
+        pageInfoLabel.setText("HiÃ¡Â»Æ’n thÃ¡Â»â€¹ " + allItems.size() + " phiÃƒÂªn cÃ¡Â»Â§a bÃ¡ÂºÂ¡n");
     }
 
     private void refreshTable() {
@@ -211,7 +194,7 @@ public class SellerManagementController {
         auctionTable.setItems(FXCollections.observableArrayList(filtered));
     }
 
-    // --- CÁC HÀM XỬ LÝ SỰ KIỆN TỪ FXML GIỮ NGUYÊN ---
+    // --- CÃƒÂC HÃƒâ‚¬M XÃ¡Â»Â¬ LÃƒÂ SÃ¡Â»Â° KIÃ¡Â»â€ N TÃ¡Â»Âª FXML GIÃ¡Â»Â® NGUYÃƒÅ N ---
     @FXML private void handleTabAll() { selectTab("all", tabAll); }
     @FXML private void handleTabActive() { selectTab("OPEN", tabActive); }
     @FXML private void handleTabPending() { selectTab("PENDING", tabPending); }
@@ -231,22 +214,22 @@ public class SellerManagementController {
     @FXML private void handleExportData() { LoggerUtil.info("Exporting data..."); }
     @FXML private void handleCreateAuction() { LoggerUtil.info("Opening create auction form..."); }
 
-    @FXML private void handlePrevPage() { LoggerUtil.info("Trang trước"); }
+    @FXML private void handlePrevPage() { LoggerUtil.info("Trang trÃ†Â°Ã¡Â»â€ºc"); }
     @FXML private void handleNextPage() { LoggerUtil.info("Trang sau"); }
     @FXML private void handlePage1() { LoggerUtil.info("Trang 1"); }
     @FXML private void handlePage2() { LoggerUtil.info("Trang 2"); }
     @FXML private void handlePage3() { LoggerUtil.info("Trang 3"); }
 
-    private String formatVnd(long a) { return String.format("%,d đ", a).replace(',', '.'); }
+    private String formatVnd(long a) { return String.format("%,d Ã„â€˜", a).replace(',', '.'); }
 
-    // Đã bỏ hàm formatTime() thủ công vì chuyển sang dùng DateTimeUtil
+    // Ã„ÂÃƒÂ£ bÃ¡Â»Â hÃƒÂ m formatTime() thÃ¡Â»Â§ cÃƒÂ´ng vÃƒÂ¬ chuyÃ¡Â»Æ’n sang dÃƒÂ¹ng DateTimeUtil
 
     public static class AuctionItem {
         private String id, name, status;
-        private long startPrice, currentPrice, endTime; // Đổi timeLeftSeconds thành endTime
+        private long startPrice, currentPrice, endTime; // Ã„ÂÃ¡Â»â€¢i timeLeftSeconds thÃƒÂ nh endTime
         private int bids;
         private final SimpleBooleanProperty selected = new SimpleBooleanProperty(false);
-        private final SimpleStringProperty timeLeftStr = new SimpleStringProperty(""); // Biến giữ thời gian đã format
+        private final SimpleStringProperty timeLeftStr = new SimpleStringProperty(""); // BiÃ¡ÂºÂ¿n giÃ¡Â»Â¯ thÃ¡Â»Âi gian Ã„â€˜ÃƒÂ£ format
 
         public AuctionItem(String id, String name, long sp, long cp, int b, String s, long endTime) {
             this.id = id; this.name = name; this.startPrice = sp;
@@ -254,10 +237,10 @@ public class SellerManagementController {
             updateTime();
         }
 
-        // --- HÀM CẬP NHẬT THỜI GIAN THEO CHUẨN DATETIMEUTIL ---
+        // --- HÃƒâ‚¬M CÃ¡ÂºÂ¬P NHÃ¡ÂºÂ¬T THÃ¡Â»Å“I GIAN THEO CHUÃ¡ÂºÂ¨N DATETIMEUTIL ---
         public void updateTime() {
             if (DateTimeUtil.isExpired(endTime)) {
-                timeLeftStr.set("Hết");
+                timeLeftStr.set("HÃ¡ÂºÂ¿t");
             } else {
                 long remainingMs = endTime - System.currentTimeMillis();
                 timeLeftStr.set(DateTimeUtil.formatTimestamp(remainingMs));
@@ -272,6 +255,6 @@ public class SellerManagementController {
         public int getBids() { return bids; }
         public long getEndTime() { return endTime; }
         public SimpleBooleanProperty selectedProperty() { return selected; }
-        public SimpleStringProperty timeLeftStrProperty() { return timeLeftStr; } // Cung cấp cho TableColumn
+        public SimpleStringProperty timeLeftStrProperty() { return timeLeftStr; } // Cung cÃ¡ÂºÂ¥p cho TableColumn
     }
 }

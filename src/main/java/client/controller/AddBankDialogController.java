@@ -13,7 +13,6 @@ public class AddBankDialogController {
 
     @FXML private TextField bankNameField;
     @FXML private TextField accountNumberField;
-    @FXML private TextField initialBalanceField;
 
     @FunctionalInterface
     public interface OnBankLinkedListener {
@@ -41,22 +40,26 @@ public class AddBankDialogController {
 
     @FXML
     private void handleConfirmBankLink(ActionEvent event) {
-        // Tránh lỗi NullPointerException nếu FXML không map id chính xác
         String bank = bankNameField != null ? bankNameField.getText().trim() : "";
         String account = accountNumberField != null ? accountNumberField.getText().trim() : "";
+        account = account.replaceAll("[\\s-]", "");
 
         if (bank.isEmpty() || account.isEmpty()) {
             showAlert(Alert.AlertType.WARNING, "Thiếu dữ liệu", "Vui lòng nhập đầy đủ thông tin ngân hàng.");
             return;
         }
 
-        // Tặng sẵn 10.000.000đ khi thêm ngân hàng mới để test
-        double initialBalance = 10000000.0;
-
-        if (onBankLinkedListener != null) {
-            onBankLinkedListener.onBankLinked(bank, account, initialBalance);
+        if (!account.matches("\\d{6,20}")) {
+            showAlert(Alert.AlertType.WARNING, "Số tài khoản không hợp lệ", "Số tài khoản chỉ gồm 6-20 chữ số.");
+            return;
         }
 
+        if (onBankLinkedListener == null) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể liên kết ngân hàng lúc này.");
+            return;
+        }
+
+        onBankLinkedListener.onBankLinked(bank, account, 10_000_000.0);
         closePopup(event);
     }
 
@@ -65,8 +68,8 @@ public class AddBankDialogController {
         if (onCloseCallback != null) {
             onCloseCallback.run();
         }
-        if (event.getSource() instanceof Node) {
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        if (event.getSource() instanceof Node node) {
+            Stage stage = (Stage) node.getScene().getWindow();
             stage.close();
         }
     }

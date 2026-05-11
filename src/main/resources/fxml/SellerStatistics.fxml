@@ -8,8 +8,9 @@
 
 <ScrollPane fitToWidth="true"
             hbarPolicy="NEVER"
-            style="-fx-background-color: transparent; -fx-background: transparent;
+            style="-fx-background-color: #fcfcfc;
             -fx-background: #fcfcfc;"
+            stylesheets="@../CSS/style.css"
             vbarPolicy="NEVER"
             xmlns="http://javafx.com/javafx/17.0.12"
             xmlns:fx="http://javafx.com/fxml/1"

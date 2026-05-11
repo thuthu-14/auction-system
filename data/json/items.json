@@ -8,7 +8,7 @@
     "startingPrice": 2.0E7,
     "category": "FASHION",
     "sellerId": "U1777878819404",
-    "createdAt": 1778403491838,
+    "createdAt": 1778485932128,
     "images": [
       "file:/C:/Users/dodin/Downloads/he-dieu-hanh-one-ui-tren-dien-thoai-samsung.jpg"
     ]
@@ -22,7 +22,7 @@
     "startingPrice": 10000.0,
     "category": "FASHION",
     "sellerId": "U1777887117887",
-    "createdAt": 1778403491839,
+    "createdAt": 1778485932129,
     "images": [
       "file:/C:/Users/Admin/Downloads/vn-11134207-81ztc-mlpqzu8c2e4i28.jpg"
     ]
@@ -36,25 +36,41 @@
     "startingPrice": 100000.0,
     "category": "FASHION",
     "sellerId": "U1777887117887",
-    "createdAt": 1778403491839,
+    "createdAt": 1778485932129,
     "images": [
       "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20154640.png",
       "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20154657.png"
     ]
   },
   {
-    "brand": "Lilibyred",
-    "material": "tint bóng",
+    "brand": "",
+    "material": "",
     "itemId": "IT1778403491811",
     "name": "Son Kem Bóng Lì Lilybyred Bloody Liar Coating Tint 4g",
     "description": "Son Kem Bóng Lì Lilybyred Bloody Liar Coating Tint 4g \n\n\n\n1. ƯU ĐIỂM SẢN PHẨM:\n\n- Son kem bóng mang lại đôi môi căng mướt, mềm mại\n\n- Chứa tinh dầu jojoba giúp nuôi dưỡng bờ môi khô bong tróc\n\n- Chất son hòa quyện mang lại màu sắc môi tự nhiên\n\n- Không gây nặng môi, hỗ trợ che phủ vân môi\n\n- Son Lilybyred Bloody Liar Coating Tint mang mùi hương trái cây dịu ngọt khiến bạn\n\nyêu thích.",
     "startingPrice": 80000.0,
     "category": "FASHION",
     "sellerId": "U1777887117887",
-    "createdAt": 1778403491810,
+    "createdAt": 1778485932129,
     "images": [
       "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20155623.png",
       "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-10%20155631.png"
+    ]
+  },
+  {
+    "brand": "Traffy",
+    "material": "Cotton",
+    "itemId": "IT1778485932110",
+    "name": "Áo Thun Tay Ngắn TRAFFY \"HEART GIRL-HOT GIRL\" In Trái Tim",
+    "description": "Áo Thun Tay DàI TRAFFY \"HEART GIRL - HOT GIRL\" l TRAFFY HEART GIRL - HOT GIRL Long-Sleeves T-Shirt\n\n\n\n• CHẤT LƯỢNG VƯỢT TRỘI\n\nChất liệu vải cao cấp (80% cotton/ 20% spandex), mềm mại, thoáng mát, thấm hút mồ hôi, cotton pha spandex không dễ bị nhão áo, mang lại cảm giác dễ chịu tối đa khi mặc – đặc biệt thích hợp với khí hậu nóng ẩm Việt Nam. Áo giữ form chuẩn, không bị bai nhão hay chảy xệ sau nhiều lần giặt, hạn chế co rút và có độ bền cao kể cả khi giặt máy.\n\n\n\n• THIẾT KẾ ĐỘC ĐÁO\n\nForm Regular tay dài mang lại cảm giác thoải mái, dễ mặc và dễ phối đồ. Details nổi bật: Hình cô gái nằm dưới trái tim sử dụng công nghệ in DTF cao cấp, mặt trước in decal ngôi sao kim tuyến StarGirl/ Starboy, công nghệ in chất lượng không bong tróc kể cả giặt máy. Thiết kế vừa cổ điển vừa độc đáo và cá tính thời trang riêng biệt.\n\nMọi chi tiết từ đường may, cổ áo đến form dáng đều được gia công tỉ mỉ, đảm bảo sự chỉn chu trong từng sản phẩm.",
+    "startingPrice": 100000.0,
+    "category": "FASHION",
+    "sellerId": "U1777887117887",
+    "createdAt": 1778485932110,
+    "images": [
+      "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-11%20091649.png",
+      "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-11%20091749.png",
+      "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-11%20091734.png"
     ]
   }
 ]

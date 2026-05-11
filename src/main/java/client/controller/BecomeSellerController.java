@@ -2,8 +2,8 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
-import common.Message;
-import common.MessageType;
+import client.service.AuthClientService;
+import client.service.SellerClientService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,10 +11,6 @@ import javafx.scene.control.*;
 import navigation.NavigationManager;
 import server.model.User;
 import server.model.RegularUser;
-import util.JsonUtil;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class BecomeSellerController {
 
@@ -32,6 +28,8 @@ public class BecomeSellerController {
 
     private User currentUser;
     private boolean isPasswordVisible = false;
+    private final SellerClientService sellerClientService = new SellerClientService();
+    private final AuthClientService authClientService = new AuthClientService();
 
     @FXML
     public void initialize() {
@@ -58,15 +56,15 @@ public class BecomeSellerController {
         String password = getPassword();
 
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || address.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đầy đủ tất cả các thông tin!");
+            showAlert(Alert.AlertType.WARNING, "ThÃƒÂ´ng bÃƒÂ¡o", "Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p Ã„â€˜Ã¡ÂºÂ§y Ã„â€˜Ã¡Â»Â§ tÃ¡ÂºÂ¥t cÃ¡ÂºÂ£ cÃƒÂ¡c thÃƒÂ´ng tin!");
             return null;
         }
         if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đúng định dạng email!");
+            showAlert(Alert.AlertType.WARNING, "ThÃƒÂ´ng bÃƒÂ¡o", "Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p Ã„â€˜ÃƒÂºng Ã„â€˜Ã¡Â»â€¹nh dÃ¡ÂºÂ¡ng email!");
             return null;
         }
         if (!phone.matches("\\d{10,11}")) {
-            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đúng SDT");
+            showAlert(Alert.AlertType.WARNING, "ThÃƒÂ´ng bÃƒÂ¡o", "Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p Ã„â€˜ÃƒÂºng SDT");
             return null;
         }
         return new SellerData(name, email, phone, address, password);
@@ -75,19 +73,19 @@ public class BecomeSellerController {
     @FXML
     private void handleSave() {
         if (this.currentUser == null) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không lấy được thông tin user hiện tại!");
+            showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i", "KhÃƒÂ´ng lÃ¡ÂºÂ¥y Ã„â€˜Ã†Â°Ã¡Â»Â£c thÃƒÂ´ng tin user hiÃ¡Â»â€¡n tÃ¡ÂºÂ¡i!");
             return;
         }
 
         if (!(currentUser instanceof RegularUser)) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Chỉ người dùng thường mới có thể nâng cấp!");
+            showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i", "ChÃ¡Â»â€° ngÃ†Â°Ã¡Â»Âi dÃƒÂ¹ng thÃ†Â°Ã¡Â»Âng mÃ¡Â»â€ºi cÃƒÂ³ thÃ¡Â»Æ’ nÃƒÂ¢ng cÃ¡ÂºÂ¥p!");
             return;
         }
 
         RegularUser regularUser = (RegularUser) currentUser;
 
         if (regularUser.isSeller()) {
-            showAlert(Alert.AlertType.WARNING, "Thông báo", "Bạn đã là Người bán rồi! Không cần nâng cấp lại.");
+            showAlert(Alert.AlertType.WARNING, "ThÃƒÂ´ng bÃƒÂ¡o", "BÃ¡ÂºÂ¡n Ã„â€˜ÃƒÂ£ lÃƒÂ  NgÃ†Â°Ã¡Â»Âi bÃƒÂ¡n rÃ¡Â»â€œi! KhÃƒÂ´ng cÃ¡ÂºÂ§n nÃƒÂ¢ng cÃ¡ÂºÂ¥p lÃ¡ÂºÂ¡i.");
             NavigationManager.getInstance().goToHome();
             return;
         }
@@ -95,61 +93,31 @@ public class BecomeSellerController {
         SellerData data = validateInput();
         if (data != null) {
             btnSave.setDisable(true);
-            btnSave.setText("Đang xử lý...");
+            btnSave.setText("Ã„Âang xÃ¡Â»Â­ lÃƒÂ½...");
 
             new Thread(() -> {
                 try {
                     ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
                     if (socket == null) {
-                        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Chưa kết nối tới Server!"));
+                        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi mang", "Chua ket noi toi Server!"));
                         return;
                     }
 
-                    // 1. Đóng gói dữ liệu gửi Server
-                    Map<String, String> payload = new HashMap<>();
-                    payload.put("userId", currentUser.getUserId());
-                    payload.put("shopName", data.name());
-                    payload.put("phone", data.phone());
-                    payload.put("address", data.address());
-                    payload.put("email", data.email());
-
-                    // 2. Gửi lệnh UPGRADE_SELLER
-                    Message request = new Message(MessageType.UPGRADE_SELLER, payload, currentUser.getUsername());
-
-                    // 3. Chờ phản hồi
-                    Message response = socket.sendAndReceive(request);
+                    sellerClientService.upgradeSeller(socket, regularUser, data.name(), data.phone(), data.address(), data.email());
 
                     Platform.runLater(() -> {
-                        if (response != null && "SUCCESS".equals(response.getStatus())) {
-
-                            // Cập nhật User cục bộ
-                            regularUser.upgradeSeller(data.name(), data.phone(), data.address(), data.email());
-
-                            // Lưu JSON cục bộ cho Client
-                            try {
-                                Map<String, String> sellerIdMap = new HashMap<>();
-                                sellerIdMap.put("sellerId", regularUser.getUserId());
-                                sellerIdMap.put("sellerName", regularUser.getShopName());
-                                sellerIdMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
-                                JsonUtil.saveToJson("data/json/current_seller_id.json", sellerIdMap);
-                            } catch (Exception ignored) {}
-
-                            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chúc mừng! Bạn đã trở thành Người bán!");
-
-                            NavigationManager.getInstance().setMainStage((javafx.stage.Stage) nameField.getScene().getWindow());
-                            NavigationManager.getInstance().goToSellerHome();
-                        } else {
-                            String errorMsg = response != null ? response.getMessage() : "Lỗi không xác định";
-                            showAlert(Alert.AlertType.ERROR, "Lỗi Server", errorMsg);
-                        }
+                        regularUser.upgradeSeller(data.name(), data.phone(), data.address(), data.email());
+                        authClientService.saveSellerContext(regularUser);
+                        showAlert(Alert.AlertType.INFORMATION, "Thanh cong", "Chuc mung! Ban da tro thanh Nguoi ban!");
+                        NavigationManager.getInstance().setMainStage((javafx.stage.Stage) nameField.getScene().getWindow());
+                        NavigationManager.getInstance().goToSellerHome();
                     });
-
                 } catch (Exception e) {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi kết nối", "Không thể kết nối tới Server."));
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi Server", e.getMessage()));
                 } finally {
                     Platform.runLater(() -> {
                         btnSave.setDisable(false);
-                        btnSave.setText("Đăng ký");
+                        btnSave.setText("Ã„ÂÃ„Æ’ng kÃƒÂ½");
                     });
                 }
             }).start();
@@ -175,11 +143,11 @@ public class BecomeSellerController {
         if (isPasswordVisible) {
             passwordTextField.setText(passwordField.getText());
             showPassword(true);
-            btnTogglePassword.setText("🔒");
+            btnTogglePassword.setText("Ã°Å¸â€â€™");
         } else {
             passwordField.setText(passwordTextField.getText());
             showPassword(false);
-            btnTogglePassword.setText("👁");
+            btnTogglePassword.setText("Ã°Å¸â€˜Â");
         }
     }
 

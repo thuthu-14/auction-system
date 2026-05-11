@@ -2,6 +2,7 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AuctionHistoryClientService;
 import client.util.DialogUtil;
 import common.AuctionStatus;
 import common.Message;
@@ -22,12 +23,9 @@ import navigation.NavigationManager;
 import server.model.Auction;
 import server.model.Bid;
 import server.model.Item;
-import server.model.RegularUser;
 import server.model.User;
-import util.JsonUtil;
 import util.LoggerUtil;
 
-import java.io.File;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -63,6 +61,7 @@ public class AuctionHistoryController {
     private ClientSocket clientSocket;
     private HomeScreenController homeController;
     private boolean contextInjected;
+    private final AuctionHistoryClientService historyService = new AuctionHistoryClientService();
 
     @FXML
     private void initialize() {
@@ -134,9 +133,7 @@ public class AuctionHistoryController {
 
         new Thread(() -> {
             try {
-                Message response = clientSocket.sendAndReceive(
-                        new Message(MessageType.GET_USER_BIDS, currentUser.getUserId(), currentUser.getUsername()));
-                List<Bid> bids = extractBidList(response != null ? response.getData() : null);
+                List<Bid> bids = historyService.fetchUserBids(clientSocket, currentUser);
                 if (bids.isEmpty()) {
                     loadHistoryFromLocalFiles(List.of(), true);
                     return;
@@ -157,7 +154,7 @@ public class AuctionHistoryController {
                         rows.add(new HistoryRow(bid, auction));
                     }
                 }
-                addWonAuctionRows(rows, loadLocalAuctionsById(), loadLocalBids(false));
+                addWonAuctionRows(rows, historyService.loadLocalAuctionsById(), historyService.loadLocalBids(currentUser, false));
 
                 rows.sort(Comparator.comparingLong((HistoryRow row) -> row.bid.getBidTime()).reversed());
                 Platform.runLater(() -> {
@@ -176,10 +173,10 @@ public class AuctionHistoryController {
         new Thread(() -> {
             try {
                 List<Bid> bids = preferredBids == null || preferredBids.isEmpty()
-                        ? loadLocalBids(filterByCurrentUser)
+                        ? historyService.loadLocalBids(currentUser, filterByCurrentUser)
                         : preferredBids;
-                Map<String, Auction> auctionCache = loadLocalAuctionsById();
-                List<Bid> allLocalBids = loadLocalBids(false);
+                Map<String, Auction> auctionCache = historyService.loadLocalAuctionsById();
+                List<Bid> allLocalBids = historyService.loadLocalBids(currentUser, false);
                 List<HistoryRow> rows = new ArrayList<>();
 
                 for (Bid bid : bids) {
@@ -218,15 +215,11 @@ public class AuctionHistoryController {
 
     private Auction fetchAuction(String auctionId) {
         try {
-            Message response = clientSocket.sendAndReceive(
-                    new Message(MessageType.GET_AUCTION_DETAIL, auctionId, currentUser.getUsername()));
-            if (response != null && "SUCCESS".equals(response.getStatus()) && response.getData() instanceof Auction auction) {
-                return auction;
-            }
+            return historyService.fetchAuction(clientSocket, currentUser, auctionId);
         } catch (Exception e) {
             LoggerUtil.error("Fetch auction failed: " + e.getMessage());
+            return null;
         }
-        return null;
     }
 
     private void applyFilters() {
@@ -262,7 +255,7 @@ public class AuctionHistoryController {
             return;
         }
 
-        Map<String, String> localContact = findLocalSellerContact(auction);
+        Map<String, String> localContact = historyService.findLocalSellerContact(auction);
         if (localContact != null && hasUsefulContact(localContact)) {
             showContactDialog(localContact, auction);
             return;
@@ -274,22 +267,8 @@ public class AuctionHistoryController {
         }
 
         new Thread(() -> {
-            try {
-                Message response = clientSocket.sendAndReceive(
-                        new Message(MessageType.GET_SELLER_CONTACT, auction.getSellerId(), currentUser.getUsername()));
-                if (response != null && "SUCCESS".equals(response.getStatus()) && response.getData() instanceof Map<?, ?> data) {
-                    Map<String, String> contact = new HashMap<>();
-                    contact.put("name", asText(data.get("name"), auction.getSellerName()));
-                    contact.put("email", asText(data.get("email"), "Ch\u01b0a c\u1eadp nh\u1eadt"));
-                    contact.put("phone", asText(data.get("phone"), "Ch\u01b0a c\u1eadp nh\u1eadt"));
-                    Platform.runLater(() -> showContactDialog(contact, auction));
-                } else {
-                    Platform.runLater(() -> showContactDialog(localContact, auction));
-                }
-            } catch (Exception e) {
-                LoggerUtil.error("Load seller contact failed: " + e.getMessage());
-                Platform.runLater(() -> showContactDialog(localContact, auction));
-            }
+            Map<String, String> contact = historyService.fetchSellerContact(clientSocket, currentUser, auction);
+            Platform.runLater(() -> showContactDialog(contact != null ? contact : localContact, auction));
         }, "SellerContactLoader").start();
     }
 
@@ -310,47 +289,6 @@ public class AuctionHistoryController {
                 historyTable);
     }
 
-    private Map<String, String> findLocalSellerContact(Auction auction) {
-        if (auction == null) {
-            return null;
-        }
-
-        File usersFile = findDataFile("users.json");
-        if (!usersFile.exists()) {
-            return null;
-        }
-
-        try {
-            List<User> users = JsonUtil.loadListFromJson(usersFile.getPath(), User.class);
-            for (User user : users != null ? users : List.<User>of()) {
-                if (user == null) {
-                    continue;
-                }
-                boolean sameSeller = (auction.getSellerId() != null && auction.getSellerId().equals(user.getUserId()))
-                        || (auction.getSellerName() != null && auction.getSellerName().equalsIgnoreCase(user.getUsername()));
-                if (!sameSeller) {
-                    continue;
-                }
-
-                Map<String, String> contact = new HashMap<>();
-                contact.put("name", safeContact(user.getUsername(), auction.getSellerName()));
-                contact.put("email", safeContact(user.getEmail(), "Ch\u01b0a c\u1eadp nh\u1eadt"));
-                contact.put("phone", "Ch\u01b0a c\u1eadp nh\u1eadt");
-                contact.put("address", "Ch\u01b0a c\u1eadp nh\u1eadt");
-                if (user instanceof RegularUser regularUser) {
-                    contact.put("name", safeContact(regularUser.getShopName(), user.getUsername()));
-                    contact.put("email", safeContact(regularUser.getShopEmail(), user.getEmail()));
-                    contact.put("phone", safeContact(regularUser.getShopPhone(), "Ch\u01b0a c\u1eadp nh\u1eadt"));
-                    contact.put("address", safeContact(regularUser.getShopAddress(), "Ch\u01b0a c\u1eadp nh\u1eadt"));
-                }
-                return contact;
-            }
-        } catch (Exception e) {
-            LoggerUtil.error("Load local seller contact failed: " + e.getMessage());
-        }
-        return null;
-    }
-
     private boolean hasUsefulContact(Map<String, String> contact) {
         return contact != null
                 && (!"Ch\u01b0a c\u1eadp nh\u1eadt".equals(contact.get("phone"))
@@ -361,72 +299,8 @@ public class AuctionHistoryController {
         return value != null && !value.isBlank() ? value : fallback;
     }
 
-    private List<Bid> extractBidList(Object rawData) {
-        if (!(rawData instanceof List<?> rawList)) {
-            return List.of();
-        }
-
-        List<Bid> bids = new ArrayList<>();
-        for (Object item : rawList) {
-            if (item instanceof Bid bid) {
-                bids.add(bid);
-            }
-        }
-        return bids;
-    }
-
-    private List<Bid> loadLocalBids(boolean filterByCurrentUser) {
-        File bidsFile = findDataFile("bids.json");
-        if (!bidsFile.exists()) {
-            LoggerUtil.warn("Local bids.json not found from: " + new File(".").getAbsolutePath());
-            return List.of();
-        }
-
-        try {
-            List<Bid> allBids = JsonUtil.loadListFromJson(bidsFile.getPath(), Bid.class);
-            List<Bid> userBids = new ArrayList<>();
-            for (Bid bid : allBids != null ? allBids : List.<Bid>of()) {
-                if (!filterByCurrentUser || isBidFromCurrentUser(bid)) {
-                    userBids.add(bid);
-                }
-            }
-            userBids.sort(Comparator.comparingLong(Bid::getBidTime).reversed());
-            LoggerUtil.info("Local auction history bids loaded: " + userBids.size());
-            return userBids;
-        } catch (Exception e) {
-            LoggerUtil.error("Local user bids load failed: " + e.getMessage());
-            return List.of();
-        }
-    }
-
     private boolean isBidFromCurrentUser(Bid bid) {
-        if (bid == null || currentUser == null) {
-            return false;
-        }
-        String userId = currentUser.getUserId();
-        return userId != null && userId.equals(bid.getBidderId());
-    }
-
-    private Map<String, Auction> loadLocalAuctionsById() {
-        File auctionsFile = findDataFile("auctions.json");
-        if (!auctionsFile.exists()) {
-            LoggerUtil.warn("Local auctions.json not found from: " + new File(".").getAbsolutePath());
-            return Map.of();
-        }
-
-        try {
-            List<Auction> auctions = JsonUtil.loadListFromJson(auctionsFile.getPath(), Auction.class);
-            Map<String, Auction> auctionsById = new HashMap<>();
-            for (Auction auction : auctions != null ? auctions : List.<Auction>of()) {
-                if (auction != null && auction.getAuctionId() != null) {
-                    auctionsById.put(auction.getAuctionId(), auction);
-                }
-            }
-            return auctionsById;
-        } catch (Exception e) {
-            LoggerUtil.error("Local auctions load failed: " + e.getMessage());
-            return Map.of();
-        }
+        return historyService.isBidFromUser(bid, currentUser);
     }
 
     private void addWonAuctionRows(List<HistoryRow> rows, Map<String, Auction> auctionsById, List<Bid> allBids) {
@@ -491,23 +365,6 @@ public class AuctionHistoryController {
         }
         String userId = currentUser.getUserId();
         return userId != null && userId.equals(auction.getHighestBidderId());
-    }
-
-    private File findDataFile(String fileName) {
-        File current = new File(System.getProperty("user.dir")).getAbsoluteFile();
-        for (int i = 0; i < 8 && current != null; i++) {
-            File candidate = new File(current, "data/json/" + fileName);
-            if (candidate.exists()) {
-                return candidate;
-            }
-            current = current.getParentFile();
-        }
-        return new File("data/json/" + fileName);
-    }
-
-    private String asText(Object value, String fallback) {
-        String text = value != null ? value.toString() : "";
-        return text.isBlank() ? fallback : text;
     }
 
     private String formatDate(long timestamp) {
