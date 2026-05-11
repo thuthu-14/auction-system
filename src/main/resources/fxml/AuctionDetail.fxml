@@ -91,7 +91,7 @@
                                                 <Button fx:id="confirmBidBtn" onAction="#handleConfirmBid" mnemonicParsing="false" prefHeight="55.0" maxWidth="1.7976931348623157E308" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="XÁC NHẬN ĐẤU GIÁ" />
                                             </children>
                                         </VBox>
-                                        <Label fx:id="endedAuctionLabel" alignment="CENTER" managed="false" maxWidth="1.7976931348623157E308" prefHeight="82.0" style="-fx-background-color: #fff1f2; -fx-border-color: #fecdd3; -fx-background-radius: 8; -fx-border-radius: 8; -fx-text-fill: #dc2626; -fx-font-size: 24px; -fx-font-weight: bold;" text="ĐÃ KẾT THÚC" visible="false" />
+                                        <Label fx:id="endedAuctionLabel" alignment="CENTER" managed="false" maxWidth="1.7976931348623157E308" prefHeight="82.0" style="-fx-background-color: #fff1f2; -fx-border-color: #fecdd3; -fx-background-radius: 8; -fx-border-radius: 8; -fx-text-fill: #dc2626; -fx-font-size: 24px; -fx-font-weight: bold;" text="?? KẾT THÚC" visible="false" />
                                     </children>
                                 </VBox>
                             </children>

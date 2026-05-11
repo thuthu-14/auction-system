@@ -109,6 +109,19 @@
     "active": true
   },
   {
+    "ownedAuctionIds": [],
+    "bidIds": [],
+    "isSeller": false,
+    "userId": "U1778509268127",
+    "username": "baongoc",
+    "password": "Bhbnbhbn146",
+    "email": "bhbn@gmail.com",
+    "wallet": 1221600.0,
+    "role": "BIDDER",
+    "createdAt": 1778509268128,
+    "active": true
+  },
+  {
     "ownedAuctionIds": [
       "AU1777941343347",
       "AU1778402863464",
@@ -236,7 +249,7 @@
     "username": "buingoc",
     "password": "bhbnbhbn",
     "email": "bhbngoc@gmail.com",
-    "wallet": 9198886.0,
+    "wallet": 9152551.0,
     "role": "SELLER",
     "createdAt": 1777887117887,
     "active": true
@@ -275,7 +288,7 @@
     "username": "thunguyen",
     "password": "ntntnt",
     "email": "nt@gmail.com",
-    "wallet": 2.7019999E7,
+    "wallet": 2.6929999E7,
     "role": "BIDDER",
     "createdAt": 1778403578743,
     "active": true

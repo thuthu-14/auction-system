@@ -531,8 +531,8 @@ public class AuctionDetailController {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Giá theo lượt đặt");
 
-        XYChart.Data<String, Number> basePoint = new XYChart.Data<>("GiÃ¡ Ä‘áº§u", firstValue);
-        basePoint.setNode(createBidPoint("GiÃ¡ Ä‘áº§u\n" + formatVnd(firstValue)));
+        XYChart.Data<String, Number> basePoint = new XYChart.Data<>("Giá đầu", firstValue);
+        basePoint.setNode(createBidPoint("Giá đầu\n" + formatVnd(firstValue)));
         series.getData().add(basePoint);
         basePoint.setXValue("\u0110i\u1ec3m kh\u1edfi \u0111\u1ea7u");
         basePoint.setNode(createBidPoint("\u0110i\u1ec3m kh\u1edfi \u0111\u1ea7u\n" + formatVnd(firstValue)));

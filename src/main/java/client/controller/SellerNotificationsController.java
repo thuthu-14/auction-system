@@ -74,7 +74,7 @@ public class SellerNotificationsController implements Initializable {
                 User user = resolveUser();
 
                 if (socket == null || user == null) {
-                    Platform.runLater(() -> showEmptyState("KhÃ´ng cÃ³ dá»¯ liá»‡u ngÆ°á»i dÃ¹ng hoáº·c káº¿t ná»‘i server."));
+                    Platform.runLater(() -> showEmptyState("Không có dữ liệu người dùng hoặc kết nối server."));
                     return;
                 }
 
@@ -84,12 +84,12 @@ public class SellerNotificationsController implements Initializable {
                     if (response != null && response.getData() instanceof List<?> rawList) {
                         renderNotifications(rawList);
                     } else {
-                        showEmptyState("ChÆ°a cÃ³ thÃ´ng bÃ¡o nÃ o.");
+                        showEmptyState("Chưa có thông báo nào.");
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Lá»—i load seller notifications: " + e.getMessage());
-                Platform.runLater(() -> showEmptyState("KhÃ´ng táº£i Ä‘Æ°á»£c thÃ´ng bÃ¡o."));
+                LoggerUtil.error("Lỗi load seller notifications: " + e.getMessage());
+                Platform.runLater(() -> showEmptyState("Không tải được thông báo."));
             }
         }).start();
     }
@@ -105,7 +105,7 @@ public class SellerNotificationsController implements Initializable {
         }
 
         if (notificationsContainer.getChildren().isEmpty()) {
-            showEmptyState("ChÆ°a cÃ³ thÃ´ng bÃ¡o nÃ o.");
+            showEmptyState("Chưa có thông báo nào.");
         }
     }
 
@@ -128,7 +128,7 @@ public class SellerNotificationsController implements Initializable {
         VBox contentBox = new VBox(5);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
 
-        Label titleLabel = new Label(defaultText(data.getTitle(), "ThÃ´ng bÃ¡o"));
+        Label titleLabel = new Label(defaultText(data.getTitle(), "Thông báo"));
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
         titleLabel.setStyle("-fx-text-fill: " + getTitleColor(data) + ";");
 
@@ -147,7 +147,7 @@ public class SellerNotificationsController implements Initializable {
         timeLabel.setStyle("-fx-text-fill: #9ca3af;");
         timeLabelUpdaters.add(() -> timeLabel.setText(data.formatTimeAgo()));
 
-        Button actionBtn = new Button(defaultText(data.getButtonText(), "Xem chi tiáº¿t"));
+        Button actionBtn = new Button(defaultText(data.getButtonText(), "Xem chi tiết"));
         actionBtn.setFont(Font.font("System", FontWeight.BOLD, 14));
         actionBtn.setStyle(getButtonStyle(data));
         actionBtn.setOnAction(event -> handleNotificationAction(data));
@@ -164,7 +164,7 @@ public class SellerNotificationsController implements Initializable {
                 ClientSocket socket = resolveSocket();
                 User user = resolveUser();
                 if (socket == null || user == null) {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lá»—i", "Máº¥t káº¿t ná»‘i tá»›i server."));
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Mất kết nối tới server."));
                     return;
                 }
 
@@ -173,12 +173,12 @@ public class SellerNotificationsController implements Initializable {
                     if (response != null && "SUCCESS".equals(response.getStatus())) {
                         loadNotifications();
                     } else {
-                        showAlert(Alert.AlertType.ERROR, "Lá»—i", "KhÃ´ng thá»ƒ Ä‘Ã¡nh dáº¥u Ä‘Ã£ Ä‘á»c.");
+                        showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đánh dấu đã đọc.");
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Lá»—i mark seller notifications read: " + e.getMessage());
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lá»—i", "KhÃ´ng thá»ƒ Ä‘Ã¡nh dáº¥u Ä‘Ã£ Ä‘á»c."));
+                LoggerUtil.error("Lỗi mark seller notifications read: " + e.getMessage());
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đánh dấu đã đọc."));
             }
         }).start();
     }
@@ -198,7 +198,7 @@ public class SellerNotificationsController implements Initializable {
     }
 
     private void showLoadingState() {
-        notificationsContainer.getChildren().setAll(createStateLabel("Äang táº£i thÃ´ng bÃ¡o..."));
+        notificationsContainer.getChildren().setAll(createStateLabel("Đang tải thông báo..."));
     }
 
     private void showEmptyState(String text) {

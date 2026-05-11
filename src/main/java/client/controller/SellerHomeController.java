@@ -200,8 +200,13 @@ public class SellerHomeController {
     @FXML
     public void loadWalletView() {
         loadView("/fxml/WalletView.fxml", menuPay, controller -> {
-            if (controller instanceof WalletController && currentUser != null && clientSocket != null) {
-                ((WalletController) controller).setUserData(currentUser, clientSocket);
+            if (controller instanceof WalletController walletController) {
+                User user = currentUser != null ? currentUser : NavigationManager.getInstance().getCurrentUser();
+                ClientSocket socket = clientSocket != null
+                        ? clientSocket
+                        : NavigationManager.getInstance().getClientSocket();
+                walletController.setUserData(user, socket);
+                walletController.reloadWalletData();
             } else {
                 LoggerUtil.warn("Không thể truyền data cho WalletController vì user/socket bị null");
             }
@@ -238,7 +243,7 @@ public class SellerHomeController {
             contentArea.getChildren().setAll(node);
             clearStaleWalletOverlays();
             if (controller instanceof WalletController walletController) {
-                Platform.runLater(walletController::refreshVisualState);
+                Platform.runLater(walletController::reloadWalletData);
             }
         } catch (Exception e) {
             LoggerUtil.error("Lỗi load giao diện " + fxmlPath + ": " + e.getMessage());

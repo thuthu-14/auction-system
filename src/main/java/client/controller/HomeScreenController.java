@@ -203,8 +203,16 @@ public class HomeScreenController {
     public void loadWalletView() {
         updateMenuSelection(menuPay);
         loadView("/fxml/WalletView.fxml", controller -> {
-            if (controller instanceof WalletController && currentUser != null && clientSocket != null) {
-                ((WalletController) controller).setUserData(currentUser, clientSocket);
+            if (controller instanceof WalletController walletController) {
+                User user = currentUser != null ? currentUser : NavigationManager.getInstance().getCurrentUser();
+                ClientSocket socket = clientSocket != null
+                        ? clientSocket
+                        : ConnectionManager.getInstance().getClientSocket();
+                if (socket == null) {
+                    socket = NavigationManager.getInstance().getClientSocket();
+                }
+                walletController.setUserData(user, socket);
+                walletController.reloadWalletData();
             }
         });
     }

@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import server.model.User;
+import util.JsonUtil;
 import util.LoggerUtil;
 
 import java.nio.file.Files;
@@ -20,8 +21,10 @@ import java.util.Map;
 
 public class WalletService {
 
-    private static final String BANK_FILE = "data/json/bank_accounts.json";
-    private static final String TRANSACTIONS_FILE = "data/json/transactions.json";
+    private static final Path DATA_DIR = resolveProjectRoot().resolve("data").resolve("json");
+    private static final Path USERS_FILE = DATA_DIR.resolve("users.json");
+    private static final Path BANK_FILE = DATA_DIR.resolve("bank_accounts.json");
+    private static final Path TRANSACTIONS_FILE = DATA_DIR.resolve("transactions.json");
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -96,7 +99,7 @@ public class WalletService {
     public BankAccountEntry loadBankAccount(User user) {
         try {
             if (user == null) return null;
-            Path path = Paths.get(BANK_FILE);
+            Path path = BANK_FILE;
             if (!Files.exists(path)) return null;
             String content = Files.readString(path).trim();
             if (content.isEmpty() || content.equals("null")) return null;
@@ -110,6 +113,32 @@ public class WalletService {
         } catch (Exception e) {
             LoggerUtil.error("Cannot load linked bank account: " + e.getMessage());
             return null;
+        }
+    }
+
+    public User loadLatestUser(User user) {
+        try {
+            if (user == null || !Files.exists(USERS_FILE)) {
+                return user;
+            }
+
+            String content = Files.readString(USERS_FILE).trim();
+            if (content.isEmpty() || content.equals("null")) {
+                return user;
+            }
+
+            List<User> users = JsonUtil.getGson().fromJson(content, new TypeToken<List<User>>(){}.getType());
+            if (users == null) {
+                return user;
+            }
+
+            return users.stream()
+                    .filter(candidate -> isSameUser(user, candidate))
+                    .findFirst()
+                    .orElse(user);
+        } catch (Exception e) {
+            LoggerUtil.error("Cannot load latest wallet user: " + e.getMessage());
+            return user;
         }
     }
 
@@ -131,7 +160,7 @@ public class WalletService {
 
     public List<Transaction> loadTransactions(User user) throws Exception {
         if (user == null) return new ArrayList<>();
-        Path path = Paths.get(TRANSACTIONS_FILE);
+        Path path = TRANSACTIONS_FILE;
         if (!Files.exists(path)) return new ArrayList<>();
         String content = Files.readString(path).trim();
         if (content.isEmpty() || content.equals("null")) return new ArrayList<>();
@@ -144,8 +173,7 @@ public class WalletService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    private Path ensureJsonFile(String filePath) throws Exception {
-        Path path = Paths.get(filePath);
+    private Path ensureJsonFile(Path path) throws Exception {
         if (path.getParent() != null && !Files.exists(path.getParent())) {
             Files.createDirectories(path.getParent());
         }
@@ -153,6 +181,18 @@ public class WalletService {
             Files.writeString(path, "[]");
         }
         return path;
+    }
+
+    private static Path resolveProjectRoot() {
+        Path current = Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
+        Path cursor = current;
+        while (cursor != null) {
+            if (Files.exists(cursor.resolve("pom.xml")) && Files.isDirectory(cursor.resolve("data"))) {
+                return cursor;
+            }
+            cursor = cursor.getParent();
+        }
+        return current;
     }
 
     private boolean isBankAccountOfUser(User user, BankAccountEntry entry) {
@@ -163,6 +203,16 @@ public class WalletService {
         return sameText(user.getUserId(), entry.userId)
                 || sameText(user.getUsername(), entry.username)
                 || sameText(user.getEmail(), entry.email);
+    }
+
+    private boolean isSameUser(User left, User right) {
+        if (left == null || right == null) {
+            return false;
+        }
+
+        return sameText(left.getUserId(), right.getUserId())
+                || sameText(left.getUsername(), right.getUsername())
+                || sameText(left.getEmail(), right.getEmail());
     }
 
     private boolean sameText(String left, String right) {

@@ -27,7 +27,7 @@ public class SellerAuctionDetailsController {
     private final SellerClientService sellerClientService = new SellerClientService();
 
     /**
-     * TÃ¡ÂºÂ£i chi tiÃ¡ÂºÂ¿t phiÃƒÂªn Ã„â€˜Ã¡ÂºÂ¥u giÃƒÂ¡ tÃ¡Â»Â« Server
+     * Tải chi tiết phiên đấu giá từ Server
      */
     public void loadSellerAuctionDetails(String auctionId) {
         this.auctionId = auctionId;
@@ -35,7 +35,7 @@ public class SellerAuctionDetailsController {
         User user = NavigationManager.getInstance().getCurrentUser();
 
         if (socket == null || user == null) {
-            LoggerUtil.error("Socket hoÃ¡ÂºÂ·c User bÃ¡Â»â€¹ null trong loadSellerAuctionDetails");
+            LoggerUtil.error("Socket hoặc User bị null trong loadSellerAuctionDetails");
             return;
         }
 
@@ -44,28 +44,28 @@ public class SellerAuctionDetailsController {
                 Auction auction = sellerClientService.fetchAuctionDetail(socket, user, auctionId);
                 Platform.runLater(() -> updateUI(auction));
             } catch (Exception e) {
-                LoggerUtil.error("LÃ¡Â»â€”i kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i khi lÃ¡ÂºÂ¥y chi tiÃ¡ÂºÂ¿t phiÃƒÂªn: " + e.getMessage());
+                LoggerUtil.error("Lỗi kết nối khi lấy chi tiết phiên: " + e.getMessage());
                 e.printStackTrace();
             }
         }).start();
     }
 
     /**
-     * CÃ¡ÂºÂ­p nhÃ¡ÂºÂ­t thÃƒÂ´ng tin lÃƒÂªn giao diÃ¡Â»â€¡n
+     * Cập nhật thông tin lên giao diện
      */
     private void updateUI(Auction auction) {
         if (auction == null) return;
 
-        // ThÃƒÂ´ng tin sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m cÃ†Â¡ bÃ¡ÂºÂ£n (KiÃ¡Â»Æ’m tra null cho tÃ¡Â»Â«ng Label Ã„â€˜Ã¡Â»Æ’ trÃƒÂ¡nh NullPointerException)
+        // Thông tin sản phẩm cơ bản (Kiểm tra null cho từng Label để tránh NullPointerException)
         if (productName != null) productName.setText(auction.getItem() != null ? auction.getItem().getName() : "N/A");
-        if (productId != null) productId.setText("MÃƒÂ£ phiÃƒÂªn: " + auction.getAuctionId());
+        if (productId != null) productId.setText("Mã phiên: " + auction.getAuctionId());
         if (productDesc != null) productDesc.setText(auction.getItem() != null ? auction.getItem().getDescription() : "");
 
-        // GiÃƒÂ¡ cÃ¡ÂºÂ£
-        if (startPrice != null) startPrice.setText(auction.getItem() != null ? formatVnd(auction.getItem().getStartingPrice()) : "0 Ã„â€˜");
+        // Giá cả
+        if (startPrice != null) startPrice.setText(auction.getItem() != null ? formatVnd(auction.getItem().getStartingPrice()) : "0 d");
         if (currentPrice != null) currentPrice.setText(formatVnd(auction.getCurrentPrice()));
 
-        // ThÃ¡Â»Âi gian
+        // Thời gian
         if (startTime != null) startTime.setText(formatDate(auction.getStartTime()));
         if (endTime != null) endTime.setText(formatDate(auction.getEndTime()));
 
@@ -73,38 +73,38 @@ public class SellerAuctionDetailsController {
             long remain = auction.getTimeRemainingSeconds();
             if (remain > 0) {
                 timeLeft.setText(formatRemain(remain));
-                timeLeft.setStyle("-fx-text-fill: #185fa5;"); // MÃƒÂ u xanh nÃ¡ÂºÂ¿u cÃƒÂ²n thÃ¡Â»Âi gian
+                timeLeft.setStyle("-fx-text-fill: #185fa5;"); // Màu xanh nếu còn thời gian
             } else {
-                timeLeft.setText("Ã„ÂÃƒÂ£ kÃ¡ÂºÂ¿t thÃƒÂºc");
-                timeLeft.setStyle("-fx-text-fill: #dc2626;"); // MÃƒÂ u Ã„â€˜Ã¡Â»Â nÃ¡ÂºÂ¿u Ã„â€˜ÃƒÂ£ hÃ¡ÂºÂ¿t
+                timeLeft.setText("Đã kết thúc");
+                timeLeft.setStyle("-fx-text-fill: #dc2626;"); // Màu đỏ nếu đã hết
             }
         }
 
-        // TrÃ¡ÂºÂ¡ng thÃƒÂ¡i
+        // Trạng thái
         if (status != null) {
             String statusStr = auction.getStatus() != null ? auction.getStatus().toString() : "UNKNOWN";
             status.setText(statusStr);
-            // ThÃƒÂªm mÃƒÂ u sÃ¡ÂºÂ¯c cho trÃ¡ÂºÂ¡ng thÃƒÂ¡i sinh Ã„â€˜Ã¡Â»â„¢ng hÃ†Â¡n
+            // Thêm màu sắc cho trạng thái sinh động hơn
             if (statusStr.equals("ACTIVE")) status.setStyle("-fx-background-color: #dcfce7; -fx-text-fill: #166534; -fx-padding: 4 10; -fx-background-radius: 15;");
             else status.setStyle("-fx-background-color: #f3f4f6; -fx-text-fill: #374151; -fx-padding: 4 10; -fx-background-radius: 15;");
         }
 
-        // LÃ†Â°Ã¡Â»Â£t Ã„â€˜Ã¡ÂºÂ·t vÃƒÂ  ngÃ†Â°Ã¡Â»Âi dÃ¡ÂºÂ«n Ã„â€˜Ã¡ÂºÂ§u
-        if (bidCount != null) bidCount.setText((auction.getBidIds() != null ? auction.getBidIds().size() : 0) + " lÃ†Â°Ã¡Â»Â£t");
-        if (topBidderName != null) topBidderName.setText(auction.getHighestBidderName() != null ? auction.getHighestBidderName() : "ChÃ†Â°a cÃƒÂ³");
+        // Lượt đặt và người dẫn đầu
+        if (bidCount != null) bidCount.setText((auction.getBidIds() != null ? auction.getBidIds().size() : 0) + " lượt");
+        if (topBidderName != null) topBidderName.setText(auction.getHighestBidderName() != null ? auction.getHighestBidderName() : "Chưa có");
         if (topBidAmount != null) topBidAmount.setText(formatVnd(auction.getCurrentPrice()));
     }
 
-    @FXML private void handleEdit() { LoggerUtil.info("ChÃ¡Â»â€°nh sÃ¡Â»Â­a: " + auctionId); }
-    @FXML private void handlePause() { LoggerUtil.info("TÃ¡ÂºÂ¡m dÃ¡Â»Â«ng: " + auctionId); }
-    @FXML private void handleCancel() { LoggerUtil.info("HÃ¡Â»Â§y phiÃƒÂªn: " + auctionId); }
+    @FXML private void handleEdit() { LoggerUtil.info("Chỉnh sửa: " + auctionId); }
+    @FXML private void handlePause() { LoggerUtil.info("Tạm dừng: " + auctionId); }
+    @FXML private void handleCancel() { LoggerUtil.info("Hủy phiên: " + auctionId); }
 
-    private String formatVnd(double a) { return String.format("%,.0f Ã„â€˜", a).replace(',', '.'); }
+    private String formatVnd(double a) { return String.format("%,.0f d", a).replace(',', '.'); }
     private String formatDate(long m) { return new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date(m)); }
     private String formatRemain(long s) {
         long h = s / 3600;
         long m = (s % 3600) / 60;
-        if (h > 0) return h + " giÃ¡Â»Â " + m + " phÃƒÂºt";
-        return m + " phÃƒÂºt";
+        if (h > 0) return h + " giá " + m + " phút";
+        return m + " phút";
     }
 }

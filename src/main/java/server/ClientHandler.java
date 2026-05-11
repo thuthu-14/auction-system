@@ -336,7 +336,7 @@ public class ClientHandler implements Runnable {
                 // 2. Gọi NotificationDAO để ghi thông báo này xuống file notifications.json
                 NotificationDAO.addNotification(outbidNoti);
 
-                // 3. Vẫn phát sóng bình thường cho những ai đang online ngay lúc đó
+                // 3. Vẫn phút sóng bình thường cho những ai đang online ngay lúc đó
                 server.broadcastMessage(new Message(MessageType.OUTBID_NOTIFICATION, auction, currentUser.getUserId()));
             }
 

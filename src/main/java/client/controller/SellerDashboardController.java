@@ -18,7 +18,7 @@ public class SellerDashboardController {
     @FXML private VBox cardThongBao;
     @FXML private VBox cardViTien;
 
-    // ===== THÃƒÅ M Ã„ÂÃ¡Â»â€š LINK SERVER =====
+    // ===== THÊM ĐỂ LINK SERVER =====
     private User currentUser;
     private ClientSocket clientSocket;
     private SellerHomeController sellerHomeController;
@@ -47,7 +47,7 @@ public class SellerDashboardController {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource(fxmlPath));
             javafx.scene.Parent newNode = loader.load();
 
-            // ===== BÃ†Â M DÃ¡Â»Â® LIÃ¡Â»â€ U SERVER SANG MÃƒâ‚¬N HÃƒÅ’NH MÃ¡Â»Å¡I =====
+            // ===== BƠM DỮ LIỆU SERVER SANG MÀN HÌNH MỚI =====
             Object controller = loader.getController();
             if (controller != null) {
                 if (controller instanceof WalletController) {
@@ -65,10 +65,10 @@ public class SellerDashboardController {
             if (contentArea != null) {
                 contentArea.getChildren().setAll(newNode);
             } else {
-                LoggerUtil.error("LÃ¡Â»â€”i: KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y fx:id='contentArea' Ã¡Â»Å¸ trang chÃƒÂ­nh!");
+                LoggerUtil.error("Lỗi: Không tìm thấy fx:id='contentArea' ở trang chính!");
             }
         } catch (Exception e) {
-            LoggerUtil.error("KhÃƒÂ´ng thÃ¡Â»Æ’ load file FXML: " + fxmlPath + " - " + e.getMessage());
+            LoggerUtil.error("Không thể load file FXML: " + fxmlPath + " - " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -76,6 +76,7 @@ public class WalletController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         Platform.runLater(this::resetWalletViewState);
+        installAutoReloadHook();
 
         if (timeFilter != null) {
             timeFilter.getItems().addAll("Tháng này", "Tháng trước", "3 tháng gần đây", "Tất cả thời gian");
@@ -93,9 +94,31 @@ public class WalletController implements Initializable {
     }
 
     public void setUserData(User user, ClientSocket socket) {
-        this.currentUser = user;
-        this.clientSocket = socket;
+        this.currentUser = user != null ? user : NavigationManager.getInstance().getCurrentUser();
+        this.clientSocket = socket != null ? socket : getActiveSocket();
         Platform.runLater(this::loadWalletData);
+    }
+
+    public void reloadWalletData() {
+        Platform.runLater(this::loadWalletData);
+    }
+
+    private void installAutoReloadHook() {
+        if (rootPane == null) {
+            return;
+        }
+
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene == null) {
+                return;
+            }
+            Platform.runLater(this::loadWalletData);
+            newScene.windowProperty().addListener((windowObservable, oldWindow, newWindow) -> {
+                if (newWindow != null) {
+                    Platform.runLater(this::loadWalletData);
+                }
+            });
+        });
     }
 
     private void loadWalletData() {
@@ -111,9 +134,17 @@ public class WalletController implements Initializable {
             return;
         }
 
+        currentUser = walletService.loadLatestUser(currentUser);
+        NavigationManager.getInstance().setCurrentUser(currentUser);
+        LoggerUtil.info("Wallet load user="
+                + currentUser.getUsername()
+                + ", id=" + currentUser.getUserId()
+                + ", wallet=" + currentUser.getWallet());
+
         balanceLabel.setText(formatVnd(currentUser.getWallet()));
 
         BankAccountEntry entry = loadBankAccountForCurrentUser();
+        LoggerUtil.info("Wallet linked bank found=" + (entry != null));
 
         if (entry != null) {
             displayBankName.setText(entry.bankName.toUpperCase());
@@ -246,8 +277,12 @@ public class WalletController implements Initializable {
     }
 
     private void resetNodeState(Node node) {
-        node.setOpacity(1);
-        node.setDisable(false);
+        if (!node.opacityProperty().isBound()) {
+            node.setOpacity(1);
+        }
+        if (!node.disableProperty().isBound()) {
+            node.setDisable(false);
+        }
 
         if (node instanceof Parent parent) {
             for (Node child : parent.getChildrenUnmodifiable()) {
@@ -342,7 +377,7 @@ public class WalletController implements Initializable {
                             this.currentUser = updatedUser;
 
                             try {
-                                // ĐÃ XÓA: updateBankBalanceForCurrentUser - Không còn can thiệp tiền ngân hàng ảo
+                                // ?? XÓA: updateBankBalanceForCurrentUser - Không còn can thiệp tiền ngân hàng ảo
                                 saveTransaction(type, amount, updatedUser.getWallet());
                             } catch (Exception ex) {
                                 LoggerUtil.error("Lỗi lưu file local: " + ex.getMessage());
@@ -532,6 +567,8 @@ public class WalletController implements Initializable {
         try {
             if (currentUser == null) return;
             List<Transaction> list = loadTransactionsForUser();
+            LoggerUtil.info("Wallet transactions loaded=" + list.size()
+                    + " for user=" + currentUser.getUserId());
             Platform.runLater(() -> {
                 allTransactions = new ArrayList<>(list);
                 applyTransactionFilters();

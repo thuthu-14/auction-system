@@ -17,7 +17,7 @@ import util.LoggerUtil;
 import java.io.IOException;
 
 /**
- * LoginController - XÃ¡Â»Â­ lÃƒÂ½ mÃƒÂ n hÃƒÂ¬nh Login qua Server Socket
+ * LoginController - Xử lý màn hình Login qua Server Socket
  */
 public class LoginController {
 
@@ -49,7 +49,7 @@ public class LoginController {
         passwordField.setOnAction(e -> handleLogin());
         mkShow.setOnAction(e -> handleLogin());
 
-        LoggerUtil.info("Ã¢Å“â€œ LoginController initialized");
+        LoggerUtil.info("? LoginController initialized");
     }
 
     @FXML
@@ -58,7 +58,7 @@ public class LoginController {
         String password = getEnteredPassword();
 
         if (email.isEmpty() || password.isEmpty()) {
-            showError("Ã¢ÂÅ’ Email vÃƒÂ  mÃ¡ÂºÂ­t khÃ¡ÂºÂ©u khÃƒÂ´ng Ã„â€˜Ã†Â°Ã¡Â»Â£c rÃ¡Â»â€”ng!");
+            showError("? Email và mật khẩu không được rỗng!");
             return;
         }
 
@@ -75,7 +75,7 @@ public class LoginController {
                 });
             } catch (Exception e) {
                 LoggerUtil.error("Login error: " + e.getMessage());
-                showError("Ã¢ÂÅ’ LÃ¡Â»â€”i hÃ¡Â»â€¡ thÃ¡Â»â€˜ng: " + e.getMessage());
+                showError("Lỗi hệ thống: " + e.getMessage());
             } finally {
                 setLoading(false);
             }
@@ -95,19 +95,19 @@ public class LoginController {
             if (onAdminLoginSuccess != null) {
                 onAdminLoginSuccess.run();
             } else {
-                // SÃ¡Â»Â¬ DÃ¡Â»Â¤NG navigateTo cho Admin
+                // SỬ DỤNG navigateTo cho Admin
                 nav.navigateTo("/fxml/AdminDashboard.fxml");
             }
         } else if (currentUser instanceof server.model.RegularUser) {
             server.model.RegularUser regUser = (server.model.RegularUser) currentUser;
 
             if (regUser.isSeller()) {
-                // LÃ†Â°u thÃƒÂ´ng tin Seller cÃ¡Â»Â¥c bÃ¡Â»â„¢ Ã„â€˜Ã¡Â»Æ’ tiÃ¡Â»â€¡n truy xuÃ¡ÂºÂ¥t
+                // Lưu thông tin Seller cục bộ để tiện truy xuất
                 authClientService.saveSellerContext(regUser);
                 nav.goToSellerHome();
             } else {
-                // Ã„ÂÃƒâ€šY LÃƒâ‚¬ NHÃƒÂNH CHO TÃƒâ‚¬I KHOÃ¡ÂºÂ¢N MÃ¡Â»Å¡I HOÃ¡ÂºÂ¶C NGÃ†Â¯Ã¡Â»Å“I CHÃ¡Â»Ë† CÃƒâ€œ QUYÃ¡Â»â‚¬N MUA/BID
-                LoggerUtil.info("Ã„ÂiÃ¡Â»Âu hÃ†Â°Ã¡Â»â€ºng: MÃƒÂ n hÃƒÂ¬nh Home (Bidder)");
+                // ĐÂY LÀ NHÁNH CHO TÀI KHOẢN MỚI HOẶC NGƯỜI CHỈ CÓ QUYỀN MUA/BID
+                LoggerUtil.info("Điều hướng: Màn hình Home (Bidder)");
                 if (onLoginSuccess != null) {
                     onLoginSuccess.run();
                 } else {
@@ -124,10 +124,10 @@ public class LoginController {
             Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
             Stage stage = (Stage) registerButton.getScene().getWindow();
             stage.setScene(scene);
-            stage.setTitle("TÃ¡ÂºÂ¡o tÃƒÂ i khoÃ¡ÂºÂ£n");
+            stage.setTitle("Tạo tài khoản");
             StageUtil.showMaximized(stage);
         } catch (IOException e) {
-            showError("Ã¢ÂÅ’ KhÃƒÂ´ng mÃ¡Â»Å¸ Ã„â€˜Ã†Â°Ã¡Â»Â£c mÃƒÂ n hÃƒÂ¬nh Ã„â€˜Ã„Æ’ng kÃƒÂ½.");
+            showError("Không mở được màn hình đăng ký.");
         }
     }
 

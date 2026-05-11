@@ -7,13 +7,6 @@
     "createdAt": 1777879997594
   },
   {
-    "userId": "U1777887117887",
-    "bankName": "MB",
-    "accountNumber": "20001406300",
-    "initialBalance": 1.0E7,
-    "createdAt": 1777888988821
-  },
-  {
     "userId": "U1777943074443",
     "bankName": "MB",
     "accountNumber": "300014062007",
@@ -28,5 +21,23 @@
     "accountNumber": "3000123971",
     "initialBalance": 1.0E7,
     "createdAt": 1778486006341
+  },
+  {
+    "userId": "U1778509268127",
+    "username": "baongoc",
+    "email": "bhbn@gmail.com",
+    "bankName": "MB",
+    "accountNumber": "300014062007",
+    "initialBalance": 1.0E7,
+    "createdAt": 1778509681570
+  },
+  {
+    "userId": "U1777887117887",
+    "username": "buingoc",
+    "email": "bhbngoc@gmail.com",
+    "bankName": "MB",
+    "accountNumber": "300014062007",
+    "initialBalance": 1.0E7,
+    "createdAt": 1778509953787
   }
 ]

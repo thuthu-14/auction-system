@@ -31,7 +31,7 @@ import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable {
 
-    // --- UI Components Mapping tÃ¡Â»Â« FXML ---
+    // --- UI Components Mapping từ FXML ---
     @FXML private ImageView bannerImageView;
     @FXML private ScrollPane dashboardRoot;
     @FXML private Button prevBannerBtn;
@@ -48,14 +48,14 @@ public class DashboardController implements Initializable {
     private final DashboardClientService dashboardClientService = new DashboardClientService();
 
     /**
-     * NhÃ¡ÂºÂ­n dÃ¡Â»Â¯ liÃ¡Â»â€¡u ngÃ†Â°Ã¡Â»Âi dÃƒÂ¹ng vÃƒÂ  socket.
+     * Nhận dữ liệu người dùng và socket.
      */
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;
-        System.out.println("Dashboard kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i thÃƒÂ nh cÃƒÂ´ng: " + (user != null ? user.getUsername() : "Guest"));
+        System.out.println("Dashboard kết nối thành công: " + (user != null ? user.getUsername() : "Guest"));
 
-        // Ã†Â¯u tiÃƒÂªn load dÃ¡Â»Â¯ liÃ¡Â»â€¡u ngay khi cÃƒÂ³ socket
+        // Ưu tiên load dữ liệu ngay khi có socket
         loadAuctionsFromServer();
     }
 
@@ -85,15 +85,15 @@ public class DashboardController implements Initializable {
             if ("productNameLabel".equals(id)) {
                 applyLabelColor(label, "#113254");
             } else if ("timerLabel".equals(id)) {
-                applyLabelColor(label, text.contains("\u0110\u00e3") || text.contains("Ãƒâ€ž") ? "#6b7280" : "#e53e3e");
+                applyLabelColor(label, text.contains("\u0110\u00e3") || text.contains("?") ? "#6b7280" : "#e53e3e");
             } else if ("priceLabel".equals(id)) {
                 applyLabelColor(label, "#111827");
-            } else if (text.contains("V\u1eeba xong") || text.contains("VÃƒÂ¡") || text.contains("xong")) {
+            } else if (text.contains("V\u1eeba xong") || text.contains("Vừa") || text.contains("xong")) {
                 applyLabelColor(label, "#9ca3af");
             } else if (text.contains("H\u00e0ng ng\u00e0n")
                     || text.contains("H\u1ec7 th\u1ed1ng")
-                    || text.contains("HÃƒÆ’")
-                    || text.contains("thÃƒÂ¡")) {
+                    || text.contains("Hệ")
+                    || text.contains("tháng")) {
                 applyLabelColor(label, "#4a5568");
             } else if (!text.isBlank()) {
                 applyLabelColor(label, text.length() <= 4 ? "#94a3b8" : "#111827");
@@ -114,7 +114,7 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * GÃ¡Â»Â­i yÃƒÂªu cÃ¡ÂºÂ§u lÃ¡ÂºÂ¥y danh sÃƒÂ¡ch Ã„â€˜Ã¡ÂºÂ¥u giÃƒÂ¡ mÃ¡Â»â€ºi nhÃ¡ÂºÂ¥t tÃ¡Â»Â« Server (Ã„ÂÃƒÆ’ SÃ¡Â»Â¬A LÃ¡Â»â€“I CRASH)
+     * Gửi yêu cầu lấy danh sách đấu giá mới nhất từ Server (ĐÃ SỬA LỖI CRASH)
      */
     public void loadAuctionsFromServer() {
         ClientSocket socket = (clientSocket != null) ? clientSocket : ConnectionManager.getInstance().getClientSocket();
@@ -131,7 +131,7 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * XÃƒÂ³a cÃƒÂ¡c mÃ¡ÂºÂ«u cÃ…Â© vÃƒÂ  vÃ¡ÂºÂ½ lÃ¡ÂºÂ¡i cÃƒÂ¡c thÃ¡ÂºÂ» sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m mÃ¡Â»â€ºi
+     * Xóa các mẫu cũ và vẽ lại các thẻ sản phẩm mới
      */
     private void renderProductCards(List<Auction> auctions) {
         if (endingSoonGrid == null) return;
@@ -160,7 +160,7 @@ public class DashboardController implements Initializable {
                     endingSoonGrid.add(card, col, row);
                     visibleCount++;
                     col++;
-                    if (col > 1) { // ThiÃ¡ÂºÂ¿t kÃ¡ÂºÂ¿ 2 cÃ¡Â»â„¢t
+                    if (col > 1) { // Thiết kế 2 cột
                         col = 0;
                         row++;
                     }
@@ -193,28 +193,28 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * TÃ¡ÂºÂ¡o mÃ¡Â»â„¢t ÃƒÂ´ sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m BÃ¡ÂºÂ°NG CÃƒÂCH GÃ¡Â»Å’I FILE FXML (Ã„ÂÃƒÆ’ SÃ¡Â»Â¬A Ã„ÂÃ¡Â»â€š NÃƒÅ¡T BÃ¡ÂºÂ¤M CÃƒâ€œ TÃƒÂC DÃ¡Â»Â¤NG)
+     * Tạo một ô sản phẩm BẰNG CÁCH GỌI FILE FXML (?? SỬA ?? NÚT BẤM CÓ TÁC DỤNG)
      */
     private VBox createAuctionCard(Auction auction) {
         try {
-            // ThÃ¡Â»Â­ Ã„â€˜Ã†Â°Ã¡Â»Âng dÃ¡ÂºÂ«n 1
+            // Thử đường dẫn 1
             String cardPath = "/client/view/AuctionCard.fxml";
             URL resource = getClass().getResource(cardPath);
 
-            // ThÃ¡Â»Â­ Ã„â€˜Ã†Â°Ã¡Â»Âng dÃ¡ÂºÂ«n 2 nÃ¡ÂºÂ¿u Ã„â€˜Ã†Â°Ã¡Â»Âng dÃ¡ÂºÂ«n 1 sai
+            // Thử đường dẫn 2 nếu đường dẫn 1 sai
             if (resource == null) {
                 resource = getClass().getResource("/fxml/AuctionCard.fxml");
             }
 
             if (resource == null) {
-                System.err.println("Ã¢ÂÅ’ LÃ¡Â»â€“I: KhÃƒÂ´ng tÃƒÂ¬m thÃ¡ÂºÂ¥y file AuctionCard.fxml!");
+                System.err.println("? LỖI: Không tìm thấy file AuctionCard.fxml!");
                 return new VBox();
             }
 
             FXMLLoader loader = new FXMLLoader(resource);
             Parent cardNode = loader.load();
 
-            // LÃ¡ÂºÂ¥y Controller vÃƒÂ  truyÃ¡Â»Ân dÃ¡Â»Â¯ liÃ¡Â»â€¡u sang Card
+            // Lấy Controller và truyền dữ liệu sang Card
             client.controller.AuctionCardController cardController = loader.getController();
             if (cardController != null) {
                 cardController.setAuctionData(auction);
@@ -223,25 +223,25 @@ public class DashboardController implements Initializable {
                 }
             }
 
-            // NÃ¡ÂºÂ¿u root cÃ¡Â»Â§a AuctionCard.fxml lÃƒÂ  VBox thÃƒÂ¬ ÃƒÂ©p kiÃ¡Â»Æ’u trÃ¡Â»Â±c tiÃ¡ÂºÂ¿p
+            // Nếu root của AuctionCard.fxml là VBox thì ép kiểu trực tiếp
             if (cardNode instanceof VBox) {
                 return (VBox) cardNode;
             } else {
-                // NÃ¡ÂºÂ¿u lÃƒÂ  AnchorPane hoÃ¡ÂºÂ·c thÃ¡Â»Â© khÃƒÂ¡c, gÃƒÂ³i nÃƒÂ³ vÃƒÂ o mÃ¡Â»â„¢t VBox Ã„â€˜Ã¡Â»Æ’ khÃƒÂ´ng bÃ¡Â»â€¹ lÃ¡Â»â€”i hÃƒÂ m
+                // Nếu là AnchorPane hoặc thứ khác, gói nó vào một VBox để không bị lỗi hàm
                 VBox wrapper = new VBox();
                 wrapper.getChildren().add(cardNode);
                 return wrapper;
             }
 
         } catch (Exception e) {
-            System.err.println("Ã¢ÂÅ’ LÃ¡Â»â€“I LOAD THÃ¡ÂºÂº AUCTION CARD BÃƒÅ N TRONG DASHBOARD: " + e.getMessage());
+            System.err.println("LỖI LOAD THẺ AUCTION CARD BÊN TRONG DASHBOARD: " + e.getMessage());
             e.printStackTrace();
-            return new VBox(); // TrÃ¡ÂºÂ£ vÃ¡Â»Â Vbox rÃ¡Â»â€”ng Ã„â€˜Ã¡Â»Æ’ khÃƒÂ´ng bÃ¡Â»â€¹ chÃ¡ÂºÂ¿t Grid
+            return new VBox(); // Trả về Vbox rỗng để không bị chết Grid
         }
     }
 
     // ==============================================================
-    // CÃƒÂC HÃƒâ‚¬M XÃ¡Â»Â¬ LÃƒÂ Ã¡ÂºÂ¢NH BANNER BÃƒÅ N TRÃƒÅ N (GIÃ¡Â»Â® NGUYÃƒÅ N NHÃ†Â¯ CÃ…Â¨ CÃ¡Â»Â¦A BÃ¡ÂºÂ N)
+    // CÁC HÀM XỬ LÝ ẢNH BANNER BÊN TRÊN (GIỮ NGUYÊN NHƯ CŨ CỦA BẠN)
     // ==============================================================
 
     private void setupBanner() {
@@ -263,7 +263,7 @@ public class DashboardController implements Initializable {
             URL banner2 = getClass().getResource("/CSS/flashBid.png");
             if (banner2 != null) bannerImages.add(new Image(banner2.toExternalForm()));
         } catch (Exception e) {
-            System.out.println("LÃ¡Â»â€”i load Ã¡ÂºÂ£nh banner: " + e.getMessage());
+            System.out.println("Lỗi load ảnh banner: " + e.getMessage());
         }
 
         if (!bannerImages.isEmpty() && bannerImages.get(0) != null) {

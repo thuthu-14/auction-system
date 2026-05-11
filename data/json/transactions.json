@@ -187,5 +187,77 @@
     "balanceAfter": 2.7019999E7,
     "description": "Nạp tiền vào ví",
     "timestamp": 1778486011212
+  },
+  {
+    "id": "TXN_1778508828167",
+    "userId": "U1777887117887",
+    "type": "DEPOSIT",
+    "amount": 87777.0,
+    "balanceAfter": 9286663.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778508828168
+  },
+  {
+    "id": "TXN_1778509136427",
+    "userId": "U1777887117887",
+    "type": "DEPOSIT",
+    "amount": 9888.0,
+    "balanceAfter": 9296551.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778509136428
+  },
+  {
+    "id": "TXN_1778509303811",
+    "userId": "U1778509268127",
+    "type": "DEPOSIT",
+    "amount": 98000.0,
+    "balanceAfter": 98000.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778509303812
+  },
+  {
+    "id": "TXN_1778509310767",
+    "userId": "U1778509268127",
+    "type": "DEPOSIT",
+    "amount": 87000.0,
+    "balanceAfter": 185000.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778509310767
+  },
+  {
+    "id": "TXN_1778509455705",
+    "userId": "U1778509268127",
+    "type": "DEPOSIT",
+    "amount": 56600.0,
+    "balanceAfter": 241600.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778509455705
+  },
+  {
+    "id": "TXN_1778509687256",
+    "userId": "U1778509268127",
+    "type": "DEPOSIT",
+    "amount": 980000.0,
+    "balanceAfter": 1221600.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778509687256
+  },
+  {
+    "id": "TXN_1778509960938",
+    "userId": "U1777887117887",
+    "type": "WITHDRAW",
+    "amount": 144000.0,
+    "balanceAfter": 9152551.0,
+    "description": "Rút tiền về ngân hàng",
+    "timestamp": 1778509960938
+  },
+  {
+    "id": "TXN_1778510510303",
+    "userId": "U1778403578742",
+    "type": "WITHDRAW",
+    "amount": 90000.0,
+    "balanceAfter": 2.6929999E7,
+    "description": "Rút tiền về ngân hàng",
+    "timestamp": 1778510510303
   }
 ]

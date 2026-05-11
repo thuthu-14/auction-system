@@ -63,24 +63,24 @@ public class AddAuctionProductController implements Initializable {
     @FXML
     public void handleSelectImage(ActionEvent event) {
         if (selectedImagePaths.size() >= 5) {
-            showAlert(Alert.AlertType.WARNING, "Giá»›i háº¡n áº£nh", "Chá»‰ Ä‘Æ°á»£c chá»n tá»‘i Ä‘a 5 áº£nh thÃ´i nha!");
+            showAlert(Alert.AlertType.WARNING, "Giới hạn ảnh", "Chỉ được chọn tối đa 5 ảnh thôi nha!");
             return;
         }
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Chá»n áº£nh sáº£n pháº©m (Tá»‘i Ä‘a 5 áº£nh)");
+        fileChooser.setTitle("Chọn ảnh sản phẩm (Tối đa 5 ảnh)");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
         );
 
-        // Láº¥y cá»­a sá»• an toÃ n tá»« nÃºt báº¥m kÃ­ch hoáº¡t sá»± kiá»‡n
+        // Lấy cửa sổ an toàn từ nút bấm kích hoạt sự kiện
         Window window = ((Node) event.getSource()).getScene().getWindow();
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(window);
 
         if (selectedFiles != null) {
             for (File file : selectedFiles) {
                 if (selectedImagePaths.size() >= 5) {
-                    showAlert(Alert.AlertType.INFORMATION, "ThÃ´ng bÃ¡o", "ÄÃ£ Ä‘áº¡t giá»›i háº¡n 5 áº£nh, cÃ¡c áº£nh dÆ° sáº½ bá»‹ bá» qua.");
+                    showAlert(Alert.AlertType.INFORMATION, "Thông báo", "Đã đạt giới hạn 5 ảnh, các ảnh dư sẽ bị bỏ qua.");
                     break;
                 }
 
@@ -104,7 +104,7 @@ public class AddAuctionProductController implements Initializable {
                         }
                     });
 
-                    Tooltip.install(imagePane, new Tooltip("Click Ä‘Ãºp chuá»™t Ä‘á»ƒ xÃ³a áº£nh nÃ y"));
+                    Tooltip.install(imagePane, new Tooltip("Click đúp chuột để xóa ảnh này"));
                     imagePreviewContainer.getChildren().add(imagePane);
                 }
             }
@@ -195,7 +195,7 @@ public class AddAuctionProductController implements Initializable {
     private String getCalendarStylesheet() {
         URL calendarCssUrl = getClass().getResource("/CSS/calendar.css");
         if (calendarCssUrl == null) {
-            LoggerUtil.error("KhÃ´ng tÃ¬m tháº¥y CSS lá»‹ch: /CSS/calendar.css");
+            LoggerUtil.error("Không tìm thấy CSS lịch: /CSS/calendar.css");
             return null;
         }
         return calendarCssUrl.toExternalForm();
@@ -220,7 +220,7 @@ public class AddAuctionProductController implements Initializable {
         ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
 
         if (currentUser == null || socket == null || !socket.isConnected()) {
-            showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i mÃ¡ÂºÂ¡ng", "BÃ¡ÂºÂ¡n chÃ†Â°a Ã„â€˜Ã„Æ’ng nhÃ¡ÂºÂ­p hoÃ¡ÂºÂ·c mÃ¡ÂºÂ¥t kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i mÃƒÂ¡y chÃ¡Â»Â§!");
+            showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Bạn chưa đăng nhập hoặc mất kết nối máy chủ!");
             return;
         }
 
@@ -253,22 +253,22 @@ public class AddAuctionProductController implements Initializable {
                     Message response = productService.publish(socket, currentUser, payload);
                     Platform.runLater(() -> {
                         if (response != null && "SUCCESS".equals(response.getStatus())) {
-                            showAlert(Alert.AlertType.INFORMATION, "ThÃƒÂ nh cÃƒÂ´ng", "SÃ¡ÂºÂ£n phÃ¡ÂºÂ©m Ã„â€˜ÃƒÂ£ Ã„â€˜Ã†Â°Ã¡Â»Â£c Ã„â€˜Ã¡ÂºÂ©y lÃƒÂªn SÃƒÂ n Ã„ÂÃ¡ÂºÂ¥u GiÃƒÂ¡!");
+                            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Sản phẩm đã được đẩy lên Sàn Đấu Giá!");
                             clearForm();
                         } else {
-                            showAlert(Alert.AlertType.ERROR, "ThÃ¡ÂºÂ¥t bÃ¡ÂºÂ¡i", "Server tÃ¡Â»Â« chÃ¡Â»â€˜i: " + (response != null ? response.getMessage() : ""));
+                            showAlert(Alert.AlertType.ERROR, "Thất bại", "Server từ chối: " + (response != null ? response.getMessage() : ""));
                         }
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i", "MÃ¡ÂºÂ¥t kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i tÃ¡Â»â€ºi Server."));
-                    LoggerUtil.error("LÃ¡Â»â€”i khi tÃ¡ÂºÂ¡o sÃ¡ÂºÂ£n phÃ¡ÂºÂ©m Ã„â€˜Ã¡ÂºÂ¥u giÃƒÂ¡: " + e.getMessage());
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi kết nối", "Mất kết nối tới Server."));
+                    LoggerUtil.error("Lỗi khi tạo sản phẩm đấu giá: " + e.getMessage());
                 }
             }, "PublishAuctionProductThread").start();
         } catch (AddAuctionProductClientService.ValidationException e) {
             showAlert(Alert.AlertType.ERROR, e.getTitle(), e.getMessage());
         } catch (Exception e) {
-            LoggerUtil.error("LÃ¡Â»â€”i xÃ¡Â»Â­ lÃƒÂ½ UI: " + e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i", "LÃ¡Â»â€”i: " + e.getMessage());
+            LoggerUtil.error("Lỗi xử lý UI: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi: " + e.getMessage());
         }
     }
 
@@ -312,12 +312,12 @@ public class AddAuctionProductController implements Initializable {
 
     @FXML
     private void handleSaveHidden(ActionEvent event) {
-        LoggerUtil.info("LÆ°u nhÃ¡p sáº£n pháº©m...");
+        LoggerUtil.info("Lưu nháp sản phẩm...");
     }
 
     @FXML
     private void handleCancel(ActionEvent event) {
-        LoggerUtil.info("Há»§y thao tÃ¡c...");
+        LoggerUtil.info("Hủy thao tác...");
         clearForm();
     }
 

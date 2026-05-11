@@ -56,15 +56,15 @@ public class BecomeSellerController {
         String password = getPassword();
 
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || address.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "ThÃƒÂ´ng bÃƒÂ¡o", "Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p Ã„â€˜Ã¡ÂºÂ§y Ã„â€˜Ã¡Â»Â§ tÃ¡ÂºÂ¥t cÃ¡ÂºÂ£ cÃƒÂ¡c thÃƒÂ´ng tin!");
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đầy đủ tất cả các thông tin!");
             return null;
         }
         if (!email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            showAlert(Alert.AlertType.WARNING, "ThÃƒÂ´ng bÃƒÂ¡o", "Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p Ã„â€˜ÃƒÂºng Ã„â€˜Ã¡Â»â€¹nh dÃ¡ÂºÂ¡ng email!");
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đúng định dạng email!");
             return null;
         }
         if (!phone.matches("\\d{10,11}")) {
-            showAlert(Alert.AlertType.WARNING, "ThÃƒÂ´ng bÃƒÂ¡o", "Vui lÃƒÂ²ng nhÃ¡ÂºÂ­p Ã„â€˜ÃƒÂºng SDT");
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đúng SDT");
             return null;
         }
         return new SellerData(name, email, phone, address, password);
@@ -73,19 +73,19 @@ public class BecomeSellerController {
     @FXML
     private void handleSave() {
         if (this.currentUser == null) {
-            showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i", "KhÃƒÂ´ng lÃ¡ÂºÂ¥y Ã„â€˜Ã†Â°Ã¡Â»Â£c thÃƒÂ´ng tin user hiÃ¡Â»â€¡n tÃ¡ÂºÂ¡i!");
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không lấy được thông tin user hiện tại!");
             return;
         }
 
         if (!(currentUser instanceof RegularUser)) {
-            showAlert(Alert.AlertType.ERROR, "LÃ¡Â»â€”i", "ChÃ¡Â»â€° ngÃ†Â°Ã¡Â»Âi dÃƒÂ¹ng thÃ†Â°Ã¡Â»Âng mÃ¡Â»â€ºi cÃƒÂ³ thÃ¡Â»Æ’ nÃƒÂ¢ng cÃ¡ÂºÂ¥p!");
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Chỉ người dùng thường mới có thể nâng cấp!");
             return;
         }
 
         RegularUser regularUser = (RegularUser) currentUser;
 
         if (regularUser.isSeller()) {
-            showAlert(Alert.AlertType.WARNING, "ThÃƒÂ´ng bÃƒÂ¡o", "BÃ¡ÂºÂ¡n Ã„â€˜ÃƒÂ£ lÃƒÂ  NgÃ†Â°Ã¡Â»Âi bÃƒÂ¡n rÃ¡Â»â€œi! KhÃƒÂ´ng cÃ¡ÂºÂ§n nÃƒÂ¢ng cÃ¡ÂºÂ¥p lÃ¡ÂºÂ¡i.");
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Bạn đã là Người bán rồi! Không cần nâng cấp lại.");
             NavigationManager.getInstance().goToHome();
             return;
         }
@@ -93,7 +93,7 @@ public class BecomeSellerController {
         SellerData data = validateInput();
         if (data != null) {
             btnSave.setDisable(true);
-            btnSave.setText("Ã„Âang xÃ¡Â»Â­ lÃƒÂ½...");
+            btnSave.setText("Đang xử lý...");
 
             new Thread(() -> {
                 try {
@@ -117,7 +117,7 @@ public class BecomeSellerController {
                 } finally {
                     Platform.runLater(() -> {
                         btnSave.setDisable(false);
-                        btnSave.setText("Ã„ÂÃ„Æ’ng kÃƒÂ½");
+                        btnSave.setText("Đăng ký");
                     });
                 }
             }).start();
@@ -143,11 +143,11 @@ public class BecomeSellerController {
         if (isPasswordVisible) {
             passwordTextField.setText(passwordField.getText());
             showPassword(true);
-            btnTogglePassword.setText("Ã°Å¸â€â€™");
+            btnTogglePassword.setText("??");
         } else {
             passwordField.setText(passwordTextField.getText());
             showPassword(false);
-            btnTogglePassword.setText("Ã°Å¸â€˜Â");
+            btnTogglePassword.setText("??");
         }
     }
 
