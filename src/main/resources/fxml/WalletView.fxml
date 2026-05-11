@@ -5,140 +5,142 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" stylesheets="@../CSS/table.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.WalletController">
-    <padding>
-        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
-    </padding>
+<StackPane fx:id="rootPane" style="-fx-background-color: #fcfcfc;" styleClass="wallet-view" stylesheets="@../CSS/table.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.WalletController">
     <children>
-        <VBox spacing="5.0">
+        <VBox alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;">
+            <padding>
+                <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+            </padding>
             <children>
-                <Label text="Ví &amp; Thanh toán" textFill="#1a1a1a">
-                    <font>
-                        <Font name="System Bold" size="28.0" />
-                    </font>
-                </Label>
-                <Label text="Quản lý số dư, nạp/rút tiền và các phương thức thanh toán của bạn" textFill="#718096">
-                    <font>
-                        <Font size="15.0" />
-                    </font>
-                </Label>
-            </children>
-        </VBox>
-
-        <Separator prefWidth="200.0" style="-fx-opacity: 0.3;" />
-
-        <HBox spacing="30.0">
-            <children>
-                <VBox spacing="15.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 15; -fx-padding: 25;" HBox.hgrow="ALWAYS">
+                <VBox spacing="5.0">
                     <children>
-                        <Label text="Số dư hiện tại" textFill="#718096">
-                            <font><Font size="15.0" /></font>
+                        <Label style="-fx-text-fill: #1a1a1a;" styleClass="wallet-title" text="Ví &amp; Thanh toán" textFill="#1a1a1a">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
                         </Label>
-                        <Label fx:id="balanceLabel" prefHeight="54.0" prefWidth="379.0" text=" 0 đ" textFill="#1a1a1a">
-                            <font><Font name="System Bold" size="36.0" /></font>
+                        <Label style="-fx-text-fill: #718096;" styleClass="wallet-muted" text="Quản lý số dư, nạp/rút tiền và các phương thức thanh toán của bạn" textFill="#718096">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
                         </Label>
-
-                        <Region VBox.vgrow="ALWAYS" />
-
-                        <HBox spacing="15.0">
-                            <children>
-                                <Button onAction="#handleDeposit" prefHeight="45.0" prefWidth="133.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Nạp tiền" textFill="white">
-                                    <font><Font name="System Bold" size="14.0" /></font>
-                                    <padding><Insets left="30.0" right="30.0" /></padding>
-                                </Button>
-                                <Button onAction="#handleWithdraw" prefHeight="45.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 22.5; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Rút tiền" textFill="#1a1a1a">
-                                    <font><Font name="System Bold" size="14.0" /></font>
-                                    <padding><Insets left="30.0" right="30.0" /></padding>
-                                </Button>
-                            </children>
-                        </HBox>
                     </children>
                 </VBox>
 
-                <VBox spacing="15.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 15; -fx-padding: 25;" HBox.hgrow="ALWAYS">
+                <Separator prefWidth="200.0" style="-fx-opacity: 0.3;" />
+
+                <HBox spacing="30.0">
                     <children>
-                        <HBox alignment="CENTER_LEFT">
-                            <Label text="Tài khoản ngân hàng" textFill="#718096">
-                                <font><Font size="15.0" /></font>
-                            </Label>
-                        </HBox>
-
-                        <Region VBox.vgrow="ALWAYS" />
-
-                        <VBox fx:id="addBankBox" alignment="CENTER" onMouseClicked="#showAddBankPopup" prefHeight="80.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-radius: 10; -fx-border-width: 2; -fx-cursor: hand;">
+                        <VBox spacing="15.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 15; -fx-padding: 25;" HBox.hgrow="ALWAYS">
                             <children>
-                                <Label text="+ Thêm tài khoản ngân hàng" textFill="#4a5568">
-                                    <font><Font name="System Bold" size="15.0" /></font>
+                                <Label style="-fx-text-fill: #718096;" styleClass="wallet-muted" text="Số dư hiện tại" textFill="#718096">
+                                    <font><Font size="15.0" /></font>
                                 </Label>
+                                <Label fx:id="balanceLabel" prefHeight="54.0" prefWidth="379.0" style="-fx-text-fill: #1a1a1a;" styleClass="wallet-strong" text=" 0 đ" textFill="#1a1a1a">
+                                    <font><Font name="System Bold" size="36.0" /></font>
+                                </Label>
+
+                                <Region VBox.vgrow="ALWAYS" />
+
+                                <HBox spacing="15.0">
+                                    <children>
+                                        <Button onAction="#handleDeposit" prefHeight="45.0" prefWidth="133.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Nạp tiền" textFill="white">
+                                            <font><Font name="System Bold" size="14.0" /></font>
+                                            <padding><Insets left="30.0" right="30.0" /></padding>
+                                        </Button>
+                                        <Button onAction="#handleWithdraw" prefHeight="45.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 22.5; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Rút tiền" textFill="#1a1a1a">
+                                            <font><Font name="System Bold" size="14.0" /></font>
+                                            <padding><Insets left="30.0" right="30.0" /></padding>
+                                        </Button>
+                                    </children>
+                                </HBox>
                             </children>
                         </VBox>
-                        <VBox fx:id="linkedBankBox" managed="false" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-padding: 15;" visible="false">
-                            <children>
-                                <Label fx:id="displayBankName" text="TÊN NGÂN HÀNG" textFill="#1a1a1a">
-                                    <font><Font name="System Bold" size="16.0" /></font>
-                                </Label>
-                                <Label fx:id="displayAccNumber" text="**** **** **** 1234" textFill="#718096">
-                                    <font><Font size="14.0" /></font>
-                                </Label>
-                                <Separator style="-fx-opacity: 0.3;" />
 
+                        <VBox spacing="15.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 15; -fx-padding: 25;" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <Label style="-fx-text-fill: #718096;" styleClass="wallet-muted" text="Tài khoản ngân hàng" textFill="#718096">
+                                        <font><Font size="15.0" /></font>
+                                    </Label>
+                                </HBox>
+
+                                <Region VBox.vgrow="ALWAYS" />
+
+                                <VBox fx:id="addBankBox" alignment="CENTER" onMouseClicked="#showAddBankPopup" prefHeight="80.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-radius: 10; -fx-border-width: 2; -fx-cursor: hand;">
+                                    <children>
+                                        <Label style="-fx-text-fill: #4a5568;" styleClass="wallet-action-label" text="+ Thêm tài khoản ngân hàng" textFill="#4a5568">
+                                            <font><Font name="System Bold" size="15.0" /></font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                                <VBox fx:id="linkedBankBox" managed="false" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-padding: 15;" visible="false">
+                                    <children>
+                                        <Label fx:id="displayBankName" style="-fx-text-fill: #1a1a1a;" styleClass="wallet-strong" text="TÊN NGÂN HÀNG" textFill="#1a1a1a">
+                                            <font><Font name="System Bold" size="16.0" /></font>
+                                        </Label>
+                                        <Label fx:id="displayAccNumber" style="-fx-text-fill: #718096;" styleClass="wallet-muted" text="**** **** **** 1234" textFill="#718096">
+                                            <font><Font size="14.0" /></font>
+                                        </Label>
+                                        <Separator style="-fx-opacity: 0.3;" />
+                                    </children>
+                                </VBox>
                             </children>
                         </VBox>
-                    </children>
-                </VBox>
-            </children>
-        </HBox>
-
-        <VBox spacing="20.0" VBox.vgrow="ALWAYS">
-            <children>
-                <Label text="Các giao dịch gần đây" textFill="#1a1a1a">
-                    <font>
-                        <Font name="System Bold" size="20.0" />
-                    </font>
-                </Label>
-
-                <HBox alignment="CENTER_LEFT" spacing="15.0">
-                    <children>
-                        <ComboBox fx:id="timeFilter" onAction="#applyTransactionFilters" prefHeight="45.0" prefWidth="180.0" promptText="Tháng này" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
-
-                        <Button fx:id="filterAllBtn" onAction="#filterAll" prefHeight="45.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 10; -fx-cursor: hand;" text="Tất cả" textFill="white">
-                            <font><Font name="System Bold" size="14.0" /></font>
-                            <padding><Insets left="20.0" right="20.0" /></padding>
-                        </Button>
-                        <Button fx:id="filterInBtn" onAction="#filterIn" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền vào" textFill="#4a5568">
-                            <font><Font name="System Bold" size="14.0" /></font>
-                            <padding><Insets left="20.0" right="20.0" /></padding>
-                        </Button>
-                        <Button fx:id="filterOutBtn" onAction="#filterOut" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền ra" textFill="#4a5568">
-                            <font><Font name="System Bold" size="14.0" /></font>
-                            <padding><Insets left="20.0" right="20.0" /></padding>
-                        </Button>
-
-                        <Region HBox.hgrow="ALWAYS" />
-
-                        <TextField fx:id="searchField" onAction="#handleSearch" prefHeight="45.0" prefWidth="250.0" promptText="Tìm kiếm giao dịch..." style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-border-color: transparent; -fx-padding: 0 15 0 15;">
-                            <font><Font size="14.0" /></font>
-                        </TextField>
                     </children>
                 </HBox>
 
-                <TableView fx:id="transactionTable" prefHeight="200.0" style="-fx-font-family: 'System'; -fx-font-size: 13px;" VBox.vgrow="ALWAYS">
-                    <columns>
-                        <TableColumn fx:id="dateColumn" prefWidth="150.0" text="Ngày giờ" />
-                        <TableColumn fx:id="typeColumn" prefWidth="120.0" text="Loại giao dịch" />
-                        <TableColumn fx:id="moneyInColumn" prefWidth="120.0" text="Tiền vào" />
-                        <TableColumn fx:id="moneyOutColumn" prefWidth="120.0" text="Tiền ra" />
-                        <TableColumn fx:id="balanceColumn" prefWidth="120.0" text="Số dư sau" />
-                        <TableColumn fx:id="descriptionColumn" prefWidth="200.0" text="Mô tả" />
-                    </columns>
-                    <placeholder>
-                        <Label text="Chưa có giao dịch nào" textFill="#a0aec0">
-                            <font><Font size="15.0" /></font>
+                <VBox spacing="20.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label style="-fx-text-fill: #1a1a1a;" styleClass="wallet-title-small" text="Các giao dịch gần đây" textFill="#1a1a1a">
+                            <font>
+                                <Font name="System Bold" size="20.0" />
+                            </font>
                         </Label>
-                    </placeholder>
-                </TableView>
 
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                            <children>
+                                <ComboBox fx:id="timeFilter" onAction="#applyTransactionFilters" prefHeight="45.0" prefWidth="180.0" promptText="Tháng này" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
+
+                                <Button fx:id="filterAllBtn" onAction="#filterAll" prefHeight="45.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 10; -fx-cursor: hand;" text="Tất cả" textFill="white">
+                                    <font><Font name="System Bold" size="14.0" /></font>
+                                    <padding><Insets left="20.0" right="20.0" /></padding>
+                                </Button>
+                                <Button fx:id="filterInBtn" onAction="#filterIn" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền vào" textFill="#4a5568">
+                                    <font><Font name="System Bold" size="14.0" /></font>
+                                    <padding><Insets left="20.0" right="20.0" /></padding>
+                                </Button>
+                                <Button fx:id="filterOutBtn" onAction="#filterOut" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-cursor: hand;" text="Tiền ra" textFill="#4a5568">
+                                    <font><Font name="System Bold" size="14.0" /></font>
+                                    <padding><Insets left="20.0" right="20.0" /></padding>
+                                </Button>
+
+                                <Region HBox.hgrow="ALWAYS" />
+
+                                <TextField fx:id="searchField" onAction="#handleSearch" prefHeight="45.0" prefWidth="250.0" promptText="Tìm kiếm giao dịch..." style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-border-color: transparent; -fx-padding: 0 15 0 15;">
+                                    <font><Font size="14.0" /></font>
+                                </TextField>
+                            </children>
+                        </HBox>
+
+                        <TableView fx:id="transactionTable" prefHeight="200.0" style="-fx-font-family: 'System'; -fx-font-size: 13px;" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="dateColumn" prefWidth="150.0" text="Ngày giờ" />
+                                <TableColumn fx:id="typeColumn" prefWidth="120.0" text="Loại giao dịch" />
+                                <TableColumn fx:id="moneyInColumn" prefWidth="120.0" text="Tiền vào" />
+                                <TableColumn fx:id="moneyOutColumn" prefWidth="120.0" text="Tiền ra" />
+                                <TableColumn fx:id="balanceColumn" prefWidth="120.0" text="Số dư sau" />
+                                <TableColumn fx:id="descriptionColumn" prefWidth="200.0" text="Mô tả" />
+                            </columns>
+                            <placeholder>
+                                <Label style="-fx-text-fill: #a0aec0;" styleClass="wallet-placeholder" text="Chưa có giao dịch nào" textFill="#a0aec0">
+                                    <font><Font size="15.0" /></font>
+                                </Label>
+                            </placeholder>
+                        </TableView>
+                    </children>
+                </VBox>
             </children>
         </VBox>
     </children>
-</VBox>
+</StackPane>
