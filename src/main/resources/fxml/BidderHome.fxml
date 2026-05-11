@@ -35,7 +35,7 @@
                             </VBox.margin>
                         </HBox>
 
-                        <HBox fx:id="menuHome" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuHome" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
                                 <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onMouseClicked="#loadDashboardView" style="-fx-background-color: transparent;" text="🏠   Trang chủ" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
@@ -56,7 +56,7 @@
                             </VBox.margin>
                         </Label>
 
-                        <HBox fx:id="menuRecent" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuRecent" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
                                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#loadAuctionHistoryView" style="-fx-background-color: transparent;" text="📈   Lịch sử đấu giá" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
@@ -68,7 +68,7 @@
                             </children>
                         </HBox>
 
-                        <HBox fx:id="menuMsg" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuMsg" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
                                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" onMouseClicked="#loadNotificationsView" style="-fx-background-color: transparent;" text="🔔   Thông báo" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
@@ -80,7 +80,7 @@
                             </children>
                         </HBox>
 
-                        <HBox fx:id="menuPay" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuPay" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
                                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#loadWalletView" style="-fx-background-color: transparent;" text="💳   Ví tiền" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
@@ -94,7 +94,7 @@
 
                         <Region VBox.vgrow="ALWAYS" />
 
-                        <HBox fx:id="menuUpgrade" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuUpgrade" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
                                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" mouseTransparent="true" style="-fx-background-color: transparent;" text="👨‍🏫  Trở thành Seller" textFill="#e53e3e" HBox.hgrow="ALWAYS">
                                     <font>
@@ -105,7 +105,7 @@
                                 </Button>
                             </children>
                         </HBox>
-                        <HBox fx:id="menuSettings" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;">
+                        <HBox fx:id="menuSettings" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
                                 <Button alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handleLogout" style="-fx-background-color: transparent;" text=" 🚪  Đăng xuất" textFill="#e53e3e" HBox.hgrow="ALWAYS">
                                     <font>
