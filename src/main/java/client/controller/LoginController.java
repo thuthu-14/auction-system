@@ -130,7 +130,7 @@ public class LoginController {
                 onAdminLoginSuccess.run();
             } else {
                 // SỬ DỤNG navigateTo cho Admin
-                nav.navigateTo("/fxml/AdminDashboard.fxml");
+                nav.navigateTo("/fxml/AdminHome.fxml");
             }
         } else if (currentUser instanceof server.model.RegularUser) {
             server.model.RegularUser regUser = (server.model.RegularUser) currentUser;

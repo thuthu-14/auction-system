@@ -1,106 +1,128 @@
-// src/main/java/server/service/AuthService.java
 package server.service;
 
-import server.model.User;
-import server.model.RegularUser;
-import server.storage.UserDAO;
 import server.exception.AuthenticationException;
+import server.model.RegularUser;
+import server.model.User;
+import server.repository.JsonUserRepository;
+import server.repository.UserRepository;
 import util.LoggerUtil;
 import util.ValidationUtil;
+
 import java.io.IOException;
 
-/**
- * AuthService - Xử lý authentication
- */
 public class AuthService {
+    private static final AuthService DEFAULT = new AuthService(new JsonUserRepository());
 
-    /**
-     * Login user
-     */
-    public static User login(String email, String password)
+    private final UserRepository userRepository;
+
+    public AuthService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public User loginUser(String email, String password)
             throws AuthenticationException, IOException, ClassNotFoundException {
 
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
-            throw new AuthenticationException("❌ email và password không được rỗng!");
+            throw new AuthenticationException("Email va password khong duoc rong!");
         }
 
-        User user = UserDAO.getUserByEmail(email);
+        User user = loadUserByEmail(email);
 
         if (user == null) {
-            throw new AuthenticationException("❌ Tài khoản không tồn tại!");
+            throw new AuthenticationException("Tai khoan khong ton tai!");
         }
 
         if (!user.getPassword().equals(password)) {
-            throw new AuthenticationException("❌ Mật khẩu không đúng!");
+            throw new AuthenticationException("Mat khau khong dung!");
         }
 
         if (!user.isActive()) {
-            throw new AuthenticationException("❌ Tài khoản bị khóa!");
-        }
-
-        // 🔥 FIX QUAN TRỌNG NHẤT
-        if (user.getRole() == common.UserRole.ADMIN) {
-            return new server.model.Admin(
-                    user.getUserId(),
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getEmail()
-            );
+            throw new AuthenticationException("Tai khoan bi khoa!");
         }
 
         return user;
     }
 
-    /**
-     * Register user mới - CHỈ CÓ THỂ TẠO BIDDER
-     * ← SỬA: Block tạo admin
-     */
-    public static User register(String username, String password, String email)
+    public User registerUser(String username, String password, String email)
             throws IOException, ClassNotFoundException, AuthenticationException {
 
-        // Validate input
         if (!ValidationUtil.isValidUsername(username)) {
-            throw new AuthenticationException("❌ Username không hợp lệ (3-50 ký tự, chỉ a-z, 0-9, _)");
+            throw new AuthenticationException("Username khong hop le (3-50 ky tu, chi a-z, 0-9, _)");
         }
 
         if (!ValidationUtil.isValidPassword(password)) {
-            throw new AuthenticationException("❌ Password phải có ít nhất 6 ký tự");
+            throw new AuthenticationException("Password phai co it nhat 6 ky tu");
         }
 
         if (!ValidationUtil.isValidEmail(email)) {
-            throw new AuthenticationException("❌ Email không hợp lệ");
+            throw new AuthenticationException("Email khong hop le");
         }
 
-// Kiểm tra email đã tồn tại chưa
-        User existingByEmail = UserDAO.getUserByEmail(email);
+        User existingByEmail = loadUserByEmail(email);
         if (existingByEmail != null) {
             LoggerUtil.error("Registration failed: Email already exists - " + email);
-            throw new AuthenticationException("❌ Email đã tồn tại!");
+            throw new AuthenticationException("Email da ton tai!");
         }
 
-
-        // ← THÊM: Block tạo admin account
         if (username.equalsIgnoreCase("admin")) {
             LoggerUtil.error("Registration blocked: Attempted to create admin account - " + username);
-            throw new AuthenticationException("❌ Không thể tạo tài khoản admin!");
+            throw new AuthenticationException("Khong the tao tai khoan admin!");
         }
 
-        // Kiểm tra username đã tồn tại chưa
-        User existingUser = UserDAO.getUserByUsername(username);
+        User existingUser = loadUserByUsername(username);
         if (existingUser != null) {
             LoggerUtil.error("Registration failed: Username already exists - " + username);
-            throw new AuthenticationException("❌ Username đã tồn tại!");
+            throw new AuthenticationException("Username da ton tai!");
         }
 
-        // Tạo user mới - LUÔN LÀ BIDDER
         String userId = "U" + System.currentTimeMillis();
         RegularUser newUser = new RegularUser(userId, username, password, email);
-        newUser.setWallet(0); // ← Mặc định wallet = 0, user phải nạp tiền
-        newUser.setSeller(false); // ← Chỉ có thể upgrade sau
+        newUser.setWallet(0);
+        newUser.setSeller(false);
 
-        UserDAO.registerUser(newUser);
-        LoggerUtil.info("✓ User registered: " + username + " (Role: BIDDER)");
+        saveNewUser(newUser);
+        LoggerUtil.info("User registered: " + username + " (Role: BIDDER)");
 
         return newUser;
+    }
+
+    public static User login(String email, String password)
+            throws AuthenticationException, IOException, ClassNotFoundException {
+        return DEFAULT.loginUser(email, password);
+    }
+
+    public static User register(String username, String password, String email)
+            throws IOException, ClassNotFoundException, AuthenticationException {
+        return DEFAULT.registerUser(username, password, email);
+    }
+
+    private User loadUserByEmail(String email) throws IOException, ClassNotFoundException {
+        try {
+            return userRepository.getUserByEmail(email);
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    private User loadUserByUsername(String username) throws IOException, ClassNotFoundException {
+        try {
+            return userRepository.getUserByUsername(username);
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    private void saveNewUser(User user) throws IOException, ClassNotFoundException {
+        try {
+            userRepository.registerUser(user);
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 }

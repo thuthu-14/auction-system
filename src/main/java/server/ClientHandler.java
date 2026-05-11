@@ -182,6 +182,7 @@ public class ClientHandler implements Runnable {
         Map<String, Object> auctionData = (Map<String, Object>) message.getData();
 
         try {
+
             String itemType = (String) auctionData.get("itemType");
             Item item = createItemFromData(itemType, auctionData);
             RegularUser seller = (RegularUser) currentUser;
