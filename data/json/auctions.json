@@ -301,5 +301,31 @@
       "BID1778485988272"
     ],
     "viewCount": 0
+  },
+  {
+    "auctionId": "AU1778508378041",
+    "itemId": "IT1778508378043",
+    "sellerId": "U1777942394909",
+    "sellerName": "nhipham",
+    "item": {
+      "itemId": "IT1778508378043",
+      "name": "tranh",
+      "description": "new",
+      "startingPrice": 500000.0,
+      "sellerId": "U1777942394909",
+      "images": [
+        "file:/C:/Users/admin/OneDrive/Pictures/Screenshots/Ảnh%20chụp%20màn%20hình%202026-05-10%20172453.png"
+      ],
+      "type": "ART",
+      "creator": "Unknown Artist",
+      "material": "Canvas"
+    },
+    "currentPrice": 500000.0,
+    "status": "OPEN",
+    "startTime": 1778508378043,
+    "endTime": 1778627178043,
+    "createdAt": 1778508378043,
+    "bidIds": [],
+    "viewCount": 0
   }
 ]

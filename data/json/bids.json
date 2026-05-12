@@ -1384,5 +1384,95 @@
     "amount": 160000.0,
     "bidTime": 1778485988272,
     "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778135224085",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1778135056237",
+    "bidderName": "thunguyen",
+    "amount": 2.085005E7,
+    "bidTime": 1778135224085,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778136325033",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1778135056237",
+    "bidderName": "thunguyen",
+    "amount": 2.090005E7,
+    "bidTime": 1778136325034,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778137673760",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1778135056237",
+    "bidderName": "thunguyen",
+    "amount": 2.095005E7,
+    "bidTime": 1778137673761,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778138059450",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1778135056237",
+    "bidderName": "thunguyen",
+    "amount": 2.100005E7,
+    "bidTime": 1778138059451,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778138392091",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1778135056237",
+    "bidderName": "thunguyen",
+    "amount": 2.105005E7,
+    "bidTime": 1778138392091,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778138956845",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1778135056237",
+    "bidderName": "thunguyen",
+    "amount": 2.110005E7,
+    "bidTime": 1778138956845,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778140106941",
+    "auctionId": "AU1778137116936",
+    "bidderId": "U1777942394909",
+    "bidderName": "nhipham",
+    "amount": 110000.0,
+    "bidTime": 1778140106942,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778140115287",
+    "auctionId": "AU1778137116936",
+    "bidderId": "U1777942394909",
+    "bidderName": "nhipham",
+    "amount": 120000.0,
+    "bidTime": 1778140115287,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778339944601",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1777942394909",
+    "bidderName": "nhipham",
+    "amount": 2.960005E7,
+    "bidTime": 1778339944604,
+    "status": "ACTIVE"
+  },
+  {
+    "bidId": "BID1778339954256",
+    "auctionId": "AU1777879942563",
+    "bidderId": "U1777942394909",
+    "bidderName": "nhipham",
+    "amount": 2.965005E7,
+    "bidTime": 1778339954256,
+    "status": "ACTIVE"
   }
 ]

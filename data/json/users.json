@@ -39,19 +39,6 @@
     "ownedAuctionIds": [],
     "bidIds": [],
     "isSeller": false,
-    "userId": "U1777942394909",
-    "username": "nhipham",
-    "password": "123456",
-    "email": "nhi123@gmail.com",
-    "wallet": 0.0,
-    "role": "BIDDER",
-    "createdAt": 1777942394909,
-    "active": true
-  },
-  {
-    "ownedAuctionIds": [],
-    "bidIds": [],
-    "isSeller": false,
     "userId": "U1777943026744",
     "username": "baohan",
     "password": "1234566",
@@ -291,6 +278,57 @@
     "wallet": 2.6929999E7,
     "role": "BIDDER",
     "createdAt": 1778403578743,
+    "active": true
+  },
+  {
+    "ownedAuctionIds": [
+      "AU1778137116936"
+    ],
+    "bidIds": [
+      "BID1778135224085",
+      "BID1778136325033",
+      "BID1778137673760",
+      "BID1778138059450",
+      "BID1778138392091",
+      "BID1778138956845"
+    ],
+    "isSeller": true,
+    "shopName": "jidhf",
+    "shopPhone": "0904344590",
+    "shopAddress": "cjdbcd",
+    "shopEmail": "thu@gmail.com",
+    "userId": "U1778135056237",
+    "username": "thunguyen",
+    "password": "123456",
+    "email": "thu123@gmail.com",
+    "wallet": 2000000.0,
+    "role": "SELLER",
+    "createdAt": 1778135056238,
+    "active": false
+  },
+  {
+    "ownedAuctionIds": [
+      "AU1778340124809",
+      "AU1778508378041"
+    ],
+    "bidIds": [
+      "BID1778140106941",
+      "BID1778140115287",
+      "BID1778339944601",
+      "BID1778339954256"
+    ],
+    "isSeller": true,
+    "shopName": "nhi",
+    "shopPhone": "0904344590",
+    "shopAddress": "abc",
+    "shopEmail": "nhi123@gmail.com",
+    "userId": "U1777942394909",
+    "username": "nhipham",
+    "password": "123456",
+    "email": "nhi123@gmail.com",
+    "wallet": 1000003.0,
+    "role": "SELLER",
+    "createdAt": 1777942394909,
     "active": true
   }
 ]
