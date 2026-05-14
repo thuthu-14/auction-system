@@ -75,7 +75,7 @@ public class NotificationsController implements Initializable {
                 User user = resolveUser();
 
                 if (socket == null || user == null) {
-                    Platform.runLater(() -> showEmptyState("Khong co du lieu nguoi dung hoac ket noi server."));
+                    Platform.runLater(() -> showEmptyState("Không có dữ liệu nguoi dung hoac ket noi server."));
                     return;
                 }
 
@@ -85,12 +85,12 @@ public class NotificationsController implements Initializable {
                     if (response != null && response.getData() instanceof List<?> rawList) {
                         renderNotifications(rawList);
                     } else {
-                        showEmptyState("Chua co thong bao nao.");
+                        showEmptyState("Chưa có thông báo nào.");
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Loi load bidder notifications: " + e.getMessage());
-                Platform.runLater(() -> showEmptyState("Khong tai duoc thong bao."));
+                LoggerUtil.error("Lỗi load bidder notifications: " + e.getMessage());
+                Platform.runLater(() -> showEmptyState("Không tải được thông báo."));
             }
         }).start();
     }
@@ -106,7 +106,7 @@ public class NotificationsController implements Initializable {
         }
 
         if (notificationsContainer.getChildren().isEmpty()) {
-            showEmptyState("Chua co thong bao nao.");
+            showEmptyState("Chưa có thông báo nào.");
         }
     }
 
@@ -129,7 +129,7 @@ public class NotificationsController implements Initializable {
         VBox contentBox = new VBox(5);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
 
-        Label titleLabel = new Label(defaultText(data.getTitle(), "Thong bao"));
+        Label titleLabel = new Label(defaultText(data.getTitle(), "Thông báo"));
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
         titleLabel.setStyle("-fx-text-fill: " + getTitleColor(data) + ";");
 
@@ -148,7 +148,7 @@ public class NotificationsController implements Initializable {
         timeLabel.setStyle("-fx-text-fill: #9ca3af;");
         timeLabelUpdaters.add(() -> timeLabel.setText(data.formatTimeAgo()));
 
-        Button actionBtn = new Button(defaultText(data.getButtonText(), "Xem chi tiet"));
+        Button actionBtn = new Button(defaultText(data.getButtonText(), "Xem chi tiết"));
         actionBtn.setFont(Font.font("System", FontWeight.BOLD, 14));
         actionBtn.setStyle(getButtonStyle(data));
         actionBtn.setOnAction(event -> handleNotificationAction(data));
@@ -165,7 +165,7 @@ public class NotificationsController implements Initializable {
                 ClientSocket socket = resolveSocket();
                 User user = resolveUser();
                 if (socket == null || user == null) {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi", "Mat ket noi toi server."));
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Mất kết nối tới server."));
                     return;
                 }
 
@@ -174,12 +174,12 @@ public class NotificationsController implements Initializable {
                     if (response != null && "SUCCESS".equals(response.getStatus())) {
                         loadNotifications();
                     } else {
-                        showAlert(Alert.AlertType.ERROR, "Loi", "Khong the danh dau da doc.");
+                        showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đánh dấu đã đọc.");
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Loi mark bidder notifications read: " + e.getMessage());
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi", "Khong the danh dau da doc."));
+                LoggerUtil.error("Lỗi mark bidder notifications read: " + e.getMessage());
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đánh dấu đã đọc."));
             }
         }).start();
     }
@@ -211,7 +211,7 @@ public class NotificationsController implements Initializable {
             try {
                 ClientSocket socket = resolveSocket();
                 if (socket == null) {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi", "Mat ket noi toi server."));
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Mất kết nối tới server."));
                     return;
                 }
 
@@ -224,7 +224,7 @@ public class NotificationsController implements Initializable {
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Loi mo phien tu notification: " + e.getMessage());
+                LoggerUtil.error("Lỗi mo phien tu notification: " + e.getMessage());
                 Platform.runLater(() -> {
                     if (homeController != null) {
                         homeController.loadAuctionHistoryView();

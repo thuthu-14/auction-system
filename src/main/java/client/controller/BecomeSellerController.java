@@ -99,7 +99,7 @@ public class BecomeSellerController {
                 try {
                     ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
                     if (socket == null) {
-                        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi mang", "Chua ket noi toi Server!"));
+                        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Chưa kết nối tới Server!"));
                         return;
                     }
 
@@ -108,12 +108,12 @@ public class BecomeSellerController {
                     Platform.runLater(() -> {
                         regularUser.upgradeSeller(data.name(), data.phone(), data.address(), data.email());
                         authClientService.saveSellerContext(regularUser);
-                        showAlert(Alert.AlertType.INFORMATION, "Thanh cong", "Chuc mung! Ban da tro thanh Nguoi ban!");
+                        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chúc mừng! Bạn đã trở thành Người bán!");
                         NavigationManager.getInstance().setMainStage((javafx.stage.Stage) nameField.getScene().getWindow());
                         NavigationManager.getInstance().goToSellerHome();
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi Server", e.getMessage()));
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi Server", e.getMessage()));
                 } finally {
                     Platform.runLater(() -> {
                         btnSave.setDisable(false);

@@ -90,12 +90,28 @@ public class AddAuctionProductController implements Initializable {
                     selectedImagePaths.add(imagePath);
 
                     ImageView imageView = new ImageView(new Image(imagePath));
-                    imageView.setFitWidth(98.0);
-                    imageView.setFitHeight(98.0);
+                    imageView.setFitWidth(82.0);
+                    imageView.setFitHeight(82.0);
                     imageView.setPreserveRatio(true);
 
                     StackPane imagePane = new StackPane(imageView);
+                    imagePane.setPrefSize(84.0, 84.0);
+                    imagePane.setMinSize(84.0, 84.0);
+                    imagePane.setMaxSize(84.0, 84.0);
                     imagePane.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-cursor: hand;");
+
+                    Button removeButton = new Button("x");
+                    removeButton.setFocusTraversable(false);
+                    removeButton.setPrefSize(18, 18);
+                    removeButton.setMinSize(18, 18);
+                    removeButton.setMaxSize(18, 18);
+                    removeButton.setStyle("-fx-background-color: rgba(17, 24, 39, 0.82); -fx-text-fill: white; -fx-font-size: 9px; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 0; -fx-cursor: hand;");
+                    StackPane.setAlignment(removeButton, javafx.geometry.Pos.TOP_RIGHT);
+                    StackPane.setMargin(removeButton, new javafx.geometry.Insets(4));
+                    removeButton.setOnAction(e -> {
+                        imagePreviewContainer.getChildren().remove(imagePane);
+                        selectedImagePaths.remove(imagePath);
+                    });
 
                     imagePane.setOnMouseClicked(e -> {
                         if (e.getClickCount() == 2) {
@@ -105,6 +121,7 @@ public class AddAuctionProductController implements Initializable {
                     });
 
                     Tooltip.install(imagePane, new Tooltip("Click đúp chuột để xóa ảnh này"));
+                    imagePane.getChildren().add(removeButton);
                     imagePreviewContainer.getChildren().add(imagePane);
                 }
             }
@@ -129,7 +146,7 @@ public class AddAuctionProductController implements Initializable {
                 setupTimeOptions(formNode, config);
             }
         } catch (IOException e) {
-            LoggerUtil.error("Loi tai form danh muc: " + e.getMessage());
+            LoggerUtil.error("Lỗi tai form danh muc: " + e.getMessage());
         }
     }
 
@@ -362,5 +379,3 @@ public class AddAuctionProductController implements Initializable {
     }
 
 }
-
-

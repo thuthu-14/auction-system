@@ -13,7 +13,7 @@ public class Notification implements Serializable {
     private String description; // Nội dung chi tiết
     private String timeAgo;     // Thời gian hiển thị (VD: "Vừa xong", "10 phút trước")
     private long createdAt = System.currentTimeMillis(); // Thời điểm tạo thông báo
-    private String buttonText;  // Chữ trên nút bấm (VD: "Thanh toán ngay")
+    private String buttonText;  // Chữ trên nút bấm (VD: "Thanh toán ngày")
     private String referenceId; // ID tham chiếu (Mã đấu giá, mã giao dịch...)
     private boolean isRead;     // Trạng thái đã đọc hay chưa
 

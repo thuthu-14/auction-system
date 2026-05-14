@@ -12,7 +12,7 @@
     <HBox style="-fx-background-color: #e6f5ff; -fx-background-radius: 8; -fx-padding: 12 16; -fx-border-color: #cbd5e1; -fx-border-radius: 8;">
         <VBox spacing="4" HBox.hgrow="ALWAYS">
             <Label text="🚗 XE CỘ - Xe máy, Ô tô, Xe đạp..." style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;" />
-            <Label text="💰 Giá tối thiểu: 500,000 VNĐ  |  📈 Mỗi bid: 500,000 VNĐ  |  ⏱ 1-7 ngày" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+            <Label text="💰 Giá tối thiểu: 500,000 VNĐ  |  📈 Mỗi lượt đặt: 500,000 VNĐ  |  ⏱ 1-7 ngày" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
         </VBox>
     </HBox>
 

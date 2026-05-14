@@ -55,7 +55,7 @@ public class DashboardController implements Initializable {
         this.clientSocket = socket;
         System.out.println("Dashboard kết nối thành công: " + (user != null ? user.getUsername() : "Guest"));
 
-        // Ưu tiên load dữ liệu ngay khi có socket
+        // Ưu tiên load dữ liệu ngày khi có socket
         loadAuctionsFromServer();
     }
 

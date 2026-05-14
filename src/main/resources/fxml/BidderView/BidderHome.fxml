@@ -20,7 +20,7 @@
                             <children>
                                 <ImageView fitHeight="60.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true" smooth="true">
                                     <image>
-                                        <Image url="@../CSS/logo.png" />
+                                        <Image url="@../../CSS/logo.png" />
                                     </image>
                                 </ImageView>
 
@@ -37,7 +37,7 @@
 
                         <HBox fx:id="menuHome" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="230.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
-                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" onMouseClicked="#loadDashboardView" style="-fx-background-color: transparent;" text="🏠   Trang chủ" textFill="#4a5568" HBox.hgrow="ALWAYS">
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" mouseTransparent="true" style="-fx-background-color: transparent;" text="🏠   Trang chủ" textFill="#4a5568" HBox.hgrow="ALWAYS">
                                     <font>
                                         <Font name="System" size="17.0" />
                                     </font>
@@ -47,7 +47,7 @@
                             </children>
                         </HBox>
 
-                        <Label text="BIDDING" textFill="#a0aec0">
+                        <Label text="ĐẤU GIÁ" textFill="#a0aec0">
                             <font>
                                 <Font size="15.0" />
                             </font>
@@ -172,13 +172,13 @@
                             <children>
                                 <VBox alignment="CENTER" spacing="10.0">
                                     <children>
-                                        <Label style="-fx-translate-x: -3;" text="Welcome to BubblyBid Dashboard" textFill="#2e384d">
+                                        <Label style="-fx-translate-x: -3;" text="Chào mừng đến với BubblyBid" textFill="#2e384d">
                                             <font>
                                                 <Font name="System Bold" size="28.0" />
                                             </font>
                                         </Label>
 
-                                        <Label text="Select a menu item from the left to get started" textFill="#a0aec0">
+                                        <Label text="Chọn một mục ở menu bên trái để bắt đầu" textFill="#a0aec0">
                                             <font>
                                                 <Font size="16.0" />
                                             </font>

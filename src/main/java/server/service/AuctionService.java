@@ -38,6 +38,11 @@ public class AuctionService {
     }
 
     public Auction create(RegularUser seller, Item item, int durationMinutes) throws Exception {
+        return create(seller, item, durationMinutes, 0.0, 0.0);
+    }
+
+    public Auction create(RegularUser seller, Item item, int durationMinutes,
+                          double reservePrice, double minimumBidIncrement) throws Exception {
         validateCreateAuction(seller, item, durationMinutes);
 
         String auctionId = "AU" + System.currentTimeMillis();
@@ -53,6 +58,8 @@ public class AuctionService {
                 item.getStartingPrice(),
                 durationMinutes
         );
+        auction.setReservePrice(Math.max(0.0, reservePrice));
+        auction.setMinimumBidIncrement(Math.max(0.0, minimumBidIncrement));
 
         auctionRepository.createAuction(auction);
         itemRepository.saveItem(item);
@@ -96,19 +103,19 @@ public class AuctionService {
     private void validateCreateAuction(RegularUser seller, Item item, int durationMinutes)
             throws PermissionDeniedException {
         if (seller == null) {
-            throw new PermissionDeniedException("Seller khong hop le.");
+            throw new PermissionDeniedException("Người bán không hợp lệ.");
         }
         if (!seller.isActive()) {
-            throw new PermissionDeniedException("Tai khoan nguoi ban dang bi khoa.");
+            throw new PermissionDeniedException("Tài khoản người bán đang bị khóa.");
         }
         if (!seller.isSeller()) {
-            throw new PermissionDeniedException("Chi nguoi ban moi co the tao phien dau gia.");
+            throw new PermissionDeniedException("Chỉ người bán mới có thể tạo phiên đấu giá.");
         }
         if (item == null) {
-            throw new PermissionDeniedException("Item khong hop le.");
+            throw new PermissionDeniedException("Sản phẩm không hợp lệ.");
         }
         if (item.getCategory() == null) {
-            throw new PermissionDeniedException("Loai san pham khong hop le.");
+            throw new PermissionDeniedException("Loại sản phẩm không hợp lệ.");
         }
 
         String priceError = ItemValidationUtil.getStartingPriceErrorMessage(
@@ -128,6 +135,18 @@ public class AuctionService {
             throws PermissionDeniedException, IOException, ClassNotFoundException {
         try {
             return DEFAULT.create(seller, item, durationMinutes);
+        } catch (PermissionDeniedException | IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    public static Auction createAuction(RegularUser seller, Item item, int durationMinutes,
+                                        double reservePrice, double minimumBidIncrement)
+            throws PermissionDeniedException, IOException, ClassNotFoundException {
+        try {
+            return DEFAULT.create(seller, item, durationMinutes, reservePrice, minimumBidIncrement);
         } catch (PermissionDeniedException | IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {

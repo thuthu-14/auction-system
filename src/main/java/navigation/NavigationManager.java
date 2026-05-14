@@ -115,20 +115,20 @@ public class NavigationManager {
      */
     public void goToHome() {
         // Đảm bảo đường dẫn này khớp với tên file FXML của bạn
-        navigateTo("/fxml/BidderHome.fxml");
+        navigateTo("/fxml/BidderView/BidderHome.fxml");
     }
 
     /**
      * Chuyển sang giao diện quản lý của người bán
      */
     public void goToSellerHome() {
-        navigateTo("/fxml/SellerHome.fxml");
+        navigateTo("/fxml/SellerView/SellerHome.fxml");
     }
 
     /**
      * Chuyển sang giao diện ví tiền
      */
     public void goToWallet() {
-        navigateTo("/fxml/WalletView.fxml");
+        navigateTo("/fxml/BidderView/WalletView.fxml");
     }
 }

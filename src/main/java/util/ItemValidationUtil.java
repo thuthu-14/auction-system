@@ -60,7 +60,10 @@ public class ItemValidationUtil {
      * ← THÊM: Lấy error message nếu bid amount không hợp lệ
      */
     public static String getBidAmountErrorMessage(ItemCategory category, double currentPrice, double bidAmount) {
-        double increment = category.getMinimumBidIncrement();
+        return getBidAmountErrorMessage(currentPrice, bidAmount, category.getMinimumBidIncrement());
+    }
+
+    public static String getBidAmountErrorMessage(double currentPrice, double bidAmount, double increment) {
         double minimumRequired = currentPrice + increment;
 
         if (bidAmount <= currentPrice) {

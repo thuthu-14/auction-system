@@ -276,7 +276,7 @@ public class ClientHandler implements Runnable {
             Auction auction = AuctionService.getAuctionById(auctionId);
 
             if (auction == null) {
-                throw new Exception("Auction not found");
+                throw new Exception("Không tìm thấy phiên đấu giá");
             }
 
             RegularUser bidder = (RegularUser) currentUser;
@@ -591,6 +591,8 @@ public class ClientHandler implements Runnable {
             Number durationNum = (Number) auctionData.get("duration");
             if (durationNum == null) { sendError(" Thiếu thời gian đấu giá"); return; }
             int duration = durationNum.intValue();
+            double reservePrice = numberValue(auctionData.get("reservePrice"), 0.0);
+            double minimumBidIncrement = numberValue(auctionData.get("minimumBidIncrement"), 0.0);
 
             // Validate chung
             if (!util.ValidationUtil.isValidItemName(name)) {
@@ -639,6 +641,8 @@ public class ClientHandler implements Runnable {
                     if (!util.ItemValidationUtil.isValidMaterial(jewelryMaterial)) { sendError(" Chất liệu không hợp lệ"); return; }
                     if (!util.ItemValidationUtil.isValidWeight(weight)) { sendError(" Trọng lượng không hợp lệ"); return; }
                     break;
+                case "OTHER":
+                    break;
                 default:
                     sendError(" Loại sản phẩm không hợp lệ");
                     return;
@@ -646,7 +650,7 @@ public class ClientHandler implements Runnable {
 
             // Mọi thứ OK -> Tạo sản phẩm
             Item item = createItemFromData(itemType, auctionData);
-            Auction auction = AuctionService.createAuction(seller, item, duration);
+            Auction auction = AuctionService.createAuction(seller, item, duration, reservePrice, minimumBidIncrement);
 
             Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Auction created successfully");
             response.setData(auction);
@@ -748,9 +752,26 @@ public class ClientHandler implements Runnable {
                 }
                 return new Jewelry("", name, description, price, sellerId, jewelryMaterial, weight, images);
 
+            case "OTHER":
+                return new OtherItem("", name, description, price, sellerId, images);
+
             default:
                 throw new Exception("Unknown item type: " + itemType);
         }
+    }
+
+    private double numberValue(Object value, double fallback) {
+        if (value instanceof Number number) {
+            return number.doubleValue();
+        }
+        if (value instanceof String text && !text.isBlank()) {
+            try {
+                return Double.parseDouble(text.trim());
+            } catch (NumberFormatException ignored) {
+                return fallback;
+            }
+        }
+        return fallback;
     }
 
     public synchronized void sendMessage(Message message) throws IOException {

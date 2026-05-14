@@ -27,7 +27,7 @@
             </HBox>
 
             <Region VBox.vgrow="ALWAYS" /> <HBox alignment="BOTTOM_RIGHT">
-            <Button mnemonicParsing="false" style="-fx-background-color: #0a0a0a; -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;" text="Đấu giá ngay" />
+            <Button mnemonicParsing="false" style="-fx-background-color: #0a0a0a; -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 8 20; -fx-font-weight: bold; -fx-cursor: hand;" text="Đấu giá ngày" />
         </HBox>
         </children>
     </VBox>

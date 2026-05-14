@@ -173,7 +173,7 @@ public class HomeScreenController {
     @FXML
     public void loadDashboardView() {
         updateMenuSelection(menuHome);
-        loadView("/fxml/Dashboard.fxml", controller -> {
+        loadView("/fxml/BidderView/Dashboard.fxml", controller -> {
             // ← THÊM: Refresh data khi load
             if (controller instanceof DashboardController && currentUser != null && clientSocket != null) {
                 DashboardController dashCtrl = (DashboardController) controller;
@@ -187,12 +187,12 @@ public class HomeScreenController {
 
     public void loadProfileView() {
         updateMenuSelection(null);
-        loadView("/fxml/ProfileView.fxml", null);
+        loadView("/fxml/BidderView/ProfileView.fxml", null);
     }
 
     public void loadNotificationsView() {
         updateMenuSelection(menuMsg);
-        loadView("/fxml/Notifications.fxml", controller -> {
+        loadView("/fxml/BidderView/BidderNotifications.fxml", controller -> {
             if (controller instanceof NotificationsController notificationsController) {
                 notificationsController.setHomeController(this);
                 notificationsController.setUserData(currentUser, clientSocket);
@@ -202,7 +202,7 @@ public class HomeScreenController {
 
     public void loadWalletView() {
         updateMenuSelection(menuPay);
-        loadView("/fxml/WalletView.fxml", controller -> {
+        loadView("/fxml/BidderView/WalletView.fxml", controller -> {
             if (controller instanceof WalletController walletController) {
                 User user = currentUser != null ? currentUser : NavigationManager.getInstance().getCurrentUser();
                 ClientSocket socket = clientSocket != null
@@ -220,7 +220,7 @@ public class HomeScreenController {
     @FXML
     public void loadAuctionHistoryView() {
         updateMenuSelection(menuRecent);
-        loadView("/fxml/AuctionHistory.fxml", controller -> {
+        loadView("/fxml/BidderView/AuctionHistory.fxml", controller -> {
             if (controller instanceof AuctionHistoryController historyController) {
                 User user = currentUser != null ? currentUser : NavigationManager.getInstance().getCurrentUser();
                 ClientSocket socket = clientSocket != null
@@ -234,7 +234,7 @@ public class HomeScreenController {
     @FXML
     private void openBecomeSeller() {
         updateMenuSelection(menuUpgrade);
-        loadView("/fxml/BecomeSeller.fxml", controller -> {
+        loadView("/fxml/BidderView/BecomeSeller.fxml", controller -> {
             if (controller instanceof BecomeSellerController) {
                 ((BecomeSellerController) controller).setCurrentUser(currentUser);
             }
@@ -253,7 +253,7 @@ public class HomeScreenController {
 
     public void loadAuctionDetailView(server.model.Auction auction, boolean endedMode) {
         updateMenuSelection(null);
-        loadView("/fxml/AuctionDetail.fxml", controller -> {
+        loadView("/fxml/BidderView/AuctionDetail.fxml", controller -> {
             if (controller instanceof AuctionDetailController && auction != null) {
                 AuctionDetailController detailController = (AuctionDetailController) controller;
                 detailController.setEndedMode(endedMode);
@@ -360,7 +360,7 @@ public class HomeScreenController {
             stage.setScene(ResponsiveSceneUtil.createScaledScene(root));
             StageUtil.showMaximized(stage);
         } catch (Exception e) {
-            LoggerUtil.error("Loi khi dang xuat tu Home: " + e.getMessage());
+            LoggerUtil.error("Lỗi khi dang xuat tu Home: " + e.getMessage());
             e.printStackTrace();
         }
     }

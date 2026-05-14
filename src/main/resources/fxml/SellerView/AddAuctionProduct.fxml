@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox spacing="25.0" style="-fx-background-color: #fcfcfc;" stylesheets="@../CSS/table.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AddAuctionProductController">
+<HBox spacing="25.0" style="-fx-background-color: #fcfcfc;" stylesheets="@../../CSS/table.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AddAuctionProductController">
     <padding>
         <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
     </padding>
@@ -74,10 +74,10 @@
                         <Label text="Hình ảnh sản phẩm (Tối đa 5 ảnh - Tỷ lệ 1:1)" textFill="#4a5568" styleClass="field-label">
                             <font><Font name="System Bold" size="13.0" /></font>
                         </Label>
-                        <HBox spacing="15.0" alignment="CENTER_LEFT">
-                            <Button onAction="#handleSelectImage" style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-width: 2; -fx-text-fill: #4a5568; -fx-pref-width: 100; -fx-pref-height: 100; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;" text="+ Thêm ảnh" />
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Button onAction="#handleSelectImage" style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-width: 2; -fx-text-fill: #4a5568; -fx-pref-width: 84; -fx-pref-height: 84; -fx-font-size: 12px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;" text="+ Thêm ảnh" />
 
-                            <HBox fx:id="imagePreviewContainer" spacing="10.0" alignment="CENTER_LEFT" />
+                            <HBox fx:id="imagePreviewContainer" spacing="8.0" alignment="CENTER_LEFT" />
                         </HBox>
                     </VBox>
 

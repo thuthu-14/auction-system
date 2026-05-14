@@ -19,7 +19,7 @@ public enum MessageType implements Serializable {
     UPDATE_SELLER_ITEM,
     DELETE_SELLER_ITEM,
 
-    // --- BIDDING ---
+    // --- ĐẤU GIÁ ---
     PLACE_BID,
     GET_BID_HISTORY,
     GET_USER_BIDS,

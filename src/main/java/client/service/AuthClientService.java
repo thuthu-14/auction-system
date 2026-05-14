@@ -33,7 +33,7 @@ public class AuthClientService {
         if (response == null || !"SUCCESS".equals(response.getStatus())) {
             throw new java.io.IOException(response != null && response.getMessage() != null
                     ? response.getMessage()
-                    : "Sai tai khoan hoac mat khau");
+                    : "Sai tài khoản hoặc mật khẩu");
         }
         return parseUser(response.getData());
     }
@@ -49,7 +49,7 @@ public class AuthClientService {
         if (response == null || !"SUCCESS".equals(response.getStatus())) {
             throw new java.io.IOException(response != null && response.getMessage() != null
                     ? response.getMessage()
-                    : "Khong the tao tai khoan");
+                    : "Không thể tạo tài khoản");
         }
         return parseUser(response.getData());
     }

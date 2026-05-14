@@ -73,7 +73,7 @@ public class UserManagementController {
                 Platform.runLater(() -> {
                     allUsers.clear();
                     userTable.setItems(FXCollections.observableArrayList());
-                    showAlert(Alert.AlertType.ERROR, "Loi", "Khong the tai danh sach nguoi dung tu server.");
+                    showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tải danh sách người dùng từ server.");
                 });
             }
         }, "AdminLoadUsersThread").start();
@@ -118,7 +118,7 @@ public class UserManagementController {
     private void updateSelectedUserStatus(boolean active) {
         UserRow selectedRow = userTable.getSelectionModel().getSelectedItem();
         if (selectedRow == null) {
-            showAlert(Alert.AlertType.WARNING, "Chua chon nguoi dung", "Hay chon mot nguoi dung trong bang truoc.");
+            showAlert(Alert.AlertType.WARNING, "Chưa chọn người dùng", "Hãy chọn một người dùng trong bảng trước.");
             return;
         }
 
@@ -131,12 +131,12 @@ public class UserManagementController {
                     applySearch();
                     showAlert(
                             Alert.AlertType.INFORMATION,
-                            "Thanh cong",
-                            (active ? "Da mo khoa " : "Da khoa ") + user.getUsername()
+                            "Thành công",
+                            (active ? "Đã mở khóa " : "Đã khóa ") + user.getUsername()
                     );
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi", "Khong the cap nhat trang thai nguoi dung tren server."));
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể cập nhật trạng thái người dùng trên server."));
             }
         }, "AdminUpdateUserStatusThread").start();
     }
@@ -154,14 +154,14 @@ public class UserManagementController {
             return "-";
         }
         return switch (role) {
-            case ADMIN -> "Quan tri vien";
-            case SELLER -> "Nguoi ban";
-            case BIDDER -> "Nguoi dau gia";
+            case ADMIN -> "Quản trị viên";
+            case SELLER -> "Người bán";
+            case BIDDER -> "Người đấu giá";
         };
     }
 
     private static String statusText(boolean active) {
-        return active ? "Dang hoat dong" : "Da khoa";
+        return active ? "Đang hoạt động" : "Đã khóa";
     }
 
     public static class UserRow {

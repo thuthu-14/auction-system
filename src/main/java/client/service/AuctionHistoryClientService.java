@@ -64,9 +64,9 @@ public class AuctionHistoryClientService {
             if (response != null && "SUCCESS".equals(response.getStatus()) && response.getData() instanceof Map<?, ?> data) {
                 Map<String, String> contact = new HashMap<>();
                 contact.put("name", asText(data.get("name"), auction.getSellerName()));
-                contact.put("email", asText(data.get("email"), "Chua cap nhat"));
-                contact.put("phone", asText(data.get("phone"), "Chua cap nhat"));
-                contact.put("address", asText(data.get("address"), "Chua cap nhat"));
+                contact.put("email", asText(data.get("email"), "Chưa cập nhật"));
+                contact.put("phone", asText(data.get("phone"), "Chưa cập nhật"));
+                contact.put("address", asText(data.get("address"), "Chưa cập nhật"));
                 return contact;
             }
         } catch (Exception e) {

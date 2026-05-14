@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="700" prefWidth="900" stylesheets="@../CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerManagementController">
+<VBox prefHeight="700" prefWidth="900" stylesheets="@../../CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerManagementController">
 
     <HBox alignment="CENTER_LEFT" spacing="12" styleClass="custom-header-box">
         <VBox spacing="2" HBox.hgrow="ALWAYS">
@@ -26,7 +26,7 @@
             <Label style="-fx-font-size: 11px; -fx-text-fill: #3b6d11; -fx-background-color: #eaf3de; -fx-background-radius: 20; -fx-padding: 2 7;" text="Đang hoạt động" />
         </VBox>
         <VBox minWidth="0" spacing="4" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
-            <Label style="-fx-font-size: 12px; -fx-text-fill: #6b7280;" text="Tỉ lệ thành công" />
+            <Label style="-fx-font-size: 12px; -fx-text-fill: #6b7280;" text="Tỷ lệ thành công" />
             <Label fx:id="statSuccessRate" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #111827;" text="--%" />
             <Label style="-fx-font-size: 11px; -fx-text-fill: #854f0b; -fx-background-color: #faeeda; -fx-background-radius: 20; -fx-padding: 2 7;" text="Cập nhật tự động" />
         </VBox>
@@ -60,10 +60,10 @@
         <ComboBox fx:id="sortCombo" prefWidth="160" promptText="Sắp xếp" styleClass="filter-combo" />
         <ComboBox fx:id="categoryCombo" prefWidth="140" promptText="Danh mục" styleClass="filter-combo" />
         <Button onAction="#handleApplyFilter" styleClass="form-button" text="Lọc" />
-        <Button onAction="#handleResetFilter" styleClass="btn-outline-small" text="Reset" />
+        <Button onAction="#handleResetFilter" styleClass="btn-outline-small" text="Đặt lại" />
     </HBox>
 
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-padding: 12 24 0 24; -fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-padding: 12 24 0 24; -fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
         <TableView fx:id="auctionTable" prefHeight="420" styleClass="auction-table">
             <columns>
                 <TableColumn fx:id="colSelect" maxWidth="40" minWidth="40" prefWidth="40" resizable="false" text="" />

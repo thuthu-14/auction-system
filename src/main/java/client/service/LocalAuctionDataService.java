@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public class LocalAuctionDataService {
-    private static final String NOT_UPDATED = "Chua cap nhat";
+    private static final String NOT_UPDATED = "Chưa cập nhật";
 
     public List<Bid> loadBidsForAuction(String auctionId) {
         if (auctionId == null || auctionId.isBlank()) {

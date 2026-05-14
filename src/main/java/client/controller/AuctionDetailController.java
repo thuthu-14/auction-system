@@ -150,6 +150,8 @@ public class AuctionDetailController {
         JsonObject rootData = new JsonObject();
         rootData.addProperty("auctionId", auction.getAuctionId());
         rootData.addProperty("currentPrice", auction.getCurrentPrice());
+        rootData.addProperty("reservePrice", auction.getReservePrice());
+        rootData.addProperty("minimumBidIncrement", auction.getMinimumBidIncrement());
         rootData.addProperty("sellerName", auction.getSellerName());
         rootData.add("item", productData);
 
@@ -174,10 +176,10 @@ public class AuctionDetailController {
 
         JsonObject productData = getObject(itemData, "item", itemData);
         if (productNameLabel != null) {
-            productNameLabel.setText(getString(productData, "name", "Chua co ten san pham"));
+            productNameLabel.setText(getString(productData, "name", "Chưa có tên sản phẩm"));
         }
         if (descriptionLabel != null) {
-            descriptionLabel.setText(getString(productData, "description", "Chua co mo ta"));
+            descriptionLabel.setText(getString(productData, "description", "Chưa có mô tả"));
         }
 
         String incomingAuctionId = getString(itemData, "auctionId", "");
@@ -190,7 +192,10 @@ public class AuctionDetailController {
         currentPrice = sameAuction
                 ? Math.max(Math.max(currentPrice, incomingCurrentPrice), cachedHighestPrice)
                 : Math.max(incomingCurrentPrice, cachedHighestPrice);
-        minimumBidIncrement = resolveBidIncrement(getString(productData, "type", ""));
+        minimumBidIncrement = getDouble(itemData, "minimumBidIncrement", 0);
+        if (minimumBidIncrement <= 0) {
+            minimumBidIncrement = resolveBidIncrement(getString(productData, "type", ""));
+        }
 
         if (currentPriceLabel != null) {
             currentPriceLabel.setText(formatVnd(currentPrice));
@@ -903,9 +908,9 @@ public class AuctionDetailController {
 
         dynamicDetailsGrid.getChildren().clear();
         int rowIndex = 0;
-        rowIndex = addDetailRowIfPresent("Nguoi ban", itemData, "sellerName", rowIndex);
-        rowIndex = addDetailRowIfPresent("Ma san pham", productData, "itemId", rowIndex);
-        rowIndex = addDetailRowIfPresent("Gia khoi diem", formatVnd(getDouble(productData, "startingPrice", 0)), rowIndex);
+        rowIndex = addDetailRowIfPresent("Người bán", itemData, "sellerName", rowIndex);
+        rowIndex = addDetailRowIfPresent("Mã sản phẩm", productData, "itemId", rowIndex);
+        rowIndex = addDetailRowIfPresent("Giá khởi điểm", formatVnd(getDouble(productData, "startingPrice", 0)), rowIndex);
 
         DetailRenderer renderer = detailRenderers.get(getString(productData, "type", ""));
         if (renderer != null) {
@@ -916,24 +921,24 @@ public class AuctionDetailController {
     private Map<String, DetailRenderer> createDetailRenderers() {
         Map<String, DetailRenderer> renderers = new java.util.HashMap<>();
         renderers.put("VEHICLE", (data, row) -> {
-            row = addDetailRowIfPresent("Doi xe", data, "model", row);
-            return addDetailRowIfPresent("So km", getInt(data, "odometer", 0) + " km", row);
+            row = addDetailRowIfPresent("Đời xe", data, "model", row);
+            return addDetailRowIfPresent("Số km", getInt(data, "odometer", 0) + " km", row);
         });
         renderers.put("FASHION", (data, row) -> {
-            row = addDetailRowIfPresent("Thuong hieu", data, "brand", row);
-            return addDetailRowIfPresent("Chat lieu", data, "material", row);
+            row = addDetailRowIfPresent("Thương hiệu", data, "brand", row);
+            return addDetailRowIfPresent("Chất liệu", data, "material", row);
         });
         renderers.put("ART", (data, row) -> {
-            row = addDetailRowIfPresent("Tac gia", data, "creator", row);
-            return addDetailRowIfPresent("Chat lieu", data, "material", row);
+            row = addDetailRowIfPresent("Tác giả", data, "creator", row);
+            return addDetailRowIfPresent("Chất liệu", data, "material", row);
         });
         renderers.put("JEWELRY", (data, row) -> {
-            row = addDetailRowIfPresent("Chat lieu", data, "material", row);
-            return addDetailRowIfPresent("Khoi luong", getDouble(data, "weight", 0) + " gr", row);
+            row = addDetailRowIfPresent("Chất liệu", data, "material", row);
+            return addDetailRowIfPresent("Khối lượng", getDouble(data, "weight", 0) + " gr", row);
         });
         renderers.put("ELECTRONICS", (data, row) -> {
-            row = addDetailRowIfPresent("Thuong hieu", data, "brand", row);
-            return addDetailRowIfPresent("Bao hanh", data, "warrantyPeriod", row);
+            row = addDetailRowIfPresent("Thương hiệu", data, "brand", row);
+            return addDetailRowIfPresent("Bảo hành", data, "warrantyPeriod", row);
         });
         return renderers;
     }
@@ -966,7 +971,7 @@ public class AuctionDetailController {
 
     private void clearView() {
         stopBidHistoryRefresh();
-        if (productNameLabel != null) productNameLabel.setText("Khong co du lieu");
+        if (productNameLabel != null) productNameLabel.setText("Không có dữ liệu");
         if (dynamicDetailsGrid != null) dynamicDetailsGrid.getChildren().clear();
         if (bidHistoryChart != null) bidHistoryChart.getData().clear();
         lastBidHistorySignature = null;

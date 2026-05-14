@@ -48,6 +48,8 @@ public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<I
             Jewelry j = (Jewelry) src;
             jsonObject.addProperty("material", j.getMaterial());
             jsonObject.addProperty("weight", j.getWeight());
+        } else if (src instanceof OtherItem) {
+            jsonObject.addProperty("type", "OTHER");
         }
 
         return jsonObject;
@@ -98,6 +100,8 @@ public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<I
                 return new Jewelry(itemId, name, description, startingPrice, sellerId,
                         getStringSafe(jsonObject, "material", ""),
                         getDoubleSafe(jsonObject, "weight", 0.0), images);
+            case "OTHER":
+                return new OtherItem(itemId, name, description, startingPrice, sellerId, images);
             default:
                 // ← THAY THROW THÀNH TRỊ MẶC ĐỊNH
                 System.err.println("⚠️ Unknown item type: " + type + ", creating default Fashion item");

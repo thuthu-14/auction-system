@@ -68,9 +68,9 @@ public class LoginController {
             try {
                 clientSocket = (ClientSocket) authClientService.ensureConnected(clientSocket);
                 currentUser = authClientService.login(clientSocket, email, password);
-                LoggerUtil.info("Login thanh cong cho user: " + currentUser.getUsername());
+                LoggerUtil.info("Đăng nhập thành công cho user: " + currentUser.getUsername());
                 Platform.runLater(() -> {
-                    showSuccess("Dang nhap thanh cong!");
+                    showSuccess("Đăng nhập thành công!");
                     proceedToDashboard();
                 });
             } catch (Exception e) {

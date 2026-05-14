@@ -24,6 +24,8 @@
     "startTime": 1777941343348,
     "endTime": 1778060143348,
     "createdAt": 1777941343348,
+    "reservePrice": 0.0,
+    "minimumBidIncrement": 0.0,
     "bidIds": [
       "BID1777947233491",
       "BID1777947263561",
@@ -57,6 +59,8 @@
     "startTime": 1777879942566,
     "endTime": 1778369542566,
     "createdAt": 1777879942566,
+    "reservePrice": 0.0,
+    "minimumBidIncrement": 0.0,
     "bidIds": [
       "BID1777880546392",
       "BID1777942291834",
@@ -208,10 +212,12 @@
     "currentPrice": 500000.0,
     "highestBidderId": "U1778403578742",
     "highestBidderName": "thunguyen",
-    "status": "RUNNING",
+    "status": "FINISHED",
     "startTime": 1778402863464,
     "endTime": 1778521663464,
     "createdAt": 1778402863464,
+    "reservePrice": 0.0,
+    "minimumBidIncrement": 0.0,
     "bidIds": [
       "BID1778406367563",
       "BID1778406370835",
@@ -246,10 +252,12 @@
     "currentPrice": 200000.0,
     "highestBidderId": "U1778403578742",
     "highestBidderName": "thunguyen",
-    "status": "RUNNING",
+    "status": "FINISHED",
     "startTime": 1778403491811,
     "endTime": 1778522291811,
     "createdAt": 1778403491811,
+    "reservePrice": 0.0,
+    "minimumBidIncrement": 0.0,
     "bidIds": [
       "BID1778404884138",
       "BID1778404909276",
@@ -289,10 +297,12 @@
     "currentPrice": 160000.0,
     "highestBidderId": "U1778403578742",
     "highestBidderName": "thunguyen",
-    "status": "RUNNING",
+    "status": "FINISHED",
     "startTime": 1778485932110,
     "endTime": 1778604732110,
     "createdAt": 1778485932110,
+    "reservePrice": 0.0,
+    "minimumBidIncrement": 0.0,
     "bidIds": [
       "BID1778485975469",
       "BID1778485977664",
@@ -300,6 +310,98 @@
       "BID1778485982360",
       "BID1778485988272"
     ],
+    "viewCount": 0
+  },
+  {
+    "auctionId": "AU1778576463646",
+    "itemId": "IT1778576463646",
+    "sellerId": "U1777887117887",
+    "sellerName": "buingoc",
+    "item": {
+      "itemId": "IT1778576463646",
+      "name": "Pin Nikon EN-EL25 PUJIMAX 1880mAh 7.4V",
+      "description": "🔋 Giới thiệu sản phẩm\nPin Nikon EN-EL25 PUJIMAX dung lượng cao\nDung lượng: 1880mAh\n👉 Phù hợp sử dụng lâu dài cho máy ảnh\n\n⚡ Ưu điểm nổi bật\n✔️ Dung lượng lớn giúp sử dụng lâu hơn\n✔️ Hoạt động ổn định khi chụp và quay\n✔️ Phù hợp thay thế pin theo máy\n✔️ Pin bền, sạc lại nhiều lần\n✔️ An toàn khi sử dụng với mạch bảo vệ\n\n📸 Tương thích thiết bị\n✔️ Nikon Z30 / Z50 / Z50II / Zfc\n\n👉 Dùng cho các máy sử dụng pin EN-EL25\n🎯 Phù hợp sử dụng\n✔️ Du lịch, quay vlog\n✔️ Quay ngoài trời\n✔️ Dự phòng pin tiện lợi\n\n📦 Gói sản phẩm\n1 x Pin EN-EL25 (không kèm sạc)",
+      "startingPrice": 400000.0,
+      "sellerId": "U1777887117887",
+      "images": [
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20155710.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20155651.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20155646.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20155635.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20155839.png"
+      ],
+      "type": "ELECTRONICS",
+      "brand": "Nikon",
+      "warrantyPeriod": "1 năm"
+    },
+    "currentPrice": 400000.0,
+    "status": "FINISHED",
+    "startTime": 1778576463646,
+    "endTime": 1778695263646,
+    "createdAt": 1778576463646,
+    "reservePrice": 0.0,
+    "minimumBidIncrement": 0.0,
+    "bidIds": [],
+    "viewCount": 0
+  },
+  {
+    "auctionId": "AU1778576688599",
+    "itemId": "IT1778576688599",
+    "sellerId": "U1777887117887",
+    "sellerName": "buingoc",
+    "item": {
+      "itemId": "IT1778576688599",
+      "name": "Hạt hút ẩm xanh cho máy ảnh 50g 100g 200g Silica Gel Hút ẩm Tặng túi đựng",
+      "description": "Hạt hút ẩm xanh cho máy ảnh 50g 100g 200g Silica Gel Hút ẩm Tặng túi đựng\n✅  Thông tin sản phẩm: \n- Hạt Hút Ẩm Xanh Cho Máy Ảnh 200Gr giúp máy ảnh, ống kính và các thiết bị chụp ảnh của bạn không bị ẩm, mốc.\n- 200g cho hộp chống ẩm 12L, 100g cho hộp chống ẩm 6L\n- Có thể tái sử dụng khi hạt hút no nước bằng cách làm nóng rang trên bếp lò, hoặc phơi dưới nắng gắt\n- Khi chưa hút ẩm nhiều thì hạt có màu xanh, khi hút ẩm thì màu xanh nhạt dần, chuyển sang màu hồng, hút no thì chuyển sang màu trắng đục. Chính vì thế chúng ta có thể dễ dàng nhận biết được hạt hút ẩm đã hút no nước chưa.\n\n- Ngoài ra Hạt Hút Ẩm Xanh Cho Máy Ảnh 200Gr còn dùng bảo quản giầy dép, quần áo, tủ thuốc, tranh ảnh, trang sức đắt tlền.\n- Kích thước túi vải: 10*12cm",
+      "startingPrice": 10000.0,
+      "sellerId": "U1777887117887",
+      "images": [
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20160206.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20160156.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20160144.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20160138.png"
+      ],
+      "type": "OTHER"
+    },
+    "currentPrice": 10000.0,
+    "status": "FINISHED",
+    "startTime": 1778576688599,
+    "endTime": 1778695488599,
+    "createdAt": 1778576688599,
+    "reservePrice": 500006.0,
+    "minimumBidIncrement": 5000.0,
+    "bidIds": [],
+    "viewCount": 0
+  },
+  {
+    "auctionId": "AU1778576886933",
+    "itemId": "IT1778576886933",
+    "sellerId": "U1777887117887",
+    "sellerName": "buingoc",
+    "item": {
+      "itemId": "IT1778576886933",
+      "name": "Bàn phím cơ Lofree Flow Lite - Bàn phím không dây bluetooth mỏng nhẹ, 3 chế độ kết nối, Led đơn, Âm ít ồn",
+      "description": "𝗠𝗘𝗧𝗔 𝗚𝗘𝗔𝗥 - High End \u0026 Set Up Gear\n\n\n\nGọn – đẹp – linh hoạt, đó là lý do nhiều người chọn Lofree Flow Lite làm chiếc bàn phím đầu tiên cho góc làm việc tại nhà. So với phiên bản Flow nhôm trước, bản Lite nhẹ hơn, mềm hơn, dễ mang đi – nhưng vẫn giữ lại layout hợp lý, cảm giác gõ êm, và độ hoàn thiện vượt xa mong đợi với mức giá. Phù hợp với người làm văn phòng, học sinh – sinh viên, hoặc ai đơn giản muốn một chiếc bàn phím cơ không dây gọn nhẹ mà vẫn đáp ứng cả công việc và giải trí.\n\n\n\nĐIỂM NỔI BẬT CỦA LOFREE FLOW LITE\n\n\n\n🎛 Thanh lăn tiện dụng – điều chỉnh nhanh không cần rời chuột\n\n→ Dùng để chỉnh âm lượng, độ sáng – không cần lướt chuột tìm thanh điều chỉnh.\n\n→ Tiện khi đang họp, làm việc tập trung hoặc nghe nhạc – thao tác nhanh chỉ bằng một tay\n\n→ Rất phù hợp với người dùng văn phòng, designer, editor hay ai thích thao tác gọn gàng, không gián đoạn.",
+      "startingPrice": 1000000.0,
+      "sellerId": "U1777887117887",
+      "images": [
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20160604.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20160558.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20160549.png",
+        "file:/C:/Users/Admin/OneDrive/Pictures/Screenshots/Screenshot%202026-05-12%20160543.png"
+      ],
+      "type": "ELECTRONICS",
+      "brand": "Lofree ",
+      "warrantyPeriod": "1 năm"
+    },
+    "currentPrice": 1000000.0,
+    "status": "FINISHED",
+    "startTime": 1778576886933,
+    "endTime": 1778695686933,
+    "createdAt": 1778576886933,
+    "reservePrice": 0.0,
+    "minimumBidIncrement": 0.0,
+    "bidIds": [],
     "viewCount": 0
   }
 ]

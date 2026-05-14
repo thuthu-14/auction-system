@@ -26,11 +26,11 @@ public class SellerDashboardController {
 
     @FXML
     private void initialize() {
-        cardActions.put("cardTaoPhien", () -> { if (sellerHomeController != null) sellerHomeController.loadAddAuctionProductView(); else loadView("/fxml/AddAuctionProduct.fxml"); });
-        cardActions.put("cardQuanLyPhien", () -> { if (sellerHomeController != null) sellerHomeController.loadManageAuctionsView(); else loadView("/fxml/SellerManageAuctions.fxml"); });
-        cardActions.put("cardThongKe", () -> { if (sellerHomeController != null) sellerHomeController.loadSellerStatisticsView(); else loadView("/fxml/SellerStatistics.fxml"); });
-        cardActions.put("cardThongBao", () -> { if (sellerHomeController != null) sellerHomeController.loadSellerNotificationsView(); else loadView("/fxml/SellerNotifications.fxml"); });
-        cardActions.put("cardViTien", () -> { if (sellerHomeController != null) sellerHomeController.loadWalletView(); else loadView("/fxml/WalletView.fxml"); });
+        cardActions.put("cardTaoPhien", () -> { if (sellerHomeController != null) sellerHomeController.loadAddAuctionProductView(); else loadView("/fxml/SellerView/AddAuctionProduct.fxml"); });
+        cardActions.put("cardQuanLyPhien", () -> { if (sellerHomeController != null) sellerHomeController.loadManageAuctionsView(); else loadView("/fxml/SellerView/SellerManageAuctions.fxml"); });
+        cardActions.put("cardThongKe", () -> { if (sellerHomeController != null) sellerHomeController.loadSellerStatisticsView(); else loadView("/fxml/SellerView/SellerStatistics.fxml"); });
+        cardActions.put("cardThongBao", () -> { if (sellerHomeController != null) sellerHomeController.loadSellerNotificationsView(); else loadView("/fxml/SellerView/SellerNotifications.fxml"); });
+        cardActions.put("cardViTien", () -> { if (sellerHomeController != null) sellerHomeController.loadWalletView(); else loadView("/fxml/BidderView/WalletView.fxml"); });
     }
 
     public void setUserData(User user, ClientSocket socket) {

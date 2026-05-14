@@ -392,7 +392,7 @@ public class AuctionHistoryController {
 
             HistoryRow row = getTableView().getItems().get(getIndex());
             if (row.isActive()) {
-                button.setText(row.isOutbid() ? "Tr\u1ea3 gi\u00e1 ti\u1ebfp" : "\u0110\u1ea5u gi\u00e1 ngay");
+                button.setText(row.isOutbid() ? "Tr\u1ea3 gi\u00e1 ti\u1ebfp" : "\u0110\u1ea5u gi\u00e1 ngày");
                 button.setStyle("-fx-background-color: #111827; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-weight: 700; -fx-cursor: hand;");
                 button.setOnAction(event -> homeController.loadAuctionDetailView(row.auction, false));
             } else if (row.isWinner()) {

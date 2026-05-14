@@ -1,13 +1,8 @@
 package server.concurrency;
 
-import server.model.RegularUser;
-import server.model.Auction;
-import server.model.Bid;
-import server.service.BidService;
-import server.exception.*;
 import util.LoggerUtil;
-import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ConcurrentBidManager {
@@ -26,16 +21,7 @@ public class ConcurrentBidManager {
         return instance;
     }
 
-    public Bid placeBidSafely(
-            RegularUser bidder,
-            Auction auction,
-            double amount)
-            throws InvalidBidException, PermissionDeniedException,
-            AuctionClosedException, InsufficientFundsException,
-            IOException, ClassNotFoundException {
-
-        String auctionId = auction.getAuctionId();
-
+    public <T> T withAuctionWriteLock(String auctionId, Callable<T> action) throws Exception {
         ReentrantReadWriteLock lock = auctionLocks.computeIfAbsent(
                 auctionId,
                 k -> new ReentrantReadWriteLock()
@@ -45,10 +31,27 @@ public class ConcurrentBidManager {
 
         try {
             LoggerUtil.debug("Write lock acquired for auction: " + auctionId);
-            return BidService.placeBid(bidder, auction, amount);
+            return action.call();
         } finally {
             lock.writeLock().unlock();
             LoggerUtil.debug("Write lock released for auction: " + auctionId);
+        }
+    }
+
+    public <T> T withAuctionReadLock(String auctionId, Callable<T> action) throws Exception {
+        ReentrantReadWriteLock lock = auctionLocks.computeIfAbsent(
+                auctionId,
+                k -> new ReentrantReadWriteLock()
+        );
+
+        lock.readLock().lock();
+
+        try {
+            LoggerUtil.debug("Read lock acquired for auction: " + auctionId);
+            return action.call();
+        } finally {
+            lock.readLock().unlock();
+            LoggerUtil.debug("Read lock released for auction: " + auctionId);
         }
     }
 

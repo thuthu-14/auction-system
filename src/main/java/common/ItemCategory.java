@@ -22,7 +22,8 @@ public enum ItemCategory implements Serializable {
     ART("Nghệ thuật - Tranh, Tượng, Điêu khắc...", 100000.0, 100000.0, 1440, 20160),
     VEHICLE("Xe cộ - Xe máy, Ô tô, Xe đạp...", 500000.0, 500000.0, 1440, 10080),
     FASHION("Thời trang - Quần áo, Giày, Túi xách...", 10000.0, 10000.0, 1440, 4320),
-    JEWELRY("Trang sức - Nhẫn, Vòng, Dây chuyền...", 25000.0, 25000.0, 1440, 7200);
+    JEWELRY("Trang sức - Nhẫn, Vòng, Dây chuyền...", 25000.0, 25000.0, 1440, 7200),
+    OTHER("Khác - Sản phẩm không thuộc các danh mục cố định", 0.0, 1.0, 1440, 43200);
 
     private final String description;
     private final double minimumStartingBid;     // ← Giá khởi điểm tối thiểu

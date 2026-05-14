@@ -81,9 +81,9 @@ public class SignupController {
 
                 Platform.runLater(() -> {
                     showAlert(Alert.AlertType.INFORMATION,
-                            "Dang ky thanh cong",
-                            "Tao tai khoan thanh cong!",
-                            "Ten dang nhap cua ban la: " + username + "\nBan co the dung ten nay hoac email de dang nhap.");
+                            "Đăng ký thành công",
+                            "Tạo tài khoản thành công!",
+                            "Tên đăng nhập của bạn là: " + username + "\nBạn có thể dùng tên này hoặc email để đăng nhập.");
                     switchToLogin();
                 });
             } catch (Exception e) {

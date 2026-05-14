@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="rootPane" minHeight="600.0" minWidth="900.0" prefHeight="900.0" prefWidth="1440.0" stylesheets="@../CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerHomeController">
+<AnchorPane fx:id="rootPane" minHeight="600.0" minWidth="900.0" prefHeight="900.0" prefWidth="1440.0" stylesheets="@../../CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerHomeController">
 
     <children>
 
@@ -21,7 +21,7 @@
                             <children>
                                 <ImageView fitHeight="60.0" fitWidth="65.0" pickOnBounds="true" preserveRatio="true" smooth="true">
                                     <image>
-                                        <Image url="@../CSS/logo.png" />
+                                        <Image url="@../../CSS/logo.png" />
                                     </image>
                                 </ImageView>
 
@@ -48,7 +48,7 @@
                             </children>
                         </HBox>
 
-                        <Label text="SELLING" textFill="#a0aec0">
+                        <Label text="BÁN HÀNG" textFill="#a0aec0">
                             <font>
                                 <Font size="15.0" />
                             </font>
@@ -193,13 +193,13 @@
                                     <children>
                                         <VBox alignment="CENTER" minHeight="600" spacing="10.0">
                                             <children>
-                                                <Label style="-fx-translate-x: -3;" text="Welcome to BubblyBid Seller Dashboard" textFill="#2e384d">
+                                                <Label style="-fx-translate-x: -3;" text="Chào mừng đến với trang Người bán BubblyBid" textFill="#2e384d">
                                                     <font>
                                                         <Font name="System Bold" size="28.0" />
                                                     </font>
                                                 </Label>
 
-                                                <Label text="Mở đấu giá đê!" textFill="#a0aec0">
+                                                <Label text="Bắt đầu mở phiên đấu giá" textFill="#a0aec0">
                                                     <font>
                                                         <Font size="16.0" />
                                                     </font>

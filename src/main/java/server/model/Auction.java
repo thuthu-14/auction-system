@@ -21,6 +21,8 @@ public class Auction implements Serializable {
     private long startTime;
     private long endTime;
     private long createdAt;
+    private double reservePrice;
+    private double minimumBidIncrement;
 
     private List<String> bidIds;
     private int viewCount;
@@ -42,6 +44,8 @@ public class Auction implements Serializable {
         this.startTime = startTimeMillis;
         this.endTime = endTimeMillis;
         this.createdAt = System.currentTimeMillis();
+        this.reservePrice = 0.0;
+        this.minimumBidIncrement = 0.0;
 
         this.bidIds = new ArrayList<>();
         this.viewCount = 0;
@@ -64,6 +68,8 @@ public class Auction implements Serializable {
         this.startTime = System.currentTimeMillis();
         this.endTime = startTime + (durationMinutes * 60 * 1000L);
         this.createdAt = System.currentTimeMillis();
+        this.reservePrice = 0.0;
+        this.minimumBidIncrement = 0.0;
 
         this.bidIds = new ArrayList<>();
         this.viewCount = 0;
@@ -141,6 +147,12 @@ public class Auction implements Serializable {
     public void setEndTime(long endTime) { this.endTime = endTime; }
 
     public long getCreatedAt() { return createdAt; }
+
+    public double getReservePrice() { return reservePrice; }
+    public void setReservePrice(double reservePrice) { this.reservePrice = reservePrice; }
+
+    public double getMinimumBidIncrement() { return minimumBidIncrement; }
+    public void setMinimumBidIncrement(double minimumBidIncrement) { this.minimumBidIncrement = minimumBidIncrement; }
 
     public List<String> getBidIds() { return new ArrayList<>(bidIds); }
     public void setBidIds(List<String> bidIds) { this.bidIds = bidIds; }

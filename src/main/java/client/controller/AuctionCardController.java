@@ -212,7 +212,7 @@ public class AuctionCardController {
         } else {
             // Fallback: Mở popup nếu không có reference (cho trường hợp debug)
             try {
-                String fxmlPath = "/fxml/AuctionDetail.fxml";
+                String fxmlPath = "/fxml/BidderView/AuctionDetail.fxml";
 
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
                 Parent root = loader.load();

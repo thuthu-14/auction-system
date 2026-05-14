@@ -179,7 +179,7 @@ public class WalletController implements Initializable {
         }
 
         try {
-            URL fxmlLocation = getClass().getResource("/fxml/AddBankDialog.fxml");
+            URL fxmlLocation = getClass().getResource("/fxml/BidderView/AddBankDialog.fxml");
             if (fxmlLocation == null) {
                 LoggerUtil.error("Không tìm thấy file AddBankDialog.fxml");
                 return;
@@ -467,7 +467,7 @@ public class WalletController implements Initializable {
 
     private void showTransactionPopup(String type, BankAccountEntry bankEntry) {
         try {
-            URL fxmlLocation = getClass().getResource("/fxml/WalletTransactionDialog.fxml");
+            URL fxmlLocation = getClass().getResource("/fxml/BidderView/WalletTransactionDialog.fxml");
             if (fxmlLocation == null) {
                 LoggerUtil.error("Không tìm thấy file WalletTransactionDialog.fxml");
                 return;

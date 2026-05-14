@@ -46,6 +46,7 @@ public class SellerStatisticsController implements Initializable {
     private ClientSocket clientSocket;
     private boolean statisticsLoaded;
     private final SellerClientService sellerClientService = new SellerClientService();
+    private final SimpleDateFormat revenuePointFormat = new SimpleDateFormat("dd/MM HH:mm");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -146,8 +147,7 @@ public class SellerStatisticsController implements Initializable {
         int totalBids = 0;
         int endedAuctions = 0;
         int successfulAuctions = 0;
-        Map<String, Double> revenueByMonth = new TreeMap<>();
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MM/yyyy");
+        Map<Long, Double> revenueByEndTime = new TreeMap<>();
 
         for (Auction auction : safeAuctions) {
             if (auction == null) {
@@ -157,14 +157,14 @@ public class SellerStatisticsController implements Initializable {
             int bidCount = auction.getBidIds() != null ? auction.getBidIds().size() : 0;
             totalBids += bidCount;
 
-            if (auction.getTimeRemainingSeconds() <= 0) {
+            if (isEnded(auction)) {
                 endedAuctions++;
                 if (bidCount > 0) {
                     successfulAuctions++;
                     totalRevenue += auction.getCurrentPrice();
 
-                    String monthKey = monthFormat.format(new Date(auction.getEndTime()));
-                    revenueByMonth.merge(monthKey, auction.getCurrentPrice(), Double::sum);
+                    long endTime = auction.getEndTime() > 0 ? auction.getEndTime() : auction.getCreatedAt();
+                    revenueByEndTime.merge(endTime, auction.getCurrentPrice(), Double::sum);
                 }
             }
         }
@@ -177,29 +177,40 @@ public class SellerStatisticsController implements Initializable {
         double successRate = endedAuctions == 0 ? 0 : successfulAuctions * 100.0 / endedAuctions;
         setLabel(successRateLabel, String.format(Locale.US, "%.1f%%", successRate));
 
-        updateRevenueChart(revenueByMonth);
+        updateRevenueChart(revenueByEndTime);
         applyReadableStyles();
         LoggerUtil.info("Seller statistics loaded: " + safeAuctions.size() + " auctions");
     }
 
-    private void updateRevenueChart(Map<String, Double> revenueByMonth) {
+    private void updateRevenueChart(Map<Long, Double> revenueByEndTime) {
         if (revenueChart == null) {
             return;
         }
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        if (revenueByMonth == null || revenueByMonth.isEmpty()) {
+        if (revenueByEndTime == null || revenueByEndTime.isEmpty()) {
             showEmptyRevenueChart();
             return;
         }
 
-        for (Map.Entry<String, Double> entry : revenueByMonth.entrySet()) {
-            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        List<String> categories = new ArrayList<>();
+        for (Map.Entry<Long, Double> entry : revenueByEndTime.entrySet()) {
+            String label = revenuePointFormat.format(new Date(entry.getKey()));
+            categories.add(label);
+            series.getData().add(new XYChart.Data<>(label, entry.getValue()));
         }
 
-        configureDataYAxis(revenueByMonth);
+        configureDataAxes(revenueByEndTime, categories);
         revenueChart.getData().setAll(series);
         Platform.runLater(() -> styleChartNodes(false));
+    }
+
+    private boolean isEnded(Auction auction) {
+        if (auction.getStatus() == common.AuctionStatus.FINISHED
+                || auction.getStatus() == common.AuctionStatus.CLOSED) {
+            return true;
+        }
+        return auction.getEndTime() > 0 && auction.getEndTime() <= System.currentTimeMillis();
     }
 
     private void showEmptyRevenueChart() {
@@ -233,10 +244,11 @@ public class SellerStatisticsController implements Initializable {
         configureChartAxesVisible();
     }
 
-    private void configureDataYAxis(Map<String, Double> revenueByMonth) {
+    private void configureDataAxes(Map<Long, Double> revenueByEndTime, List<String> categories) {
         Axis<String> xAxis = revenueChart == null ? null : revenueChart.getXAxis();
         if (xAxis instanceof CategoryAxis categoryAxis) {
-            categoryAxis.setAutoRanging(true);
+            categoryAxis.setAutoRanging(false);
+            categoryAxis.setCategories(FXCollections.observableArrayList(categories));
             categoryAxis.setTickLabelsVisible(true);
             categoryAxis.setTickMarkVisible(true);
         }
@@ -246,7 +258,7 @@ public class SellerStatisticsController implements Initializable {
             return;
         }
 
-        double max = revenueByMonth.values().stream()
+        double max = revenueByEndTime.values().stream()
                 .mapToDouble(Double::doubleValue)
                 .max()
                 .orElse(100);
@@ -381,9 +393,9 @@ public class SellerStatisticsController implements Initializable {
         }
 
         applyReadableStyles(statisticsRoot);
-        setLabelColor(totalRevenueLabel, "#ffffff");
-        setLabelColor(avgBidLabel, "#2d3748");
-        setLabelColor(successRateLabel, "#2d3748");
+        setLabelColor(totalRevenueLabel, "#111827");
+        setLabelColor(avgBidLabel, "#111827");
+        setLabelColor(successRateLabel, "#111827");
     }
 
     private Parent findStatisticsRoot() {
@@ -414,18 +426,13 @@ public class SellerStatisticsController implements Initializable {
                 ? ""
                 : label.getParent().getStyle();
 
-        if (parentStyle.contains("#3182ce")) {
-            setLabelColor(label, "#ffffff");
-            return;
-        }
-
         double fontSize = label.getFont() != null ? label.getFont().getSize() : 14;
         if (fontSize >= 18) {
-            setLabelColor(label, "#1a1a1a");
-        } else if (label == avgBidLabel || label == successRateLabel) {
-            setLabelColor(label, "#2d3748");
+            setLabelColor(label, "#111827");
+        } else if (label == totalRevenueLabel || label == avgBidLabel || label == successRateLabel) {
+            setLabelColor(label, "#111827");
         } else {
-            setLabelColor(label, "#718096");
+            setLabelColor(label, "#4b5563");
         }
     }
 

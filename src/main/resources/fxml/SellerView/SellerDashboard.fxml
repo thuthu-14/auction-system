@@ -37,7 +37,7 @@
                     </HBox>
                     <Region VBox.vgrow="ALWAYS" />
                     <HBox alignment="CENTER_RIGHT">
-                        <Label styleClass="card-cta card-cta-teal" text="Xem ngay →" />
+                        <Label styleClass="card-cta card-cta-teal" text="Xem ngày →" />
                     </HBox>
                 </VBox>
 

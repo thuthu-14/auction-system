@@ -259,5 +259,14 @@
     "balanceAfter": 2.6929999E7,
     "description": "Rút tiền về ngân hàng",
     "timestamp": 1778510510303
+  },
+  {
+    "id": "TXN_1778572877869",
+    "userId": "U1777887117887",
+    "type": "DEPOSIT",
+    "amount": 90000.0,
+    "balanceAfter": 9242551.0,
+    "description": "Nạp tiền vào ví",
+    "timestamp": 1778572877869
   }
 ]

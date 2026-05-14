@@ -82,6 +82,8 @@ public class SellerHomeController {
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;
+        NavigationManager.getInstance().setCurrentUser(user);
+        NavigationManager.getInstance().setClientSocket(socket);
         LoggerUtil.info("SellerHomeController đã nhận data cho user: " + (user != null ? user.getUsername() : "null"));
     }
 
@@ -129,7 +131,7 @@ public class SellerHomeController {
             navigation.setClientSocket(clientSocket);
             navigation.goToHome();
         } catch (Exception e) {
-            LoggerUtil.error("Loi khi chuyen ve man hinh Bidder: " + e.getMessage());
+            LoggerUtil.error("Lỗi khi chuyen ve man hinh Bidder: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -156,17 +158,17 @@ public class SellerHomeController {
 
     @FXML
     public void loadSellerDashboardView() {
-        loadView("/fxml/SellerDashboard.fxml", menuHome, null);
+        loadView("/fxml/SellerView/SellerDashboard.fxml", menuHome, null);
     }
 
     @FXML
     public void loadAddAuctionProductView() {
-        loadView("/fxml/AddAuctionProduct.fxml", menuCreateAuctions, null);
+        loadView("/fxml/SellerView/AddAuctionProduct.fxml", menuCreateAuctions, null);
     }
 
     @FXML
     public void loadSellerStatisticsView() {
-        loadView("/fxml/SellerStatistics.fxml", menuAuctionStatistic, controller -> {
+        loadView("/fxml/SellerView/SellerStatistics.fxml", menuAuctionStatistic, controller -> {
             if (controller instanceof SellerStatisticsController statisticsController) {
                 statisticsController.setUserData(currentUser, clientSocket);
             }
@@ -175,16 +177,16 @@ public class SellerHomeController {
 
     @FXML
     public void loadManageAuctionsView() {
-        loadView("/fxml/SellerManageAuctions.fxml", menuManageAuctions, controller -> {
-            if (controller instanceof SellerManagementController) {
-                ((SellerManagementController) controller).refreshAuctions();
+        loadView("/fxml/SellerView/SellerManageAuctions.fxml", menuManageAuctions, controller -> {
+            if (controller instanceof SellerManagementController sellerManagementController) {
+                sellerManagementController.setUserData(currentUser, clientSocket);
             }
         });
     }
 
     @FXML
     public void loadSellerNotificationsView() {
-        loadView("/fxml/SellerNotifications.fxml", menuMsg, controller -> {
+        loadView("/fxml/SellerView/SellerNotifications.fxml", menuMsg, controller -> {
             if (controller instanceof SellerNotificationsController notificationsController) {
                 notificationsController.setSellerHomeController(this);
                 notificationsController.setUserData(currentUser, clientSocket);
@@ -194,12 +196,12 @@ public class SellerHomeController {
 
     @FXML
     public void loadProfileView() {
-        loadView("/fxml/ProfileView.fxml", menuHome, null); // Hoặc bạn có thể tạo menuProfile
+        loadView("/fxml/BidderView/ProfileView.fxml", menuHome, null); // Hoặc bạn có thể tạo menuProfile
     }
 
     @FXML
     public void loadWalletView() {
-        loadView("/fxml/WalletView.fxml", menuPay, controller -> {
+        loadView("/fxml/BidderView/WalletView.fxml", menuPay, controller -> {
             if (controller instanceof WalletController walletController) {
                 User user = currentUser != null ? currentUser : NavigationManager.getInstance().getCurrentUser();
                 ClientSocket socket = clientSocket != null

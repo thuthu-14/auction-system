@@ -430,6 +430,23 @@
     -fx-pref-width: 8;
 }
 
+.seller-revenue-chart {
+    -fx-background-color: white;
+    -fx-text-fill: #111827;
+}
+
+.seller-revenue-chart .chart-plot-background {
+    -fx-background-color: white;
+}
+
+.seller-revenue-chart .axis {
+    -fx-tick-label-fill: #111827;
+}
+
+.seller-revenue-chart .axis-label {
+    -fx-text-fill: #111827;
+}
+
 .auction-table .virtual-flow .scroll-bar:vertical .track {
     -fx-background-color: transparent;
 }

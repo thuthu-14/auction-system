@@ -70,7 +70,7 @@ public class ClientMain extends Application {
 
     private void showAdminPanel() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminHome.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminView/AdminHome.fxml"));
 
             if (loader.getLocation() == null) {
                 LoggerUtil.error("❌ Cannot find AdminHome.fxml");
@@ -103,7 +103,7 @@ public class ClientMain extends Application {
 
     private void showHomeScreen() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/BidderHome.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/BidderView/BidderHome.fxml"));
 
             if (loader.getLocation() == null) {
                 LoggerUtil.error("❌ Cannot find BidderHome.fxml");

@@ -53,17 +53,18 @@ public class BidService {
         synchronized (auction) {
             if (auction.getStatus() != AuctionStatus.OPEN &&
                     auction.getStatus() != AuctionStatus.RUNNING) {
-                throw new AuctionClosedException("Phien dau gia da ket thuc.");
+                throw new AuctionClosedException("Phiên đấu giá đã kết thúc.");
             }
 
-            String bidError = ItemValidationUtil.getBidAmountErrorMessage(
-                    category, auction.getCurrentPrice(), amount);
+            String bidError = auction.getMinimumBidIncrement() > 0
+                    ? ItemValidationUtil.getBidAmountErrorMessage(auction.getCurrentPrice(), amount, auction.getMinimumBidIncrement())
+                    : ItemValidationUtil.getBidAmountErrorMessage(category, auction.getCurrentPrice(), amount);
             if (bidError != null) {
                 throw new InvalidBidException(bidError);
             }
 
             if (bidder.getUserId().equals(auction.getSellerId())) {
-                throw new PermissionDeniedException("Ban khong the bid tren auction cua minh.");
+                throw new PermissionDeniedException("Bạn không thể đặt giá trên phiên đấu giá của mình.");
             }
 
             String bidId = "BID" + System.currentTimeMillis();
@@ -114,22 +115,22 @@ public class BidService {
     private void validateBidderAndAuction(RegularUser bidder, Auction auction, double amount)
             throws InvalidBidException, PermissionDeniedException, InsufficientFundsException {
         if (bidder == null) {
-            throw new PermissionDeniedException("Bidder khong hop le.");
+            throw new PermissionDeniedException("Người đấu giá không hợp lệ.");
         }
         if (auction == null) {
-            throw new PermissionDeniedException("Auction khong hop le.");
+            throw new PermissionDeniedException("Phiên đấu giá không hợp lệ.");
         }
         if (!ValidationUtil.isValidBidAmount(amount)) {
-            throw new InvalidBidException("Gia bid khong hop le.");
+            throw new InvalidBidException("Giá đặt không hợp lệ.");
         }
         if (bidder.getWallet() <= 0) {
-            throw new PermissionDeniedException("Ban can lien ket ngan hang va nap tien vao vi truoc khi dau gia.");
+            throw new PermissionDeniedException("Bạn cần liên kết ngân hàng và nạp tiền vào ví trước khi đấu giá.");
         }
         if (amount > bidder.getWallet()) {
-            throw new InsufficientFundsException("So du vi khong du de dat gia nay.");
+            throw new InsufficientFundsException("Số dư ví không đủ để đặt giá này.");
         }
         if (auction.getItem() == null || auction.getItem().getCategory() == null) {
-            throw new InvalidBidException("Auction khong co thong tin san pham hop le.");
+            throw new InvalidBidException("Phiên đấu giá không có thông tin sản phẩm hợp lệ.");
         }
     }
 

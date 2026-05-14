@@ -12,7 +12,7 @@
     <HBox style="-fx-background-color: #f0f4ff; -fx-background-radius: 8; -fx-padding: 12 16; -fx-border-color: #cbd5e1; -fx-border-radius: 8;">
         <VBox spacing="4" HBox.hgrow="ALWAYS">
             <Label text="💻 ĐIỆN TỬ - Điện thoại, Laptop, Camera..." style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;" />
-            <Label text="💰 Giá tối thiểu: 50,000 VNĐ  |  📈 Mỗi bid: 50,000 VNĐ  |  ⏱ 1-7 ngày" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+            <Label text="💰 Giá tối thiểu: 50,000 VNĐ  |  📈 Mỗi lượt đặt: 50,000 VNĐ  |  ⏱ 1-7 ngày" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
         </VBox>
     </HBox>
 
@@ -46,7 +46,7 @@
 
         <VBox spacing="15.0" HBox.hgrow="ALWAYS">
             <VBox spacing="5.0">
-                <Label text="* Hãng (Brand)" textFill="#4a5568" styleClass="field-label">
+                <Label text="* Hãng" textFill="#4a5568" styleClass="field-label">
                     <font><Font name="System Bold" size="13.0" /></font>
                 </Label>
                 <TextField fx:id="elecBrandField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Samsung, Apple, Sony..." style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
@@ -56,7 +56,7 @@
                 <Label text="* Bảo hành" textFill="#4a5568" styleClass="field-label">
                     <font><Font name="System Bold" size="13.0" /></font>
                 </Label>
-                <TextField fx:id="elecWarrantyField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="1 Year" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+                <TextField fx:id="elecWarrantyField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="1 năm" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
             </VBox>
         </VBox>
     </HBox>

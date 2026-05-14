@@ -1,41 +1,5 @@
 [
   {
-    "adminLevel": "SUPER_ADMIN",
-    "permissions": [
-      "VIEW_ALL_USERS",
-      "BAN_USER",
-      "DELETE_AUCTION",
-      "VIEW_LOGS"
-    ],
-    "userId": "ADMIN001",
-    "username": "admin",
-    "password": "admin123",
-    "email": "admin@auction.com",
-    "wallet": 1000000.0,
-    "role": "ADMIN",
-    "createdAt": 1712486400000,
-    "active": true
-  },
-  {
-    "ownedAuctionIds": [
-      "AU1777879942563"
-    ],
-    "bidIds": [],
-    "isSeller": true,
-    "shopName": "Đinh Hà Ngân",
-    "shopPhone": "0961528478",
-    "shopAddress": "123 Nghĩa Đô",
-    "shopEmail": "posuto@gmail.com",
-    "userId": "U1777878819404",
-    "username": "inhHNgn",
-    "password": "12345678",
-    "email": "posuto@gmail.com",
-    "wallet": 3.0E7,
-    "role": "SELLER",
-    "createdAt": 1777878819405,
-    "active": true
-  },
-  {
     "ownedAuctionIds": [],
     "bidIds": [],
     "isSeller": false,
@@ -47,19 +11,6 @@
     "role": "BIDDER",
     "createdAt": 1777942394909,
     "active": true
-  },
-  {
-    "ownedAuctionIds": [],
-    "bidIds": [],
-    "isSeller": false,
-    "userId": "U1777943026744",
-    "username": "baohan",
-    "password": "1234566",
-    "email": "han@gmail.com",
-    "wallet": 0.0,
-    "role": "BIDDER",
-    "createdAt": 1777943026744,
-    "active": false
   },
   {
     "ownedAuctionIds": [],
@@ -122,11 +73,106 @@
     "active": true
   },
   {
+    "ownedAuctionIds": [],
+    "bidIds": [
+      "BID1778404884138",
+      "BID1778404909276",
+      "BID1778405261249",
+      "BID1778405263906",
+      "BID1778405266950",
+      "BID1778405278499",
+      "BID1778405282642",
+      "BID1778405286157",
+      "BID1778405289763",
+      "BID1778405292536",
+      "BID1778406367563",
+      "BID1778406370835",
+      "BID1778406374464",
+      "BID1778406377358",
+      "BID1778409942581",
+      "BID1778410202966",
+      "BID1778410207048",
+      "BID1778410209740",
+      "BID1778410214755",
+      "BID1778463233994",
+      "BID1778485975469",
+      "BID1778485977664",
+      "BID1778485980359",
+      "BID1778485982360",
+      "BID1778485988272"
+    ],
+    "isSeller": true,
+    "shopName": "Nguyen thu",
+    "shopPhone": "0978435654",
+    "shopAddress": "Đống Đa, Hà Nội",
+    "shopEmail": "nt@gmail.com",
+    "userId": "U1778403578742",
+    "username": "thunguyen",
+    "password": "ntntnt",
+    "email": "nt@gmail.com",
+    "wallet": 2.6929999E7,
+    "role": "SELLER",
+    "createdAt": 1778403578743,
+    "active": true
+  },
+  {
+    "ownedAuctionIds": [
+      "AU1777879942563"
+    ],
+    "bidIds": [],
+    "isSeller": true,
+    "shopName": "Đinh Hà Ngân",
+    "shopPhone": "0961528478",
+    "shopAddress": "123 Nghĩa Đô",
+    "shopEmail": "posuto@gmail.com",
+    "userId": "U1777878819404",
+    "username": "inhHNgn",
+    "password": "12345678",
+    "email": "posuto@gmail.com",
+    "wallet": 3.0E7,
+    "role": "SELLER",
+    "createdAt": 1777878819405,
+    "active": false
+  },
+  {
+    "ownedAuctionIds": [],
+    "bidIds": [],
+    "isSeller": false,
+    "userId": "U1777943026744",
+    "username": "baohan",
+    "password": "1234566",
+    "email": "han@gmail.com",
+    "wallet": 0.0,
+    "role": "BIDDER",
+    "createdAt": 1777943026744,
+    "active": true
+  },
+  {
+    "adminLevel": "SUPER_ADMIN",
+    "permissions": [
+      "VIEW_ALL_USERS",
+      "BAN_USER",
+      "DELETE_AUCTION",
+      "VIEW_LOGS"
+    ],
+    "userId": "ADMIN001",
+    "username": "admin",
+    "password": "admin123",
+    "email": "admin@auction.com",
+    "wallet": 1000000.0,
+    "role": "ADMIN",
+    "createdAt": 1712486400000,
+    "active": true
+  },
+  {
     "ownedAuctionIds": [
       "AU1777941343347",
       "AU1778402863464",
       "AU1778403491811",
-      "AU1778485932110"
+      "AU1778485932110",
+      "AU1778576463646",
+      "AU1778576688599",
+      "AU1778576886933"
     ],
     "bidIds": [
       "BID1777942291834",
@@ -249,48 +295,9 @@
     "username": "buingoc",
     "password": "bhbnbhbn",
     "email": "bhbngoc@gmail.com",
-    "wallet": 9152551.0,
+    "wallet": 9242551.0,
     "role": "SELLER",
     "createdAt": 1777887117887,
-    "active": true
-  },
-  {
-    "ownedAuctionIds": [],
-    "bidIds": [
-      "BID1778404884138",
-      "BID1778404909276",
-      "BID1778405261249",
-      "BID1778405263906",
-      "BID1778405266950",
-      "BID1778405278499",
-      "BID1778405282642",
-      "BID1778405286157",
-      "BID1778405289763",
-      "BID1778405292536",
-      "BID1778406367563",
-      "BID1778406370835",
-      "BID1778406374464",
-      "BID1778406377358",
-      "BID1778409942581",
-      "BID1778410202966",
-      "BID1778410207048",
-      "BID1778410209740",
-      "BID1778410214755",
-      "BID1778463233994",
-      "BID1778485975469",
-      "BID1778485977664",
-      "BID1778485980359",
-      "BID1778485982360",
-      "BID1778485988272"
-    ],
-    "isSeller": false,
-    "userId": "U1778403578742",
-    "username": "thunguyen",
-    "password": "ntntnt",
-    "email": "nt@gmail.com",
-    "wallet": 2.6929999E7,
-    "role": "BIDDER",
-    "createdAt": 1778403578743,
     "active": true
   }
 ]

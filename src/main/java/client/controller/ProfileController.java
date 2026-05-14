@@ -28,7 +28,7 @@ public class ProfileController {
             stage.setScene(ResponsiveSceneUtil.createScaledScene(root));
             StageUtil.showMaximized(stage);
         } catch (Exception e) {
-            LoggerUtil.error("Loi khi dang xuat tu profile: " + e.getMessage());
+            LoggerUtil.error("Lỗi khi dang xuat tu profile: " + e.getMessage());
             e.printStackTrace();
         }
     }

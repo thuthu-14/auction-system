@@ -54,7 +54,7 @@ public class AdminHomeController {
     private void loadUserManagementView() {
         updateMenuSelection(menuRecent);
 
-        loadViewIntoContentArea("/fxml/AdminUserManagement.fxml");
+        loadViewIntoContentArea("/fxml/AdminView/AdminUserManagement.fxml");
 
     }
 
@@ -72,7 +72,7 @@ public class AdminHomeController {
     private void loadAuctionManagementView() {
         updateMenuSelection(menuMsg);
 
-        loadViewIntoContentArea("/fxml/AdminAuctionManagement.fxml");
+        loadViewIntoContentArea("/fxml/AdminView/AdminAuctionManagement.fxml");
     }
 
     @FXML

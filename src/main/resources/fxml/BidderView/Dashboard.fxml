@@ -19,7 +19,7 @@
                     <Label text="Khám phá BubblyBid" textFill="#1a1a1a">
                         <font><Font name="System Bold" size="28.0" /></font>
                     </Label>
-                    <Label text="Hàng ngàn sản phẩm độc đáo đang chờ bạn chốt giá ngay hôm nay!" textFill="#718096">
+                    <Label text="Hàng ngàn sản phẩm độc đáo đang chờ bạn chốt giá ngày hôm nay!" textFill="#718096">
                         <font><Font size="15.0" /></font>
                     </Label>
                 </children>
@@ -44,6 +44,71 @@
                     </Button>
                 </children>
             </StackPane>
+
+            <VBox spacing="20.0">
+                <children>
+                    <Label text="📂 Danh mục sản phẩm" textFill="#1a1a1a">
+                        <font><Font name="System Bold" size="22.0" /></font>
+                    </Label>
+                    <HBox alignment="CENTER" maxWidth="Infinity">
+                        <children>
+                            <VBox alignment="CENTER" spacing="12.0" style="-fx-cursor: hand;" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #fef3c7; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36;" text="🏺" />
+                                    </StackPane>
+                                    <Label text="Đồ sưu tầm" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                </children>
+                            </VBox>
+
+                            <VBox alignment="CENTER" spacing="12.0" style="-fx-cursor: hand;" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #e0f2fe; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36;" text="💻" />
+                                    </StackPane>
+                                    <Label text="Điện tử" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                </children>
+                            </VBox>
+
+                            <VBox alignment="CENTER" spacing="12.0" style="-fx-cursor: hand;" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #ffedd5; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36;" text="👕" />
+                                    </StackPane>
+                                    <Label text="Thời trang" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                </children>
+                            </VBox>
+
+                            <VBox alignment="CENTER" spacing="12.0" style="-fx-cursor: hand;" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #f3e8ff; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36;" text="💎" />
+                                    </StackPane>
+                                    <Label text="Trang sức" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                </children>
+                            </VBox>
+
+                            <VBox alignment="CENTER" spacing="12.0" style="-fx-cursor: hand;" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #dcfce7; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36;" text="🚗" />
+                                    </StackPane>
+                                    <Label text="Xe cộ" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                </children>
+                            </VBox>
+
+                            <VBox alignment="CENTER" spacing="12.0" style="-fx-cursor: hand;" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #f1f5f9; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36;" text="📦" />
+                                    </StackPane>
+                                    <Label text="Khác" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
 
             <VBox spacing="20.0">
                 <children>
