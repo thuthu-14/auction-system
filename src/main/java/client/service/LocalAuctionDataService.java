@@ -44,25 +44,8 @@ public class LocalAuctionDataService {
     }
 
     public Map<String, Auction> loadAuctionsById() {
-        File auctionsFile = findDataFile("auctions.json");
-        if (!auctionsFile.exists()) {
-            LoggerUtil.warn("Local auctions.json not found from: " + new File(".").getAbsolutePath());
-            return Map.of();
-        }
-
-        try {
-            List<Auction> auctions = JsonUtil.loadListFromJson(auctionsFile.getPath(), Auction.class);
-            Map<String, Auction> auctionsById = new HashMap<>();
-            for (Auction auction : auctions != null ? auctions : List.<Auction>of()) {
-                if (auction != null && auction.getAuctionId() != null) {
-                    auctionsById.put(auction.getAuctionId(), auction);
-                }
-            }
-            return auctionsById;
-        } catch (Exception e) {
-            LoggerUtil.error("Local auctions load failed: " + e.getMessage());
-            return Map.of();
-        }
+        // ⚠️ MIGRATED TO SQLITE - No longer using JSON files
+        return Map.of();
     }
 
     public Map<String, String> findSellerContact(Auction auction) {
@@ -111,19 +94,8 @@ public class LocalAuctionDataService {
     }
 
     private List<Bid> loadAllBids() {
-        File bidsFile = findDataFile("bids.json");
-        if (!bidsFile.exists()) {
-            LoggerUtil.warn("Local bids.json not found from: " + new File(".").getAbsolutePath());
-            return List.of();
-        }
-
-        try {
-            List<Bid> bids = JsonUtil.loadListFromJson(bidsFile.getPath(), Bid.class);
-            return bids != null ? bids : List.of();
-        } catch (Exception e) {
-            LoggerUtil.error("Local bids load failed: " + e.getMessage());
-            return List.of();
-        }
+        // ⚠️ MIGRATED TO SQLITE - No longer using JSON files
+        return List.of();
     }
 
     private boolean isSeller(Auction auction, User user) {

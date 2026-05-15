@@ -2,7 +2,7 @@ package server;
 
 import server.service.*;
 import server.observer.AuctionManager;
-import server.storage.DataManager;
+// import server.storage.DataManager;  ← XÓA HOẶC COMMENT (không dùng nữa)
 import util.LoggerUtil;
 import java.io.*;
 import java.net.*;
@@ -30,18 +30,14 @@ public class AuctionServer {
         try {
             LoggerUtil.info("Starting Auction Server...");
 
-            DataManager.initializeDataFiles();
-
             try {
                 InitializeDataService.initializeDefaultData();
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (Exception e) {
                 System.err.println("Lỗi nghiêm trọng: Không thể khởi tạo dữ liệu mặc định!");
                 e.printStackTrace();
-
             }
 
             SchedulerService.startScheduler();
-
             AuctionManager.getInstance();
 
             System.out.println("═══════════════════════════════════════════");
@@ -63,14 +59,10 @@ public class AuctionServer {
                     }
                 }
             }
-        } catch (IOException e) {
-            LoggerUtil.error("Server startup error: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             shutdown();
         }
     }
-
 
     public synchronized void shutdown() {
         isRunning = false;

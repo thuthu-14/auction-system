@@ -1,5 +1,7 @@
 package server;
 
+import server.service.InitializeDataService;
+import server.storage.SchemaInitializer;
 import util.LoggerUtil;
 
 public class ServerMain {
@@ -10,6 +12,9 @@ public class ServerMain {
             LoggerUtil.info("║   AUCTION SYSTEM SERVER v1.0           ║");
             LoggerUtil.info("║   Online Bidding Platform              ║");
             LoggerUtil.info("╚════════════════════════════════════════╝");
+
+            SchemaInitializer.init();
+            InitializeDataService.initializeDefaultData();
 
             AuctionServer server = new AuctionServer();
             server.start();

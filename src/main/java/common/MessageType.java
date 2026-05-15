@@ -18,12 +18,16 @@ public enum MessageType implements Serializable {
     CREATE_SELLER_ITEM,
     UPDATE_SELLER_ITEM,
     DELETE_SELLER_ITEM,
+    // --- UPLOAD ẢNH ---
+    UPLOAD_IMAGE,
+    UPLOAD_IMAGE_RESPONSE,
 
     // --- ĐẤU GIÁ ---
     PLACE_BID,
     GET_BID_HISTORY,
     GET_USER_BIDS,
     GET_SELLER_CONTACT,
+
 
     // --- USER & ADMIN ---
     UPGRADE_SELLER,
@@ -45,6 +49,9 @@ public enum MessageType implements Serializable {
     // --- VÍ TIỀN ---
     ADD_FUNDS,
     WITHDRAW,
+    LINK_BANK,
+    GET_TRANSACTIONS,
+    GET_BANK_ACCOUNT,
 
     // --- CẬP NHẬT TRẠNG THÁI ---
     SELLER_AUCTIONS_UPDATED,

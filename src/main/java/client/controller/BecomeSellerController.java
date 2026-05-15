@@ -107,7 +107,6 @@ public class BecomeSellerController {
 
                     Platform.runLater(() -> {
                         regularUser.upgradeSeller(data.name(), data.phone(), data.address(), data.email());
-                        authClientService.saveSellerContext(regularUser);
                         showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chúc mừng! Bạn đã trở thành Người bán!");
                         NavigationManager.getInstance().setMainStage((javafx.stage.Stage) nameField.getScene().getWindow());
                         NavigationManager.getInstance().goToSellerHome();

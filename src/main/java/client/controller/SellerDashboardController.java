@@ -30,7 +30,7 @@ public class SellerDashboardController {
         cardActions.put("cardQuanLyPhien", () -> { if (sellerHomeController != null) sellerHomeController.loadManageAuctionsView(); else loadView("/fxml/SellerView/SellerManageAuctions.fxml"); });
         cardActions.put("cardThongKe", () -> { if (sellerHomeController != null) sellerHomeController.loadSellerStatisticsView(); else loadView("/fxml/SellerView/SellerStatistics.fxml"); });
         cardActions.put("cardThongBao", () -> { if (sellerHomeController != null) sellerHomeController.loadSellerNotificationsView(); else loadView("/fxml/SellerView/SellerNotifications.fxml"); });
-        cardActions.put("cardViTien", () -> { if (sellerHomeController != null) sellerHomeController.loadWalletView(); else loadView("/fxml/BidderView/WalletView.fxml"); });
+        cardActions.put("cardViTien", () -> { if (sellerHomeController != null) sellerHomeController.loadWalletView(); else loadView("/fxml/WalletView.fxml"); });
     }
 
     public void setUserData(User user, ClientSocket socket) {

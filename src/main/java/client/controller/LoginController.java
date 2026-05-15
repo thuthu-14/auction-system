@@ -102,8 +102,6 @@ public class LoginController {
             server.model.RegularUser regUser = (server.model.RegularUser) currentUser;
 
             if (regUser.isSeller()) {
-                // Lưu thông tin Seller cục bộ để tiện truy xuất
-                authClientService.saveSellerContext(regUser);
                 nav.goToSellerHome();
             } else {
                 // ĐÂY LÀ NHÁNH CHO TÀI KHOẢN MỚI HOẶC NGƯỜI CHỈ CÓ QUYỀN MUA/BID

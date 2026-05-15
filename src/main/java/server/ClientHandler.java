@@ -2,6 +2,8 @@
 package server;
 
 import server.model.*;
+import server.repository.SqlBankAccountRepository;
+import server.repository.SqlTransactionRepository;
 import server.service.*;
 import server.storage.*;
 import server.exception.*;
@@ -10,6 +12,9 @@ import util.LoggerUtil;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
+
+import server.repository.SqlUserRepository;
+import server.repository.SqlNotificationRepository;
 
 public class ClientHandler implements Runnable {
 
@@ -77,6 +82,10 @@ public class ClientHandler implements Runnable {
                 case GET_AUCTION_DETAIL:
                     handleGetAuctionDetail(message);
                     break;
+                case UPLOAD_IMAGE:
+                    handleUploadImage(message);
+                    break;
+
                 case PLACE_BID:
                     handlePlaceBid(message);
                     break;
@@ -124,6 +133,15 @@ public class ClientHandler implements Runnable {
                     break;
                 case MARK_NOTIFICATIONS_READ:
                     handleMarkNotificationsRead(message);
+                    break;
+                case LINK_BANK:
+                    handleLinkBank(message);
+                    break;
+                case GET_TRANSACTIONS:
+                    handleGetTransactions(message);
+                    break;
+                case GET_BANK_ACCOUNT:
+                    handleGetBankAccount(message);
                     break;
 
                 default:
@@ -280,7 +298,8 @@ public class ClientHandler implements Runnable {
             }
 
             RegularUser bidder = (RegularUser) currentUser;
-            User latestUser = UserDAO.getUserById(currentUser.getUserId());
+            SqlUserRepository userRepo = new SqlUserRepository();
+            User latestUser = userRepo.getUserById(currentUser.getUserId());
             if (latestUser instanceof RegularUser latestRegularUser) {
                 bidder = latestRegularUser;
                 currentUser = latestRegularUser;
@@ -313,7 +332,7 @@ public class ClientHandler implements Runnable {
                         "Xem phiên",
                         auctionId
                 );
-                NotificationDAO.addNotification(sellerNoti);
+                new SqlNotificationRepository().addNotification(sellerNoti);
             }
 
             // =========================================================
@@ -334,7 +353,7 @@ public class ClientHandler implements Runnable {
                 );
 
                 // 2. Gọi NotificationDAO để ghi thông báo này xuống file notifications.json
-                NotificationDAO.addNotification(outbidNoti);
+                new SqlNotificationRepository().addNotification(outbidNoti);
 
                 // 3. Vẫn phút sóng bình thường cho những ai đang online ngay lúc đó
                 server.broadcastMessage(new Message(MessageType.OUTBID_NOTIFICATION, auction, currentUser.getUserId()));
@@ -792,7 +811,7 @@ public class ClientHandler implements Runnable {
     // TỐI ƯU HÓA: XỬ LÝ NẠP / RÚT TIỀN (VÍ)
     // ==========================================
 
-    private void handleAddFunds(Message message) throws IOException, ClassNotFoundException {
+    private void handleAddFunds(Message message) throws IOException {
         @SuppressWarnings("unchecked")
         Map<String, Object> data = (Map<String, Object>) message.getData();
         String userId = (String) data.get("userId");
@@ -804,39 +823,50 @@ public class ClientHandler implements Runnable {
             return;
         }
 
-        // Cố gắng tìm User từ Database
-        User user = userId != null ? UserDAO.getUserById(userId) : null;
-        if (user == null) {
-            user = UserDAO.getUserByUsername(username);
+        try {
+            SqlUserRepository userRepo = new SqlUserRepository();
+            User user = userId != null ? userRepo.getUserById(userId) : null;
+            if (user == null) {
+                user = userRepo.getUserByUsername(username);
+            }
+
+            if (user == null && currentUser != null && currentUser.getUsername().equals(username)) {
+                user = currentUser;
+            }
+
+            if (user == null) {
+                sendError("Không tìm thấy người dùng trong hệ thống");
+                return;
+            }
+
+            user.addFunds(amount);
+            userRepo.saveUser(user);
+            SqlTransactionRepository txnRepo = new SqlTransactionRepository();
+            Transaction tx = new Transaction(
+                    user.getUserId(),
+                    "DEPOSIT",
+                    amount,
+                    user.getWallet(),
+                    "Nạp tiền vào ví"
+            );
+            txnRepo.saveTransaction(tx);
+
+            if (currentUser != null && currentUser.getUserId().equals(user.getUserId())) {
+                this.currentUser = user;
+            }
+
+            Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Nạp tiền thành công");
+            response.setData(user);
+            sendMessage(response);
+
+            LoggerUtil.info("✓ User added funds: " + username + " +" + amount);
+
+        } catch (Exception e) {
+            sendError("❌ " + e.getMessage());
         }
-
-        // Fallback an toàn: Nếu Database trễ nhịp, lấy ngay phiên bản hiện tại trên bộ nhớ đệm
-        if (user == null && currentUser != null && currentUser.getUsername().equals(username)) {
-            user = currentUser;
-        }
-
-        if (user == null) {
-            sendError("Không tìm thấy người dùng trong hệ thống");
-            return;
-        }
-
-        // Thực hiện cộng tiền
-        user.addFunds(amount);
-        UserDAO.saveUser(user); // Cập nhật xuống cơ sở dữ liệu
-
-        // Cập nhật lại phiên làm việc (Session)
-        if (currentUser != null && currentUser.getUserId().equals(user.getUserId())) {
-            this.currentUser = user;
-        }
-
-        Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Nạp tiền thành công");
-        response.setData(user); // Gửi chính xác object User mới về cho Client
-        sendMessage(response);
-
-        LoggerUtil.info("✓ User added funds: " + username + " +" + amount);
     }
 
-    private void handleWithdraw(Message message) throws IOException, ClassNotFoundException {
+    private void handleWithdraw(Message message) throws IOException {
         @SuppressWarnings("unchecked")
         Map<String, Object> data = (Map<String, Object>) message.getData();
         String userId = (String) data.get("userId");
@@ -848,41 +878,196 @@ public class ClientHandler implements Runnable {
             return;
         }
 
-        // Cố gắng tìm User từ Database
-        User user = userId != null ? UserDAO.getUserById(userId) : null;
-        if (user == null) {
-            user = UserDAO.getUserByUsername(username);
+        try {
+            SqlUserRepository userRepo = new SqlUserRepository();
+            User user = userId != null ? userRepo.getUserById(userId) : null;
+            if (user == null) {
+                user = userRepo.getUserByUsername(username);
+            }
+
+            if (user == null && currentUser != null && currentUser.getUsername().equals(username)) {
+                user = currentUser;
+            }
+
+            if (user == null) {
+                sendError("Không tìm thấy người dùng trong hệ thống");
+                return;
+            }
+
+            if (!user.deductFunds(amount)) {
+                sendError("Số dư ví không đủ để thực hiện rút tiền");
+                return;
+            }
+
+            userRepo.saveUser(user);
+            Transaction tx = new Transaction(
+                    user.getUserId(),
+                    "WITHDRAW",
+                    amount,
+                    user.getWallet(),
+                    "Rút tiền về ngân hàng"
+            );
+            SqlTransactionRepository txnRepo = new SqlTransactionRepository();
+            txnRepo.saveTransaction(tx);
+
+
+            if (currentUser != null && currentUser.getUserId().equals(user.getUserId())) {
+                this.currentUser = user;
+            }
+
+            Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Rút tiền thành công");
+            response.setData(user);
+            sendMessage(response);
+
+            LoggerUtil.info("✓ User withdrew funds: " + username + " -" + amount);
+
+        } catch (Exception e) {
+            sendError("❌ " + e.getMessage());
         }
-
-        // Fallback an toàn
-        if (user == null && currentUser != null && currentUser.getUsername().equals(username)) {
-            user = currentUser;
-        }
-
-        if (user == null) {
-            sendError("Không tìm thấy người dùng trong hệ thống");
-            return;
-        }
-
-        // Thực hiện trừ tiền
-        if (!user.deductFunds(amount)) {
-            sendError("Số dư ví không đủ để thực hiện rút tiền");
-            return;
-        }
-
-        UserDAO.saveUser(user); // Lưu lại thông tin ví mới xuống DB
-
-        // Cập nhật phiên làm việc
-        if (currentUser != null && currentUser.getUserId().equals(user.getUserId())) {
-            this.currentUser = user;
-        }
-
-        Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Rút tiền thành công");
-        response.setData(user);
-        sendMessage(response);
-
-        LoggerUtil.info("✓ User withdrew funds: " + username + " -" + amount);
     }
+
+    private void handleLinkBank(Message message) throws IOException {
+        if (currentUser == null) {
+            sendError("Bạn phải đăng nhập!");
+            return;
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) message.getData();
+            String bankName = (String) data.get("bankName");
+            String accountNumber = (String) data.get("accountNumber");
+            Object balanceObj = data.get("initialBalance");
+            double initialBalance = (balanceObj != null) ? ((Number) balanceObj).doubleValue() : 0.0;
+
+            if (bankName == null || bankName.trim().isEmpty() ||
+                    accountNumber == null || accountNumber.trim().isEmpty()) {
+                sendError("Thông tin ngân hàng không hợp lệ!");
+                return;
+            }
+
+            SqlBankAccountRepository bankRepo = new SqlBankAccountRepository();
+
+            // Kiểm tra xem đã liên kết chưa
+            if (bankRepo.hasBankAccount(currentUser.getUserId())) {
+                sendError("Bạn đã liên kết tài khoản ngân hàng rồi!");
+                return;
+            }
+
+            // Lưu tài khoản ngân hàng
+            bankRepo.saveBankAccount(
+                    currentUser.getUserId(),
+                    currentUser.getUsername(),
+                    currentUser.getEmail(),
+                    bankName,
+                    accountNumber,
+                    initialBalance
+            );
+
+            Message response = new Message(MessageType.SUCCESS, "Bank linked successfully", "SERVER");
+            response.setStatus("SUCCESS");
+            response.setMessage("Liên kết ngân hàng thành công!");
+            sendMessage(response);
+
+            LoggerUtil.info("✓ " + currentUser.getUsername() + " liên kết ngân hàng: " + bankName);
+
+        } catch (Exception e) {
+            sendError("❌ Liên kết ngân hàng thất bại: " + e.getMessage());
+            LoggerUtil.error("Link bank error: " + e.getMessage());
+        }
+    }
+
+    private void handleGetTransactions(Message message) throws IOException {
+        if (currentUser == null) {
+            sendError("Bạn phải đăng nhập!");
+            return;
+        }
+
+        try {
+            SqlTransactionRepository txRepo = new SqlTransactionRepository();
+            List<Transaction> transactions = txRepo.getByUser(currentUser.getUserId());
+
+            Message response = new Message(MessageType.SUCCESS, transactions, "SERVER");
+            response.setStatus("SUCCESS");
+            sendMessage(response);
+
+            LoggerUtil.info("✓ " + currentUser.getUsername() + " xem lịch sử giao dịch");
+
+        } catch (Exception e) {
+            sendError("❌ Không thể tải lịch sử giao dịch: " + e.getMessage());
+            LoggerUtil.error("Get transactions error: " + e.getMessage());
+        }
+    }
+
+    private void handleGetBankAccount(Message message) throws IOException {
+        if (currentUser == null) {
+            sendError("Bạn phải đăng nhập!");
+            return;
+        }
+
+        try {
+            SqlBankAccountRepository bankRepo = new SqlBankAccountRepository();
+
+            if (!bankRepo.hasBankAccount(currentUser.getUserId())) {
+                sendError("Bạn chưa liên kết tài khoản ngân hàng!");
+                return;
+            }
+
+            // Lấy thông tin TK ngân hàng
+            Map<String, String> bankInfo = bankRepo.getBankAccount(currentUser.getUserId());
+
+            Message response = new Message(MessageType.SUCCESS, bankInfo, "SERVER");
+            response.setStatus("SUCCESS");
+            sendMessage(response);
+
+            LoggerUtil.info("✓ " + currentUser.getUsername() + " xem TK ngân hàng");
+
+        } catch (Exception e) {
+            sendError("❌ Không thể tải tài khoản ngân hàng: " + e.getMessage());
+            LoggerUtil.error("Get bank account error: " + e.getMessage());
+        }
+    }
+
+
+
+
+
+
+    private void handleUploadImage(Message message) throws IOException {
+        if (currentUser == null) {
+            sendError("Bạn phải đăng nhập!");
+            return;
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) message.getData();
+
+            // Lấy dữ liệu ảnh
+            byte[] imageBytes = (byte[]) data.get("imageBytes");
+            String originalFilename = (String) data.get("filename");
+
+            if (imageBytes == null || imageBytes.length == 0) {
+                sendError("Dữ liệu ảnh trống!");
+                return;
+            }
+
+            // Lưu ảnh vào disk (SỬA ĐÂY)
+            String imageUrl = ImageUploadManager.saveImage(imageBytes, originalFilename);
+
+            // Gửi URL về client
+            Message response = new Message(MessageType.UPLOAD_IMAGE_RESPONSE, imageUrl, "SERVER");
+            response.setStatus("SUCCESS");
+            sendMessage(response);
+
+            LoggerUtil.info("✓ Image uploaded: " + imageUrl + " by " + currentUser.getUsername());
+
+        } catch (Exception e) {
+            sendError("❌ Upload ảnh thất bại: " + e.getMessage());
+            LoggerUtil.error("Image upload error: " + e.getMessage());
+        }
+    }
+
 
     public void closeConnection() {
         try {
@@ -902,22 +1087,41 @@ public class ClientHandler implements Runnable {
     }
 
     private void handleGetNotifications(Message message) throws IOException {
-        // LUÔN LẤY userId từ tài khoản đang đăng nhập trên Server
+        if (currentUser == null) {
+            sendError("Bạn phải đăng nhập!");
+            return;
+        }
+
         String userId = currentUser.getUserId();
 
-        List<Notification> list = NotificationDAO.getNotificationsByUser(userId);
+        try {
+            SqlNotificationRepository notiRepo = new SqlNotificationRepository();
+            List<Notification> list = notiRepo.getNotificationsByUser(userId);
 
-        Message response = new Message(MessageType.GET_NOTIFICATIONS, new ArrayList<>(list), "SERVER");
-        sendMessage(response);
+            Message response = new Message(MessageType.GET_NOTIFICATIONS, new ArrayList<>(list), "SERVER");
+            sendMessage(response);
+        } catch (Exception e) {
+            sendError("❌ " + e.getMessage());
+        }
     }
-
     private void handleMarkNotificationsRead(Message message) throws IOException {
+        if (currentUser == null) {
+            sendError("Bạn phải đăng nhập!");
+            return;
+        }
+
         String userId = currentUser.getUserId();
         Set<String> allowedTypes = resolveNotificationTypes(message.getData());
-        NotificationDAO.markAllAsRead(userId, allowedTypes);
 
-        Message response = new Message(MessageType.MARK_NOTIFICATIONS_READ, "SUCCESS", "Đã đọc tất cả");
-        sendMessage(response);
+        try {
+            SqlNotificationRepository notiRepo = new SqlNotificationRepository();
+            notiRepo.markAllAsRead(userId, allowedTypes);
+
+            Message response = new Message(MessageType.MARK_NOTIFICATIONS_READ, "SUCCESS", "Đã đọc tất cả");
+            sendMessage(response);
+        } catch (Exception e) {
+            sendError("❌ " + e.getMessage());
+        }
     }
 
     private Set<String> resolveNotificationTypes(Object data) {
@@ -931,4 +1135,5 @@ public class ClientHandler implements Runnable {
             default -> null;
         };
     }
+
 }

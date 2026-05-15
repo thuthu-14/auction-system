@@ -5,6 +5,7 @@ import common.Message;
 import common.MessageType;
 import server.model.User;
 
+import java.io.File;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -70,7 +71,7 @@ public class AddAuctionProductClientService {
     }
 
     public Map<String, Object> buildPayload(User user, String name, String description, String category,
-                                            List<String> imagePaths, CategoryFieldReader fields) {
+                                            List<String> imagePaths, CategoryFieldReader fields) throws Exception {
         validateBase(name, description, category, imagePaths);
         if (user == null) {
             throw new ValidationException("Lỗi mạng", "Bạn chưa đăng nhập hoặc mất kết nối máy chủ!");
@@ -81,7 +82,10 @@ public class AddAuctionProductClientService {
         payload.put("sellerId", user.getUsername());
         payload.put("name", name.trim());
         payload.put("description", description.trim());
-        payload.put("images", new ArrayList<>(imagePaths));
+
+        // ← THAY ĐỔI: Upload ảnh lên server trước, rồi lưu URL
+        List<String> uploadedImageUrls = uploadImages(imagePaths);
+        payload.put("images", uploadedImageUrls);
 
         CategoryBuildResult categoryResult = buildCategoryPayload(category, payload, fields);
 
@@ -91,6 +95,46 @@ public class AddAuctionProductClientService {
         payload.put("startingPrice", categoryResult.startPrice);
         payload.put("duration", categoryResult.durationMinutes);
         return payload;
+    }
+
+    private List<String> uploadImages(List<String> imagePaths) throws Exception {
+        List<String> uploadedUrls = new ArrayList<>();
+
+        // ← Cần inject ClientSocket, tạm thời giả sử có sẵn
+        // (bước tiếp theo sẽ fix cái này)
+        client.network.ClientSocket socket = client.network.ConnectionManager.getInstance().getClientSocket();
+
+        for (String imagePath : imagePaths) {
+            try {
+                // Đọc file ảnh
+                File imageFile = new File(new java.net.URI(imagePath));
+                byte[] imageBytes = java.nio.file.Files.readAllBytes(imageFile.toPath());
+
+                // Tạo request upload
+                Map<String, Object> uploadData = new HashMap<>();
+                uploadData.put("imageBytes", imageBytes);
+                uploadData.put("filename", imageFile.getName());
+
+                Message uploadRequest = new Message();
+                uploadRequest.setType(MessageType.UPLOAD_IMAGE);
+                uploadRequest.setData(uploadData);
+
+                // Gửi và nhận response
+                Message uploadResponse = socket.sendAndReceive(uploadRequest);
+
+                if (uploadResponse != null && "SUCCESS".equals(uploadResponse.getStatus())) {
+                    String imageUrl = (String) uploadResponse.getData();
+                    uploadedUrls.add(imageUrl);
+                } else {
+                    throw new Exception("Upload failed for: " + imagePath);
+                }
+            } catch (Exception e) {
+                throw new ValidationException("Lỗi upload",
+                        "Không thể upload ảnh " + imagePath + ": " + e.getMessage());
+            }
+        }
+
+        return uploadedUrls;
     }
 
     private CategoryBuildResult buildCategoryPayload(String category, Map<String, Object> payload, CategoryFieldReader fields) {

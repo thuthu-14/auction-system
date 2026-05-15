@@ -5,12 +5,7 @@ import server.exception.PermissionDeniedException;
 import server.model.Auction;
 import server.model.Item;
 import server.model.RegularUser;
-import server.repository.AuctionRepository;
-import server.repository.ItemRepository;
-import server.repository.JsonAuctionRepository;
-import server.repository.JsonItemRepository;
-import server.repository.JsonUserRepository;
-import server.repository.UserRepository;
+import server.repository.*;
 import util.ItemValidationUtil;
 import util.LoggerUtil;
 
@@ -20,9 +15,9 @@ import java.util.List;
 public class AuctionService {
 
     private static final AuctionService DEFAULT = new AuctionService(
-            new JsonAuctionRepository(),
-            new JsonItemRepository(),
-            new JsonUserRepository()
+            new SqlAuctionRepository(),
+            new SqlItemRepository(),
+            new SqlUserRepository()
     );
 
     private final AuctionRepository auctionRepository;

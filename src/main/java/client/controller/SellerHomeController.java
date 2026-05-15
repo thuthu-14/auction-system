@@ -201,9 +201,19 @@ public class SellerHomeController {
 
     @FXML
     public void loadWalletView() {
-        loadView("/fxml/BidderView/WalletView.fxml", menuPay, controller -> {
+        loadView("/fxml/WalletView.fxml", menuPay, controller -> {
             if (controller instanceof WalletController walletController) {
-                User user = currentUser != null ? currentUser : NavigationManager.getInstance().getCurrentUser();
+                // ← LUÔN lấy user MỚI NHẤT từ NavigationManager
+                User user = NavigationManager.getInstance().getCurrentUser();
+                if (user == null) {
+                    user = this.currentUser;  // Fallback
+                }
+
+                // ← Cập nhật currentUser của SellerHomeController
+                if (user != null) {
+                    this.currentUser = user;  // THÊM: Sync local currentUser
+                }
+
                 ClientSocket socket = clientSocket != null
                         ? clientSocket
                         : NavigationManager.getInstance().getClientSocket();

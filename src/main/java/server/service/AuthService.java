@@ -3,7 +3,7 @@ package server.service;
 import server.exception.AuthenticationException;
 import server.model.RegularUser;
 import server.model.User;
-import server.repository.JsonUserRepository;
+import server.repository.SqlUserRepository;
 import server.repository.UserRepository;
 import util.LoggerUtil;
 import util.ValidationUtil;
@@ -11,7 +11,7 @@ import util.ValidationUtil;
 import java.io.IOException;
 
 public class AuthService {
-    private static final AuthService DEFAULT = new AuthService(new JsonUserRepository());
+    private static final AuthService DEFAULT = new AuthService(new SqlUserRepository());
 
     private final UserRepository userRepository;
 

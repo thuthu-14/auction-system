@@ -54,20 +54,7 @@ public class AuthClientService {
         return parseUser(response.getData());
     }
 
-    public void saveSellerContext(RegularUser seller) {
-        if (seller == null) {
-            return;
-        }
-        try {
-            Map<String, String> sellerIdMap = new HashMap<>();
-            sellerIdMap.put("sellerId", seller.getUserId());
-            sellerIdMap.put("sellerName", seller.getShopName());
-            sellerIdMap.put("timestamp", String.valueOf(System.currentTimeMillis()));
-            JsonUtil.saveToJson("data/json/current_seller_id.json", sellerIdMap);
-        } catch (Exception e) {
-            LoggerUtil.warn("Could not save seller context: " + e.getMessage());
-        }
-    }
+
 
     private User parseUser(Object rawData) {
         if (rawData instanceof User user) {

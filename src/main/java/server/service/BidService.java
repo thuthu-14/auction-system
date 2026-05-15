@@ -8,12 +8,7 @@ import server.exception.PermissionDeniedException;
 import server.model.Auction;
 import server.model.Bid;
 import server.model.RegularUser;
-import server.repository.AuctionRepository;
-import server.repository.BidRepository;
-import server.repository.JsonAuctionRepository;
-import server.repository.JsonBidRepository;
-import server.repository.JsonUserRepository;
-import server.repository.UserRepository;
+import server.repository.*;
 import util.ItemValidationUtil;
 import util.LoggerUtil;
 import util.ValidationUtil;
@@ -27,9 +22,9 @@ import java.util.Objects;
 public class BidService {
 
     private static final BidService DEFAULT = new BidService(
-            new JsonBidRepository(),
-            new JsonAuctionRepository(),
-            new JsonUserRepository()
+            new SqlBidRepository(),
+            new SqlAuctionRepository(),
+            new SqlUserRepository()
     );
 
     private final BidRepository bidRepository;

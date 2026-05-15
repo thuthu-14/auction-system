@@ -21,10 +21,7 @@ import java.util.Map;
 
 public class WalletService {
 
-    private static final Path DATA_DIR = resolveProjectRoot().resolve("data").resolve("json");
-    private static final Path USERS_FILE = DATA_DIR.resolve("users.json");
-    private static final Path BANK_FILE = DATA_DIR.resolve("bank_accounts.json");
-    private static final Path TRANSACTIONS_FILE = DATA_DIR.resolve("transactions.json");
+
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -68,164 +65,49 @@ public class WalletService {
         return socket.sendAndReceive(new Message(msgType, data, user.getUsername()));
     }
 
-    public void saveBankAccount(User user, String bank, String account, double amount) throws Exception {
+
+    public Message linkBankAccount(ClientSocket socket, User user, String bank, String account, double amount) throws Exception {
+        if (socket == null || !socket.isConnected()) {
+            throw new java.io.IOException("Socket is not connected");
+        }
         if (user == null) {
             throw new IllegalStateException("Missing current user");
         }
 
-        Path path = ensureJsonFile(BANK_FILE);
-        String content = Files.readString(path).trim();
-        if (content.isEmpty() || content.equals("null")) content = "[]";
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", user.getUserId());
+        data.put("username", user.getUsername());
+        data.put("email", user.getEmail());
+        data.put("bankName", bank);
+        data.put("accountNumber", account);
+        data.put("amount", amount);
 
-        List<BankAccountEntry> list = gson.fromJson(content, new TypeToken<List<BankAccountEntry>>(){}.getType());
-        if (list == null) list = new ArrayList<>();
-
-        list.removeIf(entry -> isBankAccountOfUser(user, entry));
-
-        BankAccountEntry entry = new BankAccountEntry();
-        entry.userId = user.getUserId();
-        entry.username = user.getUsername();
-        entry.email = user.getEmail();
-        entry.bankName = bank;
-        entry.accountNumber = account;
-        entry.initialBalance = amount;
-        entry.createdAt = System.currentTimeMillis();
-
-        list.add(entry);
-        Files.writeString(path, gson.toJson(list));
-        LoggerUtil.info("Saved linked bank account for user: " + getUserKey(user));
+        return socket.sendAndReceive(new Message(MessageType.LINK_BANK, data, user.getUsername()));
     }
 
-    public BankAccountEntry loadBankAccount(User user) {
-        try {
-            if (user == null) return null;
-            Path path = BANK_FILE;
-            if (!Files.exists(path)) return null;
-            String content = Files.readString(path).trim();
-            if (content.isEmpty() || content.equals("null")) return null;
-
-            List<BankAccountEntry> list = gson.fromJson(content, new TypeToken<List<BankAccountEntry>>(){}.getType());
-            if (list == null) return null;
-            return list.stream()
-                    .filter(entry -> isBankAccountOfUser(user, entry))
-                    .findFirst()
-                    .orElse(null);
-        } catch (Exception e) {
-            LoggerUtil.error("Cannot load linked bank account: " + e.getMessage());
-            return null;
+    public Message fetchBankAccount(ClientSocket socket, User user) throws Exception {
+        if (socket == null || !socket.isConnected()) {
+            throw new java.io.IOException("Socket is not connected");
         }
-    }
-
-    public User loadLatestUser(User user) {
-        try {
-            if (user == null || !Files.exists(USERS_FILE)) {
-                return user;
-            }
-
-            String content = Files.readString(USERS_FILE).trim();
-            if (content.isEmpty() || content.equals("null")) {
-                return user;
-            }
-
-            List<User> users = JsonUtil.getGson().fromJson(content, new TypeToken<List<User>>(){}.getType());
-            if (users == null) {
-                return user;
-            }
-
-            return users.stream()
-                    .filter(candidate -> isSameUser(user, candidate))
-                    .findFirst()
-                    .orElse(user);
-        } catch (Exception e) {
-            LoggerUtil.error("Cannot load latest wallet user: " + e.getMessage());
-            return user;
-        }
-    }
-
-    public void saveTransaction(User user, String type, double amount, double balanceAfter) throws Exception {
         if (user == null) {
             throw new IllegalStateException("Missing current user");
         }
 
-        Path path = ensureJsonFile(TRANSACTIONS_FILE);
-        String content = Files.readString(path).trim();
-        if (content.isEmpty() || content.equals("null")) content = "[]";
-
-        List<Transaction> txns = gson.fromJson(content, new TypeToken<List<Transaction>>(){}.getType());
-        if (txns == null) txns = new ArrayList<>();
-        txns.add(new Transaction(user.getUserId(), type, amount, balanceAfter,
-                "DEPOSIT".equals(type) ? "Nạp tiền vào ví" : "Rút tiền về ngân hàng"));
-        Files.writeString(path, gson.toJson(txns));
+        return socket.sendAndReceive(
+                new Message(MessageType.GET_BANK_ACCOUNT, user.getUserId(), user.getUsername())
+        );
     }
-
-    public List<Transaction> loadTransactions(User user) throws Exception {
-        if (user == null) return new ArrayList<>();
-        Path path = TRANSACTIONS_FILE;
-        if (!Files.exists(path)) return new ArrayList<>();
-        String content = Files.readString(path).trim();
-        if (content.isEmpty() || content.equals("null")) return new ArrayList<>();
-
-        List<Transaction> all = gson.fromJson(content, new TypeToken<List<Transaction>>(){}.getType());
-        if (all == null) return new ArrayList<>();
-        return all.stream()
-                .filter(t -> user.getUserId().equals(t.userId))
-                .sorted((a, b) -> Long.compare(b.timestamp, a.timestamp))
-                .collect(java.util.stream.Collectors.toList());
-    }
-
-    private Path ensureJsonFile(Path path) throws Exception {
-        if (path.getParent() != null && !Files.exists(path.getParent())) {
-            Files.createDirectories(path.getParent());
+    public Message fetchTransactions(ClientSocket socket, User user) throws Exception {
+        if (socket == null || !socket.isConnected()) {
+            throw new java.io.IOException("Socket is not connected");
         }
-        if (!Files.exists(path)) {
-            Files.writeString(path, "[]");
-        }
-        return path;
-    }
-
-    private static Path resolveProjectRoot() {
-        Path current = Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
-        Path cursor = current;
-        while (cursor != null) {
-            if (Files.exists(cursor.resolve("pom.xml")) && Files.isDirectory(cursor.resolve("data"))) {
-                return cursor;
-            }
-            cursor = cursor.getParent();
-        }
-        return current;
-    }
-
-    private boolean isBankAccountOfUser(User user, BankAccountEntry entry) {
-        if (entry == null || user == null) {
-            return false;
-        }
-
-        return sameText(user.getUserId(), entry.userId)
-                || sameText(user.getUsername(), entry.username)
-                || sameText(user.getEmail(), entry.email);
-    }
-
-    private boolean isSameUser(User left, User right) {
-        if (left == null || right == null) {
-            return false;
-        }
-
-        return sameText(left.getUserId(), right.getUserId())
-                || sameText(left.getUsername(), right.getUsername())
-                || sameText(left.getEmail(), right.getEmail());
-    }
-
-    private boolean sameText(String left, String right) {
-        return left != null && right != null && left.equalsIgnoreCase(right);
-    }
-
-    private String getUserKey(User user) {
         if (user == null) {
-            return "unknown";
+            throw new IllegalStateException("Missing current user");
         }
-        if (user.getUserId() != null && !user.getUserId().isBlank()) {
-            return user.getUserId();
-        }
-        return user.getUsername();
+
+        return socket.sendAndReceive(
+                new Message(MessageType.GET_TRANSACTIONS, user.getUserId(), user.getUsername())
+        );
     }
+
 }

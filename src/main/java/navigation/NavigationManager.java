@@ -129,6 +129,6 @@ public class NavigationManager {
      * Chuyển sang giao diện ví tiền
      */
     public void goToWallet() {
-        navigateTo("/fxml/BidderView/WalletView.fxml");
+        navigateTo("/fxml/WalletView.fxml");
     }
 }

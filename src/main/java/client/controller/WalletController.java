@@ -5,6 +5,7 @@ import client.network.ConnectionManager;
 import client.service.WalletService;
 import client.service.WalletService.BankAccountEntry;
 import common.Message;
+import common.MessageType;
 import common.Transaction;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
@@ -31,6 +32,7 @@ import navigation.NavigationManager;
 import server.model.User;
 import util.LoggerUtil;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -94,12 +96,24 @@ public class WalletController implements Initializable {
     }
 
     public void setUserData(User user, ClientSocket socket) {
-        this.currentUser = user != null ? user : NavigationManager.getInstance().getCurrentUser();
+        // ← LUÔN lấy user mới nhất từ NavigationManager
+        User navUser = NavigationManager.getInstance().getCurrentUser();
+        if (navUser != null) {
+            this.currentUser = navUser;
+        } else if (user != null) {
+            this.currentUser = user;
+        }
+
         this.clientSocket = socket != null ? socket : getActiveSocket();
         Platform.runLater(this::loadWalletData);
     }
 
     public void reloadWalletData() {
+        // ← Trước khi load, force sync user từ NavigationManager
+        User latestUser = NavigationManager.getInstance().getCurrentUser();
+        if (latestUser != null) {
+            this.currentUser = latestUser;  // THÊM: Đảm bảo currentUser mới nhất
+        }
         Platform.runLater(this::loadWalletData);
     }
 
@@ -134,33 +148,45 @@ public class WalletController implements Initializable {
             return;
         }
 
-        currentUser = walletService.loadLatestUser(currentUser);
         NavigationManager.getInstance().setCurrentUser(currentUser);
         LoggerUtil.info("Wallet load user="
                 + currentUser.getUsername()
                 + ", id=" + currentUser.getUserId()
                 + ", wallet=" + currentUser.getWallet());
 
-        balanceLabel.setText(formatVnd(currentUser.getWallet()));
-
-        BankAccountEntry entry = loadBankAccountForCurrentUser();
-        LoggerUtil.info("Wallet linked bank found=" + (entry != null));
-
-        if (entry != null) {
-            displayBankName.setText(entry.bankName.toUpperCase());
-            String acc = entry.accountNumber == null ? "" : entry.accountNumber;
-            displayAccNumber.setText(acc.length() >= 4 ? "**** **** **** " + acc.substring(acc.length() - 4) : acc);
-
-            addBankBox.setVisible(false);
-            addBankBox.setManaged(false);
-            linkedBankBox.setVisible(true);
-            linkedBankBox.setManaged(true);
-        } else {
-            addBankBox.setVisible(true);
-            addBankBox.setManaged(true);
-            linkedBankBox.setVisible(false);
-            linkedBankBox.setManaged(false);
+        // ← CẬP NHẬP SỐ DƯ NGAY LẬP TỨC (không chờ)
+        if (balanceLabel != null) {
+            balanceLabel.setText(formatVnd(currentUser.getWallet()));
+            balanceLabel.applyCss();  // ← THÊM: Force re-render UI
         }
+
+        // ← Load bank account & transaction async (không block UI)
+        new Thread(() -> {
+            try {
+                BankAccountEntry entry = loadBankAccountForCurrentUser();
+                LoggerUtil.info("Wallet linked bank found=" + (entry != null));
+
+                Platform.runLater(() -> {
+                    if (entry != null) {
+                        displayBankName.setText(entry.bankName.toUpperCase());
+                        String acc = entry.accountNumber == null ? "" : entry.accountNumber;
+                        displayAccNumber.setText(acc.length() >= 4 ? "**** **** **** " + acc.substring(acc.length() - 4) : acc);
+
+                        addBankBox.setVisible(false);
+                        addBankBox.setManaged(false);
+                        linkedBankBox.setVisible(true);
+                        linkedBankBox.setManaged(true);
+                    } else {
+                        addBankBox.setVisible(true);
+                        addBankBox.setManaged(true);
+                        linkedBankBox.setVisible(false);
+                        linkedBankBox.setManaged(false);
+                    }
+                });
+            } catch (Exception e) {
+                LoggerUtil.error("Error loading bank account: " + e.getMessage());
+            }
+        }).start();
 
         loadTransactionHistory();
         Platform.runLater(this::resetWalletViewState);
@@ -378,7 +404,7 @@ public class WalletController implements Initializable {
 
                             try {
                                 // ?? XÓA: updateBankBalanceForCurrentUser - Không còn can thiệp tiền ngân hàng ảo
-                                saveTransaction(type, amount, updatedUser.getWallet());
+
                             } catch (Exception ex) {
                                 LoggerUtil.error("Lỗi lưu file local: " + ex.getMessage());
                             }
@@ -412,23 +438,34 @@ public class WalletController implements Initializable {
         }
 
         this.currentUser = updatedUser;
+
+        // ← QUAN TRỌNG: Update NavigationManager để Seller/Bidder khác cũng thấy
+        NavigationManager.getInstance().setCurrentUser(updatedUser);
+
         if (balanceLabel != null) {
             balanceLabel.setText(formatVnd(updatedUser.getWallet()));
+            balanceLabel.applyCss();  // ← THÊM: Force re-render UI
         }
 
-        BankAccountEntry entry = loadBankAccountForCurrentUser();
-        if (entry != null) {
-            refreshLinkedBankDisplayOnly(entry.bankName, entry.accountNumber);
-        }
+        // ← Load bank account & transaction async (không block UI)
+        new Thread(() -> {
+            try {
+                BankAccountEntry entry = loadBankAccountForCurrentUser();
+                if (entry != null) {
+                    Platform.runLater(() -> refreshLinkedBankDisplay(entry.bankName, entry.accountNumber));
+                }
 
-        try {
-            allTransactions = new ArrayList<>(loadTransactionsForUser());
-            applyTransactionFilters();
-        } catch (Exception e) {
-            LoggerUtil.error("Lỗi refresh lịch sử giao dịch: " + e.getMessage());
-        }
+                List<Transaction> transactions = loadTransactionsForUser();
+                Platform.runLater(() -> {
+                    allTransactions = new ArrayList<>(transactions);
+                    applyTransactionFilters();
+                });
+            } catch (Exception e) {
+                LoggerUtil.error("Lỗi refresh lịch sử giao dịch: " + e.getMessage());
+            }
+        }).start();
 
-        resetWalletViewState();
+        Platform.runLater(this::resetWalletViewState);
     }
 
     private ClientSocket getActiveSocket() {
@@ -531,37 +568,8 @@ public class WalletController implements Initializable {
         client.util.DialogUtil.showAlert(type, title, null, msg, rootPane != null ? rootPane : balanceLabel);
     }
 
-    private void saveBankAccountForCurrentUser(String bank, String account, double amount) throws Exception {
-        walletService.saveBankAccount(currentUser, bank, account, amount);
-    }
 
-    private BankAccountEntry loadBankAccountForCurrentUser() {
-        return walletService.loadBankAccount(currentUser);
-    }
 
-    private void refreshLinkedBankDisplay(String bank, String account) {
-        refreshLinkedBankDisplayOnly(bank, account);
-        resetWalletViewState();
-        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Liên kết ngân hàng thành công!");
-    }
-
-    private void refreshLinkedBankDisplayOnly(String bank, String account) {
-        if (displayBankName != null) {
-            displayBankName.setText(bank == null ? "" : bank.toUpperCase());
-        }
-        if (displayAccNumber != null) {
-            String acc = account == null ? "" : account;
-            displayAccNumber.setText(acc.length() >= 4 ? "**** **** **** " + acc.substring(acc.length() - 4) : acc);
-        }
-        if (addBankBox != null) {
-            addBankBox.setVisible(false);
-            addBankBox.setManaged(false);
-        }
-        if (linkedBankBox != null) {
-            linkedBankBox.setVisible(true);
-            linkedBankBox.setManaged(true);
-        }
-    }
 
     private void loadTransactionHistory() {
         try {
@@ -579,11 +587,24 @@ public class WalletController implements Initializable {
     }
 
     private void saveTransaction(String type, double amount, double balanceAfter) throws Exception {
-        walletService.saveTransaction(currentUser, type, amount, balanceAfter);
+
     }
 
     private List<Transaction> loadTransactionsForUser() throws Exception {
-        return walletService.loadTransactions(currentUser);
+        Message response = walletService.fetchTransactions(getActiveSocket(), currentUser);
+        if (response != null && "SUCCESS".equals(response.getStatus())) {
+            Object data = response.getData();
+            if (data instanceof List<?> list) {
+                List<Transaction> result = new ArrayList<>();
+                for (Object obj : list) {
+                    if (obj instanceof Transaction t) {
+                        result.add(t);
+                    }
+                }
+                return result;
+            }
+        }
+        return new ArrayList<>();
     }
     private void showTransactions(List<Transaction> list) {
         transactionTable.getItems().clear();
@@ -704,4 +725,89 @@ public class WalletController implements Initializable {
         transition.setToY(1);
         transition.play();
     }
+
+
+    private static class BankAccountEntry {
+        String bankName;
+        String accountNumber;
+
+        BankAccountEntry(String bankName, String accountNumber) {
+            this.bankName = bankName;
+            this.accountNumber = accountNumber;
+        }
+    }
+
+    private BankAccountEntry loadBankAccountForCurrentUser() {
+        if (currentUser == null) {
+            return null;
+        }
+
+        try {
+            ClientSocket socket = getActiveSocket();
+            if (socket == null) {
+                LoggerUtil.warn("No active socket to load bank account");
+                return null;
+            }
+
+            Message request = new Message();
+            request.setType(MessageType.GET_BANK_ACCOUNT);
+            request.setSenderId(currentUser.getUsername());
+
+            Message response = socket.sendAndReceive(request);
+
+            if (response != null && "SUCCESS".equals(response.getStatus()) && response.getData() != null) {
+                @SuppressWarnings("unchecked")
+                Map<String, String> bankData = (Map<String, String>) response.getData();
+                String bankName = bankData.get("bankName");
+                String accountNumber = bankData.get("accountNumber");
+
+                if (bankName != null && accountNumber != null) {
+                    return new BankAccountEntry(bankName, accountNumber);
+                }
+            }
+        } catch (Exception e) {
+            LoggerUtil.warn("Non-critical: Failed to load bank account: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    private void saveBankAccountForCurrentUser(String bankName, String accountNumber, double initialBalance) throws Exception {
+        if (currentUser == null || clientSocket == null) {
+            throw new IOException("User or socket is null");
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("bankName", bankName);
+        data.put("accountNumber", accountNumber);
+        data.put("initialBalance", initialBalance);
+
+        Message request = new Message();
+        request.setType(MessageType.LINK_BANK);
+        request.setData(data);
+        request.setSenderId(currentUser.getUsername());
+
+        Message response = clientSocket.sendAndReceive(request);
+
+        if (response == null || !"SUCCESS".equals(response.getStatus())) {
+            throw new Exception(response != null ? response.getMessage() : "Failed to link bank account");
+        }
+    }
+
+    private void refreshLinkedBankDisplay(String bankName, String accountNumber) {
+        if (displayBankName != null) {
+            displayBankName.setText(bankName.toUpperCase());
+        }
+        if (displayAccNumber != null) {
+            String acc = accountNumber == null ? "" : accountNumber;
+            displayAccNumber.setText(acc.length() >= 4 ? "**** **** **** " + acc.substring(acc.length() - 4) : acc);
+        }
+        if (addBankBox != null && linkedBankBox != null) {
+            addBankBox.setVisible(false);
+            addBankBox.setManaged(false);
+            linkedBankBox.setVisible(true);
+            linkedBankBox.setManaged(true);
+        }
+    }
+
 }

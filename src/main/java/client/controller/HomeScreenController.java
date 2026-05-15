@@ -202,9 +202,19 @@ public class HomeScreenController {
 
     public void loadWalletView() {
         updateMenuSelection(menuPay);
-        loadView("/fxml/BidderView/WalletView.fxml", controller -> {
+        loadView("/fxml/WalletView.fxml", controller -> {
             if (controller instanceof WalletController walletController) {
-                User user = currentUser != null ? currentUser : NavigationManager.getInstance().getCurrentUser();
+                // ← LUÔN lấy user MỚI NHẤT từ NavigationManager trước
+                User user = NavigationManager.getInstance().getCurrentUser();
+                if (user == null) {
+                    user = currentUser;  // Fallback
+                }
+
+                // ← Cập nhật currentUser của HomeScreenController
+                if (user != null) {
+                    this.currentUser = user;  // THÊM: Sync local currentUser
+                }
+
                 ClientSocket socket = clientSocket != null
                         ? clientSocket
                         : ConnectionManager.getInstance().getClientSocket();

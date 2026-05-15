@@ -2,7 +2,7 @@ package server.service;
 
 import server.model.RegularUser;
 import server.model.User;
-import server.repository.JsonUserRepository;
+import server.repository.SqlUserRepository;
 import server.repository.UserRepository;
 import util.LoggerUtil;
 
@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class UserService {
-    private static final UserService DEFAULT = new UserService(new JsonUserRepository());
-
+    private static final UserService DEFAULT = new UserService(new SqlUserRepository());
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
