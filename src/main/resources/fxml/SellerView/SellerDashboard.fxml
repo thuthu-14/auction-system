@@ -1,18 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <VBox spacing="0" stylesheets="@/CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerDashboardController">
-
-
     <!-- CARDS GRID -->
     <ScrollPane vbarPolicy="NEVER" fitToWidth="true" styleClass="bar" VBox.vgrow="ALWAYS">
         <VBox styleClass="dashboard-cards-container">
-
             <!-- ROW 1: Tạo phiên + Quản lý phiên -->
             <HBox spacing="16">
-
                 <VBox fx:id="cardTaoPhien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
                         <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-purple" text="+" />
@@ -26,7 +20,6 @@
                         <Label styleClass="card-cta card-cta-purple" text="Bắt đầu →" />
                     </HBox>
                 </VBox>
-
                 <VBox fx:id="cardQuanLyPhien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
                         <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-teal" text="⚖" />
@@ -40,12 +33,9 @@
                         <Label styleClass="card-cta card-cta-teal" text="Xem ngày →" />
                     </HBox>
                 </VBox>
-
             </HBox>
-
             <!-- ROW 2: Thống kê + Thông báo -->
             <HBox spacing="16">
-
                 <VBox fx:id="cardThongKe" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
                         <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-orange" text="📊" />
@@ -59,7 +49,6 @@
                         <Label styleClass="card-cta card-cta-orange" text="Phân tích →" />
                     </HBox>
                 </VBox>
-
                 <VBox fx:id="cardThongBao" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
                         <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-pink" text="🔔" />
@@ -73,9 +62,7 @@
                         <Label styleClass="card-cta card-cta-pink" text="Đọc thêm →" />
                     </HBox>
                 </VBox>
-
             </HBox>
-
             <!-- ROW 3: Ví tiền full width -->
             <HBox>
                 <VBox fx:id="cardViTien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
@@ -92,8 +79,6 @@
                     </HBox>
                 </VBox>
             </HBox>
-
         </VBox>
     </ScrollPane>
-
 </VBox>
