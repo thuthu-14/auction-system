@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<ScrollPane fx:id="categoryRoot" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.CategoryController">
+    <VBox alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+        </padding>
+        <children>
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <children>
+                    <Button fx:id="backBtn" style="-fx-background-color: white; -fx-background-radius: 20; -fx-border-color: #e2e8f0; -fx-border-radius: 20; -fx-cursor: hand;" text="&lt; Quay lại" textFill="#1a1a1a">
+                        <font>
+                            <Font name="System Bold" size="14.0" />
+                        </font>
+                        <padding>
+                            <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
+                        </padding>
+                    </Button>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label text="🏺 Đồ sưu tầm" textFill="#1a1a1a">
+                        <font>
+                            <Font name="System Bold" size="28.0" />
+                        </font>
+                    </Label>
+                    <Region HBox.hgrow="ALWAYS" />
+                </children>
+            </HBox>
+            <StackPane prefHeight="220.0" style="-fx-background-color: #fef3c7; -fx-background-radius: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 8);" VBox.vgrow="NEVER">
+                <children>
+                    <HBox alignment="CENTER_LEFT" spacing="40.0">
+                        <padding>
+                            <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
+                        </padding>
+                        <children>
+                            <VBox alignment="CENTER_LEFT" spacing="15.0" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label style="-fx-background-color: #f59e0b; -fx-background-radius: 10; -fx-padding: 5 10 5 10;" text="TIÊU ĐIỂM" textFill="white">
+                                        <font>
+                                            <Font name="System Bold" size="12.0" />
+                                        </font>
+                                    </Label>
+                                    <Label fx:id="heroTitleLabel" text="Bình gốm sứ cổ triều Minh" textFill="#1a1a1a" wrapText="true">
+                                        <font>
+                                            <Font name="System Bold" size="32.0" />
+                                        </font>
+                                    </Label>
+                                    <Label fx:id="heroDescriptionLabel" maxWidth="400.0" text="Kèm theo mô tả sản phẩm" textFill="#78350f" wrapText="true">
+                                        <font>
+                                            <Font size="15.0" />
+                                        </font>
+                                    </Label>
+                                    <Button fx:id="heroBidButton" style="-fx-background-color: #1a1a1a; -fx-background-radius: 20; -fx-cursor: hand;" text="Đấu giá ngay" textFill="white">
+                                        <font>
+                                            <Font name="System Bold" size="14.0" />
+                                        </font>
+                                        <padding>
+                                            <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />
+                                        </padding>
+                                    </Button>
+                                </children>
+                            </VBox>
+                            <StackPane maxHeight="160.0" maxWidth="160.0" minHeight="160.0" minWidth="160.0" prefHeight="160.0" prefWidth="160.0" style="-fx-background-color: white; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                                <ImageView fx:id="heroImageView" fitHeight="160.0" fitWidth="160.0" preserveRatio="false" smooth="true" visible="false" />
+                                <Label fx:id="heroIconLabel" style="-fx-font-size: 80;" text="🏺" />
+                            </StackPane>
+                        </children>
+                    </HBox>
+                </children>
+            </StackPane>
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+                <children>
+                    <Label text="Tất cả sản phẩm (124)" textFill="#718096">
+                        <font>
+                            <Font name="System Bold" size="16.0" />
+                        </font>
+                    </Label>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <ComboBox prefWidth="180.0" promptText="Sắp xếp: Mới nhất" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
+                </children>
+            </HBox>
+            <FlowPane fx:id="productsFlowPane" hgap="25.0" vgap="25.0">
+                <children></children>
+            </FlowPane>
+        </children>
+    </VBox>
+</ScrollPane>
