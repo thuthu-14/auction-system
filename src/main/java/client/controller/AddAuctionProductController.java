@@ -1,5 +1,7 @@
 package client.controller;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.AddAuctionProductClientService;
@@ -84,12 +86,12 @@ public class AddAuctionProductController implements Initializable {
                     break;
                 }
 
-                String imagePath = file.toURI().toString();
+                String imagePath = file.getAbsolutePath();
 
                 if (!selectedImagePaths.contains(imagePath)) {
                     selectedImagePaths.add(imagePath);
 
-                    ImageView imageView = new ImageView(new Image(imagePath));
+                    ImageView imageView = new ImageView(new Image(file.toURI().toString()));
                     imageView.setFitWidth(82.0);
                     imageView.setFitHeight(82.0);
                     imageView.setPreserveRatio(true);
@@ -146,7 +148,7 @@ public class AddAuctionProductController implements Initializable {
                 setupTimeOptions(formNode, config);
             }
         } catch (IOException e) {
-            LoggerUtil.error("Lỗi tai form danh muc: " + e.getMessage());
+            ClientExceptionHandler.showError(ClientErrorType.UI, "Load category form", e, categoryFormPane);
         }
     }
 
@@ -212,7 +214,7 @@ public class AddAuctionProductController implements Initializable {
     private String getCalendarStylesheet() {
         URL calendarCssUrl = getClass().getResource("/CSS/calendar.css");
         if (calendarCssUrl == null) {
-            LoggerUtil.error("Không tìm thấy CSS lịch: /CSS/calendar.css");
+            ClientExceptionHandler.handle(ClientErrorType.UI, "Missing calendar stylesheet", new IllegalStateException("/CSS/calendar.css"));
             return null;
         }
         return calendarCssUrl.toExternalForm();
@@ -243,6 +245,7 @@ public class AddAuctionProductController implements Initializable {
 
         try {
             Map<String, Object> payload = productService.buildPayload(
+                    socket,
                     currentUser,
                     productNameField.getText(),
                     descriptionArea.getText(),
@@ -278,13 +281,13 @@ public class AddAuctionProductController implements Initializable {
                     });
                 } catch (Exception e) {
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi kết nối", "Mất kết nối tới Server."));
-                    LoggerUtil.error("Lỗi khi tạo sản phẩm đấu giá: " + e.getMessage());
+                    ClientExceptionHandler.handle(ClientErrorType.NETWORK, "Publish auction product", e);
                 }
             }, "PublishAuctionProductThread").start();
         } catch (AddAuctionProductClientService.ValidationException e) {
             showAlert(Alert.AlertType.ERROR, e.getTitle(), e.getMessage());
         } catch (Exception e) {
-            LoggerUtil.error("Lỗi xử lý UI: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.UI, "Build auction product payload", e);
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Lỗi: " + e.getMessage());
         }
     }

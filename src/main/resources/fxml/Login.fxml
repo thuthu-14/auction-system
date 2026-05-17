@@ -1,25 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
-
 <HBox alignment="CENTER" minHeight="650.0" minWidth="1000.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.LoginController">
     <children>
         <StackPane minWidth="450.0" HBox.hgrow="ALWAYS">
             <children>
                 <VBox alignment="CENTER_LEFT" maxWidth="440.0" spacing="25.0">
                     <children>
-
                         <Label alignment="CENTER" prefHeight="55.0" prefWidth="443.0" styleClass="my-darley" stylesheets="@../CSS/style.css" text="Đăng nhập vào tài khoản">
                             <font>
                                 <Font name="System Bold" size="36.0" />
                             </font>
                         </Label>
-
                         <HBox alignment="CENTER_LEFT" prefHeight="55.0" style="-fx-background-color: #f7f7f7; -fx-background-radius: 20;">
                             <children>
                                 <Label style="-fx-padding: 0 0 0 20; -fx-font-size: 15;" styleClass="my-font2" stylesheets="@../CSS/style.css" text="Chưa có tài khoản?">
@@ -29,7 +25,6 @@
                                 </Label>
                                 <Region HBox.hgrow="ALWAYS" />
                                 <Button fx:id="registerButton" mnemonicParsing="false" onAction="#switchToSignup" prefHeight="40.0" prefWidth="130.0" style="-fx-background-color: #ffffff; -fx-background-radius: 17; -fx-border-radius: 17; -fx-border-color: #cccccc; -fx-cursor: hand;" styleClass="my-font" stylesheets="@../CSS/style.css" text="Tạo tài khoản">
-
                                     <font>
                                         <Font size="14.0" />
                                     </font>
@@ -39,13 +34,11 @@
                                 </Button>
                             </children>
                         </HBox>
-
                         <TextField fx:id="usernameField" prefHeight="55.0" promptText="Email" style="-fx-border-color: #dddddd; -fx-background-radius: 10; -fx-background-color: #f7f7f7; -fx-border-radius: 10; -fx-padding: 0 15 0 15;" styleClass="my-font2" stylesheets="@../CSS/style.css">
                             <font>
                                 <Font size="15.0" />
                             </font>
                         </TextField>
-
                         <StackPane alignment="CENTER_RIGHT">
                             <children>
                                 <TextField fx:id="mkShow" prefHeight="55.0" style="-fx-border-color: #dddddd; -fx-background-radius: 10; -fx-background-color: #f7f7f7; -fx-border-radius: 10; -fx-padding: 0 45 0 15;" styleClass="my-font2" stylesheets="@../CSS/style.css">
@@ -68,7 +61,6 @@
                                 </Button>
                             </children>
                         </StackPane>
-
                         <Button fx:id="loginButton" onAction="#handleLogin" prefHeight="60.0" prefWidth="440.0" style="-fx-background-color: #1a1a1a; -fx-border-radius: 30; -fx-background-radius: 30; -fx-cursor: hand;" stylesheets="@../CSS/style.css" text="Tiếp tục" textFill="WHITE">
                             <font>
                                 <Font name="System Bold" size="18.0" />
@@ -77,25 +69,12 @@
                                 <Insets top="15.0" />
                             </VBox.margin>
                         </Button>
-                        <Label fx:id="messageLabel"
-                               text=""
-                               textFill="#e53e3e"
-                               wrapText="true"
-                               maxWidth="440.0" />
-
-                        <ProgressIndicator fx:id="progressIndicator"
-                                           prefHeight="22.0"
-                                           prefWidth="22.0"
-                                           visible="false"
-                                           managed="false" />
-
-
-
+                        <Label fx:id="messageLabel" text="" textFill="#e53e3e" wrapText="true" maxWidth="440.0" />
+                        <ProgressIndicator fx:id="progressIndicator" prefHeight="22.0" prefWidth="22.0" visible="false" managed="false" />
                     </children>
                 </VBox>
             </children>
         </StackPane>
-
         <StackPane minWidth="550.0" style="-fx-padding: 40;" HBox.hgrow="ALWAYS">
             <children>
                 <ImageView fitHeight="699.0" fitWidth="600.0" pickOnBounds="true">
@@ -108,7 +87,5 @@
                 </ImageView>
             </children>
         </StackPane>
-
     </children>
 </HBox>
-

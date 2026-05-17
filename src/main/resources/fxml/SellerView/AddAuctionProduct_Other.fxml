@@ -1,47 +1,48 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
 <VBox maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;" stylesheets="@/CSS/table.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
-
     <HBox style="-fx-background-color: #f8fafc; -fx-background-radius: 8; -fx-padding: 12 16; -fx-border-color: #cbd5e1; -fx-border-radius: 8;">
         <VBox spacing="4" HBox.hgrow="ALWAYS">
             <Label prefHeight="19.0" prefWidth="370.0" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;" text="KHÁC - Các mặt hàng không nằm trong danh mục cố định" />
             <Label style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" text="Giá tối thiểu tùy chỉnh | Bước giá tùy chỉnh | 1-30 ngày" />
         </VBox>
     </HBox>
-
     <Label styleClass="field-label" text="Thông tin sản phẩm đấu giá" textFill="#1a1a1a">
-        <font><Font name="System Bold" size="18.0" /></font>
+        <font>
+            <Font name="System Bold" size="18.0" />
+        </font>
     </Label>
-
     <HBox maxWidth="1.7976931348623157E308" spacing="20.0">
         <VBox spacing="15.0" HBox.hgrow="ALWAYS">
             <HBox maxWidth="1.7976931348623157E308" spacing="20.0">
                 <VBox spacing="15.0" HBox.hgrow="ALWAYS">
                     <VBox spacing="5.0">
                         <Label styleClass="field-label" text="* Giá khởi điểm (VNĐ)" textFill="#4a5568">
-                            <font><Font name="System Bold" size="13.0" /></font>
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
                         </Label>
                         <TextField fx:id="otherStartPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Nhập giá khởi điểm" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
                     </VBox>
-
                     <VBox spacing="5.0">
                         <Label styleClass="field-label" text="Giá bảo lưu (VNĐ)" textFill="#4a5568">
-                            <font><Font name="System Bold" size="13.0" /></font>
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
                         </Label>
                         <TextField fx:id="otherReservePriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Để trống nếu bán mọi giá" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
                     </VBox>
-
                     <VBox spacing="5.0">
                         <Label styleClass="field-label" text="* Bước giá (VNĐ)" textFill="#4a5568">
-                            <font><Font name="System Bold" size="13.0" /></font>
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
                         </Label>
                         <TextField fx:id="otherStepPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Nhập bước giá mong muốn" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
                     </VBox>
@@ -49,16 +50,18 @@
             </HBox>
         </VBox>
     </HBox>
-
     <Separator />
     <Label styleClass="field-label" text="Thời gian phiên đấu giá: 1-30 ngày" textFill="#1a1a1a">
-        <font><Font name="System Bold" size="14.0" /></font>
+        <font>
+            <Font name="System Bold" size="14.0" />
+        </font>
     </Label>
-
     <HBox maxWidth="1.7976931348623157E308" spacing="20.0">
         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
             <Label styleClass="field-label" text="* Bắt đầu" textFill="#4a5568">
-                <font><Font name="System Bold" size="13.0" /></font>
+                <font>
+                    <Font name="System Bold" size="13.0" />
+                </font>
             </Label>
             <HBox spacing="5.0">
                 <DatePicker fx:id="otherStartDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Chọn ngày" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;" HBox.hgrow="ALWAYS" />
@@ -67,7 +70,9 @@
         </VBox>
         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
             <Label styleClass="field-label" text="* Kết thúc" textFill="#4a5568">
-                <font><Font name="System Bold" size="13.0" /></font>
+                <font>
+                    <Font name="System Bold" size="13.0" />
+                </font>
             </Label>
             <HBox spacing="5.0">
                 <DatePicker fx:id="otherEndDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Chọn ngày" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;" HBox.hgrow="ALWAYS" />

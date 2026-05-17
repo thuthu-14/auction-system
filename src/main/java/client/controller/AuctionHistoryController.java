@@ -1,5 +1,7 @@
 package client.controller;
-
+
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.AuctionHistoryClientService;
@@ -139,6 +141,7 @@ public class AuctionHistoryController {
                     return;
                 }
                 Map<String, Auction> auctionCache = new HashMap<>();
+                Map<String, Auction> localAuctionsById = historyService.loadLocalAuctionsById();
                 List<HistoryRow> rows = new ArrayList<>();
 
                 for (Bid bid : bids) {
@@ -150,11 +153,14 @@ public class AuctionHistoryController {
                     }
 
                     Auction auction = auctionCache.computeIfAbsent(bid.getAuctionId(), this::fetchAuction);
+                    if (auction == null) {
+                        auction = localAuctionsById.get(bid.getAuctionId());
+                    }
                     if (auction != null) {
                         rows.add(new HistoryRow(bid, auction));
                     }
                 }
-                addWonAuctionRows(rows, historyService.loadLocalAuctionsById(), historyService.loadLocalBids(currentUser, false));
+                addWonAuctionRows(rows, localAuctionsById, historyService.loadLocalBids(currentUser, false));
 
                 rows.sort(Comparator.comparingLong((HistoryRow row) -> row.bid.getBidTime()).reversed());
                 Platform.runLater(() -> {
@@ -163,7 +169,7 @@ public class AuctionHistoryController {
                     applyFilters();
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Load auction history failed: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Load auction history failed: " + e.getMessage())));
                 loadHistoryFromLocalFiles(List.of(), true);
             }
         }, "AuctionHistoryLoader").start();
@@ -202,7 +208,7 @@ public class AuctionHistoryController {
                 });
                 LoggerUtil.info("Auction history local rows loaded: " + rows.size());
             } catch (Exception e) {
-                LoggerUtil.error("Load local auction history failed: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Load local auction history failed: " + e.getMessage())));
                 Platform.runLater(() -> DialogUtil.showAlert(
                         Alert.AlertType.ERROR,
                         "L\u1ed7i",
@@ -217,7 +223,7 @@ public class AuctionHistoryController {
         try {
             return historyService.fetchAuction(clientSocket, currentUser, auctionId);
         } catch (Exception e) {
-            LoggerUtil.error("Fetch auction failed: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Fetch auction failed: " + e.getMessage())));
             return null;
         }
     }
@@ -392,7 +398,7 @@ public class AuctionHistoryController {
 
             HistoryRow row = getTableView().getItems().get(getIndex());
             if (row.isActive()) {
-                button.setText(row.isOutbid() ? "Tr\u1ea3 gi\u00e1 ti\u1ebfp" : "\u0110\u1ea5u gi\u00e1 ngày");
+                button.setText(row.isOutbid() ? "Tr\u1ea3 gi\u00e1 ti\u1ebfp" : "\u0110\u1ea5u gi\u00e1 ngay");
                 button.setStyle("-fx-background-color: #111827; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-weight: 700; -fx-cursor: hand;");
                 button.setOnAction(event -> homeController.loadAuctionDetailView(row.auction, false));
             } else if (row.isWinner()) {
@@ -456,3 +462,4 @@ public class AuctionHistoryController {
         }
     }
 }
+

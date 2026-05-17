@@ -1,5 +1,7 @@
 package client.controller;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.AuctionBidClientService;
@@ -272,7 +274,7 @@ public class AuctionDetailController {
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Place bid failed: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Place bid failed: " + e.getMessage())));
                 Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Mất kết nối server"));
             } finally {
                 Platform.runLater(() -> {
@@ -469,7 +471,7 @@ public class AuctionDetailController {
                     });
                 }
             } catch (Exception e) {
-                LoggerUtil.error("Bid history refresh failed: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Bid history refresh failed: " + e.getMessage())));
                 if (allowFallbackWhenEmpty) {
                     List<Bid> localBids = bidClientService.loadLocalBidHistory(requestedAuctionId);
                     Platform.runLater(() -> {
@@ -864,7 +866,7 @@ public class AuctionDetailController {
                 thumbnailBox.getChildren().add(thumbnailFrame);
             }
         } catch (Exception e) {
-            LoggerUtil.error("Image load failed: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Image load failed: " + e.getMessage())));
         }
     }
 
@@ -898,7 +900,14 @@ public class AuctionDetailController {
             return formattedPath;
         }
 
-        return new File(formattedPath).toURI().toString();
+        File file = new File(formattedPath);
+        if (!file.isAbsolute()) {
+            file = new File(System.getProperty("user.dir"), formattedPath);
+            if (!file.exists() && formattedPath.startsWith("uploads/")) {
+                file = new File(System.getProperty("user.dir"), "data/" + formattedPath);
+            }
+        }
+        return file.toURI().toString();
     }
 
     private void renderProductDetails(JsonObject itemData, JsonObject productData) {
@@ -1093,3 +1102,4 @@ public class AuctionDetailController {
         okButton.requestFocus();
     }
 }
+

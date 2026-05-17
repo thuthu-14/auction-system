@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
@@ -14,11 +13,9 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
 <ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" stylesheets="@../../CSS/detail.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionDetailController">
     <content>
         <VBox spacing="20.0" style="-fx-background-color: #f8fafc;">
@@ -26,7 +23,6 @@
                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
             </padding>
             <children>
-
                 <AnchorPane style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 30;">
                     <children>
                         <HBox alignment="CENTER_LEFT" spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -41,20 +37,17 @@
                                         <HBox fx:id="thumbnailBox" alignment="CENTER_LEFT" minHeight="92.0" prefHeight="92.0" spacing="12.0" />
                                     </children>
                                 </VBox>
-
                                 <Region HBox.hgrow="ALWAYS" />
-
                                 <VBox maxWidth="560.0" minWidth="420.0" prefWidth="520.0" spacing="20.0">
                                     <children>
-                                        <Label fx:id="productNameLabel" managed="false" text="Tên Sản Phẩm Đang Load..." visible="false" wrapText="true">
+                                        <Label fx:id="productNameLabel" managed="false" text="Tên sản phẩm đang tải..." visible="false" wrapText="true">
                                             <font>
                                                 <Font name="System Bold" size="24.0" />
                                             </font>
                                         </Label>
-
                                         <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" spacing="10.0" style="-fx-background-color: #f8fafc; -fx-padding: 10 15; -fx-border-radius: 8;">
                                             <children>
-                                                <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #4b5563;" text="⏱ KẾT THÚC TRONG" />
+                                                <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #4b5563;" text="KẾT THÚC TRONG" />
                                                 <HBox spacing="5.0">
                                                     <children>
                                                         <Label fx:id="hourLabel" alignment="CENTER" prefWidth="35.0" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 6; -fx-padding: 5;" text="00" />
@@ -66,45 +59,39 @@
                                                 </HBox>
                                             </children>
                                         </HBox>
-
                                         <VBox style="-fx-padding: 15 0;">
                                             <children>
                                                 <Label style="-fx-text-fill: #6b7280; -fx-font-size: 14px;" text="Giá dẫn đầu hiện tại" />
                                                 <Label fx:id="currentPriceLabel" style="-fx-text-fill: #111827; -fx-font-size: 36px; -fx-font-weight: bold;" text="0 đ" />
                                             </children>
                                         </VBox>
-
                                         <Region prefHeight="1.0" style="-fx-background-color: #e2e8f0;" />
-
                                         <VBox fx:id="bidActionBox" maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-border-radius: 8; -fx-border-color: #e2e8f0;">
                                             <children>
                                                 <Label style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #111827;" text="Mức giá bạn muốn đặt" />
                                                 <HBox alignment="CENTER" spacing="15.0">
                                                     <children>
                                                         <Button fx:id="decreaseBidBtn" onAction="#handleDecreaseBid" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand;" text="-" />
-
                                                         <TextField fx:id="bidAmountField" alignment="CENTER" prefHeight="45.0" prefWidth="200.0" style="-fx-background-color: white; -fx-border-color: #111827; -fx-border-width: 2; -fx-border-radius: 6; -fx-font-size: 18px; -fx-font-weight: bold;" text="0" />
-
                                                         <Button fx:id="increaseBidBtn" onAction="#handleIncreaseBid" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" style="-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand;" text="+" />
                                                     </children>
                                                 </HBox>
                                                 <Button fx:id="confirmBidBtn" onAction="#handleConfirmBid" mnemonicParsing="false" prefHeight="55.0" maxWidth="1.7976931348623157E308" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="XÁC NHẬN ĐẤU GIÁ" />
                                             </children>
                                         </VBox>
-                                        <Label fx:id="endedAuctionLabel" alignment="CENTER" managed="false" maxWidth="1.7976931348623157E308" prefHeight="82.0" style="-fx-background-color: #fff1f2; -fx-border-color: #fecdd3; -fx-background-radius: 8; -fx-border-radius: 8; -fx-text-fill: #dc2626; -fx-font-size: 24px; -fx-font-weight: bold;" text="?? KẾT THÚC" visible="false" />
+                                        <Label fx:id="endedAuctionLabel" alignment="CENTER" managed="false" maxWidth="1.7976931348623157E308" prefHeight="82.0" style="-fx-background-color: #fff1f2; -fx-border-color: #fecdd3; -fx-background-radius: 8; -fx-border-radius: 8; -fx-text-fill: #dc2626; -fx-font-size: 24px; -fx-font-weight: bold;" text="ĐÃ KẾT THÚC" visible="false" />
                                     </children>
                                 </VBox>
                             </children>
                         </HBox>
                     </children>
                 </AnchorPane>
-
                 <VBox spacing="30.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 30;">
                     <children>
                         <VBox spacing="20.0">
                             <children>
                                 <Label maxWidth="1.7976931348623157E308" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #111827; -fx-background-color: #f1f5f9; -fx-padding: 10 20; -fx-background-radius: 4;" text="BIỂU ĐỒ LƯỢT ĐẶT GIÁ" />
-                <ScrollPane fx:id="bidHistoryScrollPane" fitToHeight="true" fitToWidth="false" hbarPolicy="NEVER" pannable="true" prefHeight="430.0" styleClass="transparent-chart-scroll" vbarPolicy="NEVER">
+                                <ScrollPane fx:id="bidHistoryScrollPane" fitToHeight="true" fitToWidth="false" hbarPolicy="NEVER" pannable="true" prefHeight="430.0" styleClass="transparent-chart-scroll" vbarPolicy="NEVER">
                                     <content>
                                         <LineChart fx:id="bidHistoryChart" animated="false" createSymbols="true" legendVisible="false" minWidth="900.0" prefHeight="400.0" prefWidth="900.0" styleClass="bid-history-chart">
                                             <xAxis>
@@ -118,11 +105,9 @@
                                 </ScrollPane>
                             </children>
                         </VBox>
-
                         <VBox spacing="20.0">
                             <children>
                                 <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #111827; -fx-background-color: #f1f5f9; -fx-padding: 10 20; -fx-background-radius: 4;" text="CHI TIẾT SẢN PHẨM" maxWidth="1.7976931348623157E308" />
-
                                 <GridPane fx:id="dynamicDetailsGrid" hgap="30.0" vgap="15.0">
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="100.0" prefWidth="120.0" />
@@ -131,7 +116,6 @@
                                 </GridPane>
                             </children>
                         </VBox>
-
                         <VBox spacing="20.0">
                             <children>
                                 <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #111827; -fx-background-color: #f1f5f9; -fx-padding: 10 20; -fx-background-radius: 4;" text="MÔ TẢ SẢN PHẨM" maxWidth="1.7976931348623157E308" />
@@ -144,7 +128,6 @@
                         </VBox>
                     </children>
                 </VBox>
-
             </children>
         </VBox>
     </content>

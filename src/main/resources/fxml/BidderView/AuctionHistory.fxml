@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -13,7 +12,6 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
 <VBox stylesheets="@/CSS/table.css" alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionHistoryController">
     <padding>
         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
@@ -33,23 +31,17 @@
                 </Label>
             </children>
         </VBox>
-
         <Separator prefWidth="200.0" style="-fx-opacity: 0.3;" />
-
         <HBox alignment="CENTER_LEFT" spacing="15.0">
             <children>
                 <ComboBox fx:id="statusFilter" prefHeight="45.0" prefWidth="180.0" promptText="Tất cả trạng thái" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px; -fx-cursor: hand;" />
-
                 <ComboBox fx:id="timeFilter" prefHeight="45.0" prefWidth="160.0" promptText="Tháng này" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px; -fx-cursor: hand;" />
-
                 <Region HBox.hgrow="ALWAYS" />
-
                 <TextField fx:id="searchField" prefHeight="45.0" prefWidth="280.0" promptText="Nhập tên sản phẩm..." style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-border-color: transparent; -fx-padding: 0 15 0 15;">
                     <font>
                         <Font size="14.0" />
                     </font>
                 </TextField>
-
                 <Button onAction="#handleSearch" prefHeight="45.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 10; -fx-cursor: hand;" text="Tìm kiếm" textFill="white">
                     <font>
                         <Font name="System Bold" size="14.0" />
@@ -60,7 +52,6 @@
                 </Button>
             </children>
         </HBox>
-
         <VBox style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: #f3f4f6; -fx-border-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 5);" VBox.vgrow="ALWAYS">
             <children>
                 <TableView fx:id="historyTable" fixedCellSize="60.0" prefHeight="450.0" style="-fx-background-color: transparent; -fx-font-size: 14px; -fx-selection-bar: #f1f5f9;" VBox.vgrow="ALWAYS">

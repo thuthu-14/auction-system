@@ -2,6 +2,15 @@
     -fx-background-color: transparent;
     -fx-background-radius: 8;
     -fx-cursor: hand;
+    -fx-min-height: 45px;
+    -fx-pref-height: 45px;
+    -fx-max-height: 45px;
+}
+
+.menu-item .button {
+    -fx-font-size: 17px;
+    -fx-font-weight: normal;
+    -fx-background-color: transparent;
 }
 
 .menu-item:hover {
@@ -11,11 +20,16 @@
 
 .menu-item:hover .button {
     -fx-text-fill: #1a1a1a;
-    -fx-font-weight: bold;
+    -fx-font-size: 17px;
+    -fx-font-weight: normal;
 }
 
 .menu-item-active {
     -fx-background-color: #e6f0fd;
     -fx-background-radius: 8;
 }
-.menu-item-active .button { -fx-text-fill: #3b82f6; }
+.menu-item-active .button {
+    -fx-text-fill: #3b82f6;
+    -fx-font-size: 17px;
+    -fx-font-weight: normal;
+}
