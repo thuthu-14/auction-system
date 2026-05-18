@@ -241,6 +241,7 @@ public class SellerAuctionDetailsController {
         confirm.setTitle("H\u1ee7y phi\u00ean \u0111\u1ea5u gi\u00e1");
         confirm.setHeaderText("X\u00e1c nh\u1eadn h\u1ee7y phi\u00ean?");
         confirm.setContentText("H\u1ec7 th\u1ed1ng s\u1ebd k\u1ebft th\u00fac phi\u00ean v\u00e0 ho\u00e0n ti\u1ec1n cho t\u1ea5t c\u1ea3 ng\u01b0\u1eddi \u0111\u00e3 \u0111\u1eb7t gi\u00e1.");
+        client.util.DialogUtil.prepareDialog(confirm, cancelAuctionButton);
         if (confirm.showAndWait().orElse(ButtonType.CANCEL) != ButtonType.OK) {
             return;
         }

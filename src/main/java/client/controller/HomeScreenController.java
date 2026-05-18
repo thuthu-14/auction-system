@@ -215,6 +215,7 @@ public class HomeScreenController {
                 if (socket != null) {
                     this.clientSocket = socket;
                 }
+                walletController.setViewMode(WalletController.WalletViewMode.BIDDER);
                 walletController.setUserData(user, socket);
                 walletController.reloadWalletData();
             }

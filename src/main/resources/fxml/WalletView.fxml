@@ -42,20 +42,20 @@
                                 <Region VBox.vgrow="ALWAYS" />
                                 <HBox spacing="15.0">
                                     <children>
-                                        <Button onAction="#handleDeposit" prefHeight="45.0" prefWidth="133.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Nạp tiền" textFill="white">
+                                        <Button fx:id="depositButton" onAction="#handleDeposit" prefHeight="50.0" prefWidth="185.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 25; -fx-cursor: hand;" text="Nạp tiền" textFill="white">
                                             <font>
-                                                <Font name="System Bold" size="14.0" />
+                                                <Font name="System Bold" size="18.0" />
                                             </font>
                                             <padding>
-                                                <Insets left="30.0" right="30.0" />
+                                                <Insets left="32.0" right="32.0" />
                                             </padding>
                                         </Button>
-                                        <Button onAction="#handleWithdraw" prefHeight="45.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 22.5; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Rút tiền" textFill="#1a1a1a">
+                                        <Button fx:id="withdrawButton" onAction="#handleWithdraw" prefHeight="50.0" prefWidth="165.0" style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 25; -fx-background-radius: 25; -fx-cursor: hand;" text="Rút tiền" textFill="#1a1a1a">
                                             <font>
-                                                <Font name="System Bold" size="14.0" />
+                                                <Font name="System Bold" size="18.0" />
                                             </font>
                                             <padding>
-                                                <Insets left="30.0" right="30.0" />
+                                                <Insets left="32.0" right="32.0" />
                                             </padding>
                                         </Button>
                                     </children>

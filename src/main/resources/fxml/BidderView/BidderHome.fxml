@@ -143,9 +143,11 @@
                                 </Button>
                             </children>
                         </HBox>
-                        <StackPane fx:id="contentArea" minWidth="0.0" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                            <content>
+                        <StackPane fx:id="contentArea" minWidth="0.0" style="-fx-background-color: #fcfcfc;">
                             <children>
-                                <VBox alignment="CENTER" spacing="10.0">
+                                <VBox alignment="CENTER" minHeight="600" spacing="10.0">
                                     <children>
                                         <Label style="-fx-translate-x: -3;" text="Chào mừng đến với BubblyBid" textFill="#2e384d">
                                             <font>
@@ -161,6 +163,8 @@
                                 </VBox>
                             </children>
                         </StackPane>
+                            </content>
+                        </ScrollPane>
                     </children>
                 </VBox>
             </children>

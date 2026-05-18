@@ -211,8 +211,10 @@ public class SellerWinnerInfoController {
 
     private void showInfo(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText(null);
+        alert.setTitle("Thông báo");
+        alert.setHeaderText("Thông báo");
         alert.setContentText(message);
+        client.util.DialogUtil.prepareDialog(alert, winnerName);
         alert.showAndWait();
     }
 

@@ -257,6 +257,7 @@ public class SellerHomeController {
                 ClientSocket socket = clientSocket != null
                         ? clientSocket
                         : NavigationManager.getInstance().getClientSocket();
+                walletController.setViewMode(WalletController.WalletViewMode.SELLER);
                 walletController.setUserData(user, socket);
                 walletController.reloadWalletData();
             } else {

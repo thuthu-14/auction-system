@@ -57,6 +57,8 @@ public class WalletController implements Initializable {
     @FXML private VBox linkedBankBox;
     @FXML private Label displayBankName;
     @FXML private Label displayAccNumber;
+    @FXML private Button depositButton;
+    @FXML private Button withdrawButton;
 
     @FXML private TableView<Transaction> transactionTable;
     @FXML private TableColumn<Transaction, String> dateColumn;
@@ -71,9 +73,14 @@ public class WalletController implements Initializable {
     private List<Transaction> allTransactions = new ArrayList<>();
     private TransactionFilter activeTransactionFilter = TransactionFilter.ALL;
     private final WalletService walletService = new WalletService();
+    private WalletViewMode viewMode = WalletViewMode.BIDDER;
 
     private enum TransactionFilter {
         ALL, IN, OUT
+    }
+
+    public enum WalletViewMode {
+        BIDDER, SELLER
     }
 
     private static final String ACTIVE_FILTER_STYLE =
@@ -100,6 +107,45 @@ public class WalletController implements Initializable {
         if (balanceColumn != null) balanceColumn.setCellValueFactory(new PropertyValueFactory<>("formattedBalanceAfter"));
         if (descriptionColumn != null) descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         setupTransactionRowPopup();
+        applyViewMode();
+    }
+
+    public void setViewMode(WalletViewMode viewMode) {
+        this.viewMode = viewMode == null ? WalletViewMode.BIDDER : viewMode;
+        Platform.runLater(this::applyViewMode);
+    }
+
+    private void applyViewMode() {
+        if (viewMode == WalletViewMode.SELLER) {
+            applyWalletButtonSize(170, 48, 17);
+        } else {
+            applyWalletButtonSize(185, 50, 18);
+        }
+    }
+
+    private void applyWalletButtonSize(double depositWidth, double height, double fontSize) {
+        applyWalletButtonSize(depositButton, depositWidth, height, fontSize);
+        applyWalletButtonSize(withdrawButton, depositWidth - 20, height, fontSize);
+    }
+
+    private void applyWalletButtonSize(Button button, double width, double height, double fontSize) {
+        if (button == null) {
+            return;
+        }
+        button.setPrefWidth(width);
+        button.setPrefHeight(height);
+        button.setMinWidth(width);
+        button.setMinHeight(height);
+        String colorStyle = button == depositButton
+                ? "-fx-background-color: #1a1a1a;"
+                : "-fx-background-color: white; -fx-border-color: #e2e8f0;";
+        double radius = height / 2.0;
+        button.setStyle(colorStyle
+                + " -fx-border-radius: " + radius + ";"
+                + " -fx-background-radius: " + radius + ";"
+                + " -fx-cursor: hand;");
+        button.setFont(javafx.scene.text.Font.font("System", javafx.scene.text.FontWeight.BOLD, fontSize));
+        button.setPadding(new Insets(0, 28, 0, 28));
     }
 
     private void setupTransactionRowPopup() {
@@ -587,16 +633,36 @@ public class WalletController implements Initializable {
 
     @FXML private void handleDeposit() {
         BankAccountEntry bankEntry = loadBankAccountForCurrentUser();
-        if (bankEntry == null) { showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng liên kết ngân hàng trước"); return; }
+        if (bankEntry == null) {
+            promptBankLinkBeforeTransaction();
+            return;
+        }
 
         showTransactionPopup("DEPOSIT", bankEntry);
     }
 
     @FXML private void handleWithdraw() {
         BankAccountEntry bankEntry = loadBankAccountForCurrentUser();
-        if (bankEntry == null) { showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng liên kết ngân hàng trước"); return; }
+        if (bankEntry == null) {
+            promptBankLinkBeforeTransaction();
+            return;
+        }
 
         showTransactionPopup("WITHDRAW", bankEntry);
+    }
+
+    private void promptBankLinkBeforeTransaction() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Cần liên kết ngân hàng");
+        alert.setHeaderText("Cần liên kết ngân hàng");
+        alert.setContentText("Vui lòng liên kết tài khoản ngân hàng trước khi nạp hoặc rút tiền.");
+        alert.getButtonTypes().setAll(ButtonType.CANCEL, ButtonType.OK);
+
+        client.util.DialogUtil.prepareDialog(alert, rootPane);
+
+        alert.showAndWait()
+                .filter(ButtonType.OK::equals)
+                .ifPresent(button -> showAddBankPopup());
     }
 
     private void showTransactionPopup(String type, BankAccountEntry bankEntry) {
@@ -886,7 +952,8 @@ public class WalletController implements Initializable {
     }
 
     private void saveBankAccountForCurrentUser(String bankName, String accountNumber, double initialBalance) throws Exception {
-        if (currentUser == null || clientSocket == null) {
+        ClientSocket socket = getActiveSocket();
+        if (currentUser == null || socket == null) {
             throw new IOException("User or socket is null");
         }
 
@@ -900,7 +967,7 @@ public class WalletController implements Initializable {
         request.setData(data);
         request.setSenderId(currentUser.getUsername());
 
-        Message response = clientSocket.sendAndReceive(request);
+        Message response = socket.sendAndReceive(request);
 
         if (response == null || !"SUCCESS".equals(response.getStatus())) {
             throw new Exception(response != null ? response.getMessage() : "Failed to link bank account");

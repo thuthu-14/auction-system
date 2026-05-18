@@ -117,7 +117,7 @@ public class WalletAccountService {
     public Map<String, String> getBankAccount(User user) throws Exception {
         requireUser(user);
         if (!bankAccountRepository.hasBankAccount(user.getUserId())) {
-            throw new IllegalStateException("Ban chua lien ket tai khoan ngan hang");
+            return null;
         }
         return bankAccountRepository.getBankAccount(user.getUserId());
     }
