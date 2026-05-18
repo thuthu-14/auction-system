@@ -5,6 +5,7 @@ import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.AuctionBidClientService;
+import client.service.ImageDownloadService;
 import com.google.gson.JsonObject;
 import common.AuctionStatus;
 import common.ItemCategory;
@@ -823,8 +824,8 @@ public class AuctionDetailController {
         renderImageGallery(item.getImages());
     }
 
-    private void renderImageGallery(List<String> imagePaths) {
-        if (mainImageView == null || imagePaths == null || imagePaths.isEmpty()) {
+    private void renderImageGallery(List<String> imageIds) {
+        if (mainImageView == null || imageIds == null || imageIds.isEmpty()) {
             return;
         }
 
@@ -834,40 +835,81 @@ public class AuctionDetailController {
         }
 
         List<StackPane> thumbnailFrames = new ArrayList<>();
-        try {
-            Image firstImage = new Image(toImageUrl(imagePaths.get(0)), true);
-            mainImageView.setImage(firstImage);
 
-            if (thumbnailBox == null) {
-                return;
-            }
+        // Load first image
+        String firstImageId = imageIds.get(0);
+        loadAndDisplayImage(firstImageId, mainImageView, true);
 
-            for (int i = 0; i < imagePaths.size(); i++) {
-                String imageUrl = toImageUrl(imagePaths.get(i));
-                Image thumbnailImage = new Image(imageUrl, 90, 90, true, true, true);
-
-                ImageView thumbnailView = new ImageView(thumbnailImage);
-                thumbnailView.setFitWidth(78);
-                thumbnailView.setFitHeight(78);
-                thumbnailView.setPreserveRatio(true);
-                thumbnailView.setSmooth(true);
-
-                StackPane thumbnailFrame = new StackPane(thumbnailView);
-                thumbnailFrame.setPrefSize(88, 88);
-                thumbnailFrame.setMinSize(88, 88);
-                thumbnailFrame.setMaxSize(88, 88);
-                thumbnailFrame.setStyle(getThumbnailStyle(i == 0));
-                thumbnailFrame.setOnMouseEntered(event -> {
-                    mainImageView.setImage(new Image(imageUrl, true));
-                    selectThumbnail(thumbnailFrames, thumbnailFrame);
-                });
-
-                thumbnailFrames.add(thumbnailFrame);
-                thumbnailBox.getChildren().add(thumbnailFrame);
-            }
-        } catch (Exception e) {
-            ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Image load failed: " + e.getMessage())));
+        if (thumbnailBox == null) {
+            return;
         }
+
+        // Create thumbnails
+        for (int i = 0; i < imageIds.size(); i++) {
+            final int index = i;
+            final String imageId = imageIds.get(i);
+
+            StackPane thumbnailFrame = createThumbnailFrame(imageId, index, thumbnailFrames);
+            thumbnailFrames.add(thumbnailFrame);
+            thumbnailBox.getChildren().add(thumbnailFrame);
+        }
+    }
+
+    private StackPane createThumbnailFrame(String imageId, int index, List<StackPane> thumbnailFrames) {
+        ImageView thumbnailView = new ImageView();
+        thumbnailView.setFitWidth(78);
+        thumbnailView.setFitHeight(78);
+        thumbnailView.setPreserveRatio(true);
+        thumbnailView.setSmooth(true);
+
+        StackPane thumbnailFrame = new StackPane(thumbnailView);
+        thumbnailFrame.setPrefSize(88, 88);
+        thumbnailFrame.setMinSize(88, 88);
+        thumbnailFrame.setMaxSize(88, 88);
+        thumbnailFrame.setStyle(getThumbnailStyle(index == 0));
+
+        // Load thumbnail
+        new Thread(() -> {
+            try {
+                ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
+                if (socket == null || !socket.isConnected()) return;
+
+                byte[] imageBytes = ImageDownloadService.downloadImage(socket, imageId);
+                Image thumbnailImage = new Image(new java.io.ByteArrayInputStream(imageBytes), 90, 90, true, true);
+
+                Platform.runLater(() -> {
+                    thumbnailView.setImage(thumbnailImage);
+                    thumbnailFrame.setOnMouseEntered(event -> {
+                        loadAndDisplayImage(imageId, mainImageView, false);
+                        // Update style trực tiếp thay vì gọi selectThumbnail
+                        thumbnailFrame.setStyle(getThumbnailStyle(true));
+                    });
+                });
+            } catch (Exception e) {
+                LoggerUtil.error("Failed to load thumbnail " + imageId + ": " + e.getMessage());
+            }
+        }, "LoadThumbnailThread-" + index).start();
+
+        return thumbnailFrame;
+    }
+
+    private void loadAndDisplayImage(String imageId, ImageView imageView, boolean isFirst) {
+        new Thread(() -> {
+            try {
+                ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
+                if (socket == null || !socket.isConnected()) {
+                    LoggerUtil.error("Socket not connected");
+                    return;
+                }
+
+                byte[] imageBytes = ImageDownloadService.downloadImage(socket, imageId);
+                Image image = new Image(new java.io.ByteArrayInputStream(imageBytes));
+                Platform.runLater(() -> imageView.setImage(image));
+
+            } catch (Exception e) {
+                LoggerUtil.error("Failed to load image " + imageId + ": " + e.getMessage());
+            }
+        }, "LoadImageThread").start();
     }
 
     private void selectThumbnail(List<StackPane> thumbnailFrames, StackPane selectedFrame) {
@@ -888,27 +930,7 @@ public class AuctionDetailController {
                 + "-fx-cursor: hand;";
     }
 
-    private String toImageUrl(String imagePath) {
-        if (imagePath == null || imagePath.isBlank()) {
-            return "";
-        }
 
-        String formattedPath = imagePath.replace("\\", "/");
-        if (formattedPath.startsWith("file:")
-                || formattedPath.startsWith("http://")
-                || formattedPath.startsWith("https://")) {
-            return formattedPath;
-        }
-
-        File file = new File(formattedPath);
-        if (!file.isAbsolute()) {
-            file = new File(System.getProperty("user.dir"), formattedPath);
-            if (!file.exists() && formattedPath.startsWith("uploads/")) {
-                file = new File(System.getProperty("user.dir"), "data/" + formattedPath);
-            }
-        }
-        return file.toURI().toString();
-    }
 
     private void renderProductDetails(JsonObject itemData, JsonObject productData) {
         if (dynamicDetailsGrid == null) {
