@@ -12,12 +12,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogEvent;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
@@ -55,7 +54,7 @@ public final class DialogUtil {
         }
 
         styleDialog(dialog);
-        Region overlay = installOverlay(ownerNode, owner);
+        Region[] overlayRef = {installOverlay(ownerNode, owner)};
         EventHandler<DialogEvent> existingShownHandler = dialog.getOnShown();
         dialog.setOnShown(event -> {
             if (existingShownHandler != null) {
@@ -65,6 +64,14 @@ public final class DialogUtil {
                 if (dialog.getDialogPane().getScene() != null) {
                     dialog.getDialogPane().getScene().setFill(Color.TRANSPARENT);
                 }
+                if (overlayRef[0] == null) {
+                    Window dialogWindow = dialog.getDialogPane().getScene() != null
+                            ? dialog.getDialogPane().getScene().getWindow()
+                            : null;
+                    Window shownOwner = resolveOwner(ownerNode, dialogWindow);
+                    overlayRef[0] = installOverlay(ownerNode, shownOwner);
+                }
+                configureAlertContent(dialog);
                 configureEnterToClose(dialog);
                 centerDialog(dialog, owner);
             });
@@ -72,7 +79,7 @@ public final class DialogUtil {
 
         EventHandler<DialogEvent> existingHiddenHandler = dialog.getOnHidden();
         dialog.setOnHidden(event -> {
-            removeOverlay(overlay);
+            removeOverlay(overlayRef[0]);
             if (existingHiddenHandler != null) {
                 existingHiddenHandler.handle(event);
             }
@@ -88,6 +95,14 @@ public final class DialogUtil {
         String stylesheet = DialogUtil.class.getResource("/CSS/style.css").toExternalForm();
         if (!pane.getStylesheets().contains(stylesheet)) {
             pane.getStylesheets().add(stylesheet);
+        }
+        pane.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.setFill(Color.TRANSPARENT);
+            }
+        });
+        if (pane.getScene() != null) {
+            pane.getScene().setFill(Color.TRANSPARENT);
         }
 
         try {
@@ -105,11 +120,27 @@ public final class DialogUtil {
     }
 
     private static String wrapAlertText(String text, int maxLineLength) {
-        if (text == null || text.isBlank() || text.contains("\n")) {
+        if (text == null || text.isBlank()) {
             return text;
         }
 
-        String[] words = text.trim().split("\\s+");
+        String[] lines = text.split("\\R", -1);
+        StringBuilder wrapped = new StringBuilder();
+        for (int i = 0; i < lines.length; i++) {
+            if (i > 0) {
+                wrapped.append('\n');
+            }
+            wrapped.append(wrapLine(lines[i], maxLineLength));
+        }
+        return wrapped.toString();
+    }
+
+    private static String wrapLine(String line, int maxLineLength) {
+        if (line == null || line.isBlank()) {
+            return line;
+        }
+
+        String[] words = line.trim().split("\\s+");
         StringBuilder wrapped = new StringBuilder();
         int lineLength = 0;
 
@@ -193,6 +224,20 @@ public final class DialogUtil {
         return null;
     }
 
+    private static void configureAlertContent(Dialog<?> dialog) {
+        if (!(dialog instanceof Alert)) {
+            return;
+        }
+
+        Node content = dialog.getDialogPane().lookup(".content.label");
+        if (content instanceof Label label) {
+            label.setWrapText(true);
+            label.setMinWidth(Region.USE_PREF_SIZE);
+            label.setPrefWidth(300);
+            label.setMaxWidth(300);
+        }
+    }
+
     private static Region installOverlay(Node ownerNode, Window owner) {
         Pane host = resolveOverlayHost(ownerNode, owner);
         if (host == null) {
@@ -218,9 +263,10 @@ public final class DialogUtil {
             node = owner.getScene().getRoot();
         }
 
+        Pane topMostPane = null;
         while (node != null) {
-            if (node instanceof StackPane || node instanceof AnchorPane) {
-                return (Pane) node;
+            if (node instanceof Pane pane) {
+                topMostPane = pane;
             }
             Parent parent = node.getParent();
             if (parent == null && node.getScene() != null) {
@@ -231,7 +277,7 @@ public final class DialogUtil {
             }
             node = parent;
         }
-        return null;
+        return topMostPane;
     }
 
     private static void removeOverlay(Region overlay) {
@@ -245,19 +291,25 @@ public final class DialogUtil {
     }
 
     private static Window resolveOwner(Node ownerNode) {
+        return resolveOwner(ownerNode, null);
+    }
+
+    private static Window resolveOwner(Node ownerNode, Window excludedWindow) {
         if (ownerNode != null && ownerNode.getScene() != null) {
             Window window = ownerNode.getScene().getWindow();
-            if (window != null && window.isShowing()) {
+            if (window != null && window.isShowing() && window != excludedWindow) {
                 return window;
             }
         }
 
         return Window.getWindows().stream()
                 .filter(Window::isShowing)
+                .filter(window -> window != excludedWindow)
                 .filter(Window::isFocused)
                 .findFirst()
                 .orElseGet(() -> Window.getWindows().stream()
                         .filter(Window::isShowing)
+                        .filter(window -> window != excludedWindow)
                         .findFirst()
                         .orElse(null));
     }

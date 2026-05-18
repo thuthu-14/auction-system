@@ -1,15 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" vbarPolicy="NEVER" prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: transparent; -fx-background: transparent;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.BecomeSellerController">
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" pannable="true" prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.BecomeSellerController">
     <content>
         <VBox spacing="20.0" style="-fx-background-color: #fcfcfc; -fx-padding: 50;">
             <children>
-                <Label alignment="CENTER" maxWidth="Infinity" text="Đăng ký trở thành Người bán" style="-fx-text-fill: #111827;">
+                <Label alignment="CENTER" maxWidth="Infinity" style="-fx-text-fill: #111827;" text="Đăng ký trở thành Người bán">
                     <font>
-                        <Font name="System Bold" size="35.0" />
+                        <Font size="35.0" />
                     </font>
                     <VBox.margin>
                         <Insets bottom="40.0" />
@@ -28,7 +30,7 @@
                     <children>
                         <VBox spacing="10.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
                             <children>
-                                <Label text="  Họ và tên" style="-fx-text-fill: #111827;">
+                                <Label style="-fx-text-fill: #111827;" text="  Họ và tên">
                                     <font>
                                         <Font name="System Bold" size="17.0" />
                                     </font>
@@ -38,7 +40,7 @@
                         </VBox>
                         <VBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                             <children>
-                                <Label text="  Email" style="-fx-text-fill: #111827;">
+                                <Label style="-fx-text-fill: #111827;" text="  Email">
                                     <font>
                                         <Font name="System Bold" size="17.0" />
                                     </font>
@@ -48,7 +50,7 @@
                         </VBox>
                         <VBox spacing="10.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
                             <children>
-                                <Label text="  Số điện thoại" style="-fx-text-fill: #111827;">
+                                <Label style="-fx-text-fill: #111827;" text="  Số điện thoại">
                                     <font>
                                         <Font name="System Bold" size="17.0" />
                                     </font>
@@ -58,7 +60,7 @@
                         </VBox>
                         <VBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                             <children>
-                                <Label text="  Địa chỉ" style="-fx-text-fill: #111827;">
+                                <Label style="-fx-text-fill: #111827;" text="  Địa chỉ">
                                     <font>
                                         <Font name="System Bold" size="17.0" />
                                     </font>
@@ -68,7 +70,7 @@
                         </VBox>
                         <VBox spacing="10.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
                             <children>
-                                <Label text="  Mật khẩu" style="-fx-text-fill: #111827;">
+                                <Label style="-fx-text-fill: #111827;" text="  Mật khẩu">
                                     <font>
                                         <Font name="System Bold" size="17.0" />
                                     </font>
@@ -76,8 +78,8 @@
                                 <StackPane alignment="CENTER_RIGHT">
                                     <children>
                                         <PasswordField fx:id="passwordField" prefHeight="50.0" promptText="Nhập mật khẩu tài khoản" style="-fx-background-color: #e5e7eb; -fx-background-radius: 12; -fx-text-fill: #111827; -fx-prompt-text-fill: #6b7280; -fx-padding: 0 62 0 20; -fx-font-size: 14;" />
-                                        <TextField fx:id="passwordTextField" managed="false" visible="false" prefHeight="50.0" style="-fx-background-color: #e5e7eb; -fx-background-radius: 12; -fx-text-fill: #111827; -fx-prompt-text-fill: #6b7280; -fx-padding: 0 62 0 20; -fx-font-size: 14;" />
-                                        <Button fx:id="btnTogglePassword" onAction="#togglePasswordVisibility" style="-fx-background-color: transparent; -fx-text-fill: #374151; -fx-cursor: hand;" text="Hien">
+                                        <TextField fx:id="passwordTextField" managed="false" prefHeight="50.0" style="-fx-background-color: #e5e7eb; -fx-background-radius: 12; -fx-text-fill: #111827; -fx-prompt-text-fill: #6b7280; -fx-padding: 0 62 0 20; -fx-font-size: 14;" visible="false" />
+                                        <Button fx:id="btnTogglePassword" onAction="#togglePasswordVisibility" style="-fx-background-color: transparent; -fx-text-fill: #374151; -fx-cursor: hand;" text="Hiện">
                                             <StackPane.margin>
                                                 <Insets right="10.0" />
                                             </StackPane.margin>
@@ -94,12 +96,12 @@
                 <Region VBox.vgrow="ALWAYS" />
                 <HBox alignment="BOTTOM_RIGHT" spacing="20.0">
                     <children>
-                        <Button fx:id="btnCancel" onAction="#handleCancel" prefHeight="45.0" prefWidth="120.0" text="Quay lại" styleClass="form-button">
+                        <Button fx:id="btnCancel" onAction="#handleCancel" prefHeight="45.0" prefWidth="120.0" styleClass="form-button" text="Quay lại">
                             <font>
                                 <Font name="System Bold" size="14.0" />
                             </font>
                         </Button>
-                        <Button fx:id="btnSave" onAction="#handleSave" prefHeight="45.0" prefWidth="120.0" text="Lưu" styleClass="form-button">
+                        <Button fx:id="btnSave" onAction="#handleSave" prefHeight="45.0" prefWidth="120.0" styleClass="form-button" text="Lưu">
                             <font>
                                 <Font name="System Bold" size="14.0" />
                             </font>

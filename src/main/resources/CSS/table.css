@@ -1,4 +1,26 @@
 /* ================= TABLE VIEW ================= */
+.auction-history-view {
+    -fx-background-color: #fcfcfc;
+}
+
+.auction-history-view .auction-history-title {
+    -fx-opacity: 1;
+    -fx-text-fill: #111827;
+}
+
+.auction-history-view .auction-history-title .text {
+    -fx-fill: #111827;
+}
+
+.auction-history-view .auction-history-subtitle {
+    -fx-opacity: 1;
+    -fx-text-fill: #4b5563;
+}
+
+.auction-history-view .auction-history-subtitle .text {
+    -fx-fill: #4b5563;
+}
+
 .scroll-pane,
 .scroll-pane > .viewport,
 .scroll-pane > .corner {

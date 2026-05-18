@@ -17,9 +17,9 @@
                                         <Image url="@../../CSS/logo.png" />
                                     </image>
                                 </ImageView>
-                                <Label styleClass="my-darley" text="BubblyBid" textFill="#1a1a1a">
+                                <Label style="-fx-font-size: 28px;" styleClass="my-darley" text="BubblyBid" textFill="#1a1a1a">
                                     <font>
-                                        <Font name="Darley Sans" size="27.0" />
+                                        <Font name="Darley Sans" size="28.0" />
                                     </font>
                                 </Label>
                             </children>

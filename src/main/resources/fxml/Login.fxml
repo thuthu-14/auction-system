@@ -1,21 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
-<HBox alignment="CENTER" minHeight="650.0" minWidth="1000.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.LoginController">
+
+<HBox alignment="CENTER" minHeight="650.0" minWidth="1000.0" style="-fx-background-color: #ffffff;" stylesheets="@/CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.LoginController">
     <children>
         <StackPane minWidth="450.0" HBox.hgrow="ALWAYS">
             <children>
                 <VBox alignment="CENTER_LEFT" maxWidth="440.0" spacing="25.0">
                     <children>
-                        <Label alignment="CENTER" prefHeight="55.0" prefWidth="443.0" styleClass="my-darley" stylesheets="@../CSS/style.css" text="Đăng nhập vào tài khoản">
-                            <font>
-                                <Font name="System Bold" size="36.0" />
-                            </font>
-                        </Label>
+                        <Label fx:id="loginTitleLabel" alignment="CENTER" prefHeight="55.0" prefWidth="443.0" styleClass="my-darley" stylesheets="@../CSS/style.css" text="Đăng nhập vào tài khoản" />
                         <HBox alignment="CENTER_LEFT" prefHeight="55.0" style="-fx-background-color: #f7f7f7; -fx-background-radius: 20;">
                             <children>
                                 <Label style="-fx-padding: 0 0 0 20; -fx-font-size: 15;" styleClass="my-font2" stylesheets="@../CSS/style.css" text="Chưa có tài khoản?">
@@ -24,7 +22,7 @@
                                     </font>
                                 </Label>
                                 <Region HBox.hgrow="ALWAYS" />
-                                <Button fx:id="registerButton" mnemonicParsing="false" onAction="#switchToSignup" prefHeight="40.0" prefWidth="130.0" style="-fx-background-color: #ffffff; -fx-background-radius: 17; -fx-border-radius: 17; -fx-border-color: #cccccc; -fx-cursor: hand;" styleClass="my-font" stylesheets="@../CSS/style.css" text="Tạo tài khoản">
+                                <Button fx:id="registerButton" mnemonicParsing="false" onAction="#switchToSignup" prefHeight="40.0" prefWidth="130.0" style="-fx-background-color: #ffffff; -fx-background-radius: 17; -fx-border-radius: 17; -fx-border-color: #cccccc; -fx-cursor: hand;" styleClass="my-font2" stylesheets="@../CSS/style.css" text="Tạo tài khoản">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
@@ -69,8 +67,8 @@
                                 <Insets top="15.0" />
                             </VBox.margin>
                         </Button>
-                        <Label fx:id="messageLabel" text="" textFill="#e53e3e" wrapText="true" maxWidth="440.0" />
-                        <ProgressIndicator fx:id="progressIndicator" prefHeight="22.0" prefWidth="22.0" visible="false" managed="false" />
+                        <Label fx:id="messageLabel" maxWidth="440.0" text="" textFill="#e53e3e" wrapText="true" />
+                        <ProgressIndicator fx:id="progressIndicator" managed="false" prefHeight="22.0" prefWidth="22.0" visible="false" />
                     </children>
                 </VBox>
             </children>

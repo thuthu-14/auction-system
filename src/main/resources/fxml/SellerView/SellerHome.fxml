@@ -17,9 +17,9 @@
                                         <Image url="@../../CSS/logo.png" />
                                     </image>
                                 </ImageView>
-                                <Label styleClass="my-darley" text="BubblyBid" textFill="#1a1a1a">
+                                <Label style="-fx-font-size: 28px;" styleClass="my-darley" text="BubblyBid" textFill="#1a1a1a">
                                     <font>
-                                        <Font name="Darley Sans" size="27.0" />
+                                        <Font name="Darley Sans" size="28.0" />
                                     </font>
                                 </Label>
                             </children>
@@ -110,7 +110,7 @@
                         <Region VBox.vgrow="ALWAYS" />
                         <HBox fx:id="menuDowngrade" alignment="CENTER_LEFT" maxWidth="Infinity" onMouseClicked="#handleMenuClick" prefHeight="45.0" prefWidth="199.0" style="-fx-background-radius: 8; -fx-cursor: hand;" styleClass="menu-item">
                             <children>
-                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" mouseTransparent="true" style="-fx-background-color: transparent; -fx-font-family: 'System'; -fx-font-size: 17px; -fx-font-weight: normal;" text="Trở về Bidder" textFill="#e53e3e">
+                                <Button alignment="BASELINE_LEFT" graphicTextGap="15.0" maxWidth="Infinity" mouseTransparent="true" style="-fx-background-color: transparent; -fx-font-family: 'System'; -fx-font-size: 17px; -fx-font-weight: normal;" text="👨‍⚖️   Trở về Bidder" textFill="#e53e3e">
                                     <font>
                                         <Font name="System" size="17.0" />
                                     </font>

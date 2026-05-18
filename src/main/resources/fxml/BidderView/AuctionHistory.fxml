@@ -12,19 +12,19 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<VBox stylesheets="@/CSS/table.css" alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionHistoryController">
+<VBox styleClass="auction-history-view" stylesheets="@/CSS/table.css" alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionHistoryController">
     <padding>
         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
     </padding>
     <children>
         <VBox spacing="5.0">
             <children>
-                <Label text="Lịch sử đấu giá" textFill="#1a1a1a">
+                <Label opacity="1.0" style="-fx-text-fill: #111827; -fx-font-size: 28px; -fx-font-weight: bold;" styleClass="auction-history-title" text="Lịch sử đấu giá" textFill="#111827">
                     <font>
                         <Font name="System Bold" size="28.0" />
                     </font>
                 </Label>
-                <Label text="Toàn bộ lịch sử đặt giá của bạn. Theo dõi trạng thái và đối chiếu các phiên đấu giá." textFill="#718096">
+                <Label opacity="1.0" style="-fx-text-fill: #4b5563; -fx-font-size: 15px;" styleClass="auction-history-subtitle" text="Toàn bộ lịch sử đặt giá của bạn. Theo dõi trạng thái và đối chiếu các phiên đấu giá." textFill="#4b5563">
                     <font>
                         <Font size="15.0" />
                     </font>

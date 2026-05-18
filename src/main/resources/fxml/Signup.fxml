@@ -23,10 +23,7 @@
             <children>
                 <VBox alignment="CENTER_LEFT" maxWidth="440.0" spacing="20.0">
                     <children>
-                        <Label alignment="CENTER" prefHeight="51.0" prefWidth="446.0" styleClass="my-darley" stylesheets="@../CSS/style.css" text="Tạo tài khoản của bạn">
-                            <font>
-                                <Font name="System Bold" size="33.0" />
-                            </font>
+                        <Label alignment="CENTER" prefHeight="51.0" prefWidth="446.0" style="-fx-font-size: 33px;" styleClass="my-darley" stylesheets="@../CSS/style.css" text="Tạo tài khoản của bạn">
                             <VBox.margin>
                                 <Insets bottom="10.0" />
                             </VBox.margin>
