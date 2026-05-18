@@ -7,11 +7,8 @@ import server.model.Auction;
 import server.model.Bid;
 import server.model.RegularUser;
 import server.model.User;
-import server.repository.SqlBidRepository;
-import util.LoggerUtil;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +55,7 @@ public class SellerClientService {
         if (user == null) {
             throw new IllegalStateException("Missing current user");
         }
-        Message response = transport.sendAndReceive(new Message(MessageType.GET_AUCTION_DETAIL, auctionId, user.getUsername()));
+        Message response = transport.sendAndReceive(new Message(MessageType.GET_AUCTION_DETAIL, (Object) auctionId, user.getUsername()));
         if (response == null || !"SUCCESS".equals(response.getStatus())) {
             throw new java.io.IOException(response != null && response.getMessage() != null
                     ? response.getMessage()
@@ -80,7 +77,7 @@ public class SellerClientService {
             throw new IllegalArgumentException("Missing auction id");
         }
 
-        Message response = transport.sendAndReceive(new Message(MessageType.GET_BID_HISTORY, auctionId, user.getUsername()));
+        Message response = transport.sendAndReceive(new Message(MessageType.GET_BID_HISTORY, (Object) auctionId, user.getUsername()));
         if (response == null || !"SUCCESS".equals(response.getStatus())) {
             throw new java.io.IOException(response != null && response.getMessage() != null
                     ? response.getMessage()
@@ -102,34 +99,11 @@ public class SellerClientService {
     }
 
     public List<Bid> fetchBidHistoryWithFallback(MessageTransport transport, User user, String auctionId) throws Exception {
-        try {
-            List<Bid> serverBids = fetchBidHistory(transport, user, auctionId);
-            if (!serverBids.isEmpty()) {
-                return serverBids;
-            }
-            return loadLocalBidHistory(auctionId);
-        } catch (Exception e) {
-            LoggerUtil.warn("Fetch bid history from server failed, fallback to SQLite: " + e.getMessage());
-            List<Bid> localBids = loadLocalBidHistory(auctionId);
-            if (!localBids.isEmpty()) {
-                return localBids;
-            }
-            throw e;
-        }
+        return fetchBidHistory(transport, user, auctionId);
     }
 
     public List<Bid> loadLocalBidHistory(String auctionId) {
-        if (auctionId == null || auctionId.isBlank() || "--".equals(auctionId)) {
-            return List.of();
-        }
-        try {
-            List<Bid> bids = new ArrayList<>(new SqlBidRepository().getBidsByAuctionId(auctionId));
-            bids.sort(Comparator.comparingLong(Bid::getBidTime));
-            return bids;
-        } catch (Exception e) {
-            LoggerUtil.warn("Load local bid history failed: " + e.getMessage());
-            return List.of();
-        }
+        return List.of();
     }
 
     public Auction cancelAuction(MessageTransport transport, User user, String auctionId) throws Exception {
@@ -141,7 +115,7 @@ public class SellerClientService {
             throw new IllegalArgumentException("Missing auction id");
         }
 
-        Message response = transport.sendAndReceive(new Message(MessageType.CANCEL_AUCTION, auctionId, user.getUsername()));
+        Message response = transport.sendAndReceive(new Message(MessageType.CANCEL_AUCTION, (Object) auctionId, user.getUsername()));
         if (response == null || !"SUCCESS".equals(response.getStatus())) {
             throw new java.io.IOException(response != null && response.getMessage() != null
                     ? response.getMessage()
@@ -159,7 +133,7 @@ public class SellerClientService {
             return Map.of();
         }
 
-        Message response = transport.sendAndReceive(new Message(MessageType.GET_SELLER_CONTACT, userId, user.getUsername()));
+        Message response = transport.sendAndReceive(new Message(MessageType.GET_SELLER_CONTACT, (Object) userId, user.getUsername()));
         if (response == null || !"SUCCESS".equals(response.getStatus())) {
             throw new java.io.IOException(response != null && response.getMessage() != null
                     ? response.getMessage()

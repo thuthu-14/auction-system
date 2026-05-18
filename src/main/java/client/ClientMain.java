@@ -7,11 +7,13 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import navigation.NavigationManager;
 import util.LoggerUtil;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ClientMain extends Application {
 
@@ -27,6 +29,7 @@ public class ClientMain extends Application {
         primaryStage.setFullScreenExitHint("");
         primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
 
+        loadCustomFonts();
         LoggerUtil.info("Auction system client started");
         showLoginScreen();
 
@@ -34,6 +37,20 @@ public class ClientMain extends Application {
             LoggerUtil.info("Application closed");
             System.exit(0);
         });
+    }
+
+    private void loadCustomFonts() {
+        loadFont("/CSS/DarleySans-Regular.otf");
+    }
+
+    private void loadFont(String resourcePath) {
+        try (InputStream input = getClass().getResourceAsStream(resourcePath)) {
+            if (input == null || Font.loadFont(input, 12) == null) {
+                LoggerUtil.warn("Could not load font: " + resourcePath);
+            }
+        } catch (IOException e) {
+            LoggerUtil.warn("Could not load font: " + resourcePath + " - " + e.getMessage());
+        }
     }
 
     private void showLoginScreen() {

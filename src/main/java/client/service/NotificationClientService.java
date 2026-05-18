@@ -94,7 +94,7 @@ public class NotificationClientService {
 
     public Message markAllRead(ClientSocket socket, User user, String scope) throws Exception {
         ensureContext(socket, user);
-        return socket.sendAndReceive(new Message(MessageType.MARK_NOTIFICATIONS_READ, scope, user.getUserId()));
+        return socket.sendAndReceive(new Message(MessageType.MARK_NOTIFICATIONS_READ, (Object) scope, user.getUserId()));
     }
 
     public Message markAllRead(ClientSocket socket, User user, NotificationScope scope) throws Exception {
@@ -105,7 +105,7 @@ public class NotificationClientService {
         if (socket == null || !socket.isConnected()) {
             throw new java.io.IOException("Socket is not connected");
         }
-        return socket.sendAndReceive(new Message(MessageType.GET_AUCTION_DETAIL, auctionId, "CLIENT"));
+        return socket.sendAndReceive(new Message(MessageType.GET_AUCTION_DETAIL, (Object) auctionId, "CLIENT"));
     }
 
     private void ensureContext(ClientSocket socket, User user) throws Exception {

@@ -10,6 +10,7 @@ import common.AuctionStatus;
 import common.ItemCategory;
 import server.model.Auction;
 import server.model.User;
+import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,10 +21,12 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.layout.*;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 import util.LoggerUtil;
 
 import java.net.URL;
@@ -73,7 +76,28 @@ public class DashboardController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupBanner();
         setupEndingSoonControls();
-        Platform.runLater(this::forceDashboardTextColors);
+        Platform.runLater(() -> {
+            forceDashboardTextColors();
+            setupCategoryHoverEffects();
+        });
+    }
+
+    private void setupCategoryHoverEffects() {
+        if (dashboardRoot == null) {
+            return;
+        }
+
+        for (Node categoryCard : dashboardRoot.lookupAll(".dashboard-category-card")) {
+            categoryCard.setOnMouseEntered(event -> animateCategoryCard(categoryCard, 1.06));
+            categoryCard.setOnMouseExited(event -> animateCategoryCard(categoryCard, 1.0));
+        }
+    }
+
+    private void animateCategoryCard(Node categoryCard, double scale) {
+        ScaleTransition transition = new ScaleTransition(Duration.millis(120), categoryCard);
+        transition.setToX(scale);
+        transition.setToY(scale);
+        transition.play();
     }
 
     private void forceDashboardTextColors() {
@@ -454,10 +478,10 @@ public class DashboardController implements Initializable {
             
             client.controller.AuctionCardController cardController = loader.getController();
             if (cardController != null) {
-                cardController.setAuctionData(auction);
                 if (homeScreenController != null) {
                     cardController.setHomeScreenController(homeScreenController);
                 }
+                cardController.setAuctionData(auction);
             }
 
             

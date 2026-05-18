@@ -127,7 +127,7 @@ public class AuctionBidMessageProcessor {
             context.getServer().broadcastMessage(new Message(MessageType.AUCTION_FINISHED_NOTIFICATION, auction, context.getCurrentUser().getUserId()));
             context.getServer().broadcastMessage(new Message(MessageType.SELLER_AUCTIONS_UPDATED, auction, context.getCurrentUser().getUserId()));
         } catch (Exception e) {
-            context.sendError("Khong the huy phien: " + e.getMessage());
+            context.sendError(e.getMessage() != null ? e.getMessage() : "Khong the huy phien");
         }
     }
 

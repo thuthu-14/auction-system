@@ -4,27 +4,14 @@ import client.network.ClientSocket;
 import common.Message;
 import common.MessageType;
 import common.Transaction;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import server.model.User;
-import util.JsonUtil;
-import util.LoggerUtil;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class WalletService {
-
-
-
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
     public static class BankAccountEntry {
         public String userId;
         public String username;
@@ -33,6 +20,11 @@ public class WalletService {
         public String accountNumber;
         public double initialBalance;
         public long createdAt;
+
+        public BankAccountEntry(String bankName, String accountNumber) {
+            this.bankName = bankName;
+            this.accountNumber = accountNumber;
+        }
     }
 
     public double parseMoneyAmount(String amountStr) {
@@ -80,7 +72,7 @@ public class WalletService {
         data.put("email", user.getEmail());
         data.put("bankName", bank);
         data.put("accountNumber", account);
-        data.put("amount", amount);
+        data.put("initialBalance", amount);
 
         return socket.sendAndReceive(new Message(MessageType.LINK_BANK, data, user.getUsername()));
     }
@@ -94,7 +86,7 @@ public class WalletService {
         }
 
         return socket.sendAndReceive(
-                new Message(MessageType.GET_BANK_ACCOUNT, user.getUserId(), user.getUsername())
+                new Message(MessageType.GET_BANK_ACCOUNT, (Object) user.getUserId(), user.getUsername())
         );
     }
     public Message fetchTransactions(ClientSocket socket, User user) throws Exception {
@@ -106,8 +98,54 @@ public class WalletService {
         }
 
         return socket.sendAndReceive(
-                new Message(MessageType.GET_TRANSACTIONS, user.getUserId(), user.getUsername())
+                new Message(MessageType.GET_TRANSACTIONS, (Object) user.getUserId(), user.getUsername())
         );
     }
 
+    public List<Transaction> fetchTransactionList(ClientSocket socket, User user) throws Exception {
+        Message response = fetchTransactions(socket, user);
+        if (response == null || !"SUCCESS".equals(response.getStatus())) {
+            throw new java.io.IOException(response != null && response.getMessage() != null
+                    ? response.getMessage()
+                    : "Cannot load transactions");
+        }
+
+        List<Transaction> result = new ArrayList<>();
+        if (response.getData() instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Transaction transaction) {
+                    result.add(transaction);
+                }
+            }
+        }
+        return result;
+    }
+
+    public BankAccountEntry loadBankAccount(ClientSocket socket, User user) throws Exception {
+        Message response = fetchBankAccount(socket, user);
+        if (response == null || !"SUCCESS".equals(response.getStatus()) || response.getData() == null) {
+            return null;
+        }
+        if (!(response.getData() instanceof Map<?, ?> bankData)) {
+            return null;
+        }
+
+        Object bankName = bankData.get("bankName");
+        Object accountNumber = bankData.get("accountNumber");
+        if (bankName == null || accountNumber == null) {
+            return null;
+        }
+        return new BankAccountEntry(bankName.toString(), accountNumber.toString());
+    }
+
+    public void saveBankAccount(ClientSocket socket, User user,
+                                String bankName, String accountNumber,
+                                double initialBalance) throws Exception {
+        Message response = linkBankAccount(socket, user, bankName, accountNumber, initialBalance);
+        if (response == null || !"SUCCESS".equals(response.getStatus())) {
+            throw new java.io.IOException(response != null && response.getMessage() != null
+                    ? response.getMessage()
+                    : "Failed to link bank account");
+        }
+    }
 }

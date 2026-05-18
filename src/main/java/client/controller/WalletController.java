@@ -6,8 +6,6 @@ import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.WalletService;
 import client.service.WalletService.BankAccountEntry;
-import common.Message;
-import common.MessageType;
 import common.Transaction;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -34,11 +32,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import navigation.NavigationManager;
-import server.repository.SqlTransactionRepository;
 import server.model.User;
 import util.LoggerUtil;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -540,7 +536,7 @@ public class WalletController implements Initializable {
 
             new Thread(() -> {
                 try {
-                    Message response = walletService.submitWalletTransaction(getActiveSocket(), currentUser, type, amount);
+                    var response = walletService.submitWalletTransaction(getActiveSocket(), currentUser, type, amount);
 
                     if (response != null && "SUCCESS".equals(response.getStatus())) {
                         if (!(response.getData() instanceof User)) {
@@ -755,30 +751,10 @@ public class WalletController implements Initializable {
     }
 
     private List<Transaction> loadTransactionsForUser() throws Exception {
-        try {
-            Message response = walletService.fetchTransactions(getActiveSocket(), currentUser);
-            if (response != null && "SUCCESS".equals(response.getStatus())) {
-                Object data = response.getData();
-                if (data instanceof List<?> list) {
-                    List<Transaction> result = new ArrayList<>();
-                    for (Object obj : list) {
-                        if (obj instanceof Transaction t) {
-                            result.add(t);
-                        }
-                    }
-                    if (!result.isEmpty()) {
-                        return result;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LoggerUtil.warn("Wallet transaction socket load failed, fallback SQLite: " + e.getMessage());
-        }
-
         if (currentUser == null || currentUser.getUserId() == null) {
             return new ArrayList<>();
         }
-        return new ArrayList<>(new SqlTransactionRepository().getByUser(currentUser.getUserId()));
+        return walletService.fetchTransactionList(getActiveSocket(), currentUser);
     }
 
     private void syncBalanceFromTransactions(List<Transaction> transactions) {
@@ -906,16 +882,6 @@ public class WalletController implements Initializable {
         button.setTextFill(active ? Color.WHITE : Color.web("#4a5568"));
     }
 
-    private static class BankAccountEntry {
-        String bankName;
-        String accountNumber;
-
-        BankAccountEntry(String bankName, String accountNumber) {
-            this.bankName = bankName;
-            this.accountNumber = accountNumber;
-        }
-    }
-
     private BankAccountEntry loadBankAccountForCurrentUser() {
         if (currentUser == null) {
             return null;
@@ -927,23 +893,7 @@ public class WalletController implements Initializable {
                 LoggerUtil.warn("No active socket to load bank account");
                 return null;
             }
-
-            Message request = new Message();
-            request.setType(MessageType.GET_BANK_ACCOUNT);
-            request.setSenderId(currentUser.getUsername());
-
-            Message response = socket.sendAndReceive(request);
-
-            if (response != null && "SUCCESS".equals(response.getStatus()) && response.getData() != null) {
-                @SuppressWarnings("unchecked")
-                Map<String, String> bankData = (Map<String, String>) response.getData();
-                String bankName = bankData.get("bankName");
-                String accountNumber = bankData.get("accountNumber");
-
-                if (bankName != null && accountNumber != null) {
-                    return new BankAccountEntry(bankName, accountNumber);
-                }
-            }
+            return walletService.loadBankAccount(socket, currentUser);
         } catch (Exception e) {
             LoggerUtil.warn("Non-critical: Failed to load bank account: " + e.getMessage());
         }
@@ -953,25 +903,7 @@ public class WalletController implements Initializable {
 
     private void saveBankAccountForCurrentUser(String bankName, String accountNumber, double initialBalance) throws Exception {
         ClientSocket socket = getActiveSocket();
-        if (currentUser == null || socket == null) {
-            throw new IOException("User or socket is null");
-        }
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("bankName", bankName);
-        data.put("accountNumber", accountNumber);
-        data.put("initialBalance", initialBalance);
-
-        Message request = new Message();
-        request.setType(MessageType.LINK_BANK);
-        request.setData(data);
-        request.setSenderId(currentUser.getUsername());
-
-        Message response = socket.sendAndReceive(request);
-
-        if (response == null || !"SUCCESS".equals(response.getStatus())) {
-            throw new Exception(response != null ? response.getMessage() : "Failed to link bank account");
-        }
+        walletService.saveBankAccount(socket, currentUser, bankName, accountNumber, initialBalance);
     }
 
     private void refreshLinkedBankDisplay(String bankName, String accountNumber) {

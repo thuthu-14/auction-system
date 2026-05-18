@@ -6,6 +6,7 @@ import client.util.RecommendationTracker;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.DashboardClientService;
+import client.service.ImageDownloadService;
 import common.AuctionStatus;
 import common.ItemCategory;
 import javafx.application.Platform;
@@ -20,11 +21,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import server.model.Auction;
 import server.model.Item;
 import server.model.User;
 
-import java.io.File;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Comparator;
@@ -48,6 +49,8 @@ public class CategoryController {
 
     private final DashboardClientService dashboardClientService = new DashboardClientService();
     private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
+    private static final double HERO_IMAGE_SIZE = 190.0;
+    private static final double HERO_IMAGE_RADIUS = 24.0;
 
     private User currentUser;
     private ClientSocket clientSocket;
@@ -62,6 +65,7 @@ public class CategoryController {
         if (heroBidButton != null) {
             heroBidButton.setOnAction(event -> handleHeroBid());
         }
+        installHeroImageClip();
         Platform.runLater(this::loadAuctionsFromServer);
     }
 
@@ -154,46 +158,68 @@ public class CategoryController {
             return;
         }
 
-        try {
-            String rawPath = item.getImages().get(0);
-            Image image = null;
-            if (rawPath != null && (rawPath.startsWith("file:") || rawPath.startsWith("http"))) {
-                image = new Image(rawPath, 320, 320, true, true);
-            } else if (rawPath != null) {
-                File file = resolveImageFile(rawPath);
-                if (file.exists()) {
-                    image = new Image(file.toURI().toURL().toString(), 320, 320, true, true);
-                }
-            }
-
-            if (image == null || image.isError()) {
-                showHeroIcon();
-                return;
-            }
-
-            heroImageView.setImage(image);
-            heroImageView.setVisible(true);
-            heroImageView.setManaged(true);
-            if (heroIconLabel != null) {
-                heroIconLabel.setVisible(false);
-                heroIconLabel.setManaged(false);
-            }
-        } catch (Exception e) {
+        String imageId = item.getImages().get(0);
+        if (imageId == null || imageId.isBlank()) {
             showHeroIcon();
-            ClientExceptionHandler.handle(ClientErrorType.DATA, "Load category hero image", e);
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                ClientSocket socket = getActiveSocket();
+                if (socket == null || !socket.isConnected()) {
+                    Platform.runLater(this::showHeroIcon);
+                    return;
+                }
+
+                byte[] imageBytes = ImageDownloadService.downloadImage(socket, imageId);
+                Image image = new Image(new java.io.ByteArrayInputStream(imageBytes), HERO_IMAGE_SIZE * 2, HERO_IMAGE_SIZE * 2, true, true);
+                Platform.runLater(() -> showHeroImage(image));
+            } catch (Exception e) {
+                Platform.runLater(this::showHeroIcon);
+                ClientExceptionHandler.handle(ClientErrorType.DATA, "Load category hero image", e);
+            }
+        }, "LoadCategoryHeroImage").start();
+    }
+
+    private ClientSocket getActiveSocket() {
+        if (clientSocket != null && clientSocket.isConnected()) {
+            return clientSocket;
+        }
+        ClientSocket managerSocket = ConnectionManager.getInstance().getClientSocket();
+        if (managerSocket != null && managerSocket.isConnected()) {
+            clientSocket = managerSocket;
+            return managerSocket;
+        }
+        return null;
+    }
+
+    private void showHeroImage(Image image) {
+        if (image == null || image.isError()) {
+            showHeroIcon();
+            return;
+        }
+        heroImageView.setFitWidth(HERO_IMAGE_SIZE);
+        heroImageView.setFitHeight(HERO_IMAGE_SIZE);
+        heroImageView.setImage(image);
+        heroImageView.setVisible(true);
+        heroImageView.setManaged(true);
+        if (heroIconLabel != null) {
+            heroIconLabel.setVisible(false);
+            heroIconLabel.setManaged(false);
         }
     }
 
-    private File resolveImageFile(String rawPath) {
-        String normalizedPath = rawPath.replace("\\", "/");
-        File file = new File(normalizedPath);
-        if (!file.isAbsolute()) {
-            file = new File(System.getProperty("user.dir"), normalizedPath);
-            if (!file.exists() && normalizedPath.startsWith("uploads/")) {
-                file = new File(System.getProperty("user.dir"), "data/" + normalizedPath);
-            }
+    private void installHeroImageClip() {
+        if (heroImageView == null) {
+            return;
         }
-        return file;
+        heroImageView.setFitWidth(HERO_IMAGE_SIZE);
+        heroImageView.setFitHeight(HERO_IMAGE_SIZE);
+        Rectangle clip = new Rectangle(HERO_IMAGE_SIZE, HERO_IMAGE_SIZE);
+        clip.setArcWidth(HERO_IMAGE_RADIUS * 2);
+        clip.setArcHeight(HERO_IMAGE_RADIUS * 2);
+        heroImageView.setClip(clip);
     }
 
     private void showHeroIcon() {
@@ -248,10 +274,10 @@ public class CategoryController {
             Parent cardNode = loader.load();
             AuctionCardController cardController = loader.getController();
             if (cardController != null) {
-                cardController.setAuctionData(auction);
                 if (homeScreenController != null) {
                     cardController.setHomeScreenController(homeScreenController);
                 }
+                cardController.setAuctionData(auction);
             }
 
             if (cardNode instanceof VBox box) {

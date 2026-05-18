@@ -39,7 +39,7 @@ public class AuctionBidClientService {
     public Message fetchBidHistory(MessageTransport transport, User user, String auctionId) throws Exception {
         ensureConnected(transport);
         String sender = user != null ? user.getUsername() : "CLIENT";
-        return transport.sendAndReceive(new Message(MessageType.GET_BID_HISTORY, auctionId, sender));
+        return transport.sendAndReceive(new Message(MessageType.GET_BID_HISTORY, (Object) auctionId, sender));
     }
 
     public List<Bid> fetchBidHistoryWithFallback(MessageTransport transport, User user, String auctionId) throws Exception {

@@ -16,9 +16,7 @@ import navigation.NavigationManager;
 import server.model.Auction;
 import server.model.Item;
 import server.model.User;
-import server.repository.SqlAuctionRepository;
 import util.LoggerUtil;
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javafx.scene.shape.Rectangle;
@@ -72,6 +70,23 @@ public class SellerAuctionDetailsController {
         productImage.setClip(clip);
     }
 
+    private ClientSocket getActiveImageSocket() {
+        if (clientSocket != null && clientSocket.isConnected()) {
+            return clientSocket;
+        }
+        ClientSocket navigationSocket = NavigationManager.getInstance().getClientSocket();
+        if (navigationSocket != null && navigationSocket.isConnected()) {
+            clientSocket = navigationSocket;
+            return navigationSocket;
+        }
+        ClientSocket managerSocket = ConnectionManager.getInstance().getClientSocket();
+        if (managerSocket != null && managerSocket.isConnected()) {
+            clientSocket = managerSocket;
+            return managerSocket;
+        }
+        return null;
+    }
+
     /**
      * Tải chi tiết phiên đấu giá từ Server
      */
@@ -93,36 +108,21 @@ public class SellerAuctionDetailsController {
 
         if (socket == null || user == null) {
             ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Socket hoặc User bị null trong loadSellerAuctionDetails")));
-            loadSellerAuctionDetailsFromLocal(targetAuctionId);
             return;
         }
 
         new Thread(() -> {
             try {
                 Auction auction = sellerClientService.fetchAuctionDetail(socket, user, targetAuctionId);
-                if (auction == null) {
-                    auction = new SqlAuctionRepository().getAuctionById(targetAuctionId);
-                }
                 Auction finalAuction = auction;
                 Platform.runLater(() -> updateUI(finalAuction));
             } catch (Exception e) {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Load seller auction detail failed: " + e.getMessage())));
-                loadSellerAuctionDetailsFromLocal(targetAuctionId);
             }
         }, "SellerAuctionDetailLoadThread").start();
     }
 
 
-    private void loadSellerAuctionDetailsFromLocal(String auctionId) {
-        new Thread(() -> {
-            try {
-                Auction auction = new SqlAuctionRepository().getAuctionById(auctionId);
-                Platform.runLater(() -> updateUI(auction));
-            } catch (Exception e) {
-                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Load local seller auction detail failed: " + e.getMessage())));
-            }
-        }, "SellerAuctionDetailLocalLoadThread").start();
-    }
     /**
      * Cập nhật thông tin lên giao diện
      */
@@ -200,12 +200,13 @@ public class SellerAuctionDetailsController {
         // Download từ server
         new Thread(() -> {
             try {
-                if (clientSocket == null) {
+                ClientSocket socket = getActiveImageSocket();
+                if (socket == null) {
                     LoggerUtil.warn("ClientSocket is null");
                     return;
                 }
 
-                byte[] imageBytes = ImageDownloadService.downloadImage(clientSocket, imageId);
+                byte[] imageBytes = ImageDownloadService.downloadImage(socket, imageId);
                 Image image = new Image(new java.io.ByteArrayInputStream(imageBytes));
 
                 Platform.runLater(() -> {
@@ -273,7 +274,7 @@ public class SellerAuctionDetailsController {
                     if (cancelAuctionButton != null) {
                         cancelAuctionButton.setDisable(false);
                     }
-                    showAlert(Alert.AlertType.ERROR, "L\u1ed7i", "Kh\u00f4ng th\u1ec3 h\u1ee7y phi\u00ean: " + e.getMessage());
+                    showAlert(Alert.AlertType.ERROR, "L\u1ed7i", userFriendlyCancelError(e));
                 });
             }
         }, "SellerCancelAuctionThread").start();
@@ -367,6 +368,20 @@ public class SellerAuctionDetailsController {
 
     private void showAlert(Alert.AlertType type, String title, String content) {
         client.util.DialogUtil.showAlert(type, title, null, content);
+    }
+
+    private String userFriendlyCancelError(Exception e) {
+        String message = e != null && e.getMessage() != null ? e.getMessage() : "";
+        message = message.replace("java.lang.IllegalArgumentException:", "").trim();
+        message = message.replace("java.io.IOException:", "").trim();
+        if (message.isBlank()) {
+            return "Kh\u00f4ng th\u1ec3 h\u1ee7y phi\u00ean.";
+        }
+        if (message.toLowerCase().startsWith("khong the huy phien")
+                || message.toLowerCase().startsWith("kh\u00f4ng th\u1ec3 h\u1ee7y phi\u00ean")) {
+            return message;
+        }
+        return "Kh\u00f4ng th\u1ec3 h\u1ee7y phi\u00ean: " + message;
     }
 
     private String formatRemain(long s) {

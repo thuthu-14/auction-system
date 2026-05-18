@@ -3,6 +3,7 @@ package client.controller;
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
+import client.network.ConnectionManager;
 import client.service.ImageDownloadService;
 import client.util.RecommendationTracker;
 import javafx.application.Platform;
@@ -18,6 +19,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import navigation.NavigationManager;
 import server.model.Auction;
 import server.model.Item;
 
@@ -41,6 +43,7 @@ public class AuctionCardController {
     private Timeline countdownTimer;
     private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
     private HomeScreenController homeScreenController;
+    private String pendingImageId;
 
     @FXML
     public void initialize() {
@@ -77,6 +80,7 @@ public class AuctionCardController {
             List<String> images = item.getImages();
             if (images != null && !images.isEmpty()) {
                 String imagePath = images.get(0);
+                pendingImageId = imagePath;
 
                 // ✅ THÊM: Tải ảnh từ server
                 loadImageFromServer(imagePath);
@@ -91,6 +95,9 @@ public class AuctionCardController {
         this.homeScreenController = homeScreenController;
         if (bidButton != null) {
             bidButton.setOnAction(event -> openAuctionDetail());
+        }
+        if (pendingImageId != null && productImageView != null && productImageView.getImage() == null) {
+            loadImageFromServer(pendingImageId);
         }
     }
 
@@ -279,8 +286,17 @@ public class AuctionCardController {
      * Lấy ClientSocket từ HomeScreenController
      */
     private ClientSocket getClientSocket() {
-        if (homeScreenController != null) {
+        if (homeScreenController != null && homeScreenController.getClientSocket() != null
+                && homeScreenController.getClientSocket().isConnected()) {
             return homeScreenController.getClientSocket();  // ← GỌI METHOD VỪA THÊM
+        }
+        ClientSocket navigationSocket = NavigationManager.getInstance().getClientSocket();
+        if (navigationSocket != null && navigationSocket.isConnected()) {
+            return navigationSocket;
+        }
+        ClientSocket managerSocket = ConnectionManager.getInstance().getClientSocket();
+        if (managerSocket != null && managerSocket.isConnected()) {
+            return managerSocket;
         }
         return null;
     }

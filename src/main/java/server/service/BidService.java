@@ -66,13 +66,13 @@ public class BidService {
                 throw new PermissionDeniedException("Bạn không thể đặt giá trên phiên đấu giá của mình.");
             }
 
-            double previousPrice = auction.getCurrentPrice();
-            double chargeAmount = amount - previousPrice;
+            double previousUserBidAmount = getHighestUserBidAmount(bidder.getUserId(), auction);
+            double chargeAmount = calculateChargeAmount(amount, previousUserBidAmount);
             if (chargeAmount <= 0) {
                 throw new InvalidBidException("Gi\u00e1 \u0111\u1eb7t kh\u00f4ng h\u1ee3p l\u1ec7.");
             }
             if (chargeAmount > bidder.getWallet()) {
-                throw new InsufficientFundsException("S\u1ed1 d\u01b0 v\u00ed kh\u00f4ng \u0111\u1ee7 \u0111\u1ec3 thanh to\u00e1n b\u01b0\u1edbc gi\u00e1 n\u00e0y.");
+                throw new InsufficientFundsException("S\u1ed1 d\u01b0 v\u00ed kh\u00f4ng \u0111\u1ee7 \u0111\u1ec3 thanh to\u00e1n gi\u00e1 \u0111\u1ea5u n\u00e0y.");
             }
 
             String bidId = "BID" + System.currentTimeMillis();
@@ -88,7 +88,7 @@ public class BidService {
             }
 
             if (!bidder.deductFunds(chargeAmount)) {
-                throw new InsufficientFundsException("S\u1ed1 d\u01b0 v\u00ed kh\u00f4ng \u0111\u1ee7 \u0111\u1ec3 thanh to\u00e1n b\u01b0\u1edbc gi\u00e1 n\u00e0y.");
+                throw new InsufficientFundsException("S\u1ed1 d\u01b0 v\u00ed kh\u00f4ng \u0111\u1ee7 \u0111\u1ec3 thanh to\u00e1n gi\u00e1 \u0111\u1ea5u n\u00e0y.");
             }
             bidRepository.saveBid(bid);
             auctionRepository.saveAuction(auction);
@@ -111,9 +111,10 @@ public class BidService {
     }
 
     public List<Bid> getHistory(String auctionId) throws Exception {
-        List<Bid> bids = new ArrayList<>(bidRepository.getBidsByAuctionId(auctionId));
+        String resolvedAuctionId = resolveAuctionId(auctionId);
+        List<Bid> bids = new ArrayList<>(bidRepository.getBidsByAuctionId(resolvedAuctionId));
 
-        Auction auction = auctionRepository.getAuctionById(auctionId);
+        Auction auction = auctionRepository.getAuctionById(resolvedAuctionId);
         if (auction != null) {
             for (String bidId : auction.getBidIds()) {
                 Bid bid = bidRepository.getBidById(bidId);
@@ -216,6 +217,39 @@ public class BidService {
                 && Objects.equals(existingBid.getBidderId(), newBid.getBidderId())
                 && existingBid.getBidTime() == newBid.getBidTime()
                 && Double.compare(existingBid.getAmount(), newBid.getAmount()) == 0;
+    }
+
+    private double getHighestUserBidAmount(String bidderId, Auction auction) throws Exception {
+        if (bidderId == null || auction == null || auction.getAuctionId() == null) {
+            return 0.0;
+        }
+
+        double highestUserBidAmount = 0.0;
+        for (Bid existingBid : bidRepository.getBidsByAuctionId(auction.getAuctionId())) {
+            if (existingBid != null && bidderId.equals(existingBid.getBidderId())) {
+                highestUserBidAmount = Math.max(highestUserBidAmount, existingBid.getAmount());
+            }
+        }
+        return highestUserBidAmount;
+    }
+
+    private String resolveAuctionId(String requestedAuctionId) throws Exception {
+        String value = RequestPayloadUtil.requiredAuctionId(requestedAuctionId);
+        Auction auction = auctionRepository.getAuctionById(value);
+        if (auction != null) {
+            return auction.getAuctionId();
+        }
+
+        for (Auction candidate : auctionRepository.getAllAuctions()) {
+            if (candidate != null && value.equals(candidate.getItemId())) {
+                return candidate.getAuctionId();
+            }
+        }
+        return value;
+    }
+
+    private double calculateChargeAmount(double amount, double previousUserBidAmount) {
+        return amount - previousUserBidAmount;
     }
 
     private String productName(Auction auction) {

@@ -33,7 +33,7 @@ public class AuctionHistoryClientService {
         }
         ensureConnected(transport);
         Message response = transport.sendAndReceive(
-                new Message(MessageType.GET_USER_BIDS, user.getUserId(), user.getUsername()));
+                new Message(MessageType.GET_USER_BIDS, (Object) user.getUserId(), user.getUsername()));
         return bidClientService.extractBidList(response != null ? response.getData() : null);
     }
 
@@ -44,7 +44,7 @@ public class AuctionHistoryClientService {
             }
             ensureConnected(transport);
             Message response = transport.sendAndReceive(
-                    new Message(MessageType.GET_AUCTION_DETAIL, auctionId, user.getUsername()));
+                new Message(MessageType.GET_AUCTION_DETAIL, (Object) auctionId, user.getUsername()));
             if (response != null && "SUCCESS".equals(response.getStatus()) && response.getData() instanceof Auction auction) {
                 return auction;
             }
@@ -62,7 +62,7 @@ public class AuctionHistoryClientService {
 
         try {
             Message response = transport.sendAndReceive(
-                    new Message(MessageType.GET_SELLER_CONTACT, auction.getSellerId(), user.getUsername()));
+                new Message(MessageType.GET_SELLER_CONTACT, (Object) auction.getSellerId(), user.getUsername()));
             if (response != null && "SUCCESS".equals(response.getStatus()) && response.getData() instanceof Map<?, ?> data) {
                 Map<String, String> contact = new HashMap<>();
                 contact.put("name", asText(data.get("name"), auction.getSellerName()));

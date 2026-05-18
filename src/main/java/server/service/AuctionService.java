@@ -31,13 +31,26 @@ public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BidRepository bidRepository;
+    private final SqlTransactionRepository transactionRepository;
 
     public AuctionService(AuctionRepository auctionRepository,
                           ItemRepository itemRepository,
                           UserRepository userRepository) {
+        this(auctionRepository, itemRepository, userRepository,
+                new SqlBidRepository(), new SqlTransactionRepository());
+    }
+
+    public AuctionService(AuctionRepository auctionRepository,
+                          ItemRepository itemRepository,
+                          UserRepository userRepository,
+                          BidRepository bidRepository,
+                          SqlTransactionRepository transactionRepository) {
         this.auctionRepository = auctionRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
+        this.bidRepository = bidRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     public Auction create(RegularUser seller, Item item, int durationMinutes) throws Exception {
@@ -96,7 +109,7 @@ public class AuctionService {
     }
 
     public Auction getById(String auctionId) throws Exception {
-        Auction auction = auctionRepository.getAuctionById(RequestPayloadUtil.requiredAuctionId(auctionId));
+        Auction auction = findAuctionByAuctionOrItemId(RequestPayloadUtil.requiredAuctionId(auctionId));
         if (auction == null) {
             throw new IOException("Khong tim thay phien dau gia");
         }
@@ -129,7 +142,7 @@ public class AuctionService {
 
     public Auction cancel(String auctionId, String sellerId) throws Exception {
         return ConcurrentBidManager.getInstance().withAuctionWriteLock(auctionId, () -> {
-            Auction auction = auctionRepository.getAuctionById(auctionId);
+            Auction auction = findAuctionByAuctionOrItemId(auctionId);
             if (auction == null) {
                 throw new PermissionDeniedException("Phi\u00ean \u0111\u1ea5u gi\u00e1 kh\u00f4ng t\u1ed3n t\u1ea1i.");
             }
@@ -143,7 +156,7 @@ public class AuctionService {
                 throw new PermissionDeniedException("Phi\u00ean \u0111\u1ea5u gi\u00e1 \u0111\u00e3 k\u1ebft th\u00fac, kh\u00f4ng th\u1ec3 h\u1ee7y.");
             }
 
-            List<Bid> bids = new SqlBidRepository().getBidsByAuctionId(auction.getAuctionId());
+            List<Bid> bids = bidRepository.getBidsByAuctionId(auction.getAuctionId());
             refundAllBidsForCancelledAuction(auction, bids);
 
             auction.setStatus(AuctionStatus.CANCELLED);
@@ -160,14 +173,12 @@ public class AuctionService {
     }
 
     private void refundLosingBids(Auction auction) throws Exception {
-        List<Bid> bids = new SqlBidRepository().getBidsByAuctionId(auction.getAuctionId());
+        List<Bid> bids = bidRepository.getBidsByAuctionId(auction.getAuctionId());
         if (bids.isEmpty()) {
             return;
         }
 
         Map<String, Double> refundsByUser = calculateRefundsByUser(auction, bids, false);
-        SqlTransactionRepository transactionRepository = new SqlTransactionRepository();
-
         for (Map.Entry<String, Double> refund : refundsByUser.entrySet()) {
             User bidder = userRepository.getUserById(refund.getKey());
             if (bidder == null) {
@@ -196,8 +207,6 @@ public class AuctionService {
         }
 
         Map<String, Double> refundsByUser = calculateRefundsByUser(auction, bids, true);
-        SqlTransactionRepository transactionRepository = new SqlTransactionRepository();
-
         for (Map.Entry<String, Double> refund : refundsByUser.entrySet()) {
             User bidder = userRepository.getUserById(refund.getKey());
             if (bidder == null || refund.getValue() <= 0) {
@@ -220,14 +229,15 @@ public class AuctionService {
     private Map<String, Double> calculateRefundsByUser(Auction auction, List<Bid> bids, boolean includeWinner) {
         bids.sort((first, second) -> Long.compare(first.getBidTime(), second.getBidTime()));
         Map<String, Double> refundsByUser = new HashMap<>();
-        double previousPrice = startingPrice(auction);
+        Map<String, Double> previousBidAmountByUser = new HashMap<>();
 
         for (Bid bid : bids) {
             if (bid == null || bid.getBidderId() == null || bid.getBidderId().isBlank()) {
                 continue;
             }
-            double chargedAmount = bid.getAmount() - previousPrice;
-            previousPrice = Math.max(previousPrice, bid.getAmount());
+            double previousUserBidAmount = previousBidAmountByUser.getOrDefault(bid.getBidderId(), 0.0);
+            double chargedAmount = bid.getAmount() - previousUserBidAmount;
+            previousBidAmountByUser.put(bid.getBidderId(), Math.max(previousUserBidAmount, bid.getAmount()));
             if (chargedAmount <= 0) {
                 continue;
             }
@@ -236,13 +246,6 @@ public class AuctionService {
             }
         }
         return refundsByUser;
-    }
-
-    private double startingPrice(Auction auction) {
-        if (auction != null && auction.getItem() != null) {
-            return Math.max(0.0, auction.getItem().getStartingPrice());
-        }
-        return 0.0;
     }
 
     private String productName(Auction auction) {
@@ -441,6 +444,21 @@ public class AuctionService {
         return seller;
     }
 
+    private Auction findAuctionByAuctionOrItemId(String id) throws Exception {
+        String resolvedId = RequestPayloadUtil.requiredAuctionId(id);
+        Auction auction = auctionRepository.getAuctionById(resolvedId);
+        if (auction != null) {
+            return auction;
+        }
+
+        for (Auction candidate : auctionRepository.getAllAuctions()) {
+            if (candidate != null && resolvedId.equals(candidate.getItemId())) {
+                return candidate;
+            }
+        }
+        return null;
+    }
+
     private void requireAdmin(User user) throws PermissionDeniedException {
         if (!(user instanceof server.model.Admin)) {
             throw new PermissionDeniedException("Chi Admin co quyen thuc hien thao tac nay");
@@ -451,24 +469,24 @@ public class AuctionService {
             throws IOException, ClassNotFoundException {
         try {
             return DEFAULT.cancel(auctionId, sellerId);
-        } catch (PermissionDeniedException e) {
+        } catch (PermissionDeniedException | IllegalArgumentException e) {
             throw new IOException(e.getMessage());
         } catch (IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOException(e);
+            throw new IOException(e.getMessage() != null ? e.getMessage() : "Khong the huy phien");
         }
     }
     public static Auction cancelAuction(User currentUser, Object data)
             throws IOException, ClassNotFoundException {
         try {
             return DEFAULT.cancel(currentUser, data);
-        } catch (PermissionDeniedException e) {
+        } catch (PermissionDeniedException | IllegalArgumentException e) {
             throw new IOException(e.getMessage());
         } catch (IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOException(e);
+            throw new IOException(e.getMessage() != null ? e.getMessage() : "Khong the huy phien");
         }
     }
     /**

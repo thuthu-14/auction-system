@@ -1,6 +1,7 @@
 package server.model;
 
 import common.AuctionStatus;
+import common.Constants;
 import util.LoggerUtil;
 import java.io.Serializable;
 import java.util.*;
@@ -82,7 +83,11 @@ public class Auction implements Serializable {
     }
 
     public synchronized boolean placeBid(String bidderId, String bidderName, double amount) throws Exception {
+        long now = System.currentTimeMillis();
         if (status != AuctionStatus.OPEN && status != AuctionStatus.RUNNING) {
+            throw new Exception("Phiên đấu giá đã kết thúc!");
+        }
+        if (now > endTime) {
             throw new Exception("Phiên đấu giá đã kết thúc!");
         }
 
@@ -100,12 +105,20 @@ public class Auction implements Serializable {
 
     public synchronized void extendAuctionIfNeeded() {
         long now = System.currentTimeMillis();
-        long fiveMinutesBefore = endTime - (5 * 60 * 1000L);
+        long remainingMillis = endTime - now;
+        long antiSnipeWindowMillis = Constants.ANTI_SNIPE_MINUTES * 60 * 1000L;
 
-        if (now > fiveMinutesBefore && bidIds.size() > 0) {
-            endTime += (2 * 60 * 1000L);
-            LoggerUtil.info("Auction extended by 2 minutes: " + auctionId);
+        if (isOpenForBidding() && remainingMillis > 0 && remainingMillis <= antiSnipeWindowMillis) {
+            long extensionMillis = Constants.AUTO_EXTEND_MINUTES * 60 * 1000L;
+            endTime += extensionMillis;
+            LoggerUtil.info("Anti-sniping extension: auction " + auctionId
+                    + " extended by " + Constants.AUTO_EXTEND_MINUTES
+                    + " minutes. Remaining before extension: " + (remainingMillis / 1000) + "s");
         }
+    }
+
+    private boolean isOpenForBidding() {
+        return status == AuctionStatus.OPEN || status == AuctionStatus.RUNNING;
     }
 
     public long getTimeRemainingSeconds() {
