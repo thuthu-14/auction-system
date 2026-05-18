@@ -39,6 +39,7 @@ public class HomeScreenController {
     private User currentUser;
     private ClientSocket clientSocket;
     private Runnable onLogout;
+    private boolean showingSearchResults = false;
 
     @FXML
     public void initialize() {
@@ -164,6 +165,7 @@ public class HomeScreenController {
 
     @FXML
     public void loadDashboardView() {
+        showingSearchResults = false;
         updateMenuSelection(menuHome);
         navigateContent("/fxml/BidderView/Dashboard.fxml", controller -> {
             // ← THÊM: Refresh data khi load
@@ -178,11 +180,13 @@ public class HomeScreenController {
 
 
     public void loadProfileView() {
+        showingSearchResults = false;
         updateMenuSelection(null);
         navigateContent("/fxml/BidderView/ProfileView.fxml", null);
     }
 
     public void loadCategoryView(String fxmlPath) {
+        showingSearchResults = false;
         updateMenuSelection(null);
         navigateContent(fxmlPath, controller -> {
             if (controller instanceof CategoryController categoryController) {
@@ -193,6 +197,7 @@ public class HomeScreenController {
     }
 
     public void loadNotificationsView() {
+        showingSearchResults = false;
         updateMenuSelection(menuMsg);
         navigateContent("/fxml/BidderView/BidderNotifications.fxml", controller -> {
             if (controller instanceof NotificationsController notificationsController) {
@@ -203,6 +208,7 @@ public class HomeScreenController {
     }
 
     public void loadWalletView() {
+        showingSearchResults = false;
         updateMenuSelection(menuPay);
         navigateContent("/fxml/WalletView.fxml", controller -> {
             if (controller instanceof WalletController walletController) {
@@ -223,6 +229,7 @@ public class HomeScreenController {
     }
     @FXML
     public void loadAuctionHistoryView() {
+        showingSearchResults = false;
         updateMenuSelection(menuRecent);
         navigateContent("/fxml/BidderView/AuctionHistory.fxml", controller -> {
             if (controller instanceof AuctionHistoryController historyController) {
@@ -234,6 +241,7 @@ public class HomeScreenController {
     }
     @FXML
     private void openBecomeSeller() {
+        showingSearchResults = false;
         updateMenuSelection(menuUpgrade);
         navigateContent("/fxml/BidderView/BecomeSeller.fxml", controller -> {
             if (controller instanceof BecomeSellerController) {
@@ -253,6 +261,7 @@ public class HomeScreenController {
     }
 
     public void loadAuctionDetailView(server.model.Auction auction, boolean endedMode) {
+        showingSearchResults = false;
         RecommendationTracker.recordAuctionClick(auction);
         updateMenuSelection(null);
         navigateContent("/fxml/BidderView/AuctionDetail.fxml", controller -> {
@@ -279,6 +288,7 @@ public class HomeScreenController {
         if (productSearchInput == null) return;
         String keyword = productSearchInput.getText().trim();
         if (!keyword.isEmpty()) {
+            loadProductSearchView(keyword);
         }
     }
 
@@ -288,6 +298,21 @@ public class HomeScreenController {
             productSearchInput.clear();
             productSearchInput.requestFocus();
         }
+        if (showingSearchResults) {
+            loadDashboardView();
+        }
+    }
+
+    private void loadProductSearchView(String keyword) {
+        showingSearchResults = true;
+        updateMenuSelection(null);
+        navigateContent("/fxml/BidderView/ProductSearch.fxml", controller -> {
+            if (controller instanceof ProductSearchController searchController) {
+                searchController.setHomeScreenController(this);
+                searchController.setUserData(currentUser, clientSocket);
+                searchController.search(keyword);
+            }
+        });
     }
     
 

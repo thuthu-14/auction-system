@@ -87,6 +87,9 @@ public class Auction implements Serializable {
         if (status != AuctionStatus.OPEN && status != AuctionStatus.RUNNING) {
             throw new Exception("Phiên đấu giá đã kết thúc!");
         }
+        if (now < startTime) {
+            throw new Exception("Phiên đấu giá chưa bắt đầu!");
+        }
         if (now > endTime) {
             throw new Exception("Phiên đấu giá đã kết thúc!");
         }

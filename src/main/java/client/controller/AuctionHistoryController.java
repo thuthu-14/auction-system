@@ -369,6 +369,9 @@ public class AuctionHistoryController {
         if (auction == null || currentUser == null) {
             return false;
         }
+        if (auction.getStatus() == AuctionStatus.CANCELLED) {
+            return false;
+        }
         String userId = currentUser.getUserId();
         return userId != null && userId.equals(auction.getHighestBidderId());
     }

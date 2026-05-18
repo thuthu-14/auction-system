@@ -99,6 +99,11 @@ public class SellerWinnerInfoController {
     }
 
     private void renderWinnerInfo(Auction auction, List<Bid> bids, Map<String, String> contact) {
+        if (auction != null && auction.getStatus() == AuctionStatus.CANCELLED) {
+            showEmptyWinnerState("Phiên đấu giá đã bị hủy nên không có người trúng.");
+            return;
+        }
+
         Bid winningBid = findWinningBid(auction, bids);
         boolean auctionEnded = auction != null
                 && (auction.getStatus() == AuctionStatus.FINISHED
@@ -129,6 +134,10 @@ public class SellerWinnerInfoController {
     }
 
     private String resolveWinnerId(Auction auction, List<Bid> bids) {
+        if (auction != null && auction.getStatus() == AuctionStatus.CANCELLED) {
+            return null;
+        }
+
         Bid winningBid = findWinningBid(auction, bids);
         if (winningBid != null && winningBid.getBidderId() != null && !winningBid.getBidderId().isBlank()) {
             return winningBid.getBidderId();
@@ -137,6 +146,9 @@ public class SellerWinnerInfoController {
     }
 
     private Bid findWinningBid(Auction auction, List<Bid> bids) {
+        if (auction != null && auction.getStatus() == AuctionStatus.CANCELLED) {
+            return null;
+        }
         if (bids == null || bids.isEmpty()) {
             return null;
         }

@@ -10,7 +10,14 @@ import common.AuctionStatus;
 import common.ItemCategory;
 import server.model.Auction;
 import server.model.User;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -51,10 +58,14 @@ public class DashboardController implements Initializable {
     @FXML private HBox endingSoonHBox;
     @FXML private Button prevEndingBtn;
     @FXML private Button nextEndingBtn;
+    @FXML private ScrollPane suggestedScroll;
     @FXML private HBox suggestedHBox;
+    @FXML private Button prevSuggestedBtn;
+    @FXML private Button nextSuggestedBtn;
 
     private List<Image> bannerImages;
     private int currentImageIndex = 0;
+    private boolean bannerAnimating = false;
 
     private User currentUser;
     private ClientSocket clientSocket;
@@ -76,6 +87,7 @@ public class DashboardController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupBanner();
         setupEndingSoonControls();
+        setupSuggestedControls();
         Platform.runLater(() -> {
             forceDashboardTextColors();
             setupCategoryHoverEffects();
@@ -235,6 +247,7 @@ public class DashboardController implements Initializable {
                 suggestedHBox.getChildren().add(card);
             }
         }
+        updateSuggestedButtons();
     }
 
     private int recommendationScore(Auction auction, Map<ItemCategory, Integer> categoryWeights, Map<String, Integer> auctionRank) {
@@ -269,6 +282,19 @@ public class DashboardController implements Initializable {
         }
     }
 
+    private void setupSuggestedControls() {
+        if (prevSuggestedBtn != null) {
+            prevSuggestedBtn.setOnAction(event -> scrollSuggested(-1));
+        }
+        if (nextSuggestedBtn != null) {
+            nextSuggestedBtn.setOnAction(event -> scrollSuggested(1));
+        }
+        if (suggestedScroll != null) {
+            suggestedScroll.setHvalue(0);
+            suggestedScroll.hvalueProperty().addListener((obs, oldValue, newValue) -> updateSuggestedButtons());
+        }
+    }
+
     private boolean isVisibleAuction(Auction auction) {
         if (auction == null || auction.getStatus() == null) {
             return false;
@@ -281,9 +307,24 @@ public class DashboardController implements Initializable {
         if (endingSoonScroll == null) {
             return;
         }
-        double step = 0.38;
-        double next = Math.max(0, Math.min(1, endingSoonScroll.getHvalue() + direction * step));
-        endingSoonScroll.setHvalue(next);
+        scrollPaneSmoothly(endingSoonScroll, direction);
+    }
+
+    private void scrollSuggested(int direction) {
+        if (suggestedScroll == null) {
+            return;
+        }
+        scrollPaneSmoothly(suggestedScroll, direction);
+    }
+
+    private void scrollPaneSmoothly(ScrollPane scrollPane, int direction) {
+        double step = 0.28;
+        double next = Math.max(0, Math.min(1, scrollPane.getHvalue() + direction * step));
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.millis(720),
+                        new KeyValue(scrollPane.hvalueProperty(), next, Interpolator.SPLINE(0.22, 0.61, 0.36, 1.0)))
+        );
+        timeline.play();
     }
 
     private void updateEndingSoonButtons() {
@@ -299,24 +340,37 @@ public class DashboardController implements Initializable {
         nextEndingBtn.toFront();
     }
 
+    private void updateSuggestedButtons() {
+        if (prevSuggestedBtn == null || nextSuggestedBtn == null || suggestedHBox == null) {
+            return;
+        }
+        boolean hasOverflow = suggestedHBox.getChildren().size() > 4;
+        prevSuggestedBtn.setVisible(hasOverflow);
+        prevSuggestedBtn.setManaged(hasOverflow);
+        nextSuggestedBtn.setVisible(hasOverflow);
+        nextSuggestedBtn.setManaged(hasOverflow);
+        prevSuggestedBtn.toFront();
+        nextSuggestedBtn.toFront();
+    }
+
     private void applyCompactCardSize(VBox card) {
-        double cardWidth = 218;
-        double contentWidth = 198;
+        double cardWidth = 238;
+        double contentWidth = 216;
         card.setAlignment(Pos.TOP_CENTER);
-        card.setSpacing(7);
-        card.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #eef2f7; -fx-border-radius: 10; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 8, 0, 0, 3); -fx-padding: 10;");
+        card.setSpacing(8);
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #eef2f7; -fx-border-radius: 10; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 8, 0, 0, 3); -fx-padding: 11;");
         card.setMinWidth(cardWidth);
         card.setPrefWidth(cardWidth);
         card.setMaxWidth(cardWidth);
-        card.setMinHeight(336);
-        card.setPrefHeight(336);
-        card.setMaxHeight(336);
+        card.setMinHeight(362);
+        card.setPrefHeight(362);
+        card.setMaxHeight(362);
 
         javafx.scene.Node imageContainer = card.lookup("#imageContainer");
         if (imageContainer instanceof Region region) {
-            region.setMinSize(188, 188);
-            region.setPrefSize(188, 188);
-            region.setMaxSize(188, 188);
+            region.setMinSize(216, 204);
+            region.setPrefSize(216, 204);
+            region.setMaxSize(216, 204);
             region.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 8;");
             VBox.setMargin(region, new javafx.geometry.Insets(0, 0, 0, 0));
             if (region instanceof StackPane stackPane) {
@@ -326,8 +380,8 @@ public class DashboardController implements Initializable {
 
         javafx.scene.Node productImage = card.lookup("#productImageView");
         if (productImage instanceof ImageView imageView) {
-            imageView.setFitWidth(188);
-            imageView.setFitHeight(188);
+            imageView.setFitWidth(216);
+            imageView.setFitHeight(204);
         }
 
         javafx.scene.Node productName = card.lookup("#productNameLabel");
@@ -336,20 +390,20 @@ public class DashboardController implements Initializable {
             label.setMinHeight(40);
             label.setPrefHeight(40);
             label.setMaxHeight(40);
-            label.setStyle("-fx-text-fill: #113254; -fx-font-size: 13px; -fx-font-weight: bold;");
+            label.setStyle("-fx-text-fill: #113254; -fx-font-size: 14px; -fx-font-weight: bold;");
             VBox.setMargin(label, new javafx.geometry.Insets(4, 0, 0, 0));
         }
 
         
-        resizeMetaRow(card, contentWidth, 25, 11, 11);
+        resizeMetaRow(card, contentWidth, 27, 12, 12);
 
         javafx.scene.Node bidButton = card.lookup("#bidButton");
         if (bidButton instanceof Button button) {
             setRegionWidth(button, contentWidth);
-            button.setMinHeight(28);
-            button.setPrefHeight(28);
-            button.setMaxHeight(28);
-            button.setStyle("-fx-background-color: #1a1a1a; -fx-background-radius: 14; -fx-cursor: hand; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 0;");
+            button.setMinHeight(32);
+            button.setPrefHeight(32);
+            button.setMaxHeight(32);
+            button.setStyle("-fx-background-color: #1a1a1a; -fx-background-radius: 16; -fx-cursor: hand; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 0;");
         }
     }
 
@@ -540,14 +594,56 @@ public class DashboardController implements Initializable {
 
     private void showNextImage() {
         if (bannerImages == null || bannerImages.isEmpty()) return;
-        currentImageIndex = (currentImageIndex + 1) % bannerImages.size();
-        bannerImageView.setImage(bannerImages.get(currentImageIndex));
+        showBannerImage((currentImageIndex + 1) % bannerImages.size(), 1);
     }
 
     private void showPreviousImage() {
         if (bannerImages == null || bannerImages.isEmpty()) return;
-        currentImageIndex = (currentImageIndex - 1 + bannerImages.size()) % bannerImages.size();
+        showBannerImage((currentImageIndex - 1 + bannerImages.size()) % bannerImages.size(), -1);
+    }
+
+    private void showBannerImage(int nextIndex, int direction) {
+        if (bannerImages == null || bannerImages.isEmpty() || bannerImageView == null || bannerAnimating) {
+            return;
+        }
+        if (nextIndex == currentImageIndex) {
+            return;
+        }
+
+        bannerAnimating = true;
+        setBannerButtonsDisabled(true);
+
+        double slideDistance = 46.0 * direction;
+        bannerImageView.setOpacity(0.0);
+        bannerImageView.setTranslateX(slideDistance);
+        currentImageIndex = nextIndex;
         bannerImageView.setImage(bannerImages.get(currentImageIndex));
+
+        TranslateTransition slide = new TranslateTransition(Duration.millis(320), bannerImageView);
+        slide.setFromX(slideDistance);
+        slide.setToX(0.0);
+
+        FadeTransition fade = new FadeTransition(Duration.millis(260), bannerImageView);
+        fade.setFromValue(0.0);
+        fade.setToValue(1.0);
+
+        ParallelTransition transition = new ParallelTransition(slide, fade);
+        transition.setOnFinished(event -> {
+            bannerImageView.setTranslateX(0.0);
+            bannerImageView.setOpacity(1.0);
+            bannerAnimating = false;
+            setBannerButtonsDisabled(false);
+        });
+        transition.play();
+    }
+
+    private void setBannerButtonsDisabled(boolean disabled) {
+        if (prevBannerBtn != null) {
+            prevBannerBtn.setDisable(disabled);
+        }
+        if (nextBannerBtn != null) {
+            nextBannerBtn.setDisable(disabled);
+        }
     }
 
     public void refreshAuctions() {

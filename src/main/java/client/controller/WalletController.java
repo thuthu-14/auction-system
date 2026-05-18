@@ -178,7 +178,8 @@ public class WalletController implements Initializable {
 
         DialogPane pane = dialog.getDialogPane();
         pane.getButtonTypes().add(ButtonType.CLOSE);
-        pane.setStyle("-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e5e7eb; -fx-border-radius: 14;");
+        pane.setStyle("-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e5e7eb; -fx-border-radius: 14;"
+                + " -fx-padding: 0 0 14 0;");
 
         VBox content = new VBox(16);
         content.setPadding(new Insets(18, 22, 18, 22));
@@ -207,7 +208,26 @@ public class WalletController implements Initializable {
 
         content.getChildren().addAll(title, amount, detailGrid);
         pane.setContent(content);
+        styleTransactionDetailCloseButton(pane);
         dialog.showAndWait();
+    }
+
+    private void styleTransactionDetailCloseButton(DialogPane pane) {
+        Node closeNode = pane.lookupButton(ButtonType.CLOSE);
+        if (closeNode instanceof Button closeButton) {
+            closeButton.setText("Đóng");
+            closeButton.setMinHeight(40);
+            closeButton.setPrefHeight(40);
+            closeButton.setMinWidth(110);
+            closeButton.setDefaultButton(true);
+            closeButton.setStyle("-fx-background-color: #111827;"
+                    + " -fx-text-fill: white;"
+                    + " -fx-font-size: 14px;"
+                    + " -fx-font-weight: bold;"
+                    + " -fx-background-radius: 20;"
+                    + " -fx-cursor: hand;"
+                    + " -fx-padding: 0 24 0 24;");
+        }
     }
 
     private void addTransactionDetailRow(GridPane grid, int rowIndex, String labelText, String valueText) {

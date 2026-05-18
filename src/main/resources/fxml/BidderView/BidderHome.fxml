@@ -145,24 +145,24 @@
                         </HBox>
                         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" VBox.vgrow="ALWAYS">
                             <content>
-                        <StackPane fx:id="contentArea" minWidth="0.0" style="-fx-background-color: #fcfcfc;">
-                            <children>
-                                <VBox alignment="CENTER" minHeight="600" spacing="10.0">
+                                <StackPane fx:id="contentArea" minWidth="0.0" style="-fx-background-color: #fcfcfc;">
                                     <children>
-                                        <Label style="-fx-translate-x: -3;" text="Chào mừng đến với BubblyBid" textFill="#2e384d">
-                                            <font>
-                                                <Font name="System Bold" size="28.0" />
-                                            </font>
-                                        </Label>
-                                        <Label text="Chọn một mục ở menu bên trái để bắt đầu" textFill="#a0aec0">
-                                            <font>
-                                                <Font size="16.0" />
-                                            </font>
-                                        </Label>
+                                        <VBox alignment="CENTER" minHeight="600" spacing="10.0">
+                                            <children>
+                                                <Label style="-fx-translate-x: -3;" text="Chào mừng đến với BubblyBid" textFill="#2e384d">
+                                                    <font>
+                                                        <Font name="System Bold" size="28.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label text="Chọn một mục ở menu bên trái để bắt đầu" textFill="#a0aec0">
+                                                    <font>
+                                                        <Font size="16.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                        </VBox>
                                     </children>
-                                </VBox>
-                            </children>
-                        </StackPane>
+                                </StackPane>
                             </content>
                         </ScrollPane>
                     </children>

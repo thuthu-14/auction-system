@@ -59,7 +59,16 @@ public class AuctionService {
 
     public Auction create(RegularUser seller, Item item, int durationMinutes,
                           double reservePrice, double minimumBidIncrement) throws Exception {
+        long startTimeMillis = System.currentTimeMillis();
+        long endTimeMillis = startTimeMillis + durationMinutes * 60_000L;
+        return create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement);
+    }
+
+    public Auction create(RegularUser seller, Item item, long startTimeMillis, long endTimeMillis,
+                          double reservePrice, double minimumBidIncrement) throws Exception {
+        int durationMinutes = (int) ((endTimeMillis - startTimeMillis) / 60_000L);
         validateCreateAuction(seller, item, durationMinutes);
+        validateTimeWindow(startTimeMillis, endTimeMillis);
 
         String auctionId = "AU" + System.currentTimeMillis();
         String itemId = "IT" + System.currentTimeMillis();
@@ -72,7 +81,8 @@ public class AuctionService {
                 seller.getUsername(),
                 item,
                 item.getStartingPrice(),
-                durationMinutes
+                startTimeMillis,
+                endTimeMillis
         );
         auction.setReservePrice(Math.max(0.0, reservePrice));
         auction.setMinimumBidIncrement(Math.max(0.0, minimumBidIncrement));
@@ -160,6 +170,8 @@ public class AuctionService {
             refundAllBidsForCancelledAuction(auction, bids);
 
             auction.setStatus(AuctionStatus.CANCELLED);
+            auction.setHighestBidderId(null);
+            auction.setHighestBidderName(null);
             auctionRepository.saveAuction(auction);
             AuctionManager.getInstance().notifyAuctionCancelled(auction);
             LoggerUtil.info("Auction cancelled: " + auctionId + " by seller " + sellerId);
@@ -301,6 +313,16 @@ public class AuctionService {
         }
     }
 
+    private void validateTimeWindow(long startTimeMillis, long endTimeMillis) throws PermissionDeniedException {
+        long now = System.currentTimeMillis();
+        if (startTimeMillis < now - 60_000L) {
+            throw new PermissionDeniedException("Thời gian bắt đầu phải từ thời điểm hiện tại trở đi.");
+        }
+        if (endTimeMillis <= startTimeMillis) {
+            throw new PermissionDeniedException("Thời gian kết thúc phải sau thời gian bắt đầu.");
+        }
+    }
+
     public static Auction createAuction(RegularUser seller, Item item, int durationMinutes)
             throws PermissionDeniedException, IOException, ClassNotFoundException {
         try {
@@ -317,6 +339,18 @@ public class AuctionService {
             throws PermissionDeniedException, IOException, ClassNotFoundException {
         try {
             return DEFAULT.create(seller, item, durationMinutes, reservePrice, minimumBidIncrement);
+        } catch (PermissionDeniedException | IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    public static Auction createAuction(RegularUser seller, Item item, long startTimeMillis, long endTimeMillis,
+                                        double reservePrice, double minimumBidIncrement)
+            throws PermissionDeniedException, IOException, ClassNotFoundException {
+        try {
+            return DEFAULT.create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement);
         } catch (PermissionDeniedException | IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {

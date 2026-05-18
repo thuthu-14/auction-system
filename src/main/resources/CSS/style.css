@@ -90,6 +90,19 @@
     -fx-text-fill: #111827;
 }
 
+.product-search-title {
+    -fx-font-family: "System";
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+}
+
+.product-search-summary {
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+    -fx-text-fill: #718096;
+}
+
 .my-custom-alert.dialog-pane {
     -fx-background-color: white;
     -fx-background-insets: 0;

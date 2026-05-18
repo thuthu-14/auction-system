@@ -138,24 +138,6 @@
                     <children>
                         <HBox alignment="CENTER_LEFT" maxHeight="80.0" minHeight="80.0" prefHeight="80.0" style="-fx-background-color: #ffffff;                               -fx-padding: 0 40 0 40;                               -fx-border-color: #f0f0f0;                               -fx-border-width: 0 0 1 0;">
                             <children>
-                                <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" prefHeight="48.0" prefWidth="500.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 24; -fx-padding: 0 20 0 20;">
-                                    <children>
-                                        <Label style="-fx-font-size: 16px;" text="🔍" textFill="#9ca3af" />
-                                        <TextField fx:id="productSearchInput" onAction="#handleProductSearch" promptText="Tìm kiếm sản phẩm..." style="-fx-background-color: transparent; -fx-prompt-text-fill: #9ca3af; -fx-text-fill: #374151;" HBox.hgrow="ALWAYS">
-                                            <font>
-                                                <Font size="15.0" />
-                                            </font>
-                                            <padding>
-                                                <Insets left="10.0" />
-                                            </padding>
-                                        </TextField>
-                                        <Button fx:id="clearSearchBtn" onAction="#clearSearch" style="-fx-background-color: transparent; -fx-cursor: hand;" text="✕" textFill="#9ca3af" visible="false">
-                                            <font>
-                                                <Font name="System Bold" size="14.0" />
-                                            </font>
-                                        </Button>
-                                    </children>
-                                </HBox>
                                 <Region HBox.hgrow="ALWAYS" />
                                 <Button onAction="#loadProfileView" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e2e8f0; -fx-background-radius: 20; -fx-cursor: hand;" text="👤">
                                     <font>

@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -153,28 +155,36 @@ public class AddAuctionProductController implements Initializable {
     }
 
     private void setupTimeOptions(Parent formNode, CategoryFormConfig config) {
-        LocalDate today = LocalDate.now();
-        LocalDate tomorrow = today.plusDays(1);
+        LocalDateTime nextStartDateTime = nextAvailableStartDateTime();
+        LocalDate startDate = nextStartDateTime.toLocalDate();
+        LocalTime nextStartTime = nextStartDateTime.toLocalTime();
+        LocalDate endDate = startDate.plusDays(1);
 
         ComboBox<?> startHourCombo = (ComboBox<?>) formNode.lookup(config.startHourId());
         ComboBox<?> endHourCombo = (ComboBox<?>) formNode.lookup(config.endHourId());
         DatePicker startDatePicker = (DatePicker) formNode.lookup(config.startDateId());
         DatePicker endDatePicker = (DatePicker) formNode.lookup(config.endDateId());
 
-        if (startDatePicker != null) startDatePicker.setValue(today);
-        if (endDatePicker != null) endDatePicker.setValue(tomorrow);
+        if (startDatePicker != null) startDatePicker.setValue(startDate);
+        if (endDatePicker != null) endDatePicker.setValue(endDate);
         applyCalendarStyles(startDatePicker, endDatePicker);
 
         if (startHourCombo != null) {
             @SuppressWarnings("unchecked") ComboBox<String> comboBox = (ComboBox<String>) startHourCombo;
             comboBox.setItems(timeOptions);
-            comboBox.getSelectionModel().select("08:00");
+            comboBox.getSelectionModel().select(nextStartTime.toString());
         }
         if (endHourCombo != null) {
             @SuppressWarnings("unchecked") ComboBox<String> comboBox = (ComboBox<String>) endHourCombo;
             comboBox.setItems(timeOptions);
-            comboBox.getSelectionModel().select("17:00");
+            comboBox.getSelectionModel().select(nextStartTime.toString());
         }
+    }
+
+    private LocalDateTime nextAvailableStartDateTime() {
+        LocalDateTime now = LocalDateTime.now().plusMinutes(30);
+        int minute = now.getMinute() <= 30 ? 30 : 60;
+        return now.withMinute(0).withSecond(0).withNano(0).plusMinutes(minute);
     }
     private void applyCalendarStyles(DatePicker... datePickers) {
         String calendarCss = getCalendarStylesheet();

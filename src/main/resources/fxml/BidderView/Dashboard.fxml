@@ -146,34 +146,29 @@
                                 </font>
                             </Label>
                             <Region HBox.hgrow="ALWAYS" />
-                            <Button style="-fx-background-color: transparent; -fx-cursor: hand; -fx-padding: 0;" text="Xem tất cả &gt;" textFill="#3182ce" underline="true">
-                                <font>
-                                    <Font size="14.0" />
-                                </font>
-                            </Button>
                         </children>
                     </HBox>
-                    <StackPane maxWidth="Infinity" style="-fx-padding: 0 26 0 26;">
+                    <StackPane alignment="CENTER" maxWidth="Infinity" minHeight="372.0" prefHeight="372.0" style="-fx-padding: 0 24 0 24;">
                         <children>
-                            <ScrollPane fx:id="endingSoonScroll" fitToHeight="true" hbarPolicy="NEVER" maxWidth="Infinity" prefHeight="346.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                            <ScrollPane fx:id="endingSoonScroll" fitToHeight="true" hbarPolicy="NEVER" maxWidth="Infinity" prefHeight="372.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
                                 <content>
                                     <HBox fx:id="endingSoonHBox" alignment="CENTER_LEFT" spacing="16.0" />
                                 </content>
                             </ScrollPane>
-                            <Button fx:id="prevEndingBtn" prefHeight="36.0" prefWidth="36.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 18; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 18;" text="&lt;" StackPane.alignment="CENTER_LEFT">
+                            <Button fx:id="prevEndingBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;" text="&lt;" StackPane.alignment="CENTER_LEFT">
                                 <font>
                                     <Font name="System Bold" size="16.0" />
                                 </font>
                                 <StackPane.margin>
-                                    <Insets left="0.0" />
+                                    <Insets left="-52.0" />
                                 </StackPane.margin>
                             </Button>
-                            <Button fx:id="nextEndingBtn" prefHeight="36.0" prefWidth="36.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 18; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 18;" text="&gt;" StackPane.alignment="CENTER_RIGHT">
+                            <Button fx:id="nextEndingBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;" text="&gt;" StackPane.alignment="CENTER_RIGHT">
                                 <font>
                                     <Font name="System Bold" size="16.0" />
                                 </font>
                                 <StackPane.margin>
-                                    <Insets right="0.0" />
+                                    <Insets right="-52.0" />
                                 </StackPane.margin>
                             </Button>
                         </children>
@@ -187,11 +182,31 @@
                             <Font name="System Bold" size="20.0" />
                         </font>
                     </Label>
-                    <ScrollPane fitToHeight="true" hbarPolicy="NEVER" prefHeight="346.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
-                        <content>
-                            <HBox fx:id="suggestedHBox" alignment="CENTER_LEFT" spacing="16.0" />
-                        </content>
-                    </ScrollPane>
+                    <StackPane alignment="CENTER" maxWidth="Infinity" minHeight="346.0" prefHeight="346.0" style="-fx-padding: 0 24 0 24;">
+                        <children>
+                            <ScrollPane fx:id="suggestedScroll" fitToHeight="true" hbarPolicy="NEVER" maxWidth="Infinity" prefHeight="346.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                                <content>
+                                    <HBox fx:id="suggestedHBox" alignment="CENTER_LEFT" spacing="16.0" />
+                                </content>
+                            </ScrollPane>
+                            <Button fx:id="prevSuggestedBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;" text="&lt;" StackPane.alignment="CENTER_LEFT">
+                                <font>
+                                    <Font name="System Bold" size="16.0" />
+                                </font>
+                                <StackPane.margin>
+                                    <Insets left="-52.0" />
+                                </StackPane.margin>
+                            </Button>
+                            <Button fx:id="nextSuggestedBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;" text="&gt;" StackPane.alignment="CENTER_RIGHT">
+                                <font>
+                                    <Font name="System Bold" size="16.0" />
+                                </font>
+                                <StackPane.margin>
+                                    <Insets right="-52.0" />
+                                </StackPane.margin>
+                            </Button>
+                        </children>
+                    </StackPane>
                 </children>
             </VBox>
         </children>
