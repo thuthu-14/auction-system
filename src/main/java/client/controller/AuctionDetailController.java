@@ -2,12 +2,15 @@ package client.controller;
 
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
+import client.controller.auctiondetail.AuctionBidHistoryGraphController;
+import client.controller.auctiondetail.AuctionBidHistoryGraphRenderer;
+import client.controller.auctiondetail.AuctionImageGalleryRenderer;
+import client.controller.auctiondetail.AuctionRealtimeDispatcher;
+import client.network.AuctionListener;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.AuctionBidClientService;
 import client.service.AuctionDetailDataMapper;
-import client.service.BidHistoryCache;
-import client.service.ImageDownloadService;
 import client.util.AuctionDetailGridRenderer;
 import client.util.JsonObjects;
 import com.google.gson.JsonObject;
@@ -26,21 +29,17 @@ import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import navigation.NavigationManager;
 import server.model.Auction;
@@ -51,13 +50,11 @@ import util.DateTimeUtil;
 import util.LoggerUtil;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class AuctionDetailController {
+public class AuctionDetailController implements AuctionListener {
     private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
     private static final Duration BID_HISTORY_REFRESH_INTERVAL = Duration.millis(500);
 
@@ -88,27 +85,25 @@ public class AuctionDetailController {
     private Timeline bidHistoryRefreshTimer;
     private final AtomicBoolean bidHistoryRequestInFlight = new AtomicBoolean(false);
     private boolean endedMode;
-    private boolean initialBidHistoryPositioned;
     private boolean bidPriceAxisPinInstalled;
-    private boolean fallbackBidHistoryRendered;
-    private String lastBidHistorySignature;
     private final AuctionBidClientService bidClientService = new AuctionBidClientService();
     private final AuctionDetailDataMapper dataMapper = new AuctionDetailDataMapper();
-    private final BidHistoryCache bidHistoryCache = new BidHistoryCache();
     private final AuctionDetailGridRenderer detailGridRenderer = new AuctionDetailGridRenderer();
+    private final AuctionRealtimeDispatcher realtimeDispatcher = new AuctionRealtimeDispatcher(this);
+    private AuctionImageGalleryRenderer imageGalleryRenderer;
+    private AuctionBidHistoryGraphRenderer bidHistoryGraphRenderer;
+    private AuctionBidHistoryGraphController bidHistoryGraphController;
 
     public void loadAuctionData(Auction auction) {
         stopBidHistoryRefresh();
-        initialBidHistoryPositioned = false;
-        fallbackBidHistoryRendered = false;
-        lastBidHistorySignature = null;
+        bidHistoryGraphController().reset();
         if (auction == null) {
             clearView();
             return;
         }
 
         Item item = auction.getItem();
-        loadMainImage(item);
+        imageGalleryRenderer().loadMainImage(item);
 
         endedMode = endedMode || dataMapper.isAuctionEnded(auction);
         loadAuctionData(dataMapper.toDetailData(auction));
@@ -131,10 +126,10 @@ public class AuctionDetailController {
 
         JsonObject productData = JsonObjects.getObject(itemData, "item", itemData);
         if (productNameLabel != null) {
-            productNameLabel.setText(JsonObjects.getString(productData, "name", "Chưa có tên sản phẩm"));
+            productNameLabel.setText(JsonObjects.getString(productData, "name", "ChÆ°a cÃ³ tÃªn sáº£n pháº©m"));
         }
         if (descriptionLabel != null) {
-            descriptionLabel.setText(JsonObjects.getString(productData, "description", "Chưa có mô tả"));
+            descriptionLabel.setText(JsonObjects.getString(productData, "description", "ChÆ°a cÃ³ mÃ´ táº£"));
         }
 
         String incomingAuctionId = JsonObjects.getString(itemData, "auctionId", "");
@@ -185,30 +180,30 @@ public class AuctionDetailController {
 
     @FXML private void handleConfirmBid() {
         if (endedMode) {
-            showAlert(Alert.AlertType.WARNING, "Đã kết thúc", "Phiên đấu giá này đã kết thúc.");
+            showAlert(Alert.AlertType.WARNING, "ÄÃ£ káº¿t thÃºc", "PhiÃªn Ä‘áº¥u giÃ¡ nÃ y Ä‘Ã£ káº¿t thÃºc.");
             return;
         }
 
         double amount = parseBidAmount();
         double minimumAllowed = currentPrice + minimumBidIncrement;
         if (amount < minimumAllowed) {
-            showAlert(Alert.AlertType.WARNING, "Giá đặt thấp", "Tối thiểu: " + formatVnd(minimumAllowed));
+            showAlert(Alert.AlertType.WARNING, "GiÃ¡ Ä‘áº·t tháº¥p", "Tá»‘i thiá»ƒu: " + formatVnd(minimumAllowed));
             return;
         }
 
         User currentUser = NavigationManager.getInstance().getCurrentUser();
         ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
         if (currentUser == null || socket == null || !socket.isConnected()) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng đăng nhập lại!");
+            showAlert(Alert.AlertType.ERROR, "Lá»—i", "Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i!");
             return;
         }
         if (currentUser.getWallet() <= 0) {
-            showAlert(Alert.AlertType.WARNING, "Chưa thể đấu giá", "Bạn cần liên kết ngân hàng và nạp tiền vào ví trước khi đấu giá.");
+            showAlert(Alert.AlertType.WARNING, "ChÆ°a thá»ƒ Ä‘áº¥u giÃ¡", "Báº¡n cáº§n liÃªn káº¿t ngÃ¢n hÃ ng vÃ  náº¡p tiá»n vÃ o vÃ­ trÆ°á»›c khi Ä‘áº¥u giÃ¡.");
             return;
         }
 
         confirmBidBtn.setDisable(true);
-        confirmBidBtn.setText("ĐANG XỬ LÝ...");
+        confirmBidBtn.setText("ÄANG Xá»¬ LÃ...");
         new Thread(() -> {
             try {
                 Message response = bidClientService.placeBid(socket, currentUser, currentAuctionId, amount);
@@ -221,18 +216,18 @@ public class AuctionDetailController {
                         } else {
                             refreshBidHistoryFromServer(currentAuctionId);
                         }
-                        showAlert(Alert.AlertType.INFORMATION, "Thành công", "Bạn đã xác nhận đấu giá thành công!");
+                        showAlert(Alert.AlertType.INFORMATION, "ThÃ nh cÃ´ng", "Báº¡n Ä‘Ã£ xÃ¡c nháº­n Ä‘áº¥u giÃ¡ thÃ nh cÃ´ng!");
                     } else {
-                        showAlert(Alert.AlertType.ERROR, "Thất bại", response != null ? response.getMessage() : "Lỗi server");
+                        showAlert(Alert.AlertType.ERROR, "Tháº¥t báº¡i", response != null ? response.getMessage() : "Lá»—i server");
                     }
                 });
             } catch (Exception e) {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Place bid failed: " + e.getMessage())));
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Mất kết nối server"));
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lá»—i", "Máº¥t káº¿t ná»‘i server"));
             } finally {
                 Platform.runLater(() -> {
                     confirmBidBtn.setDisable(endedMode);
-                    confirmBidBtn.setText("XÁC NHẬN ĐẤU GIÁ");
+                    confirmBidBtn.setText("XÃC NHáº¬N Äáº¤U GIÃ");
                 });
             }
         }, "PlaceBidThread").start();
@@ -282,7 +277,7 @@ public class AuctionDetailController {
             updateBidHistoryGraph(localBids, shouldAutoScrollInitialBidHistory());
         }
 
-        List<Bid> cachedBids = bidHistoryCache.get(currentAuctionId);
+        List<Bid> cachedBids = bidHistoryGraphController().getCachedBids(currentAuctionId);
         if (cachedBids != null && !cachedBids.isEmpty()) {
             updateBidHistoryGraph(cachedBids, shouldAutoScrollInitialBidHistory());
         }
@@ -453,216 +448,103 @@ public class AuctionDetailController {
                 continue;
             }
 
-            Object data = asyncMessage.getData();
-            if (data instanceof Bid bid && currentAuctionId != null && currentAuctionId.equals(bid.getAuctionId())) {
-                mergeBidIntoHistory(bid, false);
-            } else if (data instanceof Auction auction && currentAuctionId != null && currentAuctionId.equals(auction.getAuctionId())) {
-                applyLatestBidPrice(auction.getCurrentPrice());
-            }
+            realtimeDispatcher.dispatch(asyncMessage);
         }
+    }
+
+    @Override
+    public void onAuctionUpdated(Auction auction) {
+        if (isCurrentAuction(auction)) {
+            applyLatestBidPrice(auction.getCurrentPrice());
+        }
+    }
+
+    @Override
+    public void onBidPlaced(Bid bid) {
+        if (bid != null && currentAuctionId != null && currentAuctionId.equals(bid.getAuctionId())) {
+            mergeBidIntoHistory(bid, false);
+        }
+    }
+
+    @Override
+    public void onPriceUpdated(Auction auction) {
+        onAuctionUpdated(auction);
+    }
+
+    @Override
+    public void onAuctionFinished(Auction auction) {
+        if (isCurrentAuction(auction)) {
+            applyLatestBidPrice(auction.getCurrentPrice());
+            endedMode = true;
+            applyEndedMode();
+        }
+    }
+
+    @Override
+    public void onError(String errorMessage) {
+        LoggerUtil.warn("Auction realtime error: " + safeRealtimeText(errorMessage));
+    }
+
+    @Override
+    public void onNotification(String message) {
+        LoggerUtil.debug("Auction realtime notification: " + safeRealtimeText(message));
+    }
+
+    @Override
+    public void onOutbid(Auction auction) {
+        onAuctionUpdated(auction);
+    }
+
+    @Override
+    public void onAuctionExtended(Auction auction) {
+        if (isCurrentAuction(auction)) {
+            startCountdown(auction.getEndTime());
+            applyLatestBidPrice(auction.getCurrentPrice());
+        }
+    }
+
+    private boolean isCurrentAuction(Auction auction) {
+        return auction != null && currentAuctionId != null && currentAuctionId.equals(auction.getAuctionId());
+    }
+
+    private String safeRealtimeText(String value) {
+        return value == null || value.isBlank() ? "" : value;
     }
 
     private void updateBidHistoryGraph(List<Bid> bids) {
-        updateBidHistoryGraph(bids, false);
+        bidHistoryGraphController().updateGraph(bids);
     }
 
     private void updateBidHistoryGraph(List<Bid> bids, boolean scrollToLatest) {
-        if (bidHistoryChart == null) {
-            return;
-        }
-
-        List<Bid> sortedBids = new ArrayList<>(bids != null ? bids : List.of());
-        sortedBids.sort(Comparator.comparingLong(Bid::getBidTime));
-        double firstValue = startingPrice > 0 ? startingPrice : currentPrice;
-        String newSignature = bidHistoryCache.buildSignature(sortedBids, firstValue);
-        if (newSignature.equals(lastBidHistorySignature)) {
-            if (bidHistoryScrollPane != null && scrollToLatest) {
-                Platform.runLater(() -> bidHistoryScrollPane.setHvalue(1.0));
-            }
-            return;
-        }
-        if (sortedBids.isEmpty() && fallbackBidHistoryRendered) {
-            return;
-        }
-        if (sortedBids.isEmpty() && shouldKeepExistingBidGraph()) {
-            return;
-        }
-
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Giá theo lượt đặt");
-
-        XYChart.Data<String, Number> basePoint = new XYChart.Data<>("Giá đầu", firstValue);
-        basePoint.setNode(createBidPoint("Giá đầu\n" + formatVnd(firstValue)));
-        series.getData().add(basePoint);
-        basePoint.setXValue("\u0110i\u1ec3m kh\u1edfi \u0111\u1ea7u");
-        basePoint.setNode(createBidPoint("\u0110i\u1ec3m kh\u1edfi \u0111\u1ea7u\n" + formatVnd(firstValue)));
-        fallbackBidHistoryRendered = sortedBids.isEmpty();
-
-        if (sortedBids.isEmpty() && series.getData().isEmpty()) {
-            XYChart.Data<String, Number> startingPoint = new XYChart.Data<>("Giá đầu", firstValue);
-            startingPoint.setNode(createBidPoint("Giá đầu\n" + formatVnd(firstValue)));
-            series.getData().add(startingPoint);
-            fallbackBidHistoryRendered = true;
-        } else {
-            for (int i = 0; i < sortedBids.size(); i++) {
-                Bid bid = sortedBids.get(i);
-                String turnLabel = "Lần thứ " + (i + 1);
-                XYChart.Data<String, Number> bidPoint = new XYChart.Data<>(turnLabel, bid.getAmount());
-                bidPoint.setNode(createBidPoint(turnLabel
-                        + "\nNgười đặt: " + safeText(bid.getBidderName(), "Không rõ")
-                        + "\nGiá: " + formatVnd(bid.getAmount())));
-                series.getData().add(bidPoint);
-            }
-        }
-
-        if (bidTurnAxis != null) {
-            bidTurnAxis.getCategories().setAll(series.getData().stream()
-                    .map(XYChart.Data::getXValue)
-                    .toList());
-        }
-        bidHistoryChart.getData().setAll(series);
-        bidHistoryChart.setPrefWidth(calculateBidChartWidth(series.getData().size()));
-        bidHistoryChart.setMinWidth(calculateBidChartWidth(series.getData().size()));
-        bidHistoryChart.setMaxWidth(Region.USE_PREF_SIZE);
-        updateBidPriceAxis(sortedBids, firstValue);
-        lastBidHistorySignature = newSignature;
-
-        if (!sortedBids.isEmpty()) {
-            syncPriceFromBidHistory(sortedBids);
-        }
-        if (currentAuctionId != null && !currentAuctionId.isBlank()) {
-            bidHistoryCache.put(currentAuctionId, sortedBids);
-        }
-        if (bidHistoryScrollPane != null && scrollToLatest) {
-            Platform.runLater(() -> bidHistoryScrollPane.setHvalue(1.0));
-        }
+        bidHistoryGraphController().updateGraph(bids, scrollToLatest);
     }
 
     private boolean shouldKeepExistingBidGraph() {
-        if (currentAuctionId != null) {
-            List<Bid> cachedBids = bidHistoryCache.get(currentAuctionId);
-            if (cachedBids != null && !cachedBids.isEmpty()) {
-                return true;
-            }
-        }
-        return bidHistoryChart != null
-                && !bidHistoryChart.getData().isEmpty()
-                && !bidHistoryChart.getData().get(0).getData().isEmpty()
-                && bidHistoryChart.getData().get(0).getData().size() > 1;
+        return bidHistoryGraphController().shouldKeepExistingGraph();
     }
 
     private void showFallbackCurrentPriceGraph() {
-        if (bidHistoryChart == null) {
-            return;
-        }
-        if (fallbackBidHistoryRendered) {
-            return;
-        }
-
-        double firstValue = startingPrice > 0 ? startingPrice : currentPrice;
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Giá theo lượt đặt");
-        XYChart.Data<String, Number> startingPoint = new XYChart.Data<>("Giá đầu", firstValue);
-        startingPoint.setNode(createBidPoint("Giá đầu\n" + formatVnd(firstValue)));
-        series.getData().add(startingPoint);
-        bidHistoryChart.getData().setAll(series);
-        bidHistoryChart.setPrefWidth(calculateBidChartWidth(series.getData().size()));
-        bidHistoryChart.setMinWidth(calculateBidChartWidth(series.getData().size()));
-        bidHistoryChart.setMaxWidth(Region.USE_PREF_SIZE);
-        updateBidPriceAxis(List.of(), firstValue);
-        fallbackBidHistoryRendered = true;
-        lastBidHistorySignature = bidHistoryCache.buildSignature(List.of(), firstValue);
-    }
-
-    private double calculateBidChartWidth(int pointCount) {
-        return Math.max(900, 180 + Math.max(pointCount, 1) * 90.0);
-    }
-
-    private StackPane createBidPoint(String tooltipText) {
-        Circle outer = new Circle(6);
-        outer.setStyle("-fx-fill: #f15a24;");
-        Circle inner = new Circle(3);
-        inner.setStyle("-fx-fill: white;");
-        StackPane point = new StackPane(outer, inner);
-        point.setMinSize(18, 18);
-        point.setPrefSize(18, 18);
-        point.setMaxSize(18, 18);
-        Tooltip.install(point, new Tooltip(tooltipText));
-        return point;
+        bidHistoryGraphController().showFallbackCurrentPriceGraph();
     }
 
     private void keepExistingOrShowFallback() {
-        if (!shouldKeepExistingBidGraph()) {
-            showFallbackCurrentPriceGraph();
-        }
+        bidHistoryGraphController().keepExistingOrShowFallback();
     }
 
     private boolean shouldAutoScrollInitialBidHistory() {
-        if (initialBidHistoryPositioned) {
-            return false;
-        }
-        initialBidHistoryPositioned = true;
-        return true;
+        return bidHistoryGraphController().shouldAutoScrollInitialHistory();
     }
 
     private void mergeBidIntoHistory(Bid bid) {
-        mergeBidIntoHistory(bid, false);
+        bidHistoryGraphController().mergeBidIntoHistory(bid);
     }
 
     private void mergeBidIntoHistory(Bid bid, boolean scrollToLatest) {
-        if (bid == null || currentAuctionId == null || currentAuctionId.isBlank()) {
-            return;
-        }
-
-        List<Bid> cachedBids = bidHistoryCache.merge(currentAuctionId, bid);
-        fallbackBidHistoryRendered = false;
-        updateBidHistoryGraph(cachedBids, scrollToLatest);
+        bidHistoryGraphController().mergeBidIntoHistory(bid, scrollToLatest);
     }
 
     private List<Bid> mergeWithCachedHistory(String auctionId, List<Bid> serverBids) {
-        return bidHistoryCache.merge(auctionId, serverBids);
-    }
-
-    private String safeText(String value, String fallback) {
-        return value != null && !value.isBlank() ? value : fallback;
-    }
-
-    private void updateBidPriceAxis(List<Bid> sortedBids, double firstValue) {
-        if (bidPriceAxis == null) {
-            return;
-        }
-
-        double minValue = firstValue;
-        double maxValue = firstValue;
-        for (Bid bid : sortedBids) {
-            minValue = Math.min(minValue, bid.getAmount());
-            maxValue = Math.max(maxValue, bid.getAmount());
-        }
-
-        double spread = Math.max(maxValue - minValue, Math.max(maxValue * 0.02, minimumBidIncrement));
-        double tickUnit = choosePriceTickUnit(spread);
-        double padding = Math.max(tickUnit * 2, spread * 0.2);
-        double lowerBound = Math.max(0, Math.floor((minValue - padding) / tickUnit) * tickUnit);
-        double upperBound = Math.ceil((maxValue + padding) / tickUnit) * tickUnit;
-        if (upperBound <= lowerBound) {
-            upperBound = lowerBound + tickUnit * 6;
-        }
-
-        bidPriceAxis.setLowerBound(lowerBound);
-        bidPriceAxis.setUpperBound(upperBound);
-        bidPriceAxis.setTickUnit(tickUnit);
-        Platform.runLater(this::updatePinnedBidPriceAxis);
-    }
-
-    private double choosePriceTickUnit(double spread) {
-        double target = Math.max(spread / 7, 1);
-        double[] units = {10_000, 25_000, 50_000, 100_000, 250_000, 500_000, 1_000_000, 2_500_000, 5_000_000, 10_000_000};
-        for (double unit : units) {
-            if (target <= unit) {
-                return unit;
-            }
-        }
-        return 25_000_000;
+        return bidHistoryGraphController().mergeWithCachedHistory(auctionId, serverBids);
     }
 
     private void applyLatestBidPrice(double amount) {
@@ -699,133 +581,43 @@ public class AuctionDetailController {
             return 0;
         }
 
-        return bidHistoryCache.getHighestPrice(auctionId);
+        return bidHistoryGraphController().getHighestPrice(auctionId);
     }
 
-    private void loadMainImage(Item item) {
-        if (mainImageView == null || item == null || item.getImages() == null || item.getImages().isEmpty()) {
-            if (thumbnailBox != null) {
-                thumbnailBox.getChildren().clear();
-            }
-            return;
+    private AuctionImageGalleryRenderer imageGalleryRenderer() {
+        if (imageGalleryRenderer == null) {
+            imageGalleryRenderer = new AuctionImageGalleryRenderer(mainImageView, thumbnailBox);
         }
-
-        renderImageGallery(item.getImages());
+        return imageGalleryRenderer;
     }
 
-    private void renderImageGallery(List<String> imageIds) {
-        if (mainImageView == null || imageIds == null || imageIds.isEmpty()) {
-            return;
+    private AuctionBidHistoryGraphRenderer bidHistoryGraphRenderer() {
+        if (bidHistoryGraphRenderer == null) {
+            bidHistoryGraphRenderer = new AuctionBidHistoryGraphRenderer(
+                    bidHistoryChart,
+                    bidTurnAxis,
+                    bidPriceAxis,
+                    this::formatVnd,
+                    this::updatePinnedBidPriceAxis
+            );
         }
-
-        if (thumbnailBox != null) {
-            thumbnailBox.getChildren().clear();
-            thumbnailBox.setAlignment(Pos.CENTER_LEFT);
-        }
-
-        List<StackPane> thumbnailFrames = new ArrayList<>();
-
-        // Load first image
-        String firstImageId = imageIds.get(0);
-        loadAndDisplayImage(firstImageId, mainImageView, true);
-
-        if (thumbnailBox == null) {
-            return;
-        }
-
-        // Create thumbnails
-        for (int i = 0; i < imageIds.size(); i++) {
-            final int index = i;
-            final String imageId = imageIds.get(i);
-
-            StackPane thumbnailFrame = createThumbnailFrame(imageId, index, thumbnailFrames);
-            thumbnailFrames.add(thumbnailFrame);
-            thumbnailBox.getChildren().add(thumbnailFrame);
-        }
+        return bidHistoryGraphRenderer;
     }
 
-    private StackPane createThumbnailFrame(String imageId, int index, List<StackPane> thumbnailFrames) {
-        ImageView thumbnailView = new ImageView();
-        thumbnailView.setFitWidth(78);
-        thumbnailView.setFitHeight(78);
-        thumbnailView.setPreserveRatio(true);
-        thumbnailView.setSmooth(true);
-
-        StackPane thumbnailFrame = new StackPane(thumbnailView);
-        thumbnailFrame.setPrefSize(88, 88);
-        thumbnailFrame.setMinSize(88, 88);
-        thumbnailFrame.setMaxSize(88, 88);
-        thumbnailFrame.setStyle(getThumbnailStyle(index == 0));
-
-        // Load thumbnail
-        new Thread(() -> {
-            try {
-                ClientSocket socket = getActiveImageSocket();
-                if (socket == null || !socket.isConnected()) return;
-
-                byte[] imageBytes = ImageDownloadService.downloadImage(socket, imageId);
-                Image thumbnailImage = new Image(new java.io.ByteArrayInputStream(imageBytes), 90, 90, true, true);
-
-                Platform.runLater(() -> {
-                    thumbnailView.setImage(thumbnailImage);
-                    thumbnailFrame.setOnMouseEntered(event -> {
-                        loadAndDisplayImage(imageId, mainImageView, false);
-                        // Update style trực tiếp thay vì gọi selectThumbnail
-                        thumbnailFrame.setStyle(getThumbnailStyle(true));
-                    });
-                });
-            } catch (Exception e) {
-                LoggerUtil.error("Failed to load thumbnail " + imageId + ": " + e.getMessage());
-            }
-        }, "LoadThumbnailThread-" + index).start();
-
-        return thumbnailFrame;
-    }
-
-    private void loadAndDisplayImage(String imageId, ImageView imageView, boolean isFirst) {
-        new Thread(() -> {
-            try {
-                ClientSocket socket = getActiveImageSocket();
-                if (socket == null || !socket.isConnected()) {
-                    LoggerUtil.error("Socket not connected");
-                    return;
-                }
-
-                byte[] imageBytes = ImageDownloadService.downloadImage(socket, imageId);
-                Image image = new Image(new java.io.ByteArrayInputStream(imageBytes));
-                Platform.runLater(() -> imageView.setImage(image));
-
-            } catch (Exception e) {
-                LoggerUtil.error("Failed to load image " + imageId + ": " + e.getMessage());
-            }
-        }, "LoadImageThread").start();
-    }
-
-    private ClientSocket getActiveImageSocket() {
-        ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
-        if (socket != null && socket.isConnected()) {
-            return socket;
+    private AuctionBidHistoryGraphController bidHistoryGraphController() {
+        if (bidHistoryGraphController == null) {
+            bidHistoryGraphController = new AuctionBidHistoryGraphController(
+                    bidHistoryChart,
+                    bidHistoryScrollPane,
+                    () -> currentAuctionId,
+                    () -> startingPrice > 0 ? startingPrice : currentPrice,
+                    () -> minimumBidIncrement,
+                    bidHistoryGraphRenderer(),
+                    this::syncPriceFromBidHistory
+            );
         }
-        socket = NavigationManager.getInstance().getClientSocket();
-        if (socket != null && socket.isConnected()) {
-            return socket;
-        }
-        return null;
+        return bidHistoryGraphController;
     }
-
-    private String getThumbnailStyle(boolean selected) {
-        String borderColor = selected ? "#ef4444" : "#e5e7eb";
-        int borderWidth = selected ? 3 : 1;
-        return "-fx-background-color: white;"
-                + "-fx-border-color: " + borderColor + ";"
-                + "-fx-border-width: " + borderWidth + ";"
-                + "-fx-border-radius: 4;"
-                + "-fx-background-radius: 4;"
-                + "-fx-padding: 4;"
-                + "-fx-cursor: hand;";
-    }
-
-
 
     private void renderProductDetails(JsonObject itemData, JsonObject productData) {
         detailGridRenderer.render(dynamicDetailsGrid, itemData, productData, this::formatVnd);
@@ -841,10 +633,10 @@ public class AuctionDetailController {
 
     private void clearView() {
         stopBidHistoryRefresh();
-        if (productNameLabel != null) productNameLabel.setText("Không có dữ liệu");
+        if (productNameLabel != null) productNameLabel.setText("KhÃ´ng cÃ³ dá»¯ liá»‡u");
         if (dynamicDetailsGrid != null) dynamicDetailsGrid.getChildren().clear();
         if (bidHistoryChart != null) bidHistoryChart.getData().clear();
-        lastBidHistorySignature = null;
+        bidHistoryGraphController().clearSignature();
     }
 
     private void applyEndedMode() {
