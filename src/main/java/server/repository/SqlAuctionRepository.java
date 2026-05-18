@@ -167,6 +167,10 @@ public class SqlAuctionRepository implements AuctionRepository {
         auction.setHighestBidderId(rs.getString("highest_bidder_id"));
         auction.setHighestBidderName(rs.getString("highest_bidder_name"));
         auction.setStatus(AuctionStatus.valueOf(rs.getString("status")));
+        if (auction.getStatus() == AuctionStatus.CANCELLED) {
+            auction.setHighestBidderId(null);
+            auction.setHighestBidderName(null);
+        }
         auction.setStartTime(rs.getLong("start_time"));
         auction.setEndTime(rs.getLong("end_time"));
         auction.setReservePrice(rs.getDouble("reserve_price"));
