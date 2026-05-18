@@ -1,5 +1,7 @@
 package client.controller;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.service.NotificationClientService;
 import client.service.NotificationClientService.NotificationAction;
@@ -88,7 +90,7 @@ public class SellerNotificationsController implements Initializable {
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi load seller notifications: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi load seller notifications: " + e.getMessage())));
                 Platform.runLater(() -> showEmptyState("Không tải được thông báo."));
             }
         }).start();
@@ -177,7 +179,7 @@ public class SellerNotificationsController implements Initializable {
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi mark seller notifications read: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi mark seller notifications read: " + e.getMessage())));
                 Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đánh dấu đã đọc."));
             }
         }).start();
@@ -276,4 +278,5 @@ public class SellerNotificationsController implements Initializable {
         client.util.DialogUtil.showAlert(type, title, null, content);
     }
 }
+
 

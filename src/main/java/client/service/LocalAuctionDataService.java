@@ -1,9 +1,13 @@
 package client.service;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import server.model.Auction;
 import server.model.Bid;
 import server.model.RegularUser;
 import server.model.User;
+import server.repository.SqlAuctionRepository;
+import server.repository.SqlBidRepository;
 import util.JsonUtil;
 import util.LoggerUtil;
 
@@ -45,7 +49,17 @@ public class LocalAuctionDataService {
 
     public Map<String, Auction> loadAuctionsById() {
         // ⚠️ MIGRATED TO SQLITE - No longer using JSON files
-        return Map.of();
+        Map<String, Auction> auctionsById = new HashMap<>();
+        try {
+            for (Auction auction : new SqlAuctionRepository().getAllAuctions()) {
+                if (auction != null && auction.getAuctionId() != null && !auction.getAuctionId().isBlank()) {
+                    auctionsById.put(auction.getAuctionId(), auction);
+                }
+            }
+        } catch (Exception e) {
+            ClientExceptionHandler.handle(ClientErrorType.DATA, "Load local auctions from SQLite", e);
+        }
+        return auctionsById;
     }
 
     public Map<String, String> findSellerContact(Auction auction) {
@@ -80,7 +94,7 @@ public class LocalAuctionDataService {
                 return contact;
             }
         } catch (Exception e) {
-            LoggerUtil.error("Load local seller contact failed: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.DATA, "Load local seller contact", e);
         }
         return null;
     }
@@ -95,7 +109,12 @@ public class LocalAuctionDataService {
 
     private List<Bid> loadAllBids() {
         // ⚠️ MIGRATED TO SQLITE - No longer using JSON files
-        return List.of();
+        try {
+            return new SqlBidRepository().getAllBids();
+        } catch (Exception e) {
+            ClientExceptionHandler.handle(ClientErrorType.DATA, "Load local bids from SQLite", e);
+            return List.of();
+        }
     }
 
     private boolean isSeller(Auction auction, User user) {

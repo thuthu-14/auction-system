@@ -1,5 +1,7 @@
 package client.controller;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.SellerClientService;
@@ -114,7 +116,7 @@ public class SellerStatisticsController implements Initializable {
                 List<Auction> auctions = sellerClientService.fetchSellerAuctions(socket, user);
                 Platform.runLater(() -> processAndDisplayStatistics(auctions));
             } catch (Exception e) {
-                LoggerUtil.error("Seller statistics load failed: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Seller statistics load failed: " + e.getMessage())));
                 Platform.runLater(this::showEmptyStatistics);
             }
         }, "SellerStatisticsLoadThread").start();
@@ -153,6 +155,9 @@ public class SellerStatisticsController implements Initializable {
             if (auction == null) {
                 continue;
             }
+            if (isCancelled(auction)) {
+                continue;
+            }
 
             int bidCount = auction.getBidIds() != null ? auction.getBidIds().size() : 0;
             totalBids += bidCount;
@@ -171,7 +176,10 @@ public class SellerStatisticsController implements Initializable {
 
         setLabel(totalRevenueLabel, formatVnd(totalRevenue));
 
-        double averageBid = safeAuctions.isEmpty() ? 0 : (double) totalBids / safeAuctions.size();
+        long countedAuctions = safeAuctions.stream()
+                .filter(auction -> auction != null && !isCancelled(auction))
+                .count();
+        double averageBid = countedAuctions == 0 ? 0 : (double) totalBids / countedAuctions;
         setLabel(avgBidLabel, String.format(Locale.US, "%.1f", averageBid));
 
         double successRate = endedAuctions == 0 ? 0 : successfulAuctions * 100.0 / endedAuctions;
@@ -206,11 +214,18 @@ public class SellerStatisticsController implements Initializable {
     }
 
     private boolean isEnded(Auction auction) {
+        if (isCancelled(auction)) {
+            return false;
+        }
         if (auction.getStatus() == common.AuctionStatus.FINISHED
                 || auction.getStatus() == common.AuctionStatus.CLOSED) {
             return true;
         }
         return auction.getEndTime() > 0 && auction.getEndTime() <= System.currentTimeMillis();
+    }
+
+    private boolean isCancelled(Auction auction) {
+        return auction != null && auction.getStatus() == common.AuctionStatus.CANCELLED;
     }
 
     private void showEmptyRevenueChart() {
@@ -449,3 +464,4 @@ public class SellerStatisticsController implements Initializable {
         label.setStyle(style + " -fx-text-fill: " + color + ";");
     }
 }
+

@@ -1,17 +1,15 @@
 package client.controller;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
-import client.util.ResponsiveSceneUtil;
-import client.util.StageUtil;
 import navigation.NavigationManager;
 import server.model.User;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -26,7 +24,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import util.LoggerUtil;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -45,6 +42,7 @@ public class SellerHomeController {
 
     private User currentUser;
     private ClientSocket clientSocket;
+    private String selectedSellerAuctionId;
 
     @FXML
     public void initialize() {
@@ -58,7 +56,7 @@ public class SellerHomeController {
                     clearSearchBtn.setVisible(!newValue.trim().isEmpty())
             );
         } else {
-            LoggerUtil.warn("Cảnh báo: productSearchInput hoặc clearSearchBtn bị null!");
+            LoggerUtil.warn("productSearchInput or clearSearchBtn is null");
         }
 
         Platform.runLater(() -> {
@@ -73,7 +71,6 @@ public class SellerHomeController {
             }
         });
 
-        // Load trang chủ mặc định
         loadSellerDashboardView();
     }
 
@@ -84,7 +81,7 @@ public class SellerHomeController {
         this.clientSocket = socket;
         NavigationManager.getInstance().setCurrentUser(user);
         NavigationManager.getInstance().setClientSocket(socket);
-        LoggerUtil.info("SellerHomeController đã nhận data cho user: " + (user != null ? user.getUsername() : "null"));
+        LoggerUtil.info("SellerHomeController received user: " + (user != null ? user.getUsername() : "null"));
     }
 
     // ================= MENU ACTIONS =================
@@ -93,9 +90,8 @@ public class SellerHomeController {
     private void handleMenuClick(MouseEvent event) {
         if (event.getSource() instanceof HBox clickedMenu) {
 
-            // Xử lý nút Chuyển về màn hình người mua
             if (clickedMenu == menuDowngrade) {
-                LoggerUtil.info("Đang chuyển về màn hình Bidder (Home)");
+                LoggerUtil.info("Switching to Bidder home");
                 switchToBidderMode();
                 return;
             }
@@ -131,27 +127,16 @@ public class SellerHomeController {
             navigation.setClientSocket(clientSocket);
             navigation.goToHome();
         } catch (Exception e) {
-            LoggerUtil.error("Lỗi khi chuyen ve man hinh Bidder: " + e.getMessage());
-            e.printStackTrace();
+            ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Error switching to Bidder: " + e.getMessage())));
+            ClientExceptionHandler.showError(ClientErrorType.NAVIGATION, "Switch seller to bidder", e);
         }
     }
 
     @FXML
     private void handleLogout() {
-        try {
-            navigation.NavigationManager.getInstance().setCurrentUser(null);
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-            Parent root = loader.load();
-
-            javafx.stage.Stage stage = (javafx.stage.Stage) rootPane.getScene().getWindow();
-            javafx.scene.Scene scene = ResponsiveSceneUtil.createScaledScene(root);
-            stage.setScene(scene);
-            StageUtil.showMaximized(stage);
-        } catch (Exception e) {
-            LoggerUtil.error("Lỗi khi đăng xuất: " + e.getMessage());
-            e.printStackTrace();
-        }
+        NavigationManager navigation = NavigationManager.getInstance();
+        navigation.setMainStage((javafx.stage.Stage) rootPane.getScene().getWindow());
+        navigation.goToLogin();
     }
 
     // ================= VIEW LOADERS =================
@@ -179,9 +164,66 @@ public class SellerHomeController {
     public void loadManageAuctionsView() {
         loadView("/fxml/SellerView/SellerManageAuctions.fxml", menuManageAuctions, controller -> {
             if (controller instanceof SellerManagementController sellerManagementController) {
+                sellerManagementController.setSellerHomeController(this);
                 sellerManagementController.setUserData(currentUser, clientSocket);
             }
         });
+    }
+
+    public void loadSellerAuctionDetailsView(String auctionId) {
+        String targetAuctionId = rememberSellerAuctionId(auctionId);
+        if (targetAuctionId == null) {
+            LoggerUtil.warn("Cannot open seller auction details: missing auction id");
+            return;
+        }
+        loadView("/fxml/SellerView/SellerAuctionDetails.fxml", menuManageAuctions, controller -> {
+            if (controller instanceof SellerAuctionDetailsController detailsController) {
+                detailsController.setSellerHomeController(this);
+                detailsController.setUserData(currentUser, clientSocket);
+                detailsController.loadSellerAuctionDetails(targetAuctionId);
+            }
+        });
+    }
+
+    public void loadSellerAuctionBidHistoryView(String auctionId) {
+        String targetAuctionId = rememberSellerAuctionId(auctionId);
+        if (targetAuctionId == null) {
+            LoggerUtil.warn("Cannot open seller auction bid history: missing auction id");
+            return;
+        }
+        loadView("/fxml/SellerView/SellerAuctionBidHistory.fxml", menuManageAuctions, controller -> {
+            if (controller instanceof SellerAuctionBidHistoryController bidHistoryController) {
+                bidHistoryController.setSellerHomeController(this);
+                bidHistoryController.setUserData(currentUser, clientSocket);
+                bidHistoryController.loadAuctionBidHistory(targetAuctionId);
+            }
+        });
+    }
+
+    public void loadSellerWinnerInfoView(String auctionId) {
+        String targetAuctionId = rememberSellerAuctionId(auctionId);
+        if (targetAuctionId == null) {
+            LoggerUtil.warn("Cannot open seller winner info: missing auction id");
+            return;
+        }
+        loadView("/fxml/SellerView/SellerWinnerInfo.fxml", menuManageAuctions, controller -> {
+            if (controller instanceof SellerWinnerInfoController winnerInfoController) {
+                winnerInfoController.setSellerHomeController(this);
+                winnerInfoController.setUserData(currentUser, clientSocket);
+                winnerInfoController.loadWinnerInfo(targetAuctionId);
+            }
+        });
+    }
+
+    public String getSelectedSellerAuctionId() {
+        return selectedSellerAuctionId;
+    }
+
+    public String rememberSellerAuctionId(String auctionId) {
+        if (auctionId != null && !auctionId.isBlank() && !"--".equals(auctionId)) {
+            selectedSellerAuctionId = auctionId;
+        }
+        return selectedSellerAuctionId;
     }
 
     @FXML
@@ -196,22 +238,20 @@ public class SellerHomeController {
 
     @FXML
     public void loadProfileView() {
-        loadView("/fxml/BidderView/ProfileView.fxml", menuHome, null); // Hoặc bạn có thể tạo menuProfile
+        loadView("/fxml/BidderView/ProfileView.fxml", menuHome, null);
     }
 
     @FXML
     public void loadWalletView() {
         loadView("/fxml/WalletView.fxml", menuPay, controller -> {
             if (controller instanceof WalletController walletController) {
-                // ← LUÔN lấy user MỚI NHẤT từ NavigationManager
                 User user = NavigationManager.getInstance().getCurrentUser();
                 if (user == null) {
                     user = this.currentUser;  // Fallback
                 }
 
-                // ← Cập nhật currentUser của SellerHomeController
                 if (user != null) {
-                    this.currentUser = user;  // THÊM: Sync local currentUser
+                    this.currentUser = user;
                 }
 
                 ClientSocket socket = clientSocket != null
@@ -220,46 +260,25 @@ public class SellerHomeController {
                 walletController.setUserData(user, socket);
                 walletController.reloadWalletData();
             } else {
-                LoggerUtil.warn("Không thể truyền data cho WalletController vì user/socket bị null");
+                LoggerUtil.warn("Cannot pass data to WalletController because user or socket is null");
             }
         });
     }
 
-    /**
-     * Hàm Helper dùng chung để load các file FXML vào contentArea
-     */
     private void loadView(String fxmlPath, HBox menuToSelect, Consumer<Object> controllerSetup) {
         updateMenuSelection(menuToSelect);
-        try {
-            clearStaleWalletOverlays();
-
-            URL resource = getClass().getResource(fxmlPath);
-            if (resource == null) {
-                LoggerUtil.error("Không tìm thấy file: " + fxmlPath);
-                return;
+        clearStaleWalletOverlays();
+        Object controller = NavigationManager.getInstance().loadContent(contentArea, fxmlPath, loadedController -> {
+            if (loadedController instanceof SellerDashboardController dashboardController) {
+                dashboardController.setSellerHomeController(this);
             }
-            FXMLLoader loader = new FXMLLoader(resource);
-            Parent node = loader.load();
-
-            Object controller = loader.getController();
-            if (controller instanceof SellerDashboardController) {
-                ((SellerDashboardController) controller).setSellerHomeController(this);
-                ((SellerDashboardController) controller).setUserData(currentUser, clientSocket);
-            }
-
             if (controllerSetup != null) {
-                controllerSetup.accept(controller);
+                controllerSetup.accept(loadedController);
             }
-
-            prepareContentNode(node);
-            contentArea.getChildren().setAll(node);
-            clearStaleWalletOverlays();
-            if (controller instanceof WalletController walletController) {
-                Platform.runLater(walletController::reloadWalletData);
-            }
-        } catch (Exception e) {
-            LoggerUtil.error("Lỗi load giao diện " + fxmlPath + ": " + e.getMessage());
-            e.printStackTrace();
+        });
+        clearStaleWalletOverlays();
+        if (controller instanceof WalletController walletController) {
+            Platform.runLater(walletController::reloadWalletData);
         }
     }
 
@@ -312,7 +331,6 @@ public class SellerHomeController {
         if (productSearchInput == null) return;
         String keyword = productSearchInput.getText().trim();
         if (!keyword.isEmpty()) {
-            System.out.println("Searching for: " + keyword);
         }
     }
 
@@ -324,3 +342,6 @@ public class SellerHomeController {
         }
     }
 }
+
+
+

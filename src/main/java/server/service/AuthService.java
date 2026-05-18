@@ -9,6 +9,7 @@ import util.LoggerUtil;
 import util.ValidationUtil;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class AuthService {
     private static final AuthService DEFAULT = new AuthService(new SqlUserRepository());
@@ -60,18 +61,18 @@ public class AuthService {
 
         User existingByEmail = loadUserByEmail(email);
         if (existingByEmail != null) {
-            LoggerUtil.error("Registration failed: Email already exists - " + email);
+            LoggerUtil.warn("Registration failed: Email already exists - " + email);
             throw new AuthenticationException("Email đã tồn tại!");
         }
 
         if (username.equalsIgnoreCase("admin")) {
-            LoggerUtil.error("Registration blocked: Attempted to create admin account - " + username);
+            LoggerUtil.warn("Registration blocked: Attempted to create admin account - " + username);
             throw new AuthenticationException("Không thể tạo tài khoản admin!");
         }
 
         User existingUser = loadUserByUsername(username);
         if (existingUser != null) {
-            LoggerUtil.error("Registration failed: Username already exists - " + username);
+            LoggerUtil.warn("Registration failed: Username already exists - " + username);
             throw new AuthenticationException("Tên đăng nhập đã tồn tại!");
         }
 
@@ -94,6 +95,12 @@ public class AuthService {
     public static User register(String username, String password, String email)
             throws IOException, ClassNotFoundException, AuthenticationException {
         return DEFAULT.registerUser(username, password, email);
+    }
+
+    public static User register(Object data)
+            throws IOException, ClassNotFoundException, AuthenticationException {
+        Map<String, String> registerData = RequestPayloadUtil.stringMap(data);
+        return register(registerData.get("username"), registerData.get("password"), registerData.get("email"));
     }
 
     private User loadUserByEmail(String email) throws IOException, ClassNotFoundException {

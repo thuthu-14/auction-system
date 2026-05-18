@@ -11,6 +11,7 @@ public enum MessageType implements Serializable {
     GET_ALL_AUCTIONS,      // ← THÊM: Để Buyer lấy danh sách sản phẩm trên Dashboard
     UPDATE_AUCTION,
     DELETE_AUCTION,
+    CANCEL_AUCTION,
     GET_AUCTION_DETAIL,
     GET_SELLER_AUCTIONS,
 

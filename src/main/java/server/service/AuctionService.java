@@ -1,16 +1,23 @@
 package server.service;
 
 import common.AuctionStatus;
+import common.Transaction;
 import server.exception.PermissionDeniedException;
 import server.model.Auction;
+import server.model.Bid;
 import server.model.Item;
 import server.model.RegularUser;
+import server.model.User;
+import server.concurrency.ConcurrentBidManager;
+import server.observer.AuctionManager;
 import server.repository.*;
 import util.ItemValidationUtil;
 import util.LoggerUtil;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AuctionService {
 
@@ -56,12 +63,22 @@ public class AuctionService {
         auction.setReservePrice(Math.max(0.0, reservePrice));
         auction.setMinimumBidIncrement(Math.max(0.0, minimumBidIncrement));
 
-        auctionRepository.createAuction(auction);
-        itemRepository.saveItem(item);
-        seller.addOwnedAuction(auctionId);
-        userRepository.saveUser(seller);
+        try {
+            itemRepository.saveItem(item);
+            auctionRepository.createAuction(auction);
+            seller.addOwnedAuction(auctionId);
+            userRepository.saveUser(seller);
+        } catch (Exception e) {
+            try {
+                auctionRepository.deleteAuction(auctionId);
+            } catch (Exception cleanupError) {
+                LoggerUtil.warn("Failed to cleanup auction after create error: " + cleanupError.getMessage());
+            }
+            throw e;
+        }
 
         LoggerUtil.info("Auction created: " + auctionId + " by " + seller.getUsername());
+        AuctionManager.getInstance().notifyAuctionCreated(auction);
         return auction;
     }
 
@@ -73,26 +90,180 @@ public class AuctionService {
         return auctionRepository.getAllAuctions();
     }
 
+    public List<Auction> getList(boolean includeAll) throws Exception {
+        return includeAll ? getAll() : getActive();
+    }
+
     public Auction getById(String auctionId) throws Exception {
-        return auctionRepository.getAuctionById(auctionId);
+        Auction auction = auctionRepository.getAuctionById(RequestPayloadUtil.requiredAuctionId(auctionId));
+        if (auction == null) {
+            throw new IOException("Khong tim thay phien dau gia");
+        }
+        return auction;
     }
 
     public List<Auction> getBySeller(String sellerId) throws Exception {
         return auctionRepository.getAuctionsBySellerId(sellerId);
     }
 
+    public List<Auction> getBySeller(User currentUser) throws Exception {
+        RegularUser seller = requireSeller(currentUser);
+        return auctionRepository.getAuctionsBySellerId(seller.getUserId());
+    }
+
     public void finish(String auctionId) throws Exception {
-        Auction auction = auctionRepository.getAuctionById(auctionId);
-        if (auction != null && auction.getStatus() != AuctionStatus.FINISHED) {
-            auction.setStatus(AuctionStatus.FINISHED);
+        ConcurrentBidManager.getInstance().withAuctionWriteLock(auctionId, () -> {
+            Auction auction = auctionRepository.getAuctionById(auctionId);
+            if (auction != null && auction.getStatus() != AuctionStatus.FINISHED
+                    && auction.getStatus() != AuctionStatus.CANCELLED) {
+                refundLosingBids(auction);
+                auction.setStatus(AuctionStatus.FINISHED);
+                auctionRepository.saveAuction(auction);
+                AuctionManager.getInstance().notifyAuctionFinished(auction);
+                LoggerUtil.info("Auction finished: " + auctionId);
+            }
+            return null;
+        });
+    }
+
+    public Auction cancel(String auctionId, String sellerId) throws Exception {
+        return ConcurrentBidManager.getInstance().withAuctionWriteLock(auctionId, () -> {
+            Auction auction = auctionRepository.getAuctionById(auctionId);
+            if (auction == null) {
+                throw new PermissionDeniedException("Phi\u00ean \u0111\u1ea5u gi\u00e1 kh\u00f4ng t\u1ed3n t\u1ea1i.");
+            }
+            if (sellerId == null || !sellerId.equals(auction.getSellerId())) {
+                throw new PermissionDeniedException("B\u1ea1n kh\u00f4ng ph\u1ea3i ch\u1ee7 c\u1ee7a phi\u00ean \u0111\u1ea5u gi\u00e1 n\u00e0y.");
+            }
+            if (auction.getStatus() == AuctionStatus.CANCELLED) {
+                return auction;
+            }
+            if (auction.getStatus() == AuctionStatus.FINISHED || auction.getStatus() == AuctionStatus.CLOSED) {
+                throw new PermissionDeniedException("Phi\u00ean \u0111\u1ea5u gi\u00e1 \u0111\u00e3 k\u1ebft th\u00fac, kh\u00f4ng th\u1ec3 h\u1ee7y.");
+            }
+
+            List<Bid> bids = new SqlBidRepository().getBidsByAuctionId(auction.getAuctionId());
+            refundAllBidsForCancelledAuction(auction, bids);
+
+            auction.setStatus(AuctionStatus.CANCELLED);
             auctionRepository.saveAuction(auction);
-            LoggerUtil.info("Auction finished: " + auctionId);
+            AuctionManager.getInstance().notifyAuctionCancelled(auction);
+            LoggerUtil.info("Auction cancelled: " + auctionId + " by seller " + sellerId);
+            return auction;
+        });
+    }
+
+    public Auction cancel(User currentUser, Object data) throws Exception {
+        RegularUser seller = requireSeller(currentUser);
+        return cancel(RequestPayloadUtil.requiredAuctionId(data), seller.getUserId());
+    }
+
+    private void refundLosingBids(Auction auction) throws Exception {
+        List<Bid> bids = new SqlBidRepository().getBidsByAuctionId(auction.getAuctionId());
+        if (bids.isEmpty()) {
+            return;
+        }
+
+        Map<String, Double> refundsByUser = calculateRefundsByUser(auction, bids, false);
+        SqlTransactionRepository transactionRepository = new SqlTransactionRepository();
+
+        for (Map.Entry<String, Double> refund : refundsByUser.entrySet()) {
+            User bidder = userRepository.getUserById(refund.getKey());
+            if (bidder == null) {
+                continue;
+            }
+
+            double refundAmount = refund.getValue();
+            if (refundAmount <= 0) {
+                continue;
+            }
+            bidder.addFunds(refundAmount);
+            userRepository.saveUser(bidder);
+            transactionRepository.saveTransaction(new Transaction(
+                    bidder.getUserId(),
+                    "DEPOSIT",
+                    refundAmount,
+                    bidder.getWallet(),
+                    "Ho\u00e0n ti\u1ec1n \u0111\u1ea5u gi\u00e1 s\u1ea3n ph\u1ea9m " + productName(auction)
+            ));
         }
     }
 
+    private void refundAllBidsForCancelledAuction(Auction auction, List<Bid> bids) throws Exception {
+        if (bids == null || bids.isEmpty()) {
+            return;
+        }
+
+        Map<String, Double> refundsByUser = calculateRefundsByUser(auction, bids, true);
+        SqlTransactionRepository transactionRepository = new SqlTransactionRepository();
+
+        for (Map.Entry<String, Double> refund : refundsByUser.entrySet()) {
+            User bidder = userRepository.getUserById(refund.getKey());
+            if (bidder == null || refund.getValue() <= 0) {
+                continue;
+            }
+
+            double refundAmount = refund.getValue();
+            bidder.addFunds(refundAmount);
+            userRepository.saveUser(bidder);
+            transactionRepository.saveTransaction(new Transaction(
+                    bidder.getUserId(),
+                    "DEPOSIT",
+                    refundAmount,
+                    bidder.getWallet(),
+                    "Ho\u00e0n ti\u1ec1n do phi\u00ean \u0111\u1ea5u gi\u00e1 b\u1ecb h\u1ee7y: " + productName(auction)
+            ));
+        }
+    }
+
+    private Map<String, Double> calculateRefundsByUser(Auction auction, List<Bid> bids, boolean includeWinner) {
+        bids.sort((first, second) -> Long.compare(first.getBidTime(), second.getBidTime()));
+        Map<String, Double> refundsByUser = new HashMap<>();
+        double previousPrice = startingPrice(auction);
+
+        for (Bid bid : bids) {
+            if (bid == null || bid.getBidderId() == null || bid.getBidderId().isBlank()) {
+                continue;
+            }
+            double chargedAmount = bid.getAmount() - previousPrice;
+            previousPrice = Math.max(previousPrice, bid.getAmount());
+            if (chargedAmount <= 0) {
+                continue;
+            }
+            if (includeWinner || auction.getHighestBidderId() == null || !auction.getHighestBidderId().equals(bid.getBidderId())) {
+                refundsByUser.merge(bid.getBidderId(), chargedAmount, Double::sum);
+            }
+        }
+        return refundsByUser;
+    }
+
+    private double startingPrice(Auction auction) {
+        if (auction != null && auction.getItem() != null) {
+            return Math.max(0.0, auction.getItem().getStartingPrice());
+        }
+        return 0.0;
+    }
+
+    private String productName(Auction auction) {
+        if (auction != null && auction.getItem() != null
+                && auction.getItem().getName() != null
+                && !auction.getItem().getName().isBlank()) {
+            return auction.getItem().getName();
+        }
+        return auction != null && auction.getAuctionId() != null ? auction.getAuctionId() : "";
+    }
+
     public void delete(String auctionId) throws Exception {
-        auctionRepository.deleteAuction(auctionId);
-        LoggerUtil.info("Auction deleted: " + auctionId);
+        String resolvedAuctionId = RequestPayloadUtil.requiredAuctionId(auctionId);
+        auctionRepository.deleteAuction(resolvedAuctionId);
+        LoggerUtil.info("Auction deleted: " + resolvedAuctionId);
+    }
+
+    public String deleteForAdmin(User currentUser, Object data) throws Exception {
+        requireAdmin(currentUser);
+        String auctionId = RequestPayloadUtil.requiredAuctionId(data);
+        delete(auctionId);
+        return auctionId;
     }
 
     private void validateCreateAuction(RegularUser seller, Item item, int durationMinutes)
@@ -171,6 +342,17 @@ public class AuctionService {
         }
     }
 
+    public static List<Auction> getAuctions(boolean includeAll)
+            throws IOException, ClassNotFoundException {
+        try {
+            return DEFAULT.getList(includeAll);
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
     public static Auction getAuctionById(String auctionId)
             throws IOException, ClassNotFoundException {
         try {
@@ -182,10 +364,32 @@ public class AuctionService {
         }
     }
 
+    public static Auction getAuctionByRequest(Object data)
+            throws IOException, ClassNotFoundException {
+        try {
+            return DEFAULT.getById(RequestPayloadUtil.requiredAuctionId(data));
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
     public static List<Auction> getAuctionsBySeller(String sellerId)
             throws IOException, ClassNotFoundException {
         try {
             return DEFAULT.getBySeller(sellerId);
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    public static List<Auction> getAuctionsBySeller(User currentUser)
+            throws IOException, ClassNotFoundException {
+        try {
+            return DEFAULT.getBySeller(currentUser);
         } catch (IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -208,6 +412,58 @@ public class AuctionService {
             throws IOException, ClassNotFoundException {
         try {
             DEFAULT.delete(auctionId);
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    public static String deleteAuctionForAdmin(User currentUser, Object data)
+            throws IOException, ClassNotFoundException {
+        try {
+            return DEFAULT.deleteForAdmin(currentUser, data);
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    private RegularUser requireSeller(User user) throws PermissionDeniedException {
+        if (!(user instanceof RegularUser seller)) {
+            throw new PermissionDeniedException("Ban phai dang nhap bang tai khoan nguoi ban");
+        }
+        if (!seller.isSeller()) {
+            throw new PermissionDeniedException("Ban khong phai Seller");
+        }
+        return seller;
+    }
+
+    private void requireAdmin(User user) throws PermissionDeniedException {
+        if (!(user instanceof server.model.Admin)) {
+            throw new PermissionDeniedException("Chi Admin co quyen thuc hien thao tac nay");
+        }
+    }
+
+    public static Auction cancelAuction(String auctionId, String sellerId)
+            throws IOException, ClassNotFoundException {
+        try {
+            return DEFAULT.cancel(auctionId, sellerId);
+        } catch (PermissionDeniedException e) {
+            throw new IOException(e.getMessage());
+        } catch (IOException | ClassNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+    public static Auction cancelAuction(User currentUser, Object data)
+            throws IOException, ClassNotFoundException {
+        try {
+            return DEFAULT.cancel(currentUser, data);
+        } catch (PermissionDeniedException e) {
+            throw new IOException(e.getMessage());
         } catch (IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {

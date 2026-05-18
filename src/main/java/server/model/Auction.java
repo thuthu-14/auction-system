@@ -1,6 +1,7 @@
 package server.model;
 
 import common.AuctionStatus;
+import util.LoggerUtil;
 import java.io.Serializable;
 import java.util.*;
 
@@ -103,7 +104,7 @@ public class Auction implements Serializable {
 
         if (now > fiveMinutesBefore && bidIds.size() > 0) {
             endTime += (2 * 60 * 1000L);
-            System.out.println("Phiên đấu được gia hạn thêm 2 phút!");
+            LoggerUtil.info("Auction extended by 2 minutes: " + auctionId);
         }
     }
 

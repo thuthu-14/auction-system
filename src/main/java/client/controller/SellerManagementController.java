@@ -1,5 +1,7 @@
 package client.controller;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.SellerClientService;
@@ -60,6 +62,7 @@ public class SellerManagementController {
     private User currentUser;
     private ClientSocket clientSocket;
     private Timeline countdownTimer;
+    private SellerHomeController sellerHomeController;
 
     @FXML
     public void initialize() {
@@ -88,6 +91,10 @@ public class SellerManagementController {
             NavigationManager.getInstance().setClientSocket(socket);
         }
         refreshAuctions();
+    }
+
+    public void setSellerHomeController(SellerHomeController sellerHomeController) {
+        this.sellerHomeController = sellerHomeController;
     }
 
     private void setupFilters() {
@@ -179,6 +186,17 @@ public class SellerManagementController {
                 }
                 Button button = new Button("Chi tiết");
                 button.setStyle("-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-radius: 5; -fx-cursor: hand;");
+                button.setOnAction(event -> {
+                    if (getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                        return;
+                    }
+                    AuctionItem row = getTableView().getItems().get(getIndex());
+                    if (sellerHomeController != null) {
+                        sellerHomeController.loadSellerAuctionDetailsView(row.getId());
+                    } else {
+                        LoggerUtil.warn("SellerHomeController is null, cannot open auction details: " + row.getId());
+                    }
+                });
                 setGraphic(button);
             }
         });
@@ -204,7 +222,7 @@ public class SellerManagementController {
                     refreshTable();
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Load seller auctions table failed: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Load seller auctions table failed: " + e.getMessage())));
                 Platform.runLater(() -> {
                     allItems.clear();
                     updateStats();
@@ -350,7 +368,14 @@ public class SellerManagementController {
     }
 
     @FXML private void handleExportData() { LoggerUtil.info("Exporting seller auction data..."); }
-    @FXML private void handleCreateAuction() { LoggerUtil.info("Opening create auction form..."); }
+    @FXML
+    private void handleCreateAuction() {
+        if (sellerHomeController != null) {
+            sellerHomeController.loadAddAuctionProductView();
+        } else {
+            LoggerUtil.info("Opening create auction form...");
+        }
+    }
     @FXML private void handlePrevPage() { LoggerUtil.info("Trang trước"); }
     @FXML private void handleNextPage() { LoggerUtil.info("Trang sau"); }
     @FXML private void handlePage1() { LoggerUtil.info("Trang 1"); }
@@ -380,6 +405,7 @@ public class SellerManagementController {
 
     public static class AuctionItem {
         private final String id;
+        private final String itemId;
         private final String name;
         private final String categoryLabel;
         private final AuctionStatus status;
@@ -393,6 +419,9 @@ public class SellerManagementController {
 
         public AuctionItem(Auction auction) {
             Item item = auction.getItem();
+            itemId = safe(auction.getItemId() != null && !auction.getItemId().isBlank()
+                    ? auction.getItemId()
+                    : item.getItemId());
             id = safe(auction.getAuctionId());
             name = safe(item.getName());
             categoryLabel = categoryLabel(item.getCategory());
@@ -453,6 +482,7 @@ public class SellerManagementController {
         }
 
         public String getId() { return id; }
+        public String getItemId() { return itemId; }
         public String getName() { return name; }
         public String getCategoryLabel() { return categoryLabel; }
         public long getStartPrice() { return startPrice; }
@@ -487,3 +517,4 @@ public class SellerManagementController {
         }
     }
 }
+

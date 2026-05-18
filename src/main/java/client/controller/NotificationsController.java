@@ -1,5 +1,7 @@
 package client.controller;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.NotificationClientService;
@@ -89,7 +91,7 @@ public class NotificationsController implements Initializable {
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi load bidder notifications: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi load bidder notifications: " + e.getMessage())));
                 Platform.runLater(() -> showEmptyState("Không tải được thông báo."));
             }
         }).start();
@@ -178,7 +180,7 @@ public class NotificationsController implements Initializable {
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi mark bidder notifications read: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi mark bidder notifications read: " + e.getMessage())));
                 Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đánh dấu đã đọc."));
             }
         }).start();
@@ -224,7 +226,7 @@ public class NotificationsController implements Initializable {
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi mo phien tu notification: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi mo phien tu notification: " + e.getMessage())));
                 Platform.runLater(() -> {
                     if (homeController != null) {
                         homeController.loadAuctionHistoryView();
@@ -314,3 +316,4 @@ public class NotificationsController implements Initializable {
         client.util.DialogUtil.showAlert(type, title, null, content);
     }
 }
+

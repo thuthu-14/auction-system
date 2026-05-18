@@ -1,18 +1,21 @@
 package server.concurrency;
 
 import common.Constants;
+import server.exception.ServerErrorType;
+import server.exception.ServerExceptionHandler;
 import util.LoggerUtil;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 public class ThreadPoolManager {
 
     private static ThreadPoolManager instance;
-    private ExecutorService executorService;
-    private ScheduledExecutorService scheduledExecutorService;
+    private final ExecutorService executorService;
+    private final ScheduledExecutorService scheduledExecutorService;
 
     private ThreadPoolManager() {
         this.executorService = Executors.newFixedThreadPool(Constants.THREAD_POOL_SIZE);
-        this.scheduledExecutorService = Executors.newScheduledThreadPool(2);
+        this.scheduledExecutorService = Executors.newScheduledThreadPool(Constants.THREAD_POOL_SIZE);
         LoggerUtil.info("ThreadPoolManager initialized with " + Constants.THREAD_POOL_SIZE + " threads");
     }
 
@@ -24,9 +27,7 @@ public class ThreadPoolManager {
     }
 
     public void execute(Runnable task) {
-        if (task != null) {
-            executorService.execute(task);
-        }
+        executorService.execute(Objects.requireNonNull(task, "task"));
     }
 
     public ScheduledFuture<?> scheduleAtFixedRate(
@@ -34,17 +35,20 @@ public class ThreadPoolManager {
             long initialDelay,
             long period,
             TimeUnit unit) {
-        if (task != null) {
-            return scheduledExecutorService.scheduleAtFixedRate(task, initialDelay, period, unit);
-        }
-        return null;
+        return scheduledExecutorService.scheduleAtFixedRate(
+                Objects.requireNonNull(task, "task"),
+                initialDelay,
+                period,
+                Objects.requireNonNull(unit, "unit")
+        );
     }
 
     public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
-        if (task != null) {
-            return scheduledExecutorService.schedule(task, delay, unit);
-        }
-        return null;
+        return scheduledExecutorService.schedule(
+                Objects.requireNonNull(task, "task"),
+                delay,
+                Objects.requireNonNull(unit, "unit")
+        );
     }
 
     public void shutdown() {
@@ -59,7 +63,7 @@ public class ThreadPoolManager {
                 LoggerUtil.warn("Thread pools did not terminate gracefully");
             }
         } catch (InterruptedException e) {
-            LoggerUtil.error("Error shutting down thread pools: " + e.getMessage());
+            ServerExceptionHandler.handle(ServerErrorType.SYSTEM, "Shutdown thread pools", e);
             Thread.currentThread().interrupt();
         }
     }

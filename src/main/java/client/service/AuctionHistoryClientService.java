@@ -1,5 +1,7 @@
 package client.service;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.MessageTransport;
 import common.Message;
 import common.MessageType;
@@ -47,7 +49,7 @@ public class AuctionHistoryClientService {
                 return auction;
             }
         } catch (Exception e) {
-            LoggerUtil.error("Fetch auction failed: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.DATA, "Fetch auction detail", e);
         }
         return null;
     }
@@ -70,7 +72,7 @@ public class AuctionHistoryClientService {
                 return contact;
             }
         } catch (Exception e) {
-            LoggerUtil.error("Load seller contact failed: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.DATA, "Load seller contact", e);
         }
         return localContact;
     }

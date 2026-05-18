@@ -2,6 +2,8 @@ package server.service;
 
 import server.model.Auction;
 import common.AuctionStatus;
+import server.concurrency.ThreadPoolManager;
+import server.exception.ServerExceptionHandler;
 import util.LoggerUtil;
 import java.io.IOException;
 import java.util.*;
@@ -9,16 +11,14 @@ import java.util.concurrent.*;
 
 public class SchedulerService {
 
-    private static ScheduledExecutorService scheduler;
+    private static ScheduledFuture<?> schedulerTask;
 
     public static void startScheduler() {
-        scheduler = Executors.newScheduledThreadPool(1);
-
-        scheduler.scheduleAtFixedRate(() -> {
+        schedulerTask = ThreadPoolManager.getInstance().scheduleAtFixedRate(() -> {
             try {
                 checkExpiredAuctions();
             } catch (Exception e) {
-                LoggerUtil.error("Scheduler error: " + e.getMessage());
+                ServerExceptionHandler.handle("Scheduler check expired auctions", e);
             }
         }, 0, 1, TimeUnit.MINUTES);
 
@@ -47,8 +47,8 @@ public class SchedulerService {
     }
 
     public static void stopScheduler() {
-        if (scheduler != null && !scheduler.isShutdown()) {
-            scheduler.shutdown();
+        if (schedulerTask != null && !schedulerTask.isCancelled()) {
+            schedulerTask.cancel(true);
             LoggerUtil.info("Scheduler stopped");
         }
     }

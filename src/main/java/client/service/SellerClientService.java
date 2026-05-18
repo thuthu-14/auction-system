@@ -4,9 +4,14 @@ import client.network.MessageTransport;
 import common.Message;
 import common.MessageType;
 import server.model.Auction;
+import server.model.Bid;
 import server.model.RegularUser;
 import server.model.User;
+import server.repository.SqlBidRepository;
+import util.LoggerUtil;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +20,8 @@ public class SellerClientService {
     private final DashboardClientService auctionExtractor = new DashboardClientService();
 
     public void upgradeSeller(MessageTransport transport, RegularUser user,
-                              String shopName, String phone, String address, String email) throws Exception {
+                              String shopName, String phone, String address, String email,
+                              String password) throws Exception {
         ensureConnected(transport);
         Map<String, String> payload = new HashMap<>();
         payload.put("userId", user.getUserId());
@@ -23,6 +29,7 @@ public class SellerClientService {
         payload.put("phone", phone);
         payload.put("address", address);
         payload.put("email", email);
+        payload.put("password", password);
 
         Message response = transport.sendAndReceive(new Message(MessageType.UPGRADE_SELLER, payload, user.getUsername()));
         if (response == null || !"SUCCESS".equals(response.getStatus())) {
@@ -57,8 +64,118 @@ public class SellerClientService {
                     ? response.getMessage()
                     : "Cannot load auction detail");
         }
+        if (response.getData() instanceof Auction auction) {
+            return auction;
+        }
         List<Auction> auctions = auctionExtractor.extractAuctionList(response.getData());
         return auctions.isEmpty() ? null : auctions.get(0);
+    }
+
+    public List<Bid> fetchBidHistory(MessageTransport transport, User user, String auctionId) throws Exception {
+        ensureConnected(transport);
+        if (user == null) {
+            throw new IllegalStateException("Missing current user");
+        }
+        if (auctionId == null || auctionId.isBlank()) {
+            throw new IllegalArgumentException("Missing auction id");
+        }
+
+        Message response = transport.sendAndReceive(new Message(MessageType.GET_BID_HISTORY, auctionId, user.getUsername()));
+        if (response == null || !"SUCCESS".equals(response.getStatus())) {
+            throw new java.io.IOException(response != null && response.getMessage() != null
+                    ? response.getMessage()
+                    : "Cannot load bid history");
+        }
+
+        List<Bid> bids = new ArrayList<>();
+        Object rawData = response.getData();
+        if (rawData instanceof Bid bid) {
+            bids.add(bid);
+        } else if (rawData instanceof List<?> rawList) {
+            for (Object item : rawList) {
+                if (item instanceof Bid bid) {
+                    bids.add(bid);
+                }
+            }
+        }
+        return bids;
+    }
+
+    public List<Bid> fetchBidHistoryWithFallback(MessageTransport transport, User user, String auctionId) throws Exception {
+        try {
+            List<Bid> serverBids = fetchBidHistory(transport, user, auctionId);
+            if (!serverBids.isEmpty()) {
+                return serverBids;
+            }
+            return loadLocalBidHistory(auctionId);
+        } catch (Exception e) {
+            LoggerUtil.warn("Fetch bid history from server failed, fallback to SQLite: " + e.getMessage());
+            List<Bid> localBids = loadLocalBidHistory(auctionId);
+            if (!localBids.isEmpty()) {
+                return localBids;
+            }
+            throw e;
+        }
+    }
+
+    public List<Bid> loadLocalBidHistory(String auctionId) {
+        if (auctionId == null || auctionId.isBlank() || "--".equals(auctionId)) {
+            return List.of();
+        }
+        try {
+            List<Bid> bids = new ArrayList<>(new SqlBidRepository().getBidsByAuctionId(auctionId));
+            bids.sort(Comparator.comparingLong(Bid::getBidTime));
+            return bids;
+        } catch (Exception e) {
+            LoggerUtil.warn("Load local bid history failed: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    public Auction cancelAuction(MessageTransport transport, User user, String auctionId) throws Exception {
+        ensureConnected(transport);
+        if (user == null) {
+            throw new IllegalStateException("Missing current user");
+        }
+        if (auctionId == null || auctionId.isBlank() || "--".equals(auctionId)) {
+            throw new IllegalArgumentException("Missing auction id");
+        }
+
+        Message response = transport.sendAndReceive(new Message(MessageType.CANCEL_AUCTION, auctionId, user.getUsername()));
+        if (response == null || !"SUCCESS".equals(response.getStatus())) {
+            throw new java.io.IOException(response != null && response.getMessage() != null
+                    ? response.getMessage()
+                    : "Cannot cancel auction");
+        }
+        return response.getData() instanceof Auction auction ? auction : null;
+    }
+
+    public Map<String, String> fetchUserContact(MessageTransport transport, User user, String userId) throws Exception {
+        ensureConnected(transport);
+        if (user == null) {
+            throw new IllegalStateException("Missing current user");
+        }
+        if (userId == null || userId.isBlank()) {
+            return Map.of();
+        }
+
+        Message response = transport.sendAndReceive(new Message(MessageType.GET_SELLER_CONTACT, userId, user.getUsername()));
+        if (response == null || !"SUCCESS".equals(response.getStatus())) {
+            throw new java.io.IOException(response != null && response.getMessage() != null
+                    ? response.getMessage()
+                    : "Cannot load user contact");
+        }
+
+        if (response.getData() instanceof Map<?, ?> rawMap) {
+            Map<String, String> contact = new HashMap<>();
+            for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+                if (entry.getKey() != null && entry.getValue() != null) {
+                    contact.put(entry.getKey().toString(), entry.getValue().toString());
+                }
+            }
+            return contact;
+        }
+        return Map.of();
     }
 
     private void ensureConnected(MessageTransport transport) throws Exception {
@@ -66,4 +183,5 @@ public class SellerClientService {
             throw new java.io.IOException("Socket is not connected");
         }
     }
+
 }

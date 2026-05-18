@@ -1,6 +1,8 @@
 // src/main/java/client/network/ConnectionManager.java
 package client.network;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import common.AppConfig;
 import common.Constants;
 import util.LoggerUtil;
@@ -57,7 +59,7 @@ public class ConnectionManager {
             return true;
 
         } catch (IOException e) {
-            LoggerUtil.error("Failed to connect: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.NETWORK, "Connect to server", e);
             isConnected = false;
             return false;
         }
@@ -80,7 +82,7 @@ public class ConnectionManager {
             LoggerUtil.info("✓ Disconnected from server");
 
         } catch (IOException e) {
-            LoggerUtil.error("Error disconnecting: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.NETWORK, "Disconnect from server", e);
         }
     }
 

@@ -2,17 +2,17 @@ package client.controller;
 
 
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import navigation.NavigationManager;
 import server.model.User;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -110,27 +110,18 @@ public class AdminHomeController {
                     }
                 }
             } catch (Exception e) {
-                System.out.println("Lỗi đổi màu menu: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UI, "Admin menu selection", e);
             }
         }
     }
     private void loadViewIntoContentArea(String fxmlPath) {
-        try {
-            if (contentArea != null) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-                Parent view = loader.load();
-                Object controller = loader.getController();
-                if (controller instanceof UserManagementController userManagementController) {
-                    userManagementController.setContext(currentUser, clientSocket);
-                } else if (controller instanceof AdminAuctionManagementController auctionManagementController) {
-                    auctionManagementController.setContext(currentUser, clientSocket);
-                }
-                contentArea.getChildren().clear();
-                contentArea.getChildren().add(view);
+        NavigationManager.getInstance().loadContent(contentArea, fxmlPath, controller -> {
+            if (controller instanceof UserManagementController userManagementController) {
+                userManagementController.setContext(currentUser, clientSocket);
+            } else if (controller instanceof AdminAuctionManagementController auctionManagementController) {
+                auctionManagementController.setContext(currentUser, clientSocket);
             }
-        } catch (IOException e) {
-            System.err.println("Không tìm thấy file FXML: " + fxmlPath);
-            e.printStackTrace();
-        }
+        });
     }
 }
+

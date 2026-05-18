@@ -16,7 +16,7 @@ public class Transaction implements Serializable {
     public Transaction() {}
 
     public Transaction(String userId, String type, double amount, double balanceAfter, String description) {
-        this.id = "TXN_" + System.currentTimeMillis();
+        this.id = "TXN_" + System.currentTimeMillis() + "_" + System.nanoTime();
         this.userId = userId;
         this.type = type;
         this.amount = amount;
@@ -32,7 +32,13 @@ public class Transaction implements Serializable {
     }
 
     public String getTypeLabel() {
-        return "DEPOSIT".equals(type) ? "+ Nạp tiền" : "- Rút tiền";
+        if ("DEPOSIT".equals(type)) {
+            return "+ N\u1ea1p ti\u1ec1n";
+        }
+        if ("PAYMENT".equals(type)) {
+            return "- Thanh to\u00e1n";
+        }
+        return "- R\u00fat ti\u1ec1n";
     }
 
     public double getAmount() {
@@ -44,7 +50,7 @@ public class Transaction implements Serializable {
     }
 
     public String getMoneyOut() {
-        return "WITHDRAW".equals(type) ? formatVnd(amount) : "";
+        return "WITHDRAW".equals(type) || "PAYMENT".equals(type) ? formatVnd(amount) : "";
     }
 
     public double getBalanceAfter() {

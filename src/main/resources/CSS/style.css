@@ -30,6 +30,15 @@
     -fx-background-color: transparent;
     -fx-background-radius: 8;
     -fx-cursor: hand;
+    -fx-min-height: 45px;
+    -fx-pref-height: 45px;
+    -fx-max-height: 45px;
+}
+
+.menu-item .button {
+    -fx-font-size: 17px;
+    -fx-font-weight: normal;
+    -fx-background-color: transparent;
 }
 
 .menu-item:hover {
@@ -39,7 +48,8 @@
 
 .menu-item:hover .button {
     -fx-text-fill: #1a1a1a;
-    -fx-font-weight: bold;
+    -fx-font-size: 17px;
+    -fx-font-weight: normal;
 }
 
 .menu-item-active {
@@ -49,6 +59,8 @@
 
 .menu-item-active .button {
     -fx-text-fill: #3b82f6;
+    -fx-font-size: 17px;
+    -fx-font-weight: normal;
 }
 
 .eye-button {
@@ -313,8 +325,8 @@
     -fx-padding: 0;
     -fx-border-color: #e5e7eb;
     -fx-border-width: 1;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
     -fx-font-size: 13px;
     -fx-font-family: "System";
     -fx-focus-color: transparent;
@@ -331,7 +343,7 @@
 .auction-table .column-header-background {
     -fx-background-color: #f9fafb;
     -fx-background-insets: 0;
-    -fx-background-radius: 10 10 0 0;
+    -fx-background-radius: 12 12 0 0;
 }
 
 .auction-table .column-header {
@@ -344,6 +356,7 @@
 
 .auction-table .filler {
     -fx-background-color: #f9fafb;
+    -fx-background-radius: 0 12 0 0;
     -fx-border-color: transparent transparent #e5e7eb transparent;
     -fx-border-width: 0 0 1 0;
 }

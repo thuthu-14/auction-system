@@ -63,6 +63,24 @@ public class SqlBidRepository implements BidRepository {
     }
 
     @Override
+    public List<Bid> getBidsLinkedToUser(String userId) throws Exception {
+        String sql = """
+            SELECT b.* FROM bids b
+            INNER JOIN user_bids ub ON ub.bid_id = b.bid_id
+            WHERE ub.user_id = ?
+        """;
+        List<Bid> list = new ArrayList<>();
+
+        try (Connection c = DatabaseManager.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, userId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) list.add(mapBid(rs));
+        }
+        return list;
+    }
+
+    @Override
     public void saveBid(Bid bid) throws Exception {
         String sql = """
             INSERT OR REPLACE INTO bids

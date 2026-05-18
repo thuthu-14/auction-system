@@ -1,5 +1,7 @@
 package client.controller;
-
+
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.WalletService;
@@ -8,17 +10,20 @@ import common.Message;
 import common.MessageType;
 import common.Transaction;
 import javafx.animation.FadeTransition;
-import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -29,6 +34,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import navigation.NavigationManager;
+import server.repository.SqlTransactionRepository;
 import server.model.User;
 import util.LoggerUtil;
 
@@ -93,6 +99,104 @@ public class WalletController implements Initializable {
         if (moneyOutColumn != null) moneyOutColumn.setCellValueFactory(new PropertyValueFactory<>("moneyOut"));
         if (balanceColumn != null) balanceColumn.setCellValueFactory(new PropertyValueFactory<>("formattedBalanceAfter"));
         if (descriptionColumn != null) descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        setupTransactionRowPopup();
+    }
+
+    private void setupTransactionRowPopup() {
+        if (transactionTable == null) {
+            return;
+        }
+        transactionTable.setRowFactory(table -> {
+            TableRow<Transaction> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY) {
+                    showTransactionDetailPopup(row.getItem());
+                }
+            });
+            row.setOnMouseEntered(event -> {
+                if (!row.isEmpty()) {
+                    row.setStyle("-fx-cursor: hand;");
+                }
+            });
+            return row;
+        });
+    }
+
+    private void showTransactionDetailPopup(Transaction transaction) {
+        if (transaction == null) {
+            return;
+        }
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Chi tiết giao dịch");
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        if (rootPane != null && rootPane.getScene() != null && rootPane.getScene().getWindow() != null) {
+            dialog.initOwner(rootPane.getScene().getWindow());
+        }
+
+        DialogPane pane = dialog.getDialogPane();
+        pane.getButtonTypes().add(ButtonType.CLOSE);
+        pane.setStyle("-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e5e7eb; -fx-border-radius: 14;");
+
+        VBox content = new VBox(16);
+        content.setPadding(new Insets(18, 22, 18, 22));
+        content.setPrefWidth(520);
+
+        Label title = new Label(transaction.getTypeLabel());
+        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #111827;");
+
+        Label amount = new Label(formatSignedTransactionAmount(transaction));
+        amount.setAlignment(Pos.CENTER_LEFT);
+        amount.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: "
+                + (isMoneyIn(transaction) ? "#047857" : "#dc2626") + ";");
+
+        GridPane detailGrid = new GridPane();
+        detailGrid.setHgap(24);
+        detailGrid.setVgap(12);
+        detailGrid.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 10; -fx-padding: 16;");
+
+        addTransactionDetailRow(detailGrid, 0, "Mã giao dịch", safeText(transaction.id));
+        addTransactionDetailRow(detailGrid, 1, "Thời gian", transaction.getFormattedDate());
+        addTransactionDetailRow(detailGrid, 2, "Loại giao dịch", transaction.getTypeLabel());
+        addTransactionDetailRow(detailGrid, 3, "Tiền vào", emptyToDash(transaction.getMoneyIn()));
+        addTransactionDetailRow(detailGrid, 4, "Tiền ra", emptyToDash(transaction.getMoneyOut()));
+        addTransactionDetailRow(detailGrid, 5, "Số dư sau", transaction.getFormattedBalanceAfter());
+        addTransactionDetailRow(detailGrid, 6, "Mô tả", safeText(transaction.getDescription()));
+
+        content.getChildren().addAll(title, amount, detailGrid);
+        pane.setContent(content);
+        dialog.showAndWait();
+    }
+
+    private void addTransactionDetailRow(GridPane grid, int rowIndex, String labelText, String valueText) {
+        Label label = new Label(labelText);
+        label.setMinWidth(130);
+        label.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #64748b;");
+
+        Label value = new Label(valueText);
+        value.setWrapText(true);
+        value.setMaxWidth(320);
+        value.setStyle("-fx-font-size: 14px; -fx-text-fill: #111827;");
+
+        grid.add(label, 0, rowIndex);
+        grid.add(value, 1, rowIndex);
+    }
+
+    private String formatSignedTransactionAmount(Transaction transaction) {
+        String prefix = isMoneyIn(transaction) ? "+ " : "- ";
+        return prefix + formatVnd(transaction.getAmount());
+    }
+
+    private boolean isMoneyIn(Transaction transaction) {
+        return transaction != null && "DEPOSIT".equals(transaction.getType());
+    }
+
+    private String emptyToDash(String value) {
+        return value == null || value.isBlank() ? "--" : value;
+    }
+
+    private String safeText(String value) {
+        return value == null || value.isBlank() ? "--" : value;
     }
 
     public void setUserData(User user, ClientSocket socket) {
@@ -184,7 +288,7 @@ public class WalletController implements Initializable {
                     }
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Error loading bank account: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Error loading bank account: " + e.getMessage())));
             }
         }).start();
 
@@ -207,7 +311,7 @@ public class WalletController implements Initializable {
         try {
             URL fxmlLocation = getClass().getResource("/fxml/BidderView/AddBankDialog.fxml");
             if (fxmlLocation == null) {
-                LoggerUtil.error("Không tìm thấy file AddBankDialog.fxml");
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Không tìm thấy file AddBankDialog.fxml")));
                 return;
             }
 
@@ -254,7 +358,7 @@ public class WalletController implements Initializable {
                     saveBankAccountForCurrentUser(bank, account, amount);
                     Platform.runLater(() -> refreshLinkedBankDisplay(bank, account));
                 } catch (Exception e) {
-                    LoggerUtil.error("Lỗi lưu ngân hàng: " + e.getMessage());
+                    ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi lưu ngân hàng: " + e.getMessage())));
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể lưu thông tin ngân hàng."));
                 }
             });
@@ -278,7 +382,7 @@ public class WalletController implements Initializable {
 
         } catch (Exception e) {
             clearWalletOverlay();
-            LoggerUtil.error("Lỗi show popup thêm thẻ: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi show popup thêm thẻ: " + e.getMessage())));
         }
     }
 
@@ -401,24 +505,17 @@ public class WalletController implements Initializable {
                         Platform.runLater(() -> {
                             NavigationManager.getInstance().setCurrentUser(updatedUser);
                             this.currentUser = updatedUser;
-
-                            try {
-                                // ?? XÓA: updateBankBalanceForCurrentUser - Không còn can thiệp tiền ngân hàng ảo
-
-                            } catch (Exception ex) {
-                                LoggerUtil.error("Lỗi lưu file local: " + ex.getMessage());
-                            }
                             refreshWalletAfterTransaction(updatedUser);
-                            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Giao dịch hoàn tất!");
+                            showAlert(Alert.AlertType.INFORMATION, "Th\u00e0nh c\u00f4ng", "Giao d\u1ecbch ho\u00e0n t\u1ea5t!");
                         });
                     } else {
-                        String errorMsg = response != null ? response.getMessage() : "Giao dịch bị từ chối";
-                        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", errorMsg));
+                        String errorMsg = response != null ? response.getMessage() : "Giao d\u1ecbch b\u1ecb t\u1eeb ch\u1ed1i";
+                        Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "L\u1ed7i", errorMsg));
                     }
 
                 } catch (Exception e) {
-                    LoggerUtil.error("Wallet transaction failed: " + e.getMessage());
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Không thể gửi yêu cầu tới Server"));
+                    ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Wallet transaction failed: " + e.getMessage())));
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "L\u1ed7i m\u1ea1ng", "Kh\u00f4ng th\u1ec3 g\u1eedi y\u00eau c\u1ea7u t\u1edbi Server"));
                 }
             }).start();
 
@@ -461,7 +558,7 @@ public class WalletController implements Initializable {
                     applyTransactionFilters();
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Lỗi refresh lịch sử giao dịch: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi refresh lịch sử giao dịch: " + e.getMessage())));
             }
         }).start();
 
@@ -506,7 +603,7 @@ public class WalletController implements Initializable {
         try {
             URL fxmlLocation = getClass().getResource("/fxml/BidderView/WalletTransactionDialog.fxml");
             if (fxmlLocation == null) {
-                LoggerUtil.error("Không tìm thấy file WalletTransactionDialog.fxml");
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Không tìm thấy file WalletTransactionDialog.fxml")));
                 return;
             }
 
@@ -558,7 +655,7 @@ public class WalletController implements Initializable {
             dialogStage.showAndWait();
         } catch (Exception e) {
             clearWalletOverlay();
-            LoggerUtil.error("Lỗi show popup giao dịch ví: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi show popup giao dịch ví: " + e.getMessage())));
         }
     }
 
@@ -579,10 +676,11 @@ public class WalletController implements Initializable {
                     + " for user=" + currentUser.getUserId());
             Platform.runLater(() -> {
                 allTransactions = new ArrayList<>(list);
+                syncBalanceFromTransactions(allTransactions);
                 applyTransactionFilters();
             });
         } catch (Exception e) {
-            LoggerUtil.error("Lỗi load lịch sử GD: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi load lịch sử GD: " + e.getMessage())));
         }
     }
 
@@ -591,21 +689,55 @@ public class WalletController implements Initializable {
     }
 
     private List<Transaction> loadTransactionsForUser() throws Exception {
-        Message response = walletService.fetchTransactions(getActiveSocket(), currentUser);
-        if (response != null && "SUCCESS".equals(response.getStatus())) {
-            Object data = response.getData();
-            if (data instanceof List<?> list) {
-                List<Transaction> result = new ArrayList<>();
-                for (Object obj : list) {
-                    if (obj instanceof Transaction t) {
-                        result.add(t);
+        try {
+            Message response = walletService.fetchTransactions(getActiveSocket(), currentUser);
+            if (response != null && "SUCCESS".equals(response.getStatus())) {
+                Object data = response.getData();
+                if (data instanceof List<?> list) {
+                    List<Transaction> result = new ArrayList<>();
+                    for (Object obj : list) {
+                        if (obj instanceof Transaction t) {
+                            result.add(t);
+                        }
+                    }
+                    if (!result.isEmpty()) {
+                        return result;
                     }
                 }
-                return result;
             }
+        } catch (Exception e) {
+            LoggerUtil.warn("Wallet transaction socket load failed, fallback SQLite: " + e.getMessage());
         }
-        return new ArrayList<>();
+
+        if (currentUser == null || currentUser.getUserId() == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(new SqlTransactionRepository().getByUser(currentUser.getUserId()));
     }
+
+    private void syncBalanceFromTransactions(List<Transaction> transactions) {
+        if (transactions == null || transactions.isEmpty() || currentUser == null || currentUser.getUserId() == null) {
+            return;
+        }
+
+        Transaction latest = transactions.stream()
+                .filter(t -> t != null && currentUser.getUserId().equals(t.getUserId()))
+                .max(Comparator.comparingLong(t -> t.timestamp))
+                .orElse(null);
+        if (latest == null) {
+            return;
+        }
+
+        double latestBalance = latest.getBalanceAfter();
+        currentUser.setWallet(latestBalance);
+        NavigationManager.getInstance().setCurrentUser(currentUser);
+        if (balanceLabel != null) {
+            balanceLabel.setText(formatVnd(latestBalance));
+            balanceLabel.applyCss();
+        }
+        LoggerUtil.info("Wallet balance synced from latest transaction: " + latestBalance);
+    }
+
     private void showTransactions(List<Transaction> list) {
         transactionTable.getItems().clear();
         transactionTable.setItems(FXCollections.observableArrayList(list));
@@ -643,7 +775,6 @@ public class WalletController implements Initializable {
 
     private void setActiveTransactionFilter(TransactionFilter filter) {
         activeTransactionFilter = filter;
-        animateActiveFilterButton();
         applyTransactionFilters();
     }
 
@@ -652,7 +783,7 @@ public class WalletController implements Initializable {
             return "DEPOSIT".equals(transaction.type);
         }
         if (activeTransactionFilter == TransactionFilter.OUT) {
-            return "WITHDRAW".equals(transaction.type);
+            return "WITHDRAW".equals(transaction.type) || "PAYMENT".equals(transaction.type);
         }
         return true;
     }
@@ -708,24 +839,6 @@ public class WalletController implements Initializable {
         button.setStyle(active ? ACTIVE_FILTER_STYLE : INACTIVE_FILTER_STYLE);
         button.setTextFill(active ? Color.WHITE : Color.web("#4a5568"));
     }
-
-    private void animateActiveFilterButton() {
-        Button activeButton = switch (activeTransactionFilter) {
-            case IN -> filterInBtn;
-            case OUT -> filterOutBtn;
-            default -> filterAllBtn;
-        };
-        if (activeButton == null) {
-            return;
-        }
-        ScaleTransition transition = new ScaleTransition(Duration.millis(110), activeButton);
-        transition.setFromX(0.96);
-        transition.setFromY(0.96);
-        transition.setToX(1);
-        transition.setToY(1);
-        transition.play();
-    }
-
 
     private static class BankAccountEntry {
         String bankName;
@@ -811,3 +924,4 @@ public class WalletController implements Initializable {
     }
 
 }
+

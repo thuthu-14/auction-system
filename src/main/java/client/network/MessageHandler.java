@@ -1,6 +1,8 @@
 // src/main/java/client/network/MessageHandler.java
 package client.network;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import common.Message;
 import common.MessageType;
 import util.LoggerUtil;
@@ -94,16 +96,17 @@ public class MessageHandler {
                     }
                 } catch (IOException e) {
                     if (isRunning) {
+                        ClientExceptionHandler.handle(ClientErrorType.NETWORK, "Receive server message", e);
                         notifyError("Connection error: " + e.getMessage());
                     }
                     break;
                 } catch (ClassNotFoundException e) {
-                    LoggerUtil.error("ClassNotFoundException: " + e.getMessage());
+                    ClientExceptionHandler.handle(ClientErrorType.DATA, "Deserialize server message", e);
                     notifyError("Data error: " + e.getMessage());
                 }
             }
         } catch (Exception e) {
-            LoggerUtil.error("MessageHandler error: " + e.getMessage());
+            ClientExceptionHandler.handle("Message handler", e);
             notifyError("Error: " + e.getMessage());
         } finally {
             isRunning = false;
@@ -120,7 +123,7 @@ public class MessageHandler {
             try {
                 listener.onMessageReceived(message);
             } catch (Exception e) {
-                LoggerUtil.error("Error notifying listener: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UI, "Notify message listener", e);
             }
         }
     }
@@ -133,7 +136,7 @@ public class MessageHandler {
             try {
                 listener.onError(errorMessage);
             } catch (Exception e) {
-                LoggerUtil.error("Error notifying error listener: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UI, "Notify error listener", e);
             }
         }
     }
@@ -146,7 +149,7 @@ public class MessageHandler {
             try {
                 listener.onConnectionClosed();
             } catch (Exception e) {
-                LoggerUtil.error("Error notifying close listener: " + e.getMessage());
+                ClientExceptionHandler.handle(ClientErrorType.UI, "Notify close listener", e);
             }
         }
     }

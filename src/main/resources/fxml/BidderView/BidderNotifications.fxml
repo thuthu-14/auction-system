@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-
 <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: #fcfcfc;" hbarPolicy="NEVER" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.NotificationsController">
-
     <VBox spacing="25.0" style="-fx-background-color: #fcfcfc;">
         <padding>
             <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
         </padding>
-
         <HBox alignment="CENTER_LEFT">
             <children>
                 <Label style="-fx-text-fill: #1a1a1a;" text="Thông báo của bạn" textFill="#1a1a1a">
@@ -27,7 +23,6 @@
                 </Button>
             </children>
         </HBox>
-
         <VBox fx:id="notificationsContainer" spacing="15.0" />
     </VBox>
 </ScrollPane>

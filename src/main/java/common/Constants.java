@@ -3,7 +3,7 @@ package common;
 public class Constants {
     public static final int SERVER_PORT = 5000;
     public static final String SERVER_HOST = "localhost";
-    public static final int THREAD_POOL_SIZE = 20;
+    public static final int THREAD_POOL_SIZE = 100;
     public static final int SOCKET_TIMEOUT = 15000;
 
     public static final String JSON_DIR = "data/json";

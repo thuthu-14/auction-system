@@ -4,8 +4,15 @@ import client.network.MessageTransport;
 import common.Message;
 import common.MessageType;
 import server.model.User;
+import util.LoggerUtil;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -70,9 +77,12 @@ public class AddAuctionProductClientService {
                 .orElse(null);
     }
 
-    public Map<String, Object> buildPayload(User user, String name, String description, String category,
+    public Map<String, Object> buildPayload(MessageTransport transport, User user, String name, String description, String category,
                                             List<String> imagePaths, CategoryFieldReader fields) throws Exception {
         validateBase(name, description, category, imagePaths);
+        if (transport == null || !transport.isConnected()) {
+            throw new ValidationException("Loi mang", "Khong the upload anh vi mat ket noi may chu!");
+        }
         if (user == null) {
             throw new ValidationException("Lỗi mạng", "Bạn chưa đăng nhập hoặc mất kết nối máy chủ!");
         }
@@ -84,7 +94,7 @@ public class AddAuctionProductClientService {
         payload.put("description", description.trim());
 
         // ← THAY ĐỔI: Upload ảnh lên server trước, rồi lưu URL
-        List<String> uploadedImageUrls = uploadImages(imagePaths);
+        List<String> uploadedImageUrls = uploadImages(transport, imagePaths);
         payload.put("images", uploadedImageUrls);
 
         CategoryBuildResult categoryResult = buildCategoryPayload(category, payload, fields);
@@ -97,18 +107,18 @@ public class AddAuctionProductClientService {
         return payload;
     }
 
-    private List<String> uploadImages(List<String> imagePaths) throws Exception {
+    private List<String> uploadImages(MessageTransport transport, List<String> imagePaths) throws Exception {
         List<String> uploadedUrls = new ArrayList<>();
 
         // ← Cần inject ClientSocket, tạm thời giả sử có sẵn
         // (bước tiếp theo sẽ fix cái này)
-        client.network.ClientSocket socket = client.network.ConnectionManager.getInstance().getClientSocket();
+        
 
         for (String imagePath : imagePaths) {
             try {
                 // Đọc file ảnh
-                File imageFile = new File(new java.net.URI(imagePath));
-                byte[] imageBytes = java.nio.file.Files.readAllBytes(imageFile.toPath());
+                File imageFile = resolveLocalImageFile(imagePath);
+                byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
 
                 // Tạo request upload
                 Map<String, Object> uploadData = new HashMap<>();
@@ -120,21 +130,60 @@ public class AddAuctionProductClientService {
                 uploadRequest.setData(uploadData);
 
                 // Gửi và nhận response
-                Message uploadResponse = socket.sendAndReceive(uploadRequest);
+                Message uploadResponse = transport.sendAndReceive(uploadRequest);
 
                 if (uploadResponse != null && "SUCCESS".equals(uploadResponse.getStatus())) {
                     String imageUrl = (String) uploadResponse.getData();
+                    if (imageUrl == null || imageUrl.isBlank()) {
+                        throw new Exception("Server did not return image URL");
+                    }
                     uploadedUrls.add(imageUrl);
                 } else {
-                    throw new Exception("Upload failed for: " + imagePath);
+                    throw new Exception(uploadResponse != null && uploadResponse.getMessage() != null
+                            ? uploadResponse.getMessage()
+                            : "Server tu choi upload anh");
                 }
             } catch (Exception e) {
+                LoggerUtil.error("Upload image failed [" + imagePath + "]: " + e.getMessage());
+                if (!uploadedUrls.isEmpty()) {
+                    continue;
+                }
                 throw new ValidationException("Lỗi upload",
                         "Không thể upload ảnh " + imagePath + ": " + e.getMessage());
             }
         }
 
+        if (uploadedUrls.isEmpty()) {
+            throw new ValidationException("Loi upload", "Khong co anh nao upload thanh cong.");
+        }
         return uploadedUrls;
+    }
+
+    private File resolveLocalImageFile(String imagePath) throws Exception {
+        if (imagePath == null || imagePath.isBlank()) {
+            throw new Exception("Duong dan anh rong");
+        }
+
+        Path path;
+        if (imagePath.startsWith("file:")) {
+            try {
+                path = Paths.get(URI.create(imagePath));
+            } catch (IllegalArgumentException e) {
+                String decoded = URLDecoder.decode(imagePath, StandardCharsets.UTF_8);
+                path = Paths.get(URI.create(decoded));
+            }
+        } else {
+            path = Paths.get(imagePath);
+        }
+
+        File imageFile = path.toFile();
+        if (!imageFile.exists() || !imageFile.isFile()) {
+            throw new Exception("Khong tim thay file anh");
+        }
+        if (!imageFile.canRead()) {
+            throw new Exception("Khong co quyen doc file anh");
+        }
+        return imageFile;
     }
 
     private CategoryBuildResult buildCategoryPayload(String category, Map<String, Object> payload, CategoryFieldReader fields) {

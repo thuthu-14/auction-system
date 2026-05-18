@@ -1,17 +1,14 @@
 package client;
 
-import client.controller.AdminHomeController;
-import client.controller.HomeScreenController;
 import client.controller.LoginController;
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
-import client.util.ResponsiveSceneUtil;
-import client.util.StageUtil;
 import javafx.scene.input.KeyCombination;
-import navigation.NavigationManager; // <-- Import thêm cái này để đồng bộ
+import javafx.stage.Stage;
+import navigation.NavigationManager;
 import util.LoggerUtil;
 
 import java.io.IOException;
@@ -22,115 +19,75 @@ public class ClientMain extends Application {
     private LoginController loginController;
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) {
         primaryStage = stage;
+        ClientExceptionHandler.installGlobalHandlers();
 
-        // BẮT BUỘC CÓ ĐỂ ĐỒNG BỘ: Cấp phát main stage cho NavigationManager
         NavigationManager.getInstance().setMainStage(primaryStage);
         primaryStage.setFullScreenExitHint("");
         primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
 
-        LoggerUtil.info("╔════════════════════════════════════════╗");
-        LoggerUtil.info("║   AUCTION SYSTEM CLIENT v1.0           ║");
-        LoggerUtil.info("║   Online Bidding Platform              ║");
-        LoggerUtil.info("╚════════════════════════════════════════╝");
-
+        LoggerUtil.info("Auction system client started");
         showLoginScreen();
 
         stage.setOnCloseRequest(e -> {
-            LoggerUtil.info("✓ Application closed");
+            LoggerUtil.info("Application closed");
             System.exit(0);
         });
     }
 
-    /**
-     * Hiển thị login screen
-     */
     private void showLoginScreen() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-
-            // SỬA: Đồng bộ kích thước màn hình giống như trong SignupController (1300x800)
-            Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
+            Scene scene = new Scene(loader.load(), 1300, 800);
 
             loginController = loader.getController();
             loginController.setOnAdminLoginSuccess(this::showAdminPanel);
             loginController.setOnLoginSuccess(this::showHomeScreen);
 
-            primaryStage.setTitle("🏪 Hệ thống Đấu giá - Đăng nhập");
+            primaryStage.setTitle("He thong Dau gia - Dang nhap");
             primaryStage.setScene(scene);
-            StageUtil.showMaximized(primaryStage);
+            primaryStage.setMaximized(true);
+            primaryStage.show();
 
-            LoggerUtil.info("✓ Login screen displayed");
+            LoggerUtil.info("Login screen displayed");
         } catch (IOException e) {
-            LoggerUtil.error("❌ Error loading login screen: " + e.getMessage());
-            e.printStackTrace();
+            ClientExceptionHandler.showError(ClientErrorType.NAVIGATION, "Error loading login screen", e);
         }
     }
 
     private void showAdminPanel() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminView/AdminHome.fxml"));
-
-            if (loader.getLocation() == null) {
-                LoggerUtil.error("❌ Cannot find AdminHome.fxml");
-                return;
-            }
-
-            Parent root = loader.load();
-            Scene scene = ResponsiveSceneUtil.createScaledScene(root);
-            AdminHomeController adminController = loader.getController();
-
-            if (adminController != null && loginController != null) {
-                if (loginController.getCurrentUser() != null && loginController.getClientSocket() != null) {
-                    adminController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
-                }
-
-                // Rút gọn callback
-                adminController.setOnLogout(this::showLoginScreen);
-            }
-
-            primaryStage.setTitle("⚙️ Bảng điều khiển Admin");
-            primaryStage.setScene(scene);
-            StageUtil.showMaximized(primaryStage);
-
-            LoggerUtil.info("✓ Admin panel displayed");
-        } catch (Exception e) {
-            LoggerUtil.error("❌ Error loading admin panel: " + e.getMessage());
-            e.printStackTrace();
+        if (loginController == null || loginController.getCurrentUser() == null) {
+            ClientExceptionHandler.showError(
+                    ClientErrorType.NAVIGATION,
+                    "Error loading admin panel",
+                    new IllegalStateException("Missing authenticated user")
+            );
+            return;
         }
+
+        NavigationManager nav = NavigationManager.getInstance();
+        nav.setMainStage(primaryStage);
+        nav.setCurrentUser(loginController.getCurrentUser());
+        nav.setClientSocket(loginController.getClientSocket());
+        nav.goToAdminHome();
     }
 
     private void showHomeScreen() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/BidderView/BidderHome.fxml"));
-
-            if (loader.getLocation() == null) {
-                LoggerUtil.error("❌ Cannot find BidderHome.fxml");
-                return;
-            }
-
-            Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
-            HomeScreenController homeController = loader.getController();
-
-            if (homeController != null && loginController != null) {
-                if (loginController.getCurrentUser() != null && loginController.getClientSocket() != null) {
-                    homeController.setUserData(loginController.getCurrentUser(), loginController.getClientSocket());
-                }
-
-                // Rút gọn callback
-                homeController.setOnLogout(this::showLoginScreen);
-            }
-
-            primaryStage.setTitle("🏪 Chợ Đấu giá");
-            primaryStage.setScene(scene);
-            StageUtil.showMaximized(primaryStage);
-
-            LoggerUtil.info("✓ Home screen displayed");
-        } catch (Exception e) {
-            LoggerUtil.error("❌ Error loading home screen: " + e.getMessage());
-            e.printStackTrace();
+        if (loginController == null || loginController.getCurrentUser() == null) {
+            ClientExceptionHandler.showError(
+                    ClientErrorType.NAVIGATION,
+                    "Error loading home screen",
+                    new IllegalStateException("Missing authenticated user")
+            );
+            return;
         }
+
+        NavigationManager nav = NavigationManager.getInstance();
+        nav.setMainStage(primaryStage);
+        nav.setCurrentUser(loginController.getCurrentUser());
+        nav.setClientSocket(loginController.getClientSocket());
+        nav.goToHome();
     }
 
     public static void main(String[] args) {

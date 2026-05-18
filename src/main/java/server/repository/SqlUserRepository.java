@@ -110,6 +110,9 @@ public class SqlUserRepository implements UserRepository {
                 try (PreparedStatement ins = c.prepareStatement(
                         "INSERT INTO user_owned_auctions (user_id, auction_id) VALUES (?, ?)")) {
                     for (String a : auctionIds) {
+                        if (a == null || a.isBlank()) {
+                            continue;
+                        }
                         ins.setString(1, userId);
                         ins.setString(2, a);
                         ins.addBatch();
@@ -132,6 +135,9 @@ public class SqlUserRepository implements UserRepository {
                 try (PreparedStatement ins = c.prepareStatement(
                         "INSERT INTO user_bids (user_id, bid_id) VALUES (?, ?)")) {
                     for (String b : bidIds) {
+                        if (b == null || b.isBlank()) {
+                            continue;
+                        }
                         ins.setString(1, userId);
                         ins.setString(2, b);
                         ins.addBatch();

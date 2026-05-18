@@ -76,6 +76,9 @@ public class SqlItemRepository implements ItemRepository {
                         "INSERT INTO item_images (item_id, image_url, sort_index) VALUES (?, ?, ?)")) {
                     int idx = 0;
                     for (String url : images) {
+                        if (url == null || url.isBlank()) {
+                            continue;
+                        }
                         ins.setString(1, itemId);
                         ins.setString(2, url);
                         ins.setInt(3, idx++);

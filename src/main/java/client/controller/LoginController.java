@@ -1,20 +1,18 @@
 package client.controller;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientException;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.AuthClientService;
-import client.util.ResponsiveSceneUtil;
-import client.util.StageUtil;
 import common.UserRole;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import navigation.NavigationManager;
 import util.LoggerUtil;
-import java.io.IOException;
 
 /**
  * LoginController - Xử lý màn hình Login qua Server Socket
@@ -74,7 +72,8 @@ public class LoginController {
                     proceedToDashboard();
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Login error: " + e.getMessage());
+                ClientException exception = ClientExceptionHandler.wrap(ClientErrorType.AUTHENTICATION, "Login error", e);
+                ClientExceptionHandler.handle("Login error", exception);
                 showError("Lỗi hệ thống: " + e.getMessage());
             } finally {
                 setLoading(false);
@@ -96,7 +95,7 @@ public class LoginController {
                 onAdminLoginSuccess.run();
             } else {
                 // SỬ DỤNG navigateTo cho Admin
-                nav.navigateTo("/fxml/AdminDashboard.fxml");
+                nav.goToAdminHome();
             }
         } else if (currentUser instanceof server.model.RegularUser) {
             server.model.RegularUser regUser = (server.model.RegularUser) currentUser;
@@ -117,16 +116,9 @@ public class LoginController {
 
     @FXML
     private void switchToSignup() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Signup.fxml"));
-            Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
-            Stage stage = (Stage) registerButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.setTitle("Tạo tài khoản");
-            StageUtil.showMaximized(stage);
-        } catch (IOException e) {
-            showError("Không mở được màn hình đăng ký.");
-        }
+        NavigationManager navigation = NavigationManager.getInstance();
+        navigation.setMainStage((Stage) registerButton.getScene().getWindow());
+        navigation.navigateTo("/fxml/Signup.fxml");
     }
 
     @FXML
@@ -186,3 +178,4 @@ public class LoginController {
         return this.clientSocket;
     }
 }
+

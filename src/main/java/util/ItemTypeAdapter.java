@@ -104,7 +104,7 @@ public class ItemTypeAdapter implements JsonSerializer<Item>, JsonDeserializer<I
                 return new OtherItem(itemId, name, description, startingPrice, sellerId, images);
             default:
                 // ← THAY THROW THÀNH TRỊ MẶC ĐỊNH
-                System.err.println("⚠️ Unknown item type: " + type + ", creating default Fashion item");
+                LoggerUtil.warn("Unknown item type: " + type + ", creating default Fashion item");
                 return new Fashion(itemId, name, description, startingPrice, sellerId, "", "", images);
         }
     }

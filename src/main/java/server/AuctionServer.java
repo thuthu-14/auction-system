@@ -2,60 +2,59 @@ package server;
 
 import server.service.*;
 import server.observer.AuctionManager;
+import server.concurrency.ThreadPoolManager;
+import server.exception.ServerErrorType;
+import server.exception.ServerExceptionHandler;
 // import server.storage.DataManager;  ← XÓA HOẶC COMMENT (không dùng nữa)
 import util.LoggerUtil;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.concurrent.*;
 
 public class AuctionServer {
 
     private ServerSocket serverSocket;
-    private ExecutorService threadPool;
+    private ThreadPoolManager threadPoolManager;
     private List<ClientHandler> clients;
     private static final int PORT = 5000;
-    private static final int THREAD_POOL_SIZE = 20;
     private volatile boolean isRunning;
 
     public AuctionServer() throws IOException {
         this.serverSocket = new ServerSocket(PORT);
-        this.threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+        this.threadPoolManager = ThreadPoolManager.getInstance();
         this.clients = Collections.synchronizedList(new ArrayList<>());
         this.isRunning = true;
         LoggerUtil.info("AuctionServer initialized");
     }
 
     public void start() {
+        ServerExceptionHandler.installGlobalHandlers();
         try {
             LoggerUtil.info("Starting Auction Server...");
 
             try {
                 InitializeDataService.initializeDefaultData();
             } catch (Exception e) {
-                System.err.println("Lỗi nghiêm trọng: Không thể khởi tạo dữ liệu mặc định!");
-                e.printStackTrace();
+                ServerExceptionHandler.handle(ServerErrorType.DATA, "Initialize default data", e);
             }
 
             SchedulerService.startScheduler();
             AuctionManager.getInstance();
 
-            System.out.println("═══════════════════════════════════════════");
-            System.out.println("Server listening on port " + PORT);
-            System.out.println("═══════════════════════════════════════════");
+            LoggerUtil.info("Server listening on port " + PORT);
 
             while (isRunning) {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     ClientHandler handler = new ClientHandler(clientSocket, this);
                     clients.add(handler);
-                    threadPool.execute(handler);
+                    threadPoolManager.execute(handler);
 
                     LoggerUtil.info("Client connected: " + clientSocket.getInetAddress().getHostAddress() +
                             " - Active clients: " + clients.size());
                 } catch (IOException e) {
                     if (isRunning) {
-                        LoggerUtil.error("Error accepting client: " + e.getMessage());
+                        ServerExceptionHandler.handle(ServerErrorType.NETWORK, "Accept client", e);
                     }
                 }
             }
@@ -72,21 +71,21 @@ public class AuctionServer {
                 serverSocket.close();
             }
 
-            threadPool.shutdownNow();
-
             SchedulerService.stopScheduler();
 
             for (ClientHandler client : new ArrayList<>(clients)) {
                 try {
                     client.closeConnection();
                 } catch (Exception e) {
-                    LoggerUtil.error("Error closing client: " + e.getMessage());
+                    ServerExceptionHandler.handle(ServerErrorType.NETWORK, "Close client", e);
                 }
             }
 
+            threadPoolManager.shutdown();
+
             LoggerUtil.info("Server shutdown complete");
         } catch (IOException e) {
-            LoggerUtil.error("Error during shutdown: " + e.getMessage());
+            ServerExceptionHandler.handle(ServerErrorType.NETWORK, "Server shutdown", e);
         }
     }
 
@@ -96,7 +95,7 @@ public class AuctionServer {
             try {
                 client.sendMessage(message);
             } catch (IOException e) {
-                LoggerUtil.error("Error broadcasting message: " + e.getMessage());
+                ServerExceptionHandler.handle(ServerErrorType.NETWORK, "Broadcast message", e);
                 removeClient(client);
             }
         }
@@ -112,8 +111,7 @@ public class AuctionServer {
             AuctionServer server = new AuctionServer();
             server.start();
         } catch (IOException e) {
-            LoggerUtil.error("Failed to start server: " + e.getMessage());
-            e.printStackTrace();
+            ServerExceptionHandler.handle(ServerErrorType.NETWORK, "Start server", e);
             System.exit(1);
         }
     }

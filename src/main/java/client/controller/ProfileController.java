@@ -1,14 +1,11 @@
 package client.controller;
 
-import client.util.ResponsiveSceneUtil;
-import client.util.StageUtil;
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import navigation.NavigationManager;
-import util.LoggerUtil;
 
 public class ProfileController {
 
@@ -18,18 +15,11 @@ public class ProfileController {
     @FXML
     private void handleLogout() {
         try {
-            NavigationManager.getInstance().setCurrentUser(null);
-            NavigationManager.getInstance().setClientSocket(null);
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) profileRoot.getScene().getWindow();
-            stage.setScene(ResponsiveSceneUtil.createScaledScene(root));
-            StageUtil.showMaximized(stage);
+            NavigationManager navigation = NavigationManager.getInstance();
+            navigation.setMainStage((Stage) profileRoot.getScene().getWindow());
+            navigation.goToLogin();
         } catch (Exception e) {
-            LoggerUtil.error("Lỗi khi dang xuat tu profile: " + e.getMessage());
-            e.printStackTrace();
+            ClientExceptionHandler.showError(ClientErrorType.NAVIGATION, "Profile logout", e, profileRoot);
         }
     }
 }

@@ -1,24 +1,22 @@
 package client.controller;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientException;
+import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
-import client.network.ConnectionManager;
 import client.service.AuthClientService;
-import client.util.ResponsiveSceneUtil;
-import client.util.StageUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import navigation.NavigationManager;
 import server.model.User;
 import util.LoggerUtil;
 import util.ValidationUtil;
 
-import java.io.IOException;
 
 /**
  * SignupController - Xử lý màn hình Đăng ký qua Server Socket
@@ -31,7 +29,6 @@ public class SignupController {
     @FXML private PasswordField mk;
     @FXML private Button loginButton;
 
-    private ConnectionManager connectionManager;
     private ClientSocket clientSocket;
     private User currentUser;
     private final AuthClientService authClientService = new AuthClientService();
@@ -83,11 +80,12 @@ public class SignupController {
                     showAlert(Alert.AlertType.INFORMATION,
                             "Đăng ký thành công",
                             "Tạo tài khoản thành công!",
-                            "Tên đăng nhập của bạn là: " + username + "\nBạn có thể dùng tên này hoặc email để đăng nhập.");
+                            "Bạn hãy dùng email để đăng nhập.");
                     switchToLogin();
                 });
             } catch (Exception e) {
-                LoggerUtil.error("Signup error: " + e.getMessage());
+                ClientException exception = ClientExceptionHandler.wrap(ClientErrorType.AUTHENTICATION, "Signup error", e);
+                ClientExceptionHandler.handle("Signup error", exception);
                 showAlert(Alert.AlertType.ERROR, "Lỗi hệ thống", "Sự cố kết nối", e.getMessage());
             } finally {
                 Platform.runLater(() -> loginButton.setDisable(false));
@@ -97,20 +95,9 @@ public class SignupController {
 
     @FXML
     private void switchToLogin() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-            Scene scene = ResponsiveSceneUtil.createScaledScene(loader.load());
-
-            Stage stage = (Stage) loginButton.getScene().getWindow();
-            stage.setScene(scene);
-            stage.setTitle("Đăng nhập");
-            StageUtil.showMaximized(stage);
-
-            LoggerUtil.info("Switched back to login screen");
-        } catch (IOException e) {
-            LoggerUtil.error("Error switching to login screen: " + e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Lỗi UI", "Không mở được màn hình đăng nhập", e.getMessage());
-        }
+        NavigationManager navigation = NavigationManager.getInstance();
+        navigation.setMainStage((Stage) loginButton.getScene().getWindow());
+        navigation.navigateTo("/fxml/Login.fxml");
     }
 
     private String buildUsername(String ho, String ten, String email) {
@@ -151,3 +138,4 @@ public class SignupController {
         return clientSocket;
     }
 }
+

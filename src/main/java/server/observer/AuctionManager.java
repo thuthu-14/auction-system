@@ -1,6 +1,7 @@
 package server.observer;
 
 import server.model.Auction;
+import server.model.Bid;
 import util.LoggerUtil;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,6 +15,7 @@ public class AuctionManager {
     private AuctionManager() {
         this.observers = new CopyOnWriteArrayList<>();
         this.auctions = new ConcurrentHashMap<>();
+        subscribe(new AuctionNotificationObserver());
     }
 
     public static synchronized AuctionManager getInstance() {
@@ -24,7 +26,7 @@ public class AuctionManager {
     }
 
     public void subscribe(AuctionObserver observer) {
-        if (!observers.contains(observer)) {
+        if (observer != null && observers.stream().noneMatch(existing -> existing.getClass().equals(observer.getClass()))) {
             observers.add(observer);
             LoggerUtil.debug("Observer subscribed. Total observers: " + observers.size());
         }
@@ -36,36 +38,35 @@ public class AuctionManager {
     }
 
     public void notifyAuctionCreated(Auction auction) {
-        for (AuctionObserver observer : observers) {
-            observer.update(auction, "AUCTION_CREATED");
-        }
+        notifyObservers(auction, new AuctionEvent(AuctionEvent.AUCTION_CREATED));
         LoggerUtil.info("Notified: Auction created - " + auction.getAuctionId());
     }
 
     public void notifyAuctionUpdated(Auction auction) {
-        for (AuctionObserver observer : observers) {
-            observer.update(auction, "AUCTION_UPDATED");
-        }
+        notifyObservers(auction, new AuctionEvent(AuctionEvent.AUCTION_UPDATED));
     }
 
     public void notifyBidPlaced(Auction auction) {
-        for (AuctionObserver observer : observers) {
-            observer.update(auction, "BID_PLACED");
-        }
+        notifyBidPlaced(auction, null, null);
+    }
+
+    public void notifyBidPlaced(Auction auction, Bid bid, String previousHighestBidderId) {
+        notifyObservers(auction, new AuctionEvent(AuctionEvent.BID_PLACED, bid, previousHighestBidderId));
         LoggerUtil.info("Notified: Bid placed on auction - " + auction.getAuctionId());
     }
 
     public void notifyAuctionFinished(Auction auction) {
-        for (AuctionObserver observer : observers) {
-            observer.update(auction, "AUCTION_FINISHED");
-        }
+        notifyObservers(auction, new AuctionEvent(AuctionEvent.AUCTION_FINISHED));
         LoggerUtil.info("Notified: Auction finished - " + auction.getAuctionId());
     }
 
+    public void notifyAuctionCancelled(Auction auction) {
+        notifyObservers(auction, new AuctionEvent(AuctionEvent.AUCTION_CANCELLED));
+        LoggerUtil.info("Notified: Auction cancelled - " + auction.getAuctionId());
+    }
+
     public void notifyPriceUpdate(Auction auction) {
-        for (AuctionObserver observer : observers) {
-            observer.update(auction, "PRICE_UPDATED");
-        }
+        notifyObservers(auction, new AuctionEvent(AuctionEvent.PRICE_UPDATED));
     }
 
     public void addAuction(Auction auction) {
@@ -82,5 +83,14 @@ public class AuctionManager {
 
     public Collection<Auction> getAllAuctions() {
         return new ArrayList<>(auctions.values());
+    }
+
+    private void notifyObservers(Auction auction, AuctionEvent event) {
+        if (auction == null || event == null) {
+            return;
+        }
+        for (AuctionObserver observer : observers) {
+            observer.update(auction, event);
+        }
     }
 }

@@ -1,5 +1,7 @@
 package server.storage;
 
+import server.exception.ServerErrorType;
+import server.exception.ServerExceptionHandler;
 import util.LoggerUtil;
 import java.io.*;
 import java.nio.file.*;
@@ -14,7 +16,7 @@ public class ImageUploadManager {
             Files.createDirectories(Paths.get(UPLOAD_DIR));
             LoggerUtil.info("✓ Upload directory ready: " + UPLOAD_DIR);
         } catch (IOException e) {
-            LoggerUtil.error("Failed to create upload directory: " + e.getMessage());
+            ServerExceptionHandler.handle(ServerErrorType.DATA, "Create upload directory", e);
         }
     }
 

@@ -1,5 +1,7 @@
 package client.network;
 
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
 import common.Message;
 import util.LoggerUtil;
 import java.io.*;
@@ -116,7 +118,7 @@ public class ClientSocket implements MessageTransport {
             if (socket != null && !socket.isClosed()) socket.close();
             LoggerUtil.info("✓ ClientSocket closed");
         } catch (IOException e) {
-            LoggerUtil.error("Error closing socket: " + e.getMessage());
+            ClientExceptionHandler.handle(ClientErrorType.NETWORK, "Close client socket", e);
         }
     }
 }

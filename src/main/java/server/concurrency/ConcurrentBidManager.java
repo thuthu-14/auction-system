@@ -4,6 +4,7 @@ import util.LoggerUtil;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.Objects;
 
 public class ConcurrentBidManager {
 
@@ -22,8 +23,9 @@ public class ConcurrentBidManager {
     }
 
     public <T> T withAuctionWriteLock(String auctionId, Callable<T> action) throws Exception {
+        Objects.requireNonNull(action, "action");
         ReentrantReadWriteLock lock = auctionLocks.computeIfAbsent(
-                auctionId,
+                requireAuctionId(auctionId),
                 k -> new ReentrantReadWriteLock()
         );
 
@@ -39,8 +41,9 @@ public class ConcurrentBidManager {
     }
 
     public <T> T withAuctionReadLock(String auctionId, Callable<T> action) throws Exception {
+        Objects.requireNonNull(action, "action");
         ReentrantReadWriteLock lock = auctionLocks.computeIfAbsent(
-                auctionId,
+                requireAuctionId(auctionId),
                 k -> new ReentrantReadWriteLock()
         );
 
@@ -56,11 +59,18 @@ public class ConcurrentBidManager {
     }
 
     public void removeLock(String auctionId) {
-        auctionLocks.remove(auctionId);
+        auctionLocks.remove(requireAuctionId(auctionId));
         LoggerUtil.debug("Lock removed for auction: " + auctionId);
     }
 
     public int getLockCount() {
         return auctionLocks.size();
+    }
+
+    private String requireAuctionId(String auctionId) {
+        if (auctionId == null || auctionId.isBlank()) {
+            throw new IllegalArgumentException("auctionId is required");
+        }
+        return auctionId;
     }
 }
