@@ -48,14 +48,21 @@ public class SchemaInitializer {
                 )
             """);
 
+
             st.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS item_images (
-                  item_id TEXT NOT NULL,
-                  image_url TEXT NOT NULL,
-                  sort_index INTEGER DEFAULT 0,
-                  PRIMARY KEY (item_id, image_url)
-                )
-            """);
+    CREATE TABLE IF NOT EXISTS item_images (
+      image_id TEXT PRIMARY KEY,
+      item_id TEXT NOT NULL,
+      image_data BLOB NOT NULL,
+      image_size INTEGER,
+      image_type TEXT DEFAULT 'jpg',
+      sort_index INTEGER DEFAULT 0,
+      created_at INTEGER,
+      FOREIGN KEY (item_id) REFERENCES items(item_id)
+    )
+""");
+
+
 
             st.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS auctions (

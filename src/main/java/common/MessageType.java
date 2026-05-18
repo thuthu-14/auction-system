@@ -22,6 +22,8 @@ public enum MessageType implements Serializable {
     // --- UPLOAD ẢNH ---
     UPLOAD_IMAGE,
     UPLOAD_IMAGE_RESPONSE,
+    DOWNLOAD_IMAGE,           // ← THÊM
+    DOWNLOAD_IMAGE_RESPONSE,
 
     // --- ĐẤU GIÁ ---
     PLACE_BID,
@@ -57,5 +59,7 @@ public enum MessageType implements Serializable {
     // --- CẬP NHẬT TRẠNG THÁI ---
     SELLER_AUCTIONS_UPDATED,
     GET_NOTIFICATIONS,
-    MARK_NOTIFICATIONS_READ
+    MARK_NOTIFICATIONS_READ,
+
+      // ← THÊM
 }

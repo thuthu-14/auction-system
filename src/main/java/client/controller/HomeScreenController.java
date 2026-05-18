@@ -298,5 +298,11 @@ public class HomeScreenController {
         }
         NavigationManager.getInstance().goToLogin();
     }
+    /**
+     * [THÊM MỚI] Để controller con lấy ClientSocket
+     */
+    public ClientSocket getClientSocket() {
+        return this.clientSocket;  // Thay "clientSocket" với tên biến thực tế trong HomeScreenController
+    }
 }
 

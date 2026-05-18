@@ -108,11 +108,7 @@ public class AddAuctionProductClientService {
     }
 
     private List<String> uploadImages(MessageTransport transport, List<String> imagePaths) throws Exception {
-        List<String> uploadedUrls = new ArrayList<>();
-
-        // ← Cần inject ClientSocket, tạm thời giả sử có sẵn
-        // (bước tiếp theo sẽ fix cái này)
-        
+        List<String> uploadedImageIds = new ArrayList<>();
 
         for (String imagePath : imagePaths) {
             try {
@@ -124,6 +120,7 @@ public class AddAuctionProductClientService {
                 Map<String, Object> uploadData = new HashMap<>();
                 uploadData.put("imageBytes", imageBytes);
                 uploadData.put("filename", imageFile.getName());
+                uploadData.put("itemId", "");  // ← THÊM (có thể trống lúc upload)
 
                 Message uploadRequest = new Message();
                 uploadRequest.setType(MessageType.UPLOAD_IMAGE);
@@ -133,30 +130,31 @@ public class AddAuctionProductClientService {
                 Message uploadResponse = transport.sendAndReceive(uploadRequest);
 
                 if (uploadResponse != null && "SUCCESS".equals(uploadResponse.getStatus())) {
-                    String imageUrl = (String) uploadResponse.getData();
-                    if (imageUrl == null || imageUrl.isBlank()) {
-                        throw new Exception("Server did not return image URL");
+                    String imageId = (String) uploadResponse.getData();  // ← Nhận imageId thay vì URL
+                    if (imageId == null || imageId.isBlank()) {
+                        throw new Exception("Server did not return image ID");
                     }
-                    uploadedUrls.add(imageUrl);
+                    uploadedImageIds.add(imageId);
                 } else {
                     throw new Exception(uploadResponse != null && uploadResponse.getMessage() != null
                             ? uploadResponse.getMessage()
-                            : "Server tu choi upload anh");
+                            : "Server từ chối upload ảnh");
                 }
             } catch (Exception e) {
                 LoggerUtil.error("Upload image failed [" + imagePath + "]: " + e.getMessage());
-                if (!uploadedUrls.isEmpty()) {
+                if (!uploadedImageIds.isEmpty()) {
                     continue;
                 }
+
                 throw new ValidationException("Lỗi upload",
                         "Không thể upload ảnh " + imagePath + ": " + e.getMessage());
             }
         }
 
-        if (uploadedUrls.isEmpty()) {
-            throw new ValidationException("Loi upload", "Khong co anh nao upload thanh cong.");
+        if (uploadedImageIds.isEmpty()) {
+            throw new ValidationException("Lỗi upload", "Không có ảnh nào upload thành công.");
         }
-        return uploadedUrls;
+        return uploadedImageIds;
     }
 
     private File resolveLocalImageFile(String imagePath) throws Exception {

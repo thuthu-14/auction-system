@@ -1,9 +1,11 @@
 package client.controller;
-
+
+
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.ImageDownloadService;
 import client.service.SellerClientService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -189,30 +191,39 @@ public class SellerAuctionDetailsController {
         if (productImage == null || item == null || item.getImages() == null || item.getImages().isEmpty()) {
             return;
         }
-        String imagePath = item.getImages().get(0);
-        if (imagePath == null || imagePath.isBlank()) {
+
+        String imageId = item.getImages().get(0);  // imageId bây giờ (không phải path)
+        if (imageId == null || imageId.isBlank()) {
             return;
         }
-        try {
-            productImage.setImage(new Image(resolveImageUrl(imagePath), true));
-        } catch (Exception e) {
-            LoggerUtil.warn("Cannot load seller auction image: " + e.getMessage());
-        }
+
+        // Download từ server
+        new Thread(() -> {
+            try {
+                if (clientSocket == null) {
+                    LoggerUtil.warn("ClientSocket is null");
+                    return;
+                }
+
+                byte[] imageBytes = ImageDownloadService.downloadImage(clientSocket, imageId);
+                Image image = new Image(new java.io.ByteArrayInputStream(imageBytes));
+
+                Platform.runLater(() -> {
+                    if (productImage != null && image.getWidth() > 0) {
+                        productImage.setImage(image);
+                    }
+                });
+
+            } catch (Exception e) {
+                LoggerUtil.warn("Failed to load image: " + e.getMessage());
+            }
+        }).start();
     }
 
-    private String resolveImageUrl(String imagePath) {
-        if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("file:")) {
-            return imagePath;
-        }
-        File file = new File(imagePath);
-        if (!file.isAbsolute()) {
-            file = new File(System.getProperty("user.dir"), imagePath);
-            if (!file.exists() && imagePath.startsWith("uploads/")) {
-                file = new File(System.getProperty("user.dir"), "data/" + imagePath);
-            }
-        }
-        return file.toURI().toString();
-    }
+    /**
+     * Fallback: Load ảnh từ file local
+     */
+
 
     @FXML private void handleEdit() { LoggerUtil.info("Chỉnh sửa: " + auctionId); }
     @FXML private void handlePause() { LoggerUtil.info("Tạm dừng: " + auctionId); }
@@ -363,5 +374,7 @@ public class SellerAuctionDetailsController {
         if (h > 0) return h + " giá " + m + " phút";
         return m + " phút";
     }
+
+
 }
 

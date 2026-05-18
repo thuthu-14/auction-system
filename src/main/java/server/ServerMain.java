@@ -3,6 +3,7 @@ package server;
 import server.service.InitializeDataService;
 import server.exception.ServerExceptionHandler;
 import server.storage.SchemaInitializer;
+
 import util.LoggerUtil;
 
 public class ServerMain {
@@ -15,9 +16,13 @@ public class ServerMain {
             LoggerUtil.info("║   Online Bidding Platform              ║");
             LoggerUtil.info("╚════════════════════════════════════════╝");
 
+            // [1] Khởi tạo database schema
             SchemaInitializer.init();
+
+            // [2] Khởi tạo dữ liệu mặc định
             InitializeDataService.initializeDefaultData();
 
+            // [3] Khởi động server
             AuctionServer server = new AuctionServer();
             server.start();
 

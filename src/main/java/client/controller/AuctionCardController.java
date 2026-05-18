@@ -2,6 +2,8 @@ package client.controller;
 
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
+import client.network.ClientSocket;
+import client.service.ImageDownloadService;
 import client.util.RecommendationTracker;
 import javafx.application.Platform;
 import javafx.animation.KeyFrame;
@@ -74,31 +76,10 @@ public class AuctionCardController {
         if (productImageView != null) {
             List<String> images = item.getImages();
             if (images != null && !images.isEmpty()) {
-                String rawPath = images.get(0);
-                try {
-                    Image img = null;
+                String imagePath = images.get(0);
 
-                    if (rawPath.startsWith("file:") || rawPath.startsWith("http")) {
-                        img = new Image(rawPath, 500, 500, true, true);
-                    }
-                    else {
-                        File file = resolveImageFile(rawPath);
-                        if (file.exists()) {
-                            String imageUrl = file.toURI().toURL().toString();
-                            img = new Image(imageUrl, 500, 500, true, true);
-                        }
-                    }
-
-                    if (img != null) {
-                        productImageView.setImage(img);
-                        updateImageViewport();
-                    } else {
-                        ClientExceptionHandler.handle(ClientErrorType.DATA, "Load auction card image", new IllegalArgumentException(rawPath));
-                    }
-
-                } catch (Exception e) {
-                    ClientExceptionHandler.handle(ClientErrorType.DATA, "Load auction card image", e);
-                }
+                // ✅ THÊM: Tải ảnh từ server
+                loadImageFromServer(imagePath);
             }
         }
         // ------------------------------------
@@ -113,17 +94,7 @@ public class AuctionCardController {
         }
     }
 
-    private File resolveImageFile(String rawPath) {
-        String normalizedPath = rawPath.replace("\\", "/");
-        File file = new File(normalizedPath);
-        if (!file.isAbsolute()) {
-            file = new File(System.getProperty("user.dir"), normalizedPath);
-            if (!file.exists() && normalizedPath.startsWith("uploads/")) {
-                file = new File(System.getProperty("user.dir"), "data/" + normalizedPath);
-            }
-        }
-        return file;
-    }
+
     private void updateImageViewport() {
         if (productImageView == null || imageContainer == null) return;
 
@@ -241,5 +212,79 @@ public class AuctionCardController {
     public String getCurrentAuctionId() {
         return currentAuction != null ? currentAuction.getAuctionId() : "";
     }
+    // ===== MỚI THÊM: Download ảnh từ server =====
+
+    /**
+     * Cần inject HomeScreenController để lấy transport
+     * HomeScreenController có clientSocket
+     */
+    private void loadImageFromServer(String imagePath) {
+        new Thread(() -> {
+            try {
+                // [1] Lấy clientSocket từ HomeScreenController
+                ClientSocket clientSocket = getClientSocket();
+                if (clientSocket == null) {
+                    showPlaceholderImage();  // ← Đơn giản: nếu không có socket → placeholder
+                    return;
+                }
+
+                // [2] Download ảnh từ server
+                byte[] imageBytes = ImageDownloadService.downloadImage(
+                        clientSocket,
+                        imagePath  // ← Đây là imageId bây giờ
+                );
+
+                // [3] Convert byte[] → Image
+                Image image = new Image(new java.io.ByteArrayInputStream(imageBytes));
+
+                // [4] Cập nhật UI trên Main Thread
+                Platform.runLater(() -> {
+                    if (image.getWidth() > 0 && image.getHeight() > 0) {
+                        productImageView.setImage(image);
+                        updateImageViewport();
+                    } else {
+                        showPlaceholderImage();
+                    }
+                });
+
+            } catch (Exception e) {
+                System.err.println("Failed to load image: " + e.getMessage());
+                Platform.runLater(this::showPlaceholderImage);
+            }
+        }).start();
+    }
+
+    /**
+     * Fallback: Load ảnh từ file local (khi client có bản local)
+     */
+
+
+    /**
+     * Hiển thị ảnh placeholder nếu load thất bại
+     */
+    private void showPlaceholderImage() {
+        try {
+            // Tìm file placeholder trong resources
+            java.net.URL placeholderUrl = getClass().getResource("/CSS/placeholder.png");
+            if (placeholderUrl != null) {
+                Image placeholder = new Image(placeholderUrl.toExternalForm());
+                productImageView.setImage(placeholder);
+            }
+        } catch (Exception e) {
+            System.err.println("Placeholder image not found");
+        }
+    }
+
+    /**
+     * Lấy ClientSocket từ HomeScreenController
+     */
+    private ClientSocket getClientSocket() {
+        if (homeScreenController != null) {
+            return homeScreenController.getClientSocket();  // ← GỌI METHOD VỪA THÊM
+        }
+        return null;
+    }
+
+// ===== HẾT THÊM MỚI =====
 }
 

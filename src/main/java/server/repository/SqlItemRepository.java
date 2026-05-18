@@ -6,6 +6,7 @@ import server.storage.DatabaseManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import server.repository.ImageRepository;
 
 public class SqlItemRepository implements ItemRepository {
 
@@ -62,47 +63,29 @@ public class SqlItemRepository implements ItemRepository {
     private void saveImages(String itemId, List<String> images) throws Exception {
         if (itemId == null) return;
 
-        try (Connection c = DatabaseManager.getConnection()) {
-            c.setAutoCommit(false);
-
-            try (PreparedStatement del = c.prepareStatement(
-                    "DELETE FROM item_images WHERE item_id = ?")) {
-                del.setString(1, itemId);
-                del.executeUpdate();
-            }
-
-            if (images != null) {
-                try (PreparedStatement ins = c.prepareStatement(
-                        "INSERT INTO item_images (item_id, image_url, sort_index) VALUES (?, ?, ?)")) {
-                    int idx = 0;
-                    for (String url : images) {
-                        if (url == null || url.isBlank()) {
-                            continue;
-                        }
-                        ins.setString(1, itemId);
-                        ins.setString(2, url);
-                        ins.setInt(3, idx++);
-                        ins.addBatch();
+        // Link ảnh vào item này và set sort_index
+        if (images != null && !images.isEmpty()) {
+            int index = 0;
+            for (String imageId : images) {
+                if (imageId != null && !imageId.isBlank()) {
+                    try {
+                        // Cập nhật item_id từ "" -> itemId thực và set sort_index
+                        ImageRepository.linkImageToItem(imageId, itemId, index);
+                        index++;
+                    } catch (Exception e) {
+                        // Bỏ qua lỗi individual image
                     }
-                    ins.executeBatch();
                 }
             }
-
-            c.commit();
         }
     }
 
     private List<String> loadImages(String itemId) throws Exception {
         List<String> list = new ArrayList<>();
-        String sql = "SELECT image_url FROM item_images WHERE item_id = ? ORDER BY sort_index ASC";
-
-        try (Connection c = DatabaseManager.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, itemId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(rs.getString("image_url"));
-            }
+        try {
+            list = ImageRepository.getItemImages(itemId);
+        } catch (Exception e) {
+            // Bỏ qua - trả về list rỗng nếu lỗi
         }
         return list;
     }

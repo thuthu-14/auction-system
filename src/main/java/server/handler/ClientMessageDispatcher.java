@@ -17,6 +17,7 @@ public class ClientMessageDispatcher {
         register(MessageType.GET_ALL_AUCTIONS, processor::handleGetAuctions);
         register(MessageType.GET_AUCTION_DETAIL, processor::handleGetAuctionDetail);
         register(MessageType.UPLOAD_IMAGE, processor::handleUploadImage);
+        register(MessageType.DOWNLOAD_IMAGE, processor::handleDownloadImage);  // ← THÊM
         register(MessageType.PLACE_BID, processor::handlePlaceBid);
         register(MessageType.GET_BID_HISTORY, processor::handleGetBidHistory);
         register(MessageType.GET_USER_BIDS, processor::handleGetUserBids);

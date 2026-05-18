@@ -131,4 +131,10 @@ public class ClientMessageProcessor {
     public void handleUploadImage(Message message) throws IOException {
         mediaProcessor.handleUploadImage(message);
     }
+    /**
+     * Delegate yêu cầu download ảnh
+     */
+    public void handleDownloadImage(Message message) throws IOException {
+        mediaProcessor.handleDownloadImage(message);
+    }
 }

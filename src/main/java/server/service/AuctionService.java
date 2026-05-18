@@ -11,6 +11,7 @@ import server.model.User;
 import server.concurrency.ConcurrentBidManager;
 import server.observer.AuctionManager;
 import server.repository.*;
+import server.storage.ImageUploadManager;
 import util.ItemValidationUtil;
 import util.LoggerUtil;
 
@@ -470,4 +471,35 @@ public class AuctionService {
             throw new IOException(e);
         }
     }
+    /**
+     * Xóa auction và tất cả ảnh của nó
+     */
+    /**
+     * Xóa auction và tất cả ảnh của nó
+     */
+    public void deleteAuctionWithImages(String auctionId) throws Exception {
+        try {
+            // [1] Lấy auction
+            Auction auction = getById(auctionId);
+
+            // [2] Xóa tất cả ảnh của item (từ DB)
+            if (auction != null && auction.getItem() != null) {
+                try {
+                    ImageUploadManager.deleteItemImages(auction.getItem().getItemId());
+                } catch (Exception e) {
+                    LoggerUtil.warn("Failed to delete item images: " + auctionId + " | " + e.getMessage());
+                }
+            }
+
+            // [3] Xóa auction từ DB
+            delete(auctionId);
+            LoggerUtil.info("Auction deleted with images: " + auctionId);
+
+        } catch (Exception e) {
+            LoggerUtil.error("Error deleting auction with images: " + auctionId + " | " + e.getMessage());
+            throw e;
+        }
+    }
+
+
 }
