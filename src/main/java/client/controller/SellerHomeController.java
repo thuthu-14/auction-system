@@ -238,7 +238,11 @@ public class SellerHomeController {
 
     @FXML
     public void loadProfileView() {
-        loadView("/fxml/BidderView/ProfileView.fxml", menuHome, null);
+        loadView("/fxml/BidderView/ProfileView.fxml", menuHome, controller -> {
+            if (controller instanceof ProfileController profileController) {
+                profileController.setUserData(currentUser);
+            }
+        });
     }
 
     @FXML

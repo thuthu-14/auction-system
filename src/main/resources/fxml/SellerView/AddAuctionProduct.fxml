@@ -3,24 +3,24 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<HBox spacing="25.0" style="-fx-background-color: #fcfcfc;" stylesheets="@../../CSS/table.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AddAuctionProductController">
+<HBox alignment="TOP_LEFT" fillHeight="false" spacing="25.0" style="-fx-background-color: #fcfcfc;" stylesheets="@../../CSS/table.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AddAuctionProductController">
     <padding>
         <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
     </padding>
-    <VBox minWidth="250.0" prefWidth="250.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
+    <VBox minHeight="210.0" minWidth="250.0" prefHeight="210.0" prefWidth="250.0" spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
         <padding>
             <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
         </padding>
-        <Label text="Gợi ý điền Thông tin" textFill="#1a1a1a" styleClass="field-label">
+        <Label maxWidth="1.7976931348623157E308" text="Gợi ý điền Thông tin" textFill="#1a1a1a" wrapText="true" style="-fx-text-fill: #1a1a1a;" styleClass="field-label">
             <font>
                 <Font name="System Bold" size="16.0" />
             </font>
         </Label>
         <Separator />
-        <Label text="✓ Thêm ít nhất 3 hình ảnh" textFill="#718096" />
-        <Label text="✓ Tên sản phẩm 25~100 kí tự" textFill="#718096" />
-        <Label text="✓ Thiết lập thời gian rõ ràng" textFill="#718096" />
-        <Label text="✓ Đặt mức giá mong muốn hợp lý" textFill="#718096" />
+        <Label maxWidth="1.7976931348623157E308" text="✓ Thêm ít nhất 3 hình ảnh" textFill="#718096" wrapText="true" style="-fx-text-fill: #718096;" />
+        <Label maxWidth="1.7976931348623157E308" text="✓ Tên sản phẩm 25~100 kí tự" textFill="#718096" wrapText="true" style="-fx-text-fill: #718096;" />
+        <Label maxWidth="1.7976931348623157E308" text="✓ Thiết lập thời gian rõ ràng" textFill="#718096" wrapText="true" style="-fx-text-fill: #718096;" />
+        <Label maxWidth="1.7976931348623157E308" text="✓ Đặt mức giá mong muốn hợp lý" textFill="#718096" wrapText="true" style="-fx-text-fill: #718096;" />
     </VBox>
     <ScrollPane fx:id="formScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" HBox.hgrow="ALWAYS">
         <content>

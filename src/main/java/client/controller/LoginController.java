@@ -5,6 +5,7 @@ import client.exception.ClientException;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AuthClient;
 import client.service.AuthClientService;
 import common.UserRole;
 import javafx.application.Platform;
@@ -36,7 +37,15 @@ public class LoginController {
     private server.model.User currentUser;
     private Runnable onLoginSuccess;
     private Runnable onAdminLoginSuccess;
-    private final AuthClientService authClientService = new AuthClientService();
+    private final AuthClient authClientService;
+
+    public LoginController() {
+        this(new AuthClientService());
+    }
+
+    LoginController(AuthClient authClientService) {
+        this.authClientService = authClientService;
+    }
 
     @FXML
     public void initialize() {
@@ -84,7 +93,7 @@ public class LoginController {
 
         setLoading(true);
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 clientSocket = (ClientSocket) authClientService.ensureConnected(clientSocket);
                 currentUser = authClientService.login(clientSocket, email, password);
@@ -100,7 +109,7 @@ public class LoginController {
             } finally {
                 setLoading(false);
             }
-        }).start();
+        });
     }
 
     private void proceedToDashboard() {

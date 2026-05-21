@@ -27,6 +27,7 @@
                         </font>
                     </Label>
                     <Region HBox.hgrow="ALWAYS" />
+                    <Region minWidth="118.0" prefWidth="118.0" />
                 </children>
             </HBox>
             <StackPane prefHeight="245.0" style="-fx-background-color: #ccfbf1; -fx-background-radius: 25; -fx-effect: dropshadow(three-pass-box, rgba(13,148,136,0.1), 15, 0, 0, 8);" VBox.vgrow="NEVER">
@@ -79,7 +80,7 @@
                         </font>
                     </Label>
                     <Region HBox.hgrow="ALWAYS" />
-                    <ComboBox prefWidth="180.0" promptText="Sắp xếp: Quan tâm nhất" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
+                    <ComboBox fx:id="sortCombo" prefWidth="180.0" promptText="Sắp xếp" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
                 </children>
             </HBox>
             <FlowPane fx:id="otherFlowPane" hgap="25.0" vgap="25.0">

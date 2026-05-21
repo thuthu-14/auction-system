@@ -226,7 +226,7 @@ public class AuctionCardController {
      * HomeScreenController có clientSocket
      */
     private void loadImageFromServer(String imagePath) {
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 // [1] Lấy clientSocket từ HomeScreenController
                 ClientSocket clientSocket = getClientSocket();
@@ -258,7 +258,7 @@ public class AuctionCardController {
                 System.err.println("Failed to load image: " + e.getMessage());
                 Platform.runLater(this::showPlaceholderImage);
             }
-        }).start();
+        });
     }
 
     /**

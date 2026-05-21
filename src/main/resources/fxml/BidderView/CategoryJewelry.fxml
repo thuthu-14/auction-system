@@ -87,7 +87,7 @@
                         </font>
                     </Label>
                     <Region HBox.hgrow="ALWAYS" />
-                    <ComboBox prefWidth="180.0" promptText="Sắp xếp: Phổ biến" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
+                    <ComboBox fx:id="sortCombo" prefWidth="180.0" promptText="Sắp xếp" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
                 </children>
             </HBox>
             <FlowPane fx:id="jewelryFlowPane" hgap="25.0" vgap="25.0">

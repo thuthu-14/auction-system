@@ -4,6 +4,7 @@ import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AddAuctionProductClient;
 import client.service.AddAuctionProductClientService;
 import client.service.AddAuctionProductClientService.CategoryFormConfig;
 import common.Message;
@@ -56,7 +57,15 @@ public class AddAuctionProductController implements Initializable {
     private String currentCategory;
     private javafx.collections.ObservableList<String> timeOptions;
     private List<String> selectedImagePaths = new ArrayList<>();
-    private final AddAuctionProductClientService productService = new AddAuctionProductClientService();
+    private final AddAuctionProductClient productService;
+
+    public AddAuctionProductController() {
+        this(new AddAuctionProductClientService());
+    }
+
+    AddAuctionProductController(AddAuctionProductClient productService) {
+        this.productService = productService;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -278,7 +287,7 @@ public class AddAuctionProductController implements Initializable {
                         }
                     });
 
-            new Thread(() -> {
+            client.util.ClientTaskRunner.run(() -> {
                 try {
                     Message response = productService.publish(socket, currentUser, payload);
                     Platform.runLater(() -> {
@@ -293,7 +302,7 @@ public class AddAuctionProductController implements Initializable {
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi kết nối", "Mất kết nối tới Server."));
                     ClientExceptionHandler.handle(ClientErrorType.NETWORK, "Publish auction product", e);
                 }
-            }, "PublishAuctionProductThread").start();
+            });
         } catch (AddAuctionProductClientService.ValidationException e) {
             showAlert(Alert.AlertType.ERROR, e.getTitle(), e.getMessage());
         } catch (Exception e) {

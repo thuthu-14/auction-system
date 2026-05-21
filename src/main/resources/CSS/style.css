@@ -225,11 +225,72 @@
     -fx-border-color: -alert-accent;
 }
 
+.seller-contact-dialog.dialog-pane {
+    -fx-min-width: 380px;
+    -fx-pref-width: 380px;
+    -fx-max-width: 380px;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -alert-accent: #f59e0b;
+}
+
+.seller-contact-dialog.dialog-pane > .header-panel {
+    -fx-padding: 16 22 4 22;
+}
+
+.seller-contact-dialog.dialog-pane > .header-panel .label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f59e0b;
+}
+
+.seller-contact-dialog.dialog-pane > *.content {
+    -fx-padding: 8 22 12 22;
+}
+
+.seller-contact-dialog.dialog-pane > .button-bar {
+    -fx-padding: 4 22 16 22;
+}
+
+.seller-contact-dialog.dialog-pane .seller-contact-ok-button {
+    -fx-background-color: #b7dff0;
+    -fx-text-fill: #1f2937;
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 1;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-min-width: 78px;
+    -fx-pref-width: 78px;
+    -fx-min-height: 34px;
+    -fx-pref-height: 34px;
+    -fx-padding: 0;
+}
+
+.seller-contact-dialog.dialog-pane .seller-contact-ok-button:hover {
+    -fx-background-color: #a8d5e9;
+}
+
 /* Container */
 .dashboard-cards-container {
     -fx-padding: 24 32 24 32;
     -fx-spacing: 16;
     -fx-background-color: #ffffff;
+}
+
+.bar,
+.bar:focused,
+.bar > .viewport,
+.bar > .corner {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
 }
 
 /* ── Card base ── */

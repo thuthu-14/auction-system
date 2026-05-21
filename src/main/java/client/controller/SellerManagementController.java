@@ -4,6 +4,7 @@ import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.SellerClient;
 import client.service.SellerClientService;
 import common.AuctionStatus;
 import javafx.animation.KeyFrame;
@@ -55,7 +56,7 @@ public class SellerManagementController {
     @FXML private Label pageInfoLabel;
 
     private final ObservableList<AuctionItem> allItems = FXCollections.observableArrayList();
-    private final SellerClientService sellerClientService = new SellerClientService();
+    private final SellerClient sellerClientService;
 
     private List<HBox> allTabs;
     private String currentTab = "all";
@@ -63,6 +64,14 @@ public class SellerManagementController {
     private ClientSocket clientSocket;
     private Timeline countdownTimer;
     private SellerHomeController sellerHomeController;
+
+    public SellerManagementController() {
+        this(new SellerClientService());
+    }
+
+    SellerManagementController(SellerClient sellerClientService) {
+        this.sellerClientService = sellerClientService;
+    }
 
     @FXML
     public void initialize() {
@@ -210,7 +219,7 @@ public class SellerManagementController {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 List<Auction> auctionList = sellerClientService.fetchSellerAuctions(socket, user);
                 Platform.runLater(() -> {
@@ -229,7 +238,7 @@ public class SellerManagementController {
                     refreshTable();
                 });
             }
-        }, "SellerAuctionsTableLoadThread").start();
+        });
     }
 
     private ClientSocket getActiveSocket() {

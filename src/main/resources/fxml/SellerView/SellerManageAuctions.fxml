@@ -7,7 +7,6 @@
             <Label styleClass="custom-title-label" text="Quản lý phiên đấu giá" />
             <Label style="-fx-font-size: 13px; -fx-text-fill: #6b7280;" text="Theo dõi và điều phối tất cả phiên đấu giá của bạn" />
         </VBox>
-        <Button onAction="#handleExportData" styleClass="btn-outline-small" text="⬇ Xuất dữ liệu" />
         <Button fx:id="btnCreateAuction" onAction="#handleCreateAuction" styleClass="form-button" text="＋ Tạo phiên mới" />
     </HBox>
     <HBox alignment="CENTER" spacing="12" style="-fx-padding: 16 24 0 24;">
@@ -35,10 +34,6 @@
         <HBox fx:id="tabActive" alignment="CENTER" onMouseClicked="#handleTabActive" spacing="6" styleClass="auction-tab">
             <Label styleClass="tab-label" text="Đang diễn ra" />
             <Label fx:id="countActive" styleClass="tab-count-badge" text="0" />
-        </HBox>
-        <HBox fx:id="tabPending" alignment="CENTER" onMouseClicked="#handleTabPending" spacing="6" styleClass="auction-tab">
-            <Label styleClass="tab-label" text="Chờ bắt đầu" />
-            <Label fx:id="countPending" styleClass="tab-count-badge" text="0" />
         </HBox>
         <HBox fx:id="tabEnded" alignment="CENTER" onMouseClicked="#handleTabEnded" spacing="6" styleClass="auction-tab">
             <Label styleClass="tab-label" text="Đã kết thúc" />

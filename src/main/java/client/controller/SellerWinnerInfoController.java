@@ -4,6 +4,7 @@ import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.SellerClient;
 import client.service.SellerClientService;
 import common.AuctionStatus;
 import javafx.application.Platform;
@@ -35,11 +36,19 @@ public class SellerWinnerInfoController {
     @FXML private Label shippingAddress;
     @FXML private Label noWinnerLabel;
 
-    private final SellerClientService sellerClientService = new SellerClientService();
+    private final SellerClient sellerClientService;
     private User currentUser;
     private ClientSocket clientSocket;
     private SellerHomeController sellerHomeController;
     private String auctionId;
+
+    public SellerWinnerInfoController() {
+        this(new SellerClientService());
+    }
+
+    SellerWinnerInfoController(SellerClient sellerClientService) {
+        this.sellerClientService = sellerClientService;
+    }
 
     @FXML
     public void initialize() {
@@ -82,7 +91,7 @@ public class SellerWinnerInfoController {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 Auction auction = sellerClientService.fetchAuctionDetail(socket, user, targetAuctionId);
                 List<Bid> bids = sellerClientService.fetchBidHistoryWithFallback(socket, user, targetAuctionId);
@@ -95,7 +104,7 @@ public class SellerWinnerInfoController {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Load winner info failed: " + e.getMessage())));
                 Platform.runLater(() -> showEmptyWinnerState("Không thể tải thông tin người trúng."));
             }
-        }, "SellerWinnerInfoLoadThread").start();
+        });
     }
 
     private void renderWinnerInfo(Auction auction, List<Bid> bids, Map<String, String> contact) {

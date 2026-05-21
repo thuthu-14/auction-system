@@ -2,8 +2,10 @@ package client.controller;
 
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
+import client.logic.SellerStatisticsLogic;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.SellerClient;
 import client.service.SellerClientService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -25,19 +27,14 @@ import server.model.User;
 import util.LoggerUtil;
 
 import java.net.URL;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.TreeMap;
 
 public class SellerStatisticsController implements Initializable {
-
-    private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
 
     @FXML private Label totalRevenueLabel;
     @FXML private Label avgBidLabel;
@@ -47,8 +44,17 @@ public class SellerStatisticsController implements Initializable {
     private User currentUser;
     private ClientSocket clientSocket;
     private boolean statisticsLoaded;
-    private final SellerClientService sellerClientService = new SellerClientService();
+    private final SellerClient sellerClientService;
+    private final SellerStatisticsLogic statisticsLogic = new SellerStatisticsLogic();
     private final SimpleDateFormat revenuePointFormat = new SimpleDateFormat("dd/MM HH:mm");
+
+    public SellerStatisticsController() {
+        this(new SellerClientService());
+    }
+
+    SellerStatisticsController(SellerClient sellerClientService) {
+        this.sellerClientService = sellerClientService;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -111,7 +117,7 @@ public class SellerStatisticsController implements Initializable {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 List<Auction> auctions = sellerClientService.fetchSellerAuctions(socket, user);
                 Platform.runLater(() -> processAndDisplayStatistics(auctions));
@@ -119,7 +125,7 @@ public class SellerStatisticsController implements Initializable {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Seller statistics load failed: " + e.getMessage())));
                 Platform.runLater(this::showEmptyStatistics);
             }
-        }, "SellerStatisticsLoadThread").start();
+        });
     }
 
     private ClientSocket getActiveSocket() {
@@ -145,47 +151,14 @@ public class SellerStatisticsController implements Initializable {
     private void processAndDisplayStatistics(List<Auction> auctions) {
         List<Auction> safeAuctions = auctions != null ? auctions : List.of();
 
-        double totalRevenue = 0;
-        int totalBids = 0;
-        int endedAuctions = 0;
-        int successfulAuctions = 0;
-        Map<Long, Double> revenueByEndTime = new TreeMap<>();
+        SellerStatisticsLogic.SellerStatisticsSummary summary =
+                statisticsLogic.summarize(safeAuctions, System.currentTimeMillis());
 
-        for (Auction auction : safeAuctions) {
-            if (auction == null) {
-                continue;
-            }
-            if (isCancelled(auction)) {
-                continue;
-            }
+        setLabel(totalRevenueLabel, formatVnd(summary.totalRevenue()));
+        setLabel(avgBidLabel, statisticsLogic.formatAverageBid(summary.averageBid()));
+        setLabel(successRateLabel, statisticsLogic.formatSuccessRate(summary.successRate()));
 
-            int bidCount = auction.getBidIds() != null ? auction.getBidIds().size() : 0;
-            totalBids += bidCount;
-
-            if (isEnded(auction)) {
-                endedAuctions++;
-                if (bidCount > 0) {
-                    successfulAuctions++;
-                    totalRevenue += auction.getCurrentPrice();
-
-                    long endTime = auction.getEndTime() > 0 ? auction.getEndTime() : auction.getCreatedAt();
-                    revenueByEndTime.merge(endTime, auction.getCurrentPrice(), Double::sum);
-                }
-            }
-        }
-
-        setLabel(totalRevenueLabel, formatVnd(totalRevenue));
-
-        long countedAuctions = safeAuctions.stream()
-                .filter(auction -> auction != null && !isCancelled(auction))
-                .count();
-        double averageBid = countedAuctions == 0 ? 0 : (double) totalBids / countedAuctions;
-        setLabel(avgBidLabel, String.format(Locale.US, "%.1f", averageBid));
-
-        double successRate = endedAuctions == 0 ? 0 : successfulAuctions * 100.0 / endedAuctions;
-        setLabel(successRateLabel, String.format(Locale.US, "%.1f%%", successRate));
-
-        updateRevenueChart(revenueByEndTime);
+        updateRevenueChart(summary.revenueByEndTime());
         applyReadableStyles();
         LoggerUtil.info("Seller statistics loaded: " + safeAuctions.size() + " auctions");
     }
@@ -214,18 +187,11 @@ public class SellerStatisticsController implements Initializable {
     }
 
     private boolean isEnded(Auction auction) {
-        if (isCancelled(auction)) {
-            return false;
-        }
-        if (auction.getStatus() == common.AuctionStatus.FINISHED
-                || auction.getStatus() == common.AuctionStatus.CLOSED) {
-            return true;
-        }
-        return auction.getEndTime() > 0 && auction.getEndTime() <= System.currentTimeMillis();
+        return statisticsLogic.isEnded(auction, System.currentTimeMillis());
     }
 
     private boolean isCancelled(Auction auction) {
-        return auction != null && auction.getStatus() == common.AuctionStatus.CANCELLED;
+        return statisticsLogic.isCancelled(auction);
     }
 
     private void showEmptyRevenueChart() {
@@ -311,23 +277,7 @@ public class SellerStatisticsController implements Initializable {
     }
 
     private double calculateTickUnit(double max) {
-        if (max <= 0) {
-            return 10;
-        }
-        double roughTick = max / 6.0;
-        double magnitude = Math.pow(10, Math.floor(Math.log10(roughTick)));
-        double normalized = roughTick / magnitude;
-
-        if (normalized <= 1) {
-            return magnitude;
-        }
-        if (normalized <= 2) {
-            return 2 * magnitude;
-        }
-        if (normalized <= 5) {
-            return 5 * magnitude;
-        }
-        return 10 * magnitude;
+        return statisticsLogic.calculateTickUnit(max);
     }
 
     private void styleChartNodes(boolean hideSeries) {
@@ -395,10 +345,7 @@ public class SellerStatisticsController implements Initializable {
     }
 
     private String formatVnd(double amount) {
-        if (Math.abs(amount) >= 1_000_000) {
-            return String.format(Locale.US, "%.1fM \u0111", amount / 1_000_000.0);
-        }
-        return VND_FORMATTER.format(Math.round(amount)) + " \u0111";
+        return statisticsLogic.formatVnd(amount);
     }
 
     private void applyReadableStyles() {

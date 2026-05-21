@@ -6,6 +6,7 @@ import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.ImageDownloadService;
+import client.service.SellerClient;
 import client.service.SellerClientService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -36,7 +37,15 @@ public class SellerAuctionDetailsController {
     private ClientSocket clientSocket;
     private SellerHomeController sellerHomeController;
     private Auction currentAuction;
-    private final SellerClientService sellerClientService = new SellerClientService();
+    private final SellerClient sellerClientService;
+
+    public SellerAuctionDetailsController() {
+        this(new SellerClientService());
+    }
+
+    SellerAuctionDetailsController(SellerClient sellerClientService) {
+        this.sellerClientService = sellerClientService;
+    }
 
     @FXML
     public void initialize() {
@@ -111,7 +120,7 @@ public class SellerAuctionDetailsController {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 Auction auction = sellerClientService.fetchAuctionDetail(socket, user, targetAuctionId);
                 Auction finalAuction = auction;
@@ -119,7 +128,7 @@ public class SellerAuctionDetailsController {
             } catch (Exception e) {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Load seller auction detail failed: " + e.getMessage())));
             }
-        }, "SellerAuctionDetailLoadThread").start();
+        });
     }
 
 
@@ -198,7 +207,7 @@ public class SellerAuctionDetailsController {
         }
 
         // Download từ server
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 ClientSocket socket = getActiveImageSocket();
                 if (socket == null) {
@@ -218,7 +227,7 @@ public class SellerAuctionDetailsController {
             } catch (Exception e) {
                 LoggerUtil.warn("Failed to load image: " + e.getMessage());
             }
-        }).start();
+        });
     }
 
     /**
@@ -257,7 +266,7 @@ public class SellerAuctionDetailsController {
         if (cancelAuctionButton != null) {
             cancelAuctionButton.setDisable(true);
         }
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 Auction cancelledAuction = sellerClientService.cancelAuction(socket, user, targetAuctionId);
                 Platform.runLater(() -> {
@@ -277,7 +286,7 @@ public class SellerAuctionDetailsController {
                     showAlert(Alert.AlertType.ERROR, "L\u1ed7i", userFriendlyCancelError(e));
                 });
             }
-        }, "SellerCancelAuctionThread").start();
+        });
     }
 
     @FXML
@@ -377,8 +386,11 @@ public class SellerAuctionDetailsController {
         if (message.isBlank()) {
             return "Kh\u00f4ng th\u1ec3 h\u1ee7y phi\u00ean.";
         }
-        if (message.toLowerCase().startsWith("khong the huy phien")
-                || message.toLowerCase().startsWith("kh\u00f4ng th\u1ec3 h\u1ee7y phi\u00ean")) {
+        String lowerMessage = message.toLowerCase();
+        if (lowerMessage.startsWith("khong the huy phien")) {
+            return "Kh\u00f4ng th\u1ec3 h\u1ee7y phi\u00ean" + message.substring("khong the huy phien".length());
+        }
+        if (lowerMessage.startsWith("kh\u00f4ng th\u1ec3 h\u1ee7y phi\u00ean")) {
             return message;
         }
         return "Kh\u00f4ng th\u1ec3 h\u1ee7y phi\u00ean: " + message;

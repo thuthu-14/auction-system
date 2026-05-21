@@ -52,14 +52,6 @@
                                 </Label>
                             </children>
                         </VBox>
-                        <Button style="-fx-background-color: #ffffff; -fx-border-color: #e2e8f0; -fx-border-radius: 20; -fx-background-radius: 20; -fx-cursor: hand;" text="Thay ảnh mới" textFill="#4a5568">
-                            <padding>
-                                <Insets bottom="8.0" left="20.0" right="20.0" top="8.0" />
-                            </padding>
-                            <font>
-                                <Font name="System Bold" size="13.0" />
-                            </font>
-                        </Button>
                         <Region VBox.vgrow="ALWAYS" />
                         <Button maxWidth="1.7976931348623157E308" onAction="#handleLogout" prefHeight="45.0" style="-fx-background-color: transparent; -fx-background-radius: 22.5; -fx-border-color: #e53e3e; -fx-border-radius: 22.5; -fx-cursor: hand;" text="Đăng xuất" textFill="#e53e3e">
                             <font>
@@ -88,7 +80,7 @@
                                                 <Font name="System Bold" size="14.0" />
                                             </font>
                                         </Label>
-                                        <TextField prefHeight="48.0" promptText="Họ và tên của bạn" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15;" />
+                                        <TextField fx:id="fullNameField" prefHeight="48.0" promptText="Họ và tên của bạn" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
                                     </children>
                                 </VBox>
                                 <VBox spacing="8.0" GridPane.columnIndex="1">
@@ -98,7 +90,7 @@
                                                 <Font name="System Bold" size="14.0" />
                                             </font>
                                         </Label>
-                                        <TextField disable="true" prefHeight="48.0" style="-fx-background-radius: 10; -fx-background-color: #edf2f7; -fx-opacity: 0.8; -fx-padding: 0 15 0 15;" text="user@bubblybid.com" />
+                                        <TextField fx:id="emailField" editable="false" focusTraversable="false" prefHeight="48.0" style="-fx-background-radius: 10; -fx-background-color: #edf2f7; -fx-opacity: 1; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
                                     </children>
                                 </VBox>
                                 <VBox spacing="8.0" GridPane.rowIndex="1">
@@ -108,7 +100,7 @@
                                                 <Font name="System Bold" size="14.0" />
                                             </font>
                                         </Label>
-                                        <TextField prefHeight="48.0" promptText="09xx xxx xxx" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15;" />
+                                        <TextField fx:id="phoneField" prefHeight="48.0" promptText="09xx xxx xxx" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
                                     </children>
                                 </VBox>
                                 <VBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
@@ -118,7 +110,7 @@
                                                 <Font name="System Bold" size="14.0" />
                                             </font>
                                         </Label>
-                                        <TextField prefHeight="48.0" promptText="Địa chỉ nhận hàng" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15;" />
+                                        <TextField fx:id="addressField" prefHeight="48.0" promptText="Địa chỉ nhận hàng" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
                                     </children>
                                 </VBox>
                                 <VBox spacing="8.0" GridPane.rowIndex="2">
@@ -128,14 +120,14 @@
                                                 <Font name="System Bold" size="14.0" />
                                             </font>
                                         </Label>
-                                        <PasswordField prefHeight="48.0" promptText="••••••••" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15;" />
+                                        <PasswordField fx:id="passwordField" prefHeight="48.0" promptText="••••••••" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
                                     </children>
                                 </VBox>
                             </children>
                         </GridPane>
                         <HBox alignment="CENTER_RIGHT">
                             <children>
-                                <Button prefHeight="29.0" prefWidth="109.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 25; -fx-cursor: hand;" text="Lưu thay đổi" textFill="white">
+                                <Button onAction="#handleSaveProfile" prefHeight="38.0" prefWidth="140.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 25; -fx-cursor: hand;" text="Lưu thay đổi" textFill="white">
                                     <font>
                                         <Font name="System Bold" size="13.0" />
                                     </font>

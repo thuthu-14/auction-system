@@ -2,6 +2,7 @@ package client.controller;
 
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.SellerClient;
 import client.service.SellerClientService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -28,7 +29,15 @@ public class BecomeSellerController {
 
     private User currentUser;
     private boolean isPasswordVisible = false;
-    private final SellerClientService sellerClientService = new SellerClientService();
+    private final SellerClient sellerClientService;
+
+    public BecomeSellerController() {
+        this(new SellerClientService());
+    }
+
+    BecomeSellerController(SellerClient sellerClientService) {
+        this.sellerClientService = sellerClientService;
+    }
 
     @FXML
     public void initialize() {
@@ -57,15 +66,15 @@ public class BecomeSellerController {
         String password = getPassword();
 
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || address.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Thong bao", "Vui long nhap day du tat ca cac thong tin!");
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đầy đủ tất cả các thông tin!");
             return null;
         }
         if (!email.matches("^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            showAlert(Alert.AlertType.WARNING, "Thong bao", "Vui long nhap dung dinh dang email!");
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đúng định dạng email!");
             return null;
         }
         if (!phone.matches("\\d{10,11}")) {
-            showAlert(Alert.AlertType.WARNING, "Thong bao", "Vui long nhap dung SDT!");
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Vui lòng nhập đúng số điện thoại!");
             return null;
         }
         return new SellerData(name, email, phone, address, password);
@@ -74,15 +83,15 @@ public class BecomeSellerController {
     @FXML
     private void handleSave() {
         if (currentUser == null) {
-            showAlert(Alert.AlertType.ERROR, "Loi", "Khong lay duoc thong tin user hien tai!");
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Không lấy được thông tin người dùng hiện tại!");
             return;
         }
         if (!(currentUser instanceof RegularUser regularUser)) {
-            showAlert(Alert.AlertType.ERROR, "Loi", "Chi nguoi dung thuong moi co the nang cap!");
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Chỉ người dùng thường mới có thể nâng cấp!");
             return;
         }
         if (regularUser.isSeller()) {
-            showAlert(Alert.AlertType.WARNING, "Thong bao", "Ban da la Nguoi ban roi! Khong can nang cap lai.");
+            showAlert(Alert.AlertType.WARNING, "Thông báo", "Bạn đã là Người bán rồi! Không cần nâng cấp lại.");
             NavigationManager.getInstance().goToHome();
             return;
         }
@@ -95,11 +104,11 @@ public class BecomeSellerController {
         btnSave.setDisable(true);
         btnSave.setText("\u0110ang x\u1eed l\u00fd...");
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
                 if (socket == null) {
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi mang", "Chua ket noi toi Server!"));
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi mạng", "Chưa kết nối tới Server!"));
                     return;
                 }
 
@@ -116,19 +125,19 @@ public class BecomeSellerController {
                 Platform.runLater(() -> {
                     regularUser.upgradeSeller(data.name(), data.phone(), data.address(), data.email());
                     NavigationManager.getInstance().setCurrentUser(regularUser);
-                    showAlert(Alert.AlertType.INFORMATION, "Thanh cong", "Chuc mung! Ban da tro thanh Nguoi ban!");
+                    showAlert(Alert.AlertType.INFORMATION, "Thành công", "Chúc mừng! Bạn đã trở thành Người bán!");
                     NavigationManager.getInstance().setMainStage((javafx.stage.Stage) nameField.getScene().getWindow());
                     NavigationManager.getInstance().goToSellerHome();
                 });
             } catch (Exception e) {
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Loi Server", e.getMessage()));
+                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi Server", e.getMessage()));
             } finally {
                 Platform.runLater(() -> {
                     btnSave.setDisable(false);
                     btnSave.setText("L\u01b0u");
                 });
             }
-        }).start();
+        });
     }
 
     public void setCurrentUser(User user) {

@@ -2,10 +2,13 @@ package client.controller;
 
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
+import client.logic.DashboardLogic;
 import client.util.RecommendationTracker;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AuctionQueryClient;
 import client.service.DashboardClientService;
+import client.ui.AuctionCardFactory;
 import common.AuctionStatus;
 import common.ItemCategory;
 import server.model.Auction;
@@ -20,9 +23,7 @@ import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -38,14 +39,9 @@ import util.LoggerUtil;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 public class DashboardController implements Initializable {
 
@@ -70,7 +66,21 @@ public class DashboardController implements Initializable {
     private User currentUser;
     private ClientSocket clientSocket;
     private HomeScreenController homeScreenController;
-    private final DashboardClientService dashboardClientService = new DashboardClientService();
+    private final AuctionQueryClient auctionQueryClient;
+    private final DashboardLogic dashboardLogic;
+    private final AuctionCardFactory auctionCardFactory;
+
+    public DashboardController() {
+        this(new DashboardClientService(), new DashboardLogic(), new AuctionCardFactory());
+    }
+
+    DashboardController(AuctionQueryClient auctionQueryClient,
+                        DashboardLogic dashboardLogic,
+                        AuctionCardFactory auctionCardFactory) {
+        this.auctionQueryClient = auctionQueryClient;
+        this.dashboardLogic = dashboardLogic;
+        this.auctionCardFactory = auctionCardFactory;
+    }
 
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
@@ -159,14 +169,14 @@ public class DashboardController implements Initializable {
         ClientSocket socket = (clientSocket != null) ? clientSocket : ConnectionManager.getInstance().getClientSocket();
         if (socket == null) return;
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
-                List<Auction> auctions = dashboardClientService.fetchAllAuctions(socket);
+                List<Auction> auctions = auctionQueryClient.fetchAllAuctions(socket);
                 Platform.runLater(() -> renderProductCards(auctions));
             } catch (Exception e) {
                 ClientExceptionHandler.handle(ClientErrorType.DATA, "Dashboard load auctions", e);
             }
-        }).start();
+        });
     }
 
     private void renderProductCards(List<Auction> auctions) {
@@ -175,14 +185,7 @@ public class DashboardController implements Initializable {
         endingSoonHBox.getChildren().clear();
         List<Auction> safeAuctions = auctions != null ? auctions : List.of();
 
-        List<Auction> endingSoonAuctions = safeAuctions.stream()
-                .filter(Objects::nonNull)
-                .filter(auction -> auction.getItem() != null)
-                .filter(this::isVisibleAuction)
-                .filter(auction -> auction.getTimeRemainingSeconds() > 0)
-                .sorted(Comparator.comparingLong(Auction::getTimeRemainingSeconds))
-                .limit(10)
-                .toList();
+        List<Auction> endingSoonAuctions = dashboardLogic.endingSoonAuctions(safeAuctions, 10);
 
         for (Auction auction : endingSoonAuctions) {
             VBox card = createAuctionCard(auction);
@@ -207,38 +210,13 @@ public class DashboardController implements Initializable {
         }
         suggestedHBox.getChildren().clear();
 
-        List<Auction> visibleAuctions = auctions.stream()
-                .filter(Objects::nonNull)
-                .filter(auction -> auction.getItem() != null)
-                .filter(this::isVisibleAuction)
-                .filter(auction -> auction.getTimeRemainingSeconds() > 0)
-                .toList();
-
         List<String> recentAuctionIds = RecommendationTracker.getRecentAuctionIds();
         Map<ItemCategory, Integer> categoryWeights = RecommendationTracker.getCategoryWeights();
-        Set<String> recentIdSet = new HashSet<>(recentAuctionIds);
-        Map<String, Integer> auctionRank = new HashMap<>();
-        for (int i = 0; i < recentAuctionIds.size(); i++) {
-            auctionRank.put(recentAuctionIds.get(i), recentAuctionIds.size() - i);
-        }
-
-        List<Auction> suggestions = visibleAuctions.stream()
-                .filter(auction -> auction.getAuctionId() == null || !recentIdSet.contains(auction.getAuctionId()))
-                .sorted(Comparator.comparingInt((Auction auction) -> recommendationScore(auction, categoryWeights, auctionRank)).reversed()
-                        .thenComparingInt(this::getBidCount).reversed()
-                        .thenComparingDouble(Auction::getCurrentPrice).reversed()
-                        .thenComparingLong(Auction::getEndTime))
-                .limit(8)
-                .toList();
-
-        if (!RecommendationTracker.hasSignals() || suggestions.isEmpty()) {
-            suggestions = visibleAuctions.stream()
-                    .sorted(Comparator.comparingInt(this::getBidCount).reversed()
-                            .thenComparingDouble(Auction::getCurrentPrice).reversed()
-                            .thenComparingLong(Auction::getEndTime))
-                    .limit(8)
-                    .toList();
-        }
+        List<Auction> suggestions = dashboardLogic.suggestedAuctions(auctions,
+                recentAuctionIds,
+                categoryWeights,
+                RecommendationTracker.hasSignals(),
+                8);
 
         for (Auction auction : suggestions) {
             VBox card = createAuctionCard(auction);
@@ -251,30 +229,21 @@ public class DashboardController implements Initializable {
     }
 
     private int recommendationScore(Auction auction, Map<ItemCategory, Integer> categoryWeights, Map<String, Integer> auctionRank) {
-        int score = 0;
-        if (auction == null) {
-            return score;
-        }
-        if (auction.getAuctionId() != null) {
-            score += auctionRank.getOrDefault(auction.getAuctionId(), 0) * 20;
-        }
-        if (auction.getItem() != null) {
-            score += categoryWeights.getOrDefault(auction.getItem().getCategory(), 0) * 12;
-        }
-        score += Math.min(getBidCount(auction), 10);
-        return score;
+        return dashboardLogic.recommendationScore(auction, categoryWeights, auctionRank);
     }
 
     private int getBidCount(Auction auction) {
-        return auction != null && auction.getBidIds() != null ? auction.getBidIds().size() : 0;
+        return dashboardLogic.bidCount(auction);
     }
 
     private void setupEndingSoonControls() {
         if (prevEndingBtn != null) {
-            prevEndingBtn.setOnAction(event -> scrollEndingSoon(-1));
+            prevEndingBtn.setFocusTraversable(false);
+            prevEndingBtn.setOnAction(event -> runWithoutVerticalScrollJump(() -> scrollEndingSoon(-1)));
         }
         if (nextEndingBtn != null) {
-            nextEndingBtn.setOnAction(event -> scrollEndingSoon(1));
+            nextEndingBtn.setFocusTraversable(false);
+            nextEndingBtn.setOnAction(event -> runWithoutVerticalScrollJump(() -> scrollEndingSoon(1)));
         }
         if (endingSoonScroll != null) {
             endingSoonScroll.setHvalue(0);
@@ -284,10 +253,12 @@ public class DashboardController implements Initializable {
 
     private void setupSuggestedControls() {
         if (prevSuggestedBtn != null) {
-            prevSuggestedBtn.setOnAction(event -> scrollSuggested(-1));
+            prevSuggestedBtn.setFocusTraversable(false);
+            prevSuggestedBtn.setOnAction(event -> runWithoutVerticalScrollJump(() -> scrollSuggested(-1)));
         }
         if (nextSuggestedBtn != null) {
-            nextSuggestedBtn.setOnAction(event -> scrollSuggested(1));
+            nextSuggestedBtn.setFocusTraversable(false);
+            nextSuggestedBtn.setOnAction(event -> runWithoutVerticalScrollJump(() -> scrollSuggested(1)));
         }
         if (suggestedScroll != null) {
             suggestedScroll.setHvalue(0);
@@ -296,11 +267,7 @@ public class DashboardController implements Initializable {
     }
 
     private boolean isVisibleAuction(Auction auction) {
-        if (auction == null || auction.getStatus() == null) {
-            return false;
-        }
-        return auction.getStatus() == AuctionStatus.OPEN
-                || auction.getStatus() == AuctionStatus.RUNNING;
+        return dashboardLogic.isVisibleAuction(auction);
     }
 
     private void scrollEndingSoon(int direction) {
@@ -325,6 +292,21 @@ public class DashboardController implements Initializable {
                         new KeyValue(scrollPane.hvalueProperty(), next, Interpolator.SPLINE(0.22, 0.61, 0.36, 1.0)))
         );
         timeline.play();
+    }
+
+    private void runWithoutVerticalScrollJump(Runnable action) {
+        if (action == null) {
+            return;
+        }
+        if (dashboardRoot == null) {
+            action.run();
+            return;
+        }
+
+        double currentVvalue = dashboardRoot.getVvalue();
+        action.run();
+        dashboardRoot.setVvalue(currentVvalue);
+        Platform.runLater(() -> dashboardRoot.setVvalue(currentVvalue));
     }
 
     private void updateEndingSoonButtons() {
@@ -511,47 +493,8 @@ public class DashboardController implements Initializable {
     }
 
     private VBox createAuctionCard(Auction auction) {
-        try {
-            
-            String cardPath = "/client/view/AuctionCard.fxml";
-            URL resource = getClass().getResource(cardPath);
-
-            
-            if (resource == null) {
-                resource = getClass().getResource("/fxml/BidderView/AuctionCard.fxml");
-            }
-
-            if (resource == null) {
-                ClientExceptionHandler.handle(ClientErrorType.NAVIGATION, "Load auction card in dashboard", new IllegalStateException("/fxml/BidderView/AuctionCard.fxml"));
-                return new VBox();
-            }
-
-            FXMLLoader loader = new FXMLLoader(resource);
-            Parent cardNode = loader.load();
-
-            
-            client.controller.AuctionCardController cardController = loader.getController();
-            if (cardController != null) {
-                if (homeScreenController != null) {
-                    cardController.setHomeScreenController(homeScreenController);
-                }
-                cardController.setAuctionData(auction);
-            }
-
-            
-            if (cardNode instanceof VBox) {
-                return (VBox) cardNode;
-            } else {
-                
-                VBox wrapper = new VBox();
-                wrapper.getChildren().add(cardNode);
-                return wrapper;
-            }
-
-        } catch (Exception e) {
-            ClientExceptionHandler.handle(ClientErrorType.NAVIGATION, "Load auction card in dashboard", e);
-            return new VBox(); 
-        }
+        VBox card = auctionCardFactory.create(auction, homeScreenController, "dashboard");
+        return card != null ? card : new VBox();
     }
 
     // ==============================================================
@@ -585,10 +528,12 @@ public class DashboardController implements Initializable {
         }
 
         if (prevBannerBtn != null) {
-            prevBannerBtn.setOnAction(event -> showPreviousImage());
+            prevBannerBtn.setFocusTraversable(false);
+            prevBannerBtn.setOnAction(event -> runWithoutVerticalScrollJump(this::showPreviousImage));
         }
         if (nextBannerBtn != null) {
-            nextBannerBtn.setOnAction(event -> showNextImage());
+            nextBannerBtn.setFocusTraversable(false);
+            nextBannerBtn.setOnAction(event -> runWithoutVerticalScrollJump(this::showNextImage));
         }
     }
 

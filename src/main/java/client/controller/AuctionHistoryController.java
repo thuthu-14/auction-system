@@ -4,6 +4,7 @@ import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AuctionHistoryClient;
 import client.service.AuctionHistoryClientService;
 import client.util.DialogUtil;
 import common.AuctionStatus;
@@ -14,13 +15,20 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import navigation.NavigationManager;
 import server.model.Auction;
 import server.model.Bid;
@@ -63,7 +71,15 @@ public class AuctionHistoryController {
     private ClientSocket clientSocket;
     private HomeScreenController homeController;
     private boolean contextInjected;
-    private final AuctionHistoryClientService historyService = new AuctionHistoryClientService();
+    private final AuctionHistoryClient historyService;
+
+    public AuctionHistoryController() {
+        this(new AuctionHistoryClientService());
+    }
+
+    AuctionHistoryController(AuctionHistoryClient historyService) {
+        this.historyService = historyService;
+    }
 
     @FXML
     private void initialize() {
@@ -133,7 +149,7 @@ public class AuctionHistoryController {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 List<Bid> bids = historyService.fetchUserBids(clientSocket, currentUser);
                 if (bids.isEmpty()) {
@@ -172,11 +188,11 @@ public class AuctionHistoryController {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Load auction history failed: " + e.getMessage())));
                 loadHistoryFromLocalFiles(List.of(), true);
             }
-        }, "AuctionHistoryLoader").start();
+        });
     }
 
     private void loadHistoryFromLocalFiles(List<Bid> preferredBids, boolean filterByCurrentUser) {
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 List<Bid> bids = preferredBids == null || preferredBids.isEmpty()
                         ? historyService.loadLocalBids(currentUser, filterByCurrentUser)
@@ -216,7 +232,7 @@ public class AuctionHistoryController {
                         "Kh\u00f4ng th\u1ec3 t\u1ea3i l\u1ecbch s\u1eed \u0111\u1ea5u gi\u00e1",
                         historyTable));
             }
-        }, "AuctionHistoryLocalLoader").start();
+        });
     }
 
     private Auction fetchAuction(String auctionId) {
@@ -272,10 +288,10 @@ public class AuctionHistoryController {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             Map<String, String> contact = historyService.fetchSellerContact(clientSocket, currentUser, auction);
             Platform.runLater(() -> showContactDialog(contact != null ? contact : localContact, auction));
-        }, "SellerContactLoader").start();
+        });
     }
 
     private void showContactDialog(Map<String, String> contact, Auction auction) {
@@ -284,15 +300,50 @@ public class AuctionHistoryController {
         String phone = contact != null ? contact.get("phone") : null;
         String address = contact != null ? contact.get("address") : null;
 
-        DialogUtil.showAlert(
-                Alert.AlertType.INFORMATION,
-                "Li\u00ean h\u1ec7 ng\u01b0\u1eddi b\u00e1n",
-                null,
-                "T\u00ean: " + safeContact(name, auction != null ? auction.getSellerName() : "Ng\u01b0\u1eddi b\u00e1n")
-                        + "\nEmail: " + safeContact(email, "Ch\u01b0a c\u1eadp nh\u1eadt")
-                        + "\nS\u0110T: " + safeContact(phone, "Ch\u01b0a c\u1eadp nh\u1eadt")
-                        + "\n\u0110\u1ecba ch\u1ec9: " + safeContact(address, "Ch\u01b0a c\u1eadp nh\u1eadt"),
-                historyTable);
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Li\u00ean h\u1ec7 ng\u01b0\u1eddi b\u00e1n");
+        DialogPane pane = dialog.getDialogPane();
+        pane.getStyleClass().add("seller-contact-dialog");
+        pane.getButtonTypes().add(ButtonType.OK);
+        pane.setHeaderText("Li\u00ean h\u1ec7 ng\u01b0\u1eddi b\u00e1n");
+        pane.setContent(createContactContent(
+                safeContact(name, auction != null ? auction.getSellerName() : "Ng\u01b0\u1eddi b\u00e1n"),
+                safeContact(email, "Ch\u01b0a c\u1eadp nh\u1eadt"),
+                safeContact(phone, "Ch\u01b0a c\u1eadp nh\u1eadt"),
+                safeContact(address, "Ch\u01b0a c\u1eadp nh\u1eadt")));
+        DialogUtil.prepareDialog(dialog, historyTable);
+        Button okButton = (Button) pane.lookupButton(ButtonType.OK);
+        if (okButton != null) {
+            okButton.setText("OK");
+            okButton.getStyleClass().add("seller-contact-ok-button");
+        }
+        dialog.showAndWait();
+    }
+
+    private VBox createContactContent(String name, String email, String phone, String address) {
+        VBox content = new VBox(8);
+        content.setPadding(new Insets(4, 0, 0, 0));
+        content.setPrefWidth(340);
+        content.setMinWidth(340);
+        content.setMaxWidth(340);
+        content.getChildren().addAll(
+                contactLine("T\u00ean: " + name),
+                contactLine("Email: " + email),
+                contactLine("S\u0110T: " + phone),
+                contactLine("\u0110\u1ecba ch\u1ec9: " + address)
+        );
+        return content;
+    }
+
+    private Label contactLine(String text) {
+        Label label = new Label(text);
+        label.setWrapText(true);
+        label.setMinWidth(0);
+        label.setPrefWidth(340);
+        label.setMaxWidth(340);
+        label.setMinHeight(Region.USE_PREF_SIZE);
+        label.setStyle("-fx-font-size: 14px; -fx-text-fill: #020617;");
+        return label;
     }
 
     private boolean hasUsefulContact(Map<String, String> contact) {

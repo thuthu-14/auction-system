@@ -9,6 +9,8 @@ import client.controller.auctiondetail.AuctionRealtimeDispatcher;
 import client.network.AuctionListener;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.logic.AuctionDetailLogic;
+import client.service.AuctionBidClient;
 import client.service.AuctionBidClientService;
 import client.service.AuctionDetailDataMapper;
 import client.util.AuctionDetailGridRenderer;
@@ -49,13 +51,10 @@ import server.model.User;
 import util.DateTimeUtil;
 import util.LoggerUtil;
 
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AuctionDetailController implements AuctionListener {
-    private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
     private static final Duration BID_HISTORY_REFRESH_INTERVAL = Duration.millis(500);
 
     @FXML private ImageView mainImageView;
@@ -68,6 +67,7 @@ public class AuctionDetailController implements AuctionListener {
     @FXML private Label minuteLabel;
     @FXML private Label secondLabel;
     @FXML private TextField bidAmountField;
+    @FXML private ScrollPane auctionDetailRoot;
     @FXML private ScrollPane bidHistoryScrollPane;
     @FXML private LineChart<String, Number> bidHistoryChart;
     @FXML private CategoryAxis bidTurnAxis;
@@ -86,13 +86,28 @@ public class AuctionDetailController implements AuctionListener {
     private final AtomicBoolean bidHistoryRequestInFlight = new AtomicBoolean(false);
     private boolean endedMode;
     private boolean bidPriceAxisPinInstalled;
-    private final AuctionBidClientService bidClientService = new AuctionBidClientService();
-    private final AuctionDetailDataMapper dataMapper = new AuctionDetailDataMapper();
-    private final AuctionDetailGridRenderer detailGridRenderer = new AuctionDetailGridRenderer();
+    private final AuctionBidClient bidClientService;
+    private final AuctionDetailDataMapper dataMapper;
+    private final AuctionDetailGridRenderer detailGridRenderer;
     private final AuctionRealtimeDispatcher realtimeDispatcher = new AuctionRealtimeDispatcher(this);
+    private final AuctionDetailLogic auctionDetailLogic;
     private AuctionImageGalleryRenderer imageGalleryRenderer;
     private AuctionBidHistoryGraphRenderer bidHistoryGraphRenderer;
     private AuctionBidHistoryGraphController bidHistoryGraphController;
+
+    public AuctionDetailController() {
+        this(new AuctionBidClientService(), new AuctionDetailDataMapper(), new AuctionDetailGridRenderer(), new AuctionDetailLogic());
+    }
+
+    AuctionDetailController(AuctionBidClient bidClientService,
+                            AuctionDetailDataMapper dataMapper,
+                            AuctionDetailGridRenderer detailGridRenderer,
+                            AuctionDetailLogic auctionDetailLogic) {
+        this.bidClientService = bidClientService;
+        this.dataMapper = dataMapper;
+        this.detailGridRenderer = detailGridRenderer;
+        this.auctionDetailLogic = auctionDetailLogic;
+    }
 
     public void loadAuctionData(Auction auction) {
         stopBidHistoryRefresh();
@@ -126,10 +141,10 @@ public class AuctionDetailController implements AuctionListener {
 
         JsonObject productData = JsonObjects.getObject(itemData, "item", itemData);
         if (productNameLabel != null) {
-            productNameLabel.setText(JsonObjects.getString(productData, "name", "ChÆ°a cÃ³ tÃªn sáº£n pháº©m"));
+        productNameLabel.setText(JsonObjects.getString(productData, "name", "Chưa có tên sản phẩm"));
         }
         if (descriptionLabel != null) {
-            descriptionLabel.setText(JsonObjects.getString(productData, "description", "ChÆ°a cÃ³ mÃ´ táº£"));
+        descriptionLabel.setText(JsonObjects.getString(productData, "description", "Chưa có mô tả"));
         }
 
         String incomingAuctionId = JsonObjects.getString(itemData, "auctionId", "");
@@ -139,13 +154,11 @@ public class AuctionDetailController implements AuctionListener {
         startingPrice = JsonObjects.getDouble(productData, "startingPrice", 0);
         double incomingCurrentPrice = JsonObjects.getDouble(itemData, "currentPrice", startingPrice);
         double cachedHighestPrice = getCachedHighestPrice(currentAuctionId);
-        currentPrice = sameAuction
-                ? Math.max(Math.max(currentPrice, incomingCurrentPrice), cachedHighestPrice)
-                : Math.max(incomingCurrentPrice, cachedHighestPrice);
+        currentPrice = auctionDetailLogic.resolveCurrentPrice(sameAuction, currentPrice, incomingCurrentPrice, cachedHighestPrice);
         minimumBidIncrement = JsonObjects.getDouble(itemData, "minimumBidIncrement", 0);
-        if (minimumBidIncrement <= 0) {
-            minimumBidIncrement = dataMapper.resolveBidIncrement(JsonObjects.getString(productData, "type", ""));
-        }
+        minimumBidIncrement = auctionDetailLogic.resolveMinimumBidIncrement(
+                minimumBidIncrement,
+                dataMapper.resolveBidIncrement(JsonObjects.getString(productData, "type", "")));
 
         if (currentPriceLabel != null) {
             currentPriceLabel.setText(formatVnd(currentPrice));
@@ -159,11 +172,8 @@ public class AuctionDetailController implements AuctionListener {
 
     @FXML private void handleDecreaseBid() {
         try {
-            double currentBid = Double.parseDouble(bidAmountField.getText().replaceAll("[^0-9]", ""));
-            double minAllowedBid = currentPrice + minimumBidIncrement;
-            if (currentBid - minimumBidIncrement >= minAllowedBid) {
-                bidAmountField.setText(formatPlainNumber(currentBid - minimumBidIncrement));
-            }
+            bidAmountField.setText(formatPlainNumber(auctionDetailLogic.nextDecreaseBid(
+                    bidAmountField.getText(), currentPrice, minimumBidIncrement)));
         } catch (Exception e) {
             bidAmountField.setText(formatPlainNumber(currentPrice + minimumBidIncrement));
         }
@@ -171,8 +181,8 @@ public class AuctionDetailController implements AuctionListener {
 
     @FXML private void handleIncreaseBid() {
         try {
-            double currentBid = Double.parseDouble(bidAmountField.getText().replaceAll("[^0-9]", ""));
-            bidAmountField.setText(formatPlainNumber(currentBid + minimumBidIncrement));
+            bidAmountField.setText(formatPlainNumber(auctionDetailLogic.nextIncreaseBid(
+                    bidAmountField.getText(), currentPrice, minimumBidIncrement)));
         } catch (Exception e) {
             bidAmountField.setText(formatPlainNumber(currentPrice + minimumBidIncrement));
         }
@@ -180,31 +190,36 @@ public class AuctionDetailController implements AuctionListener {
 
     @FXML private void handleConfirmBid() {
         if (endedMode) {
-            showAlert(Alert.AlertType.WARNING, "ÄÃ£ káº¿t thÃºc", "PhiÃªn Ä‘áº¥u giÃ¡ nÃ y Ä‘Ã£ káº¿t thÃºc.");
+            showAlert(Alert.AlertType.WARNING, "Đã kết thúc", "Phiên đấu giá này đã kết thúc.");
             return;
         }
 
         double amount = parseBidAmount();
-        double minimumAllowed = currentPrice + minimumBidIncrement;
+        double minimumAllowed = auctionDetailLogic.minimumAllowedBid(currentPrice, minimumBidIncrement);
         if (amount < minimumAllowed) {
-            showAlert(Alert.AlertType.WARNING, "GiÃ¡ Ä‘áº·t tháº¥p", "Tá»‘i thiá»ƒu: " + formatVnd(minimumAllowed));
+            showAlert(Alert.AlertType.WARNING, "Giá đặt thấp", "Tối thiểu: " + formatVnd(minimumAllowed));
             return;
         }
 
         User currentUser = NavigationManager.getInstance().getCurrentUser();
         ClientSocket socket = ConnectionManager.getInstance().getClientSocket();
         if (currentUser == null || socket == null || !socket.isConnected()) {
-            showAlert(Alert.AlertType.ERROR, "Lá»—i", "Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i!");
+            showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng đăng nhập lại!");
             return;
         }
         if (currentUser.getWallet() <= 0) {
-            showAlert(Alert.AlertType.WARNING, "ChÆ°a thá»ƒ Ä‘áº¥u giÃ¡", "Báº¡n cáº§n liÃªn káº¿t ngÃ¢n hÃ ng vÃ  náº¡p tiá»n vÃ o vÃ­ trÆ°á»›c khi Ä‘áº¥u giÃ¡.");
+            showAlert(Alert.AlertType.WARNING, "Chưa thể đấu giá", "Bạn cần liên kết ngân hàng và nạp tiền vào ví trước khi đấu giá.");
+            return;
+        }
+
+        if (!ProfileController.hasCompleteBidProfile(currentUser)) {
+            showAlert(Alert.AlertType.WARNING, "Cập nhật hồ sơ", "Vui lòng cập nhật số điện thoại và địa chỉ trong hồ sơ trước khi đấu giá.");
             return;
         }
 
         confirmBidBtn.setDisable(true);
-        confirmBidBtn.setText("ÄANG Xá»¬ LÃ...");
-        new Thread(() -> {
+        confirmBidBtn.setText("ĐANG XỬ LÝ...");
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 Message response = bidClientService.placeBid(socket, currentUser, currentAuctionId, amount);
 
@@ -216,21 +231,21 @@ public class AuctionDetailController implements AuctionListener {
                         } else {
                             refreshBidHistoryFromServer(currentAuctionId);
                         }
-                        showAlert(Alert.AlertType.INFORMATION, "ThÃ nh cÃ´ng", "Báº¡n Ä‘Ã£ xÃ¡c nháº­n Ä‘áº¥u giÃ¡ thÃ nh cÃ´ng!");
+                    showAlert(Alert.AlertType.INFORMATION, "Thành công", "Bạn đã xác nhận đấu giá thành công!");
                     } else {
-                        showAlert(Alert.AlertType.ERROR, "Tháº¥t báº¡i", response != null ? response.getMessage() : "Lá»—i server");
+                    showAlert(Alert.AlertType.ERROR, "Thất bại", response != null ? response.getMessage() : "Lỗi server");
                     }
                 });
             } catch (Exception e) {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Place bid failed: " + e.getMessage())));
-                Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lá»—i", "Máº¥t káº¿t ná»‘i server"));
+            Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Mất kết nối server"));
             } finally {
                 Platform.runLater(() -> {
                     confirmBidBtn.setDisable(endedMode);
-                    confirmBidBtn.setText("XÃC NHáº¬N Äáº¤U GIÃ");
+                confirmBidBtn.setText("XÁC NHẬN ĐẤU GIÁ");
                 });
             }
-        }, "PlaceBidThread").start();
+        });
     }
 
     public void startCountdown(long endTime) {
@@ -285,6 +300,7 @@ public class AuctionDetailController implements AuctionListener {
     }
 
     private void configureBidHistoryGraph() {
+        configureRootScrollLock();
         if (bidHistoryChart == null) {
             return;
         }
@@ -319,6 +335,21 @@ public class AuctionDetailController implements AuctionListener {
             bidPriceAxis.setMinorTickCount(4);
         }
         installPinnedBidPriceAxis();
+    }
+
+    private void configureRootScrollLock() {
+        if (auctionDetailRoot == null) {
+            return;
+        }
+        auctionDetailRoot.setFitToWidth(true);
+        auctionDetailRoot.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        auctionDetailRoot.setPannable(false);
+        auctionDetailRoot.setHvalue(0);
+        auctionDetailRoot.hvalueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && newValue.doubleValue() != 0) {
+                auctionDetailRoot.setHvalue(0);
+            }
+        });
     }
 
     private void installPinnedBidPriceAxis() {
@@ -390,7 +421,7 @@ public class AuctionDetailController implements AuctionListener {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 Message response = bidClientService.fetchBidHistory(socket, currentUser, requestedAuctionId);
                 if (response != null && "SUCCESS".equals(response.getStatus())) {
@@ -433,7 +464,7 @@ public class AuctionDetailController implements AuctionListener {
             } finally {
                 bidHistoryRequestInFlight.set(false);
             }
-        }, "BidHistoryRefreshThread").start();
+        });
     }
 
     private void consumeRealtimeBidMessages() {
@@ -504,11 +535,11 @@ public class AuctionDetailController implements AuctionListener {
     }
 
     private boolean isCurrentAuction(Auction auction) {
-        return auction != null && currentAuctionId != null && currentAuctionId.equals(auction.getAuctionId());
+        return auctionDetailLogic.isCurrentAuction(auction, currentAuctionId);
     }
 
     private String safeRealtimeText(String value) {
-        return value == null || value.isBlank() ? "" : value;
+        return auctionDetailLogic.safeRealtimeText(value);
     }
 
     private void updateBidHistoryGraph(List<Bid> bids) {
@@ -548,7 +579,7 @@ public class AuctionDetailController implements AuctionListener {
     }
 
     private void applyLatestBidPrice(double amount) {
-        if (amount <= currentPrice) {
+        if (!auctionDetailLogic.shouldApplyLatestBidPrice(amount, currentPrice)) {
             return;
         }
 
@@ -566,8 +597,7 @@ public class AuctionDetailController implements AuctionListener {
             return;
         }
 
-        double latestBidAmount = sortedBids.get(sortedBids.size() - 1).getAmount();
-        currentPrice = Math.max(currentPrice, latestBidAmount);
+        currentPrice = auctionDetailLogic.latestPriceFromHistory(currentPrice, sortedBids);
         if (currentPriceLabel != null) {
             currentPriceLabel.setText(formatVnd(currentPrice));
         }
@@ -624,16 +654,15 @@ public class AuctionDetailController implements AuctionListener {
     }
 
     private double parseBidAmount() {
-        try {
-            return Double.parseDouble(bidAmountField.getText().replaceAll("[^0-9]", ""));
-        } catch (Exception e) {
-            return currentPrice + minimumBidIncrement;
-        }
+        return auctionDetailLogic.parseBidAmount(
+                bidAmountField == null ? null : bidAmountField.getText(),
+                currentPrice,
+                minimumBidIncrement);
     }
 
     private void clearView() {
         stopBidHistoryRefresh();
-        if (productNameLabel != null) productNameLabel.setText("KhÃ´ng cÃ³ dá»¯ liá»‡u");
+        if (productNameLabel != null) productNameLabel.setText("Không có dữ liệu");
         if (dynamicDetailsGrid != null) dynamicDetailsGrid.getChildren().clear();
         if (bidHistoryChart != null) bidHistoryChart.getData().clear();
         bidHistoryGraphController().clearSignature();
@@ -654,11 +683,11 @@ public class AuctionDetailController implements AuctionListener {
     }
 
     private String formatVnd(double amount) {
-        return VND_FORMATTER.format(Math.round(amount)) + " VND";
+        return auctionDetailLogic.formatVnd(amount);
     }
 
     private String formatPlainNumber(double amount) {
-        return VND_FORMATTER.format(Math.round(amount));
+        return auctionDetailLogic.formatPlainNumber(amount);
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {

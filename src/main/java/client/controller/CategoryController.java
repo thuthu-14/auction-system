@@ -2,20 +2,26 @@ package client.controller;
 
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
+import client.logic.AuctionFilterStrategy;
+import client.logic.AuctionFilters;
+import client.logic.CategorySortOption;
+import client.ui.AuctionCardFactory;
 import client.util.RecommendationTracker;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AuctionQueryClient;
 import client.service.DashboardClientService;
 import client.service.ImageDownloadService;
-import common.AuctionStatus;
 import common.ItemCategory;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -26,14 +32,16 @@ import server.model.Auction;
 import server.model.Item;
 import server.model.User;
 
-import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class CategoryController {
 
+    @FXML private ScrollPane categoryRoot;
     @FXML private FlowPane productsFlowPane;
     @FXML private FlowPane electronicsFlowPane;
     @FXML private FlowPane fashionFlowPane;
@@ -42,20 +50,34 @@ public class CategoryController {
     @FXML private FlowPane otherFlowPane;
     @FXML private Button backBtn;
     @FXML private Button heroBidButton;
+    @FXML private ComboBox<String> sortCombo;
     @FXML private Label heroTitleLabel;
     @FXML private Label heroDescriptionLabel;
     @FXML private ImageView heroImageView;
     @FXML private Label heroIconLabel;
 
-    private final DashboardClientService dashboardClientService = new DashboardClientService();
+    private final AuctionQueryClient auctionQueryClient;
+    private final AuctionCardFactory auctionCardFactory;
     private static final NumberFormat VND_FORMATTER = NumberFormat.getInstance(new Locale("vi", "VN"));
     private static final double HERO_IMAGE_SIZE = 190.0;
     private static final double HERO_IMAGE_RADIUS = 24.0;
+    private static final Map<ItemCategory, CategorySortOption> DEFAULT_SORT_BY_CATEGORY = createDefaultSortByCategory();
+    private static final Map<ItemCategory, String> HERO_DESCRIPTION_COLOR_BY_CATEGORY = createHeroDescriptionColors();
 
     private User currentUser;
     private ClientSocket clientSocket;
     private HomeScreenController homeScreenController;
     private Auction heroAuction;
+    private List<Auction> currentAuctions = List.of();
+
+    public CategoryController() {
+        this(new DashboardClientService(), new AuctionCardFactory());
+    }
+
+    CategoryController(AuctionQueryClient auctionQueryClient, AuctionCardFactory auctionCardFactory) {
+        this.auctionQueryClient = auctionQueryClient;
+        this.auctionCardFactory = auctionCardFactory;
+    }
 
     @FXML
     public void initialize() {
@@ -65,7 +87,9 @@ public class CategoryController {
         if (heroBidButton != null) {
             heroBidButton.setOnAction(event -> handleHeroBid());
         }
+        configureSortCombo();
         installHeroImageClip();
+        Platform.runLater(this::forceCategoryTextColors);
         Platform.runLater(this::loadAuctionsFromServer);
     }
 
@@ -86,17 +110,21 @@ public class CategoryController {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
-                List<Auction> auctions = dashboardClientService.fetchAllAuctions(socket);
-                Platform.runLater(() -> renderAuctions(auctions));
+                List<Auction> auctions = auctionQueryClient.fetchAllAuctions(socket);
+                Platform.runLater(() -> {
+                    currentAuctions = auctions == null ? List.of() : auctions;
+                    renderAuctions(currentAuctions);
+                });
             } catch (Exception e) {
                 ClientExceptionHandler.handle(ClientErrorType.DATA, "Load category auctions", e);
             }
-        }).start();
+        });
     }
 
     private void renderAuctions(List<Auction> auctions) {
+        currentAuctions = auctions == null ? List.of() : auctions;
         FlowPane flowPane = getActiveFlowPane();
         ItemCategory category = getCurrentCategory();
         if (flowPane == null || category == null) {
@@ -104,12 +132,12 @@ public class CategoryController {
         }
 
         flowPane.getChildren().clear();
+        AuctionFilterStrategy filter = AuctionFilters.visibleActive()
+                .and(AuctionFilters.hasTimeRemaining())
+                .and(AuctionFilters.category(category));
         List<Auction> filteredAuctions = auctions == null ? List.of() : auctions.stream()
-                .filter(auction -> auction != null && auction.getItem() != null)
-                .filter(this::isVisibleAuction)
-                .filter(auction -> auction.getTimeRemainingSeconds() > 0)
-                .filter(auction -> category == auction.getItem().getCategory())
-                .sorted(Comparator.comparingLong(Auction::getEndTime))
+                .filter(filter::accepts)
+                .sorted(getAuctionComparator())
                 .toList();
 
         if (filteredAuctions.isEmpty()) {
@@ -131,6 +159,28 @@ public class CategoryController {
         }
     }
 
+    private void configureSortCombo() {
+        if (sortCombo == null) {
+            return;
+        }
+        sortCombo.getItems().setAll(CategorySortOption.labels());
+        sortCombo.getSelectionModel().select(getDefaultSortOption());
+        sortCombo.setOnAction(event -> renderAuctions(currentAuctions));
+    }
+
+    private String getDefaultSortOption() {
+        return DEFAULT_SORT_BY_CATEGORY
+                .getOrDefault(getCurrentCategory(), CategorySortOption.ENDING_SOON)
+                .label();
+    }
+
+    private Comparator<Auction> getAuctionComparator() {
+        String selected = sortCombo != null && sortCombo.getValue() != null
+                ? sortCombo.getValue()
+                : getDefaultSortOption();
+        return CategorySortOption.fromLabel(selected).comparator(this::getBidCount);
+    }
+
     private void updateHero(Auction auction) {
         if (auction == null || auction.getItem() == null) {
             return;
@@ -141,15 +191,73 @@ public class CategoryController {
             heroTitleLabel.setStyle("-fx-text-fill: #1a1a1a; -fx-font-weight: bold; -fx-font-size: 32px;");
         }
         if (heroDescriptionLabel != null) {
-            heroDescriptionLabel.setText("Gia hien tai: "
+            heroDescriptionLabel.setText("Giá hiện tại: "
                     + VND_FORMATTER.format(Math.round(auction.getCurrentPrice()))
                     + " d - "
                     + getBidCount(auction)
-                    + " luot dat gia");
+                    + " lượt đặt giá");
             heroDescriptionLabel.setTextFill(Color.web(getHeroDescriptionColor()));
             heroDescriptionLabel.setStyle("-fx-text-fill: " + getHeroDescriptionColor() + "; -fx-font-size: 15px;");
         }
         updateHeroImage(auction.getItem());
+        forceCategoryTextColors();
+    }
+
+    private void forceCategoryTextColors() {
+        if (heroTitleLabel != null) {
+            applyLabelColor(heroTitleLabel, "#1a1a1a");
+        }
+        if (heroDescriptionLabel != null) {
+            applyLabelColor(heroDescriptionLabel, getHeroDescriptionColor());
+        }
+        if (heroIconLabel != null) {
+            applyLabelColor(heroIconLabel, getHeroDescriptionColor());
+        }
+
+        if (categoryRoot == null) {
+            return;
+        }
+        applyCategoryTextColors(categoryRoot.getContent());
+    }
+
+    private void applyCategoryTextColors(Node node) {
+        if (node == null) {
+            return;
+        }
+        if (node instanceof Label label) {
+            if (label == heroTitleLabel || label == heroDescriptionLabel || label == heroIconLabel) {
+                return;
+            }
+
+            String style = label.getStyle() == null ? "" : label.getStyle();
+            String text = label.getText() == null ? "" : label.getText();
+            if (style.contains("-fx-background-color")) {
+                applyLabelColor(label, "#ffffff");
+            } else if (text.contains("s\u1ea3n ph\u1ea9m") || text.contains("S\u1ea3n ph\u1ea9m")
+                    || text.contains("Danh s\u00e1ch")) {
+                applyLabelColor(label, "#718096");
+            } else if (!text.isBlank()) {
+                applyLabelColor(label, "#1a1a1a");
+            }
+        }
+
+        if (node instanceof Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                applyCategoryTextColors(child);
+            }
+        }
+    }
+
+    private void applyLabelColor(Label label, String color) {
+        label.setTextFill(Color.web(color));
+        label.setOpacity(1.0);
+
+        String style = label.getStyle() == null ? "" : label.getStyle();
+        style = style.replaceAll("-fx-text-fill\\s*:\\s*[^;]+;?", "").trim();
+        if (!style.isEmpty() && !style.endsWith(";")) {
+            style += ";";
+        }
+        label.setStyle(style + " -fx-text-fill: " + color + ";");
     }
 
     private void updateHeroImage(Item item) {
@@ -164,7 +272,7 @@ public class CategoryController {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 ClientSocket socket = getActiveSocket();
                 if (socket == null || !socket.isConnected()) {
@@ -179,7 +287,7 @@ public class CategoryController {
                 Platform.runLater(this::showHeroIcon);
                 ClientExceptionHandler.handle(ClientErrorType.DATA, "Load category hero image", e);
             }
-        }, "LoadCategoryHeroImage").start();
+        });
     }
 
     private ClientSocket getActiveSocket() {
@@ -242,54 +350,15 @@ public class CategoryController {
     }
 
     private boolean isVisibleAuction(Auction auction) {
-        if (auction == null || auction.getStatus() == null) {
-            return false;
-        }
-        return auction.getStatus() == AuctionStatus.OPEN
-                || auction.getStatus() == AuctionStatus.RUNNING;
+        return AuctionFilters.visibleActive().accepts(auction);
     }
 
     private String getHeroDescriptionColor() {
-        ItemCategory category = getCurrentCategory();
-        if (category == ItemCategory.ART) return "#78350f";
-        if (category == ItemCategory.ELECTRONICS) return "#1e3a8a";
-        if (category == ItemCategory.FASHION) return "#881337";
-        if (category == ItemCategory.JEWELRY) return "#581c87";
-        if (category == ItemCategory.VEHICLE) return "#14532d";
-        if (category == ItemCategory.OTHER) return "#115e59";
-        return "#374151";
+        return HERO_DESCRIPTION_COLOR_BY_CATEGORY.getOrDefault(getCurrentCategory(), "#374151");
     }
 
     private VBox createAuctionCard(Auction auction) {
-        try {
-            URL resource = getClass().getResource("/fxml/BidderView/AuctionCard.fxml");
-            if (resource == null) {
-                ClientExceptionHandler.handle(ClientErrorType.NAVIGATION,
-                        "Load auction card in category",
-                        new IllegalStateException("/fxml/BidderView/AuctionCard.fxml"));
-                return null;
-            }
-
-            FXMLLoader loader = new FXMLLoader(resource);
-            Parent cardNode = loader.load();
-            AuctionCardController cardController = loader.getController();
-            if (cardController != null) {
-                if (homeScreenController != null) {
-                    cardController.setHomeScreenController(homeScreenController);
-                }
-                cardController.setAuctionData(auction);
-            }
-
-            if (cardNode instanceof VBox box) {
-                return box;
-            }
-            VBox wrapper = new VBox(cardNode);
-            wrapper.setPrefWidth(280);
-            return wrapper;
-        } catch (Exception e) {
-            ClientExceptionHandler.handle(ClientErrorType.NAVIGATION, "Load auction card in category", e);
-            return null;
-        }
+        return auctionCardFactory.create(auction, homeScreenController, "category");
     }
 
     private VBox createEmptyState() {
@@ -299,10 +368,10 @@ public class CategoryController {
         box.setMinHeight(140);
         box.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12; -fx-padding: 24;");
 
-        Label title = new Label("Chua co phien dau gia phu hop");
+        Label title = new Label("Chưa có phiên đấu giá phù hợp");
         title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;");
 
-        Label subtitle = new Label("Cac phien dang dien ra se hien thi o day.");
+        Label subtitle = new Label("Các phiên đang diễn ra sẽ hiển thị ở đây.");
         subtitle.setStyle("-fx-font-size: 13px; -fx-text-fill: #6b7280;");
 
         box.getChildren().addAll(title, subtitle);
@@ -339,5 +408,26 @@ public class CategoryController {
             RecommendationTracker.recordAuctionClick(heroAuction);
             homeScreenController.loadAuctionDetailView(heroAuction);
         }
+    }
+
+    private static Map<ItemCategory, CategorySortOption> createDefaultSortByCategory() {
+        Map<ItemCategory, CategorySortOption> options = new EnumMap<>(ItemCategory.class);
+        options.put(ItemCategory.ART, CategorySortOption.NEWEST);
+        options.put(ItemCategory.ELECTRONICS, CategorySortOption.HIGHEST_PRICE);
+        options.put(ItemCategory.FASHION, CategorySortOption.NEWEST);
+        options.put(ItemCategory.JEWELRY, CategorySortOption.MOST_BIDS);
+        options.put(ItemCategory.OTHER, CategorySortOption.MOST_BIDS);
+        return options;
+    }
+
+    private static Map<ItemCategory, String> createHeroDescriptionColors() {
+        Map<ItemCategory, String> colors = new EnumMap<>(ItemCategory.class);
+        colors.put(ItemCategory.ART, "#78350f");
+        colors.put(ItemCategory.ELECTRONICS, "#1e3a8a");
+        colors.put(ItemCategory.FASHION, "#881337");
+        colors.put(ItemCategory.JEWELRY, "#581c87");
+        colors.put(ItemCategory.VEHICLE, "#14532d");
+        colors.put(ItemCategory.OTHER, "#115e59");
+        return colors;
     }
 }

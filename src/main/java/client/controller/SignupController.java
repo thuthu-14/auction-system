@@ -4,6 +4,7 @@ import client.exception.ClientErrorType;
 import client.exception.ClientException;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
+import client.service.AuthClient;
 import client.service.AuthClientService;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -31,7 +32,15 @@ public class SignupController {
 
     private ClientSocket clientSocket;
     private User currentUser;
-    private final AuthClientService authClientService = new AuthClientService();
+    private final AuthClient authClientService;
+
+    public SignupController() {
+        this(new AuthClientService());
+    }
+
+    SignupController(AuthClient authClientService) {
+        this.authClientService = authClientService;
+    }
 
     @FXML
     public void initialize() {
@@ -71,7 +80,7 @@ public class SignupController {
         loginButton.setDisable(true);
 
         // 2. Giao tiếp với Server ở luồng riêng
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 clientSocket = (ClientSocket) authClientService.ensureConnected(clientSocket);
                 currentUser = authClientService.register(clientSocket, username, password, email);
@@ -90,7 +99,7 @@ public class SignupController {
             } finally {
                 Platform.runLater(() -> loginButton.setDisable(false));
             }
-        }).start();
+        });
     }
 
     @FXML

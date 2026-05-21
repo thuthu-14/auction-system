@@ -68,8 +68,6 @@
         <HBox alignment="CENTER_RIGHT" spacing="20">
             <Label fx:id="noWinnerLabel" style="-fx-font-size: 15px; -fx-text-fill: #94a3b8; -fx-font-style: italic;" text="Đang chờ người trúng giải..." visible="false" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button onAction="#handleMessageBuyer" style="-fx-background-color: white; -fx-text-fill: #3b82f6; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 12 25; -fx-border-color: #bfdbfe; -fx-border-width: 1; -fx-border-radius: 10; -fx-background-radius: 10; -fx-cursor: hand;" text="💬 Nhắn tin cho người mua" />
-            <Button onAction="#handleConfirmShipping" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 12 30; -fx-background-radius: 10; -fx-cursor: hand;" text="📦 Xác nhận &amp; Giao hàng" />
         </HBox>
     </VBox>
 </VBox>

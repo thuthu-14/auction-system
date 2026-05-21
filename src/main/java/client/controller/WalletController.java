@@ -2,8 +2,10 @@ package client.controller;
 
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
+import client.logic.WalletLogic;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.WalletClient;
 import client.service.WalletService;
 import client.service.WalletService.BankAccountEntry;
 import common.Transaction;
@@ -67,12 +69,17 @@ public class WalletController implements Initializable {
     private ClientSocket clientSocket;
     private User currentUser;
     private List<Transaction> allTransactions = new ArrayList<>();
-    private TransactionFilter activeTransactionFilter = TransactionFilter.ALL;
-    private final WalletService walletService = new WalletService();
+    private WalletLogic.TransactionFilter activeTransactionFilter = WalletLogic.TransactionFilter.ALL;
+    private final WalletClient walletService;
+    private final WalletLogic walletLogic = new WalletLogic();
     private WalletViewMode viewMode = WalletViewMode.BIDDER;
 
-    private enum TransactionFilter {
-        ALL, IN, OUT
+    public WalletController() {
+        this(new WalletService());
+    }
+
+    WalletController(WalletClient walletService) {
+        this.walletService = walletService;
     }
 
     public enum WalletViewMode {
@@ -201,8 +208,8 @@ public class WalletController implements Initializable {
         addTransactionDetailRow(detailGrid, 0, "Mã giao dịch", safeText(transaction.id));
         addTransactionDetailRow(detailGrid, 1, "Thời gian", transaction.getFormattedDate());
         addTransactionDetailRow(detailGrid, 2, "Loại giao dịch", transaction.getTypeLabel());
-        addTransactionDetailRow(detailGrid, 3, "Tiền vào", emptyToDash(transaction.getMoneyIn()));
-        addTransactionDetailRow(detailGrid, 4, "Tiền ra", emptyToDash(transaction.getMoneyOut()));
+        addTransactionDetailRow(detailGrid, 3, "Tiền vào", walletLogic.emptyToDash(transaction.getMoneyIn()));
+        addTransactionDetailRow(detailGrid, 4, "Tiền ra", walletLogic.emptyToDash(transaction.getMoneyOut()));
         addTransactionDetailRow(detailGrid, 5, "Số dư sau", transaction.getFormattedBalanceAfter());
         addTransactionDetailRow(detailGrid, 6, "Mô tả", safeText(transaction.getDescription()));
 
@@ -245,16 +252,11 @@ public class WalletController implements Initializable {
     }
 
     private String formatSignedTransactionAmount(Transaction transaction) {
-        String prefix = isMoneyIn(transaction) ? "+ " : "- ";
-        return prefix + formatVnd(transaction.getAmount());
+        return walletLogic.formatSignedTransactionAmount(transaction);
     }
 
     private boolean isMoneyIn(Transaction transaction) {
-        return transaction != null && "DEPOSIT".equals(transaction.getType());
-    }
-
-    private String emptyToDash(String value) {
-        return value == null || value.isBlank() ? "--" : value;
+        return walletLogic.isMoneyIn(transaction);
     }
 
     private String safeText(String value) {
@@ -327,7 +329,7 @@ public class WalletController implements Initializable {
         }
 
         // ← Load bank account & transaction async (không block UI)
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 BankAccountEntry entry = loadBankAccountForCurrentUser();
                 LoggerUtil.info("Wallet linked bank found=" + (entry != null));
@@ -335,8 +337,7 @@ public class WalletController implements Initializable {
                 Platform.runLater(() -> {
                     if (entry != null) {
                         displayBankName.setText(entry.bankName.toUpperCase());
-                        String acc = entry.accountNumber == null ? "" : entry.accountNumber;
-                        displayAccNumber.setText(acc.length() >= 4 ? "**** **** **** " + acc.substring(acc.length() - 4) : acc);
+                        displayAccNumber.setText(walletLogic.maskAccountNumber(entry.accountNumber));
 
                         addBankBox.setVisible(false);
                         addBankBox.setManaged(false);
@@ -352,7 +353,7 @@ public class WalletController implements Initializable {
             } catch (Exception e) {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Error loading bank account: " + e.getMessage())));
             }
-        }).start();
+        });
 
         loadTransactionHistory();
         Platform.runLater(this::resetWalletViewState);
@@ -554,7 +555,7 @@ public class WalletController implements Initializable {
                 return;
             }
 
-            new Thread(() -> {
+            client.util.ClientTaskRunner.run(() -> {
                 try {
                     var response = walletService.submitWalletTransaction(getActiveSocket(), currentUser, type, amount);
 
@@ -579,7 +580,7 @@ public class WalletController implements Initializable {
                     ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Wallet transaction failed: " + e.getMessage())));
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "L\u1ed7i m\u1ea1ng", "Kh\u00f4ng th\u1ec3 g\u1eedi y\u00eau c\u1ea7u t\u1edbi Server"));
                 }
-            }).start();
+            });
 
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Lỗi", "Vui lòng nhập số tiền hợp lệ");
@@ -607,7 +608,7 @@ public class WalletController implements Initializable {
         }
 
         // ← Load bank account & transaction async (không block UI)
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 BankAccountEntry entry = loadBankAccountForCurrentUser();
                 if (entry != null) {
@@ -622,7 +623,7 @@ public class WalletController implements Initializable {
             } catch (Exception e) {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi refresh lịch sử giao dịch: " + e.getMessage())));
             }
-        }).start();
+        });
 
         Platform.runLater(this::resetWalletViewState);
     }
@@ -741,7 +742,7 @@ public class WalletController implements Initializable {
         }
     }
 
-    private String formatVnd(double value) { return String.format("%,.0f đ", value); }
+    private String formatVnd(double value) { return walletLogic.formatVnd(value); }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {
         client.util.DialogUtil.showAlert(type, title, null, msg, rootPane != null ? rootPane : balanceLabel);
@@ -811,11 +812,12 @@ public class WalletController implements Initializable {
         String keyword = searchField == null || searchField.getText() == null
                 ? ""
                 : searchField.getText().trim().toLowerCase();
-        List<Transaction> filtered = allTransactions.stream()
-                .filter(this::matchesActiveTypeFilter)
-                .filter(this::matchesTimeFilter)
-                .filter(t -> keyword.isEmpty() || matchesSearchKeyword(t, keyword))
-                .collect(java.util.stream.Collectors.toList());
+        int selectedTimeIndex = timeFilter == null ? -1 : timeFilter.getSelectionModel().getSelectedIndex();
+        List<Transaction> filtered = walletLogic.filterTransactions(allTransactions,
+                activeTransactionFilter,
+                selectedTimeIndex,
+                keyword,
+                System.currentTimeMillis());
         showTransactions(filtered);
     }
 
@@ -824,74 +826,39 @@ public class WalletController implements Initializable {
     }
 
     @FXML private void filterAll() {
-        setActiveTransactionFilter(TransactionFilter.ALL);
+        setActiveTransactionFilter(WalletLogic.TransactionFilter.ALL);
     }
 
     @FXML private void filterIn() {
-        setActiveTransactionFilter(TransactionFilter.IN);
+        setActiveTransactionFilter(WalletLogic.TransactionFilter.IN);
     }
 
     @FXML private void filterOut() {
-        setActiveTransactionFilter(TransactionFilter.OUT);
+        setActiveTransactionFilter(WalletLogic.TransactionFilter.OUT);
     }
 
-    private void setActiveTransactionFilter(TransactionFilter filter) {
+    private void setActiveTransactionFilter(WalletLogic.TransactionFilter filter) {
         activeTransactionFilter = filter;
         applyTransactionFilters();
     }
 
     private boolean matchesActiveTypeFilter(Transaction transaction) {
-        if (activeTransactionFilter == TransactionFilter.IN) {
-            return "DEPOSIT".equals(transaction.type);
-        }
-        if (activeTransactionFilter == TransactionFilter.OUT) {
-            return "WITHDRAW".equals(transaction.type) || "PAYMENT".equals(transaction.type);
-        }
-        return true;
+        return walletLogic.matchesTypeFilter(transaction, activeTransactionFilter);
     }
 
     private boolean matchesTimeFilter(Transaction transaction) {
-        if (timeFilter == null || timeFilter.getSelectionModel().getSelectedIndex() < 0) {
-            return true;
-        }
-
-        int selectedIndex = timeFilter.getSelectionModel().getSelectedIndex();
-        if (selectedIndex == 3) {
-            return true;
-        }
-
-        Calendar transactionDate = Calendar.getInstance();
-        transactionDate.setTimeInMillis(transaction.timestamp);
-
-        Calendar now = Calendar.getInstance();
-        if (selectedIndex == 0) {
-            return transactionDate.get(Calendar.YEAR) == now.get(Calendar.YEAR)
-                    && transactionDate.get(Calendar.MONTH) == now.get(Calendar.MONTH);
-        }
-
-        if (selectedIndex == 1) {
-            now.add(Calendar.MONTH, -1);
-            return transactionDate.get(Calendar.YEAR) == now.get(Calendar.YEAR)
-                    && transactionDate.get(Calendar.MONTH) == now.get(Calendar.MONTH);
-        }
-
-        Calendar threeMonthsAgo = Calendar.getInstance();
-        threeMonthsAgo.add(Calendar.MONTH, -3);
-        return transaction.timestamp >= threeMonthsAgo.getTimeInMillis();
+        int selectedIndex = timeFilter == null ? -1 : timeFilter.getSelectionModel().getSelectedIndex();
+        return walletLogic.matchesTimeFilter(transaction, selectedIndex, System.currentTimeMillis());
     }
 
     private boolean matchesSearchKeyword(Transaction transaction, String keyword) {
-        String description = transaction.description == null ? "" : transaction.description.toLowerCase();
-        String typeLabel = transaction.getTypeLabel() == null ? "" : transaction.getTypeLabel().toLowerCase();
-        return description.contains(keyword)
-                || typeLabel.contains(keyword)
-                || transaction.getFormattedDate().contains(keyword);
+        return walletLogic.matchesSearchKeyword(transaction, keyword);
     }
 
     private void updateFilterButtons() {
-        styleFilterButton(filterAllBtn, activeTransactionFilter == TransactionFilter.ALL);
-        styleFilterButton(filterInBtn, activeTransactionFilter == TransactionFilter.IN);
-        styleFilterButton(filterOutBtn, activeTransactionFilter == TransactionFilter.OUT);
+        styleFilterButton(filterAllBtn, activeTransactionFilter == WalletLogic.TransactionFilter.ALL);
+        styleFilterButton(filterInBtn, activeTransactionFilter == WalletLogic.TransactionFilter.IN);
+        styleFilterButton(filterOutBtn, activeTransactionFilter == WalletLogic.TransactionFilter.OUT);
     }
 
     private void styleFilterButton(Button button, boolean active) {
@@ -931,8 +898,7 @@ public class WalletController implements Initializable {
             displayBankName.setText(bankName.toUpperCase());
         }
         if (displayAccNumber != null) {
-            String acc = accountNumber == null ? "" : accountNumber;
-            displayAccNumber.setText(acc.length() >= 4 ? "**** **** **** " + acc.substring(acc.length() - 4) : acc);
+            displayAccNumber.setText(walletLogic.maskAccountNumber(accountNumber));
         }
         if (addBankBox != null && linkedBankBox != null) {
             addBankBox.setVisible(false);

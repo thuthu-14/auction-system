@@ -2,26 +2,22 @@ package client.controller;
 
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
+import client.logic.ProductSearchLogic;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.AuctionQueryClient;
 import client.service.DashboardClientService;
-import common.AuctionStatus;
+import client.ui.AuctionCardFactory;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import server.model.Auction;
-import server.model.Item;
 import server.model.User;
 
-import java.net.URL;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 public class ProductSearchController {
 
@@ -29,11 +25,21 @@ public class ProductSearchController {
     @FXML private Label summaryLabel;
     @FXML private FlowPane resultsFlowPane;
 
-    private final DashboardClientService dashboardClientService = new DashboardClientService();
+    private final AuctionQueryClient auctionQueryClient;
+    private final AuctionCardFactory auctionCardFactory;
     private HomeScreenController homeScreenController;
     private User currentUser;
     private ClientSocket clientSocket;
     private String keyword = "";
+
+    public ProductSearchController() {
+        this(new DashboardClientService(), new AuctionCardFactory());
+    }
+
+    ProductSearchController(AuctionQueryClient auctionQueryClient, AuctionCardFactory auctionCardFactory) {
+        this.auctionQueryClient = auctionQueryClient;
+        this.auctionCardFactory = auctionCardFactory;
+    }
 
     @FXML
     public void initialize() {
@@ -71,15 +77,15 @@ public class ProductSearchController {
         }
 
         setSummary("Đang tìm kiếm...");
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
-                List<Auction> auctions = dashboardClientService.fetchAllAuctions(socket);
+                List<Auction> auctions = auctionQueryClient.fetchAllAuctions(socket);
                 Platform.runLater(() -> renderResults(auctions));
             } catch (Exception e) {
                 ClientExceptionHandler.handle(ClientErrorType.DATA, "Search products", e);
                 Platform.runLater(() -> showEmptyState("Không thể tải kết quả tìm kiếm."));
             }
-        }, "ProductSearchLoader").start();
+        });
     }
 
     private void renderResults(List<Auction> auctions) {
@@ -88,15 +94,7 @@ public class ProductSearchController {
         }
 
         resultsFlowPane.getChildren().clear();
-        String normalizedKeyword = normalize(keyword);
-        List<Auction> results = auctions == null ? List.of() : auctions.stream()
-                .filter(auction -> auction != null && auction.getItem() != null)
-                .filter(this::isVisibleAuction)
-                .filter(auction -> auction.getTimeRemainingSeconds() > 0)
-                .filter(auction -> matchesKeyword(auction, normalizedKeyword))
-                .sorted(Comparator.comparingLong(Auction::getEndTime)
-                        .thenComparing(auction -> normalize(auction.getItem().getName())))
-                .toList();
+        List<Auction> results = ProductSearchLogic.filterVisibleMatches(auctions, keyword);
 
         if (results.isEmpty()) {
             showEmptyState("Không tìm thấy sản phẩm phù hợp.");
@@ -112,48 +110,8 @@ public class ProductSearchController {
         }
     }
 
-    private boolean matchesKeyword(Auction auction, String normalizedKeyword) {
-        if (normalizedKeyword.isBlank()) {
-            return true;
-        }
-        Item item = auction.getItem();
-        String searchableText = normalize(String.join(" ",
-                safe(item.getName()),
-                item.getCategory() != null ? item.getCategory().name() : "",
-                safe(auction.getSellerName())));
-        return searchableText.contains(normalizedKeyword);
-    }
-
     private VBox createAuctionCard(Auction auction) {
-        try {
-            URL resource = getClass().getResource("/fxml/BidderView/AuctionCard.fxml");
-            if (resource == null) {
-                ClientExceptionHandler.handle(ClientErrorType.NAVIGATION,
-                        "Load auction card in search",
-                        new IllegalStateException("/fxml/BidderView/AuctionCard.fxml"));
-                return null;
-            }
-
-            FXMLLoader loader = new FXMLLoader(resource);
-            Parent cardNode = loader.load();
-            AuctionCardController cardController = loader.getController();
-            if (cardController != null) {
-                cardController.setHomeScreenController(homeScreenController);
-                cardController.setAuctionData(auction);
-            }
-
-            if (cardNode instanceof VBox box) {
-                return box;
-            }
-            return new VBox(cardNode);
-        } catch (Exception e) {
-            ClientExceptionHandler.handle(ClientErrorType.NAVIGATION, "Load auction card in search", e);
-            return null;
-        }
-    }
-
-    private boolean isVisibleAuction(Auction auction) {
-        return auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING;
+        return auctionCardFactory.create(auction, homeScreenController, "search");
     }
 
     private void showEmptyState(String message) {
@@ -197,11 +155,4 @@ public class ProductSearchController {
         }
     }
 
-    private String normalize(String value) {
-        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
-    }
-
-    private String safe(String value) {
-        return value == null ? "" : value;
-    }
 }

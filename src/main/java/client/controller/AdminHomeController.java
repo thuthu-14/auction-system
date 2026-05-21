@@ -42,6 +42,8 @@ public class AdminHomeController {
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;
+        NavigationManager.getInstance().setCurrentUser(user);
+        NavigationManager.getInstance().setClientSocket(socket);
         loadUserManagementView();
     }
 
@@ -64,7 +66,9 @@ public class AdminHomeController {
 
         if (onLogout != null) {
             onLogout.run();
+            return;
         }
+        NavigationManager.getInstance().goToLogin();
     }
 
 

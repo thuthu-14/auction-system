@@ -3,7 +3,7 @@
 <?import javafx.scene.layout.*?>
 <VBox spacing="0" stylesheets="@/CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerDashboardController">
     <!-- CARDS GRID -->
-    <ScrollPane vbarPolicy="NEVER" fitToWidth="true" styleClass="bar" VBox.vgrow="ALWAYS">
+    <ScrollPane vbarPolicy="NEVER" fitToWidth="true" focusTraversable="false" styleClass="bar" VBox.vgrow="ALWAYS">
         <VBox styleClass="dashboard-cards-container">
             <!-- ROW 1: Tạo phiên + Quản lý phiên -->
             <HBox spacing="16">

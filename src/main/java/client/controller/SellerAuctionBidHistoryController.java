@@ -4,6 +4,7 @@ import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.SellerClient;
 import client.service.SellerClientService;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -35,11 +36,19 @@ public class SellerAuctionBidHistoryController {
     @FXML private TableColumn<Bid, String> colTime;
     @FXML private TableColumn<Bid, String> colStatus;
 
-    private final SellerClientService sellerClientService = new SellerClientService();
+    private final SellerClient sellerClientService;
     private String auctionId;
     private User currentUser;
     private ClientSocket clientSocket;
     private SellerHomeController sellerHomeController;
+
+    public SellerAuctionBidHistoryController() {
+        this(new SellerClientService());
+    }
+
+    SellerAuctionBidHistoryController(SellerClient sellerClientService) {
+        this.sellerClientService = sellerClientService;
+    }
 
     @FXML
     public void initialize() {
@@ -87,7 +96,7 @@ public class SellerAuctionBidHistoryController {
         }
 
         setText(summaryLabel, "Đang tải lịch sử đặt giá...");
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 List<Bid> bids = sellerClientService.fetchBidHistoryWithFallback(socket, user, targetAuctionId);
                 Platform.runLater(() -> renderBidHistory(bids));
@@ -100,7 +109,7 @@ public class SellerAuctionBidHistoryController {
                     setText(summaryLabel, "Không thể tải lịch sử đặt giá.");
                 });
             }
-        }, "SellerAuctionBidHistoryLoadThread").start();
+        });
     }
 
     private void setupTable() {

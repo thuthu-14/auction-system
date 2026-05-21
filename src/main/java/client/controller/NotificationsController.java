@@ -4,6 +4,7 @@ import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
+import client.service.NotificationClient;
 import client.service.NotificationClientService;
 import client.service.NotificationClientService.NotificationAction;
 import client.service.NotificationClientService.NotificationPresentation;
@@ -20,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -37,7 +39,15 @@ import java.util.ResourceBundle;
 
 public class NotificationsController implements Initializable {
 
-    private final NotificationClientService notificationService = new NotificationClientService();
+    private final NotificationClient notificationService;
+
+    public NotificationsController() {
+        this(new NotificationClientService());
+    }
+
+    NotificationsController(NotificationClient notificationService) {
+        this.notificationService = notificationService;
+    }
 
     @FXML private Button markAllReadBtn;
     @FXML private VBox notificationsContainer;
@@ -71,7 +81,7 @@ public class NotificationsController implements Initializable {
 
         showLoadingState();
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 ClientSocket socket = resolveSocket();
                 User user = resolveUser();
@@ -94,12 +104,17 @@ public class NotificationsController implements Initializable {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi load bidder notifications: " + e.getMessage())));
                 Platform.runLater(() -> showEmptyState("Không tải được thông báo."));
             }
-        }).start();
+        });
     }
 
     private void renderNotifications(List<?> rawList) {
         notificationsContainer.getChildren().clear();
         timeLabelUpdaters.clear();
+
+        Notification profileReminder = createProfileReminderIfNeeded();
+        if (profileReminder != null) {
+            notificationsContainer.getChildren().add(createNotificationRow(profileReminder));
+        }
 
         for (Object item : rawList) {
             if (item instanceof Notification notification && notificationService.isVisible(notification, NotificationScope.BIDDER)) {
@@ -112,9 +127,26 @@ public class NotificationsController implements Initializable {
         }
     }
 
+    private Notification createProfileReminderIfNeeded() {
+        User user = resolveUser();
+        if (ProfileController.hasCompleteBidProfile(user)) {
+            return null;
+        }
+        String userId = user != null ? user.getUserId() : "";
+        return new Notification(
+                userId,
+                "PROFILE_UPDATE",
+                "Cập nhật thông tin tài khoản",
+                "Bạn cần cập nhật số điện thoại và địa chỉ trước khi tham gia đấu giá.",
+                "Vừa xong",
+                "Cập nhật",
+                "PROFILE"
+        );
+    }
+
     private HBox createNotificationRow(Notification data) {
         HBox container = new HBox(20);
-        container.setAlignment(Pos.CENTER_LEFT);
+        container.setAlignment(Pos.TOP_LEFT);
         container.setStyle(getContainerStyle(data));
 
         VBox iconBox = new VBox();
@@ -129,40 +161,59 @@ public class NotificationsController implements Initializable {
         iconBox.getChildren().add(iconLabel);
 
         VBox contentBox = new VBox(5);
+        contentBox.setMinWidth(0);
+        contentBox.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(contentBox, Priority.ALWAYS);
 
         Label titleLabel = new Label(defaultText(data.getTitle(), "Thông báo"));
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        titleLabel.setWrapText(true);
+        titleLabel.setMinWidth(0);
+        titleLabel.setMaxWidth(Double.MAX_VALUE);
         titleLabel.setStyle("-fx-text-fill: " + getTitleColor(data) + ";");
 
         Label descLabel = new Label(defaultText(data.getDescription(), ""));
         descLabel.setFont(Font.font("System", 14));
         descLabel.setWrapText(true);
+        descLabel.setMinWidth(0);
+        descLabel.setMaxWidth(Double.MAX_VALUE);
         descLabel.setStyle("-fx-text-fill: #4a5568;");
 
         contentBox.getChildren().addAll(titleLabel, descLabel);
 
-        VBox actionBox = new VBox(10);
-        actionBox.setAlignment(Pos.CENTER_RIGHT);
+        VBox actionBox = new VBox();
+        actionBox.setAlignment(Pos.TOP_RIGHT);
+        actionBox.setMinWidth(132);
+        actionBox.setPrefWidth(132);
+        actionBox.setMaxWidth(132);
+        actionBox.setMinHeight(68);
 
         Label timeLabel = new Label(data.formatTimeAgo());
         timeLabel.setFont(Font.font("System", 12));
+        timeLabel.setWrapText(true);
+        timeLabel.setMaxWidth(132);
+        timeLabel.setAlignment(Pos.CENTER_RIGHT);
         timeLabel.setStyle("-fx-text-fill: #9ca3af;");
         timeLabelUpdaters.add(() -> timeLabel.setText(data.formatTimeAgo()));
 
         Button actionBtn = new Button(defaultText(data.getButtonText(), "Xem chi tiết"));
         actionBtn.setFont(Font.font("System", FontWeight.BOLD, 14));
+        actionBtn.setWrapText(true);
+        actionBtn.setMaxWidth(132);
         actionBtn.setStyle(getButtonStyle(data));
         actionBtn.setOnAction(event -> handleNotificationAction(data));
 
-        actionBox.getChildren().addAll(timeLabel, actionBtn);
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
+
+        actionBox.getChildren().addAll(actionBtn, spacer, timeLabel);
         container.getChildren().addAll(iconBox, contentBox, actionBox);
 
         return container;
     }
 
     private void markAllRead() {
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 ClientSocket socket = resolveSocket();
                 User user = resolveUser();
@@ -183,7 +234,7 @@ public class NotificationsController implements Initializable {
                 ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi mark bidder notifications read: " + e.getMessage())));
                 Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể đánh dấu đã đọc."));
             }
-        }).start();
+        });
     }
 
     private void handleNotificationAction(Notification data) {
@@ -209,7 +260,7 @@ public class NotificationsController implements Initializable {
             return;
         }
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 ClientSocket socket = resolveSocket();
                 if (socket == null) {
@@ -226,14 +277,14 @@ public class NotificationsController implements Initializable {
                     }
                 });
             } catch (Exception e) {
-                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi mo phien tu notification: " + e.getMessage())));
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Lỗi mở phiên từ notification: " + e.getMessage())));
                 Platform.runLater(() -> {
                     if (homeController != null) {
                         homeController.loadAuctionHistoryView();
                     }
                 });
             }
-        }).start();
+        });
     }
 
     private void showLoadingState() {

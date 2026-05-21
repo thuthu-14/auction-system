@@ -16,14 +16,14 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<ScrollPane hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" stylesheets="@../../CSS/detail.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionDetailController">
+<ScrollPane fx:id="auctionDetailRoot" hbarPolicy="NEVER" vbarPolicy="NEVER" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" stylesheets="@../../CSS/detail.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionDetailController">
     <content>
-        <VBox spacing="20.0" style="-fx-background-color: #f8fafc;">
+        <VBox alignment="TOP_LEFT" spacing="20.0" style="-fx-background-color: #f8fafc;">
             <padding>
                 <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
             </padding>
             <children>
-                <AnchorPane style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 30;">
+                <AnchorPane maxWidth="1280.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 30;">
                     <children>
                         <HBox alignment="CENTER_LEFT" spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
@@ -50,11 +50,11 @@
                                                 <Label style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #4b5563;" text="KẾT THÚC TRONG" />
                                                 <HBox spacing="5.0">
                                                     <children>
-                                                        <Label fx:id="hourLabel" alignment="CENTER" prefWidth="35.0" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 6; -fx-padding: 5;" text="00" />
-                                                        <Label alignment="CENTER" style="-fx-font-weight: bold; -fx-font-size: 16px;" text=":" />
-                                                        <Label fx:id="minuteLabel" alignment="CENTER" prefWidth="35.0" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 6; -fx-padding: 5;" text="00" />
-                                                        <Label alignment="CENTER" style="-fx-font-weight: bold; -fx-font-size: 16px;" text=":" />
-                                                        <Label fx:id="secondLabel" alignment="CENTER" prefWidth="35.0" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 6; -fx-padding: 5;" text="00" />
+                                                        <Label fx:id="hourLabel" alignment="CENTER" minWidth="46.0" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 6; -fx-padding: 5 10 5 10;" text="00" />
+                                                        <Label alignment="CENTER" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #111827;" text=":" />
+                                                        <Label fx:id="minuteLabel" alignment="CENTER" minWidth="46.0" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 6; -fx-padding: 5 10 5 10;" text="00" />
+                                                        <Label alignment="CENTER" style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #111827;" text=":" />
+                                                        <Label fx:id="secondLabel" alignment="CENTER" minWidth="46.0" style="-fx-background-color: #111827; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-background-radius: 6; -fx-padding: 5 10 5 10;" text="00" />
                                                     </children>
                                                 </HBox>
                                             </children>
@@ -86,7 +86,7 @@
                         </HBox>
                     </children>
                 </AnchorPane>
-                <VBox spacing="30.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 30;">
+                <VBox maxWidth="1280.0" spacing="30.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 30;">
                     <children>
                         <VBox spacing="20.0">
                             <children>

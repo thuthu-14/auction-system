@@ -33,7 +33,7 @@
                             <ImageView fx:id="bannerImageView" fitHeight="250.0" fitWidth="800.0" preserveRatio="false" smooth="true" />
                         </graphic>
                     </Button>
-                    <Button fx:id="prevBannerBtn" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" text="&lt;" StackPane.alignment="CENTER_LEFT">
+                    <Button fx:id="prevBannerBtn" focusTraversable="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" text="&lt;" StackPane.alignment="CENTER_LEFT">
                         <font>
                             <Font name="System Bold" size="18.0" />
                         </font>
@@ -41,7 +41,7 @@
                             <Insets left="20.0" />
                         </StackPane.margin>
                     </Button>
-                    <Button fx:id="nextBannerBtn" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" text="&gt;" StackPane.alignment="CENTER_RIGHT">
+                    <Button fx:id="nextBannerBtn" focusTraversable="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" text="&gt;" StackPane.alignment="CENTER_RIGHT">
                         <font>
                             <Font name="System Bold" size="18.0" />
                         </font>
