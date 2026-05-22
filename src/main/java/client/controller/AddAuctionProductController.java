@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class AddAuctionProductController implements Initializable {
+public class    AddAuctionProductController implements Initializable {
 
     @FXML
     private TextField productNameField;
