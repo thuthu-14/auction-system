@@ -11,7 +11,7 @@ public final class RequestPayloadUtil {
         if (data instanceof Map<?, ?> map) {
             return (Map<String, Object>) map;
         }
-        throw new IllegalArgumentException("Du lieu request khong hop le");
+        throw new IllegalArgumentException("Dữ liệu request không hợp lệ");
     }
 
     @SuppressWarnings("unchecked")
@@ -19,14 +19,14 @@ public final class RequestPayloadUtil {
         if (data instanceof Map<?, ?> map) {
             return (Map<String, String>) map;
         }
-        throw new IllegalArgumentException("Du lieu request khong hop le");
+        throw new IllegalArgumentException("Dữ liệu request không hợp lệ");
     }
 
     public static String requiredAuctionId(Object data) {
         Object auctionId = data instanceof Map<?, ?> payload ? payload.get("auctionId") : data;
         String value = text(auctionId);
         if (value == null || "--".equals(value) || "null".equalsIgnoreCase(value)) {
-            throw new IllegalArgumentException("Khong tim thay phien dau gia");
+            throw new IllegalArgumentException("Không tìm thấy phiên đấu giá");
         }
         return value;
     }
@@ -47,7 +47,7 @@ public final class RequestPayloadUtil {
         if (value != null) {
             return Double.parseDouble(value.toString().trim());
         }
-        throw new IllegalArgumentException("Thieu du lieu so: " + key);
+        throw new IllegalArgumentException("Thiếu dữ liệu số: " + key);
     }
 
     public static double optionalDouble(Map<String, Object> data, String key, double fallback) {

@@ -11,19 +11,15 @@ import common.UserRole;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import navigation.NavigationManager;
 import util.LoggerUtil;
-
-import java.io.InputStream;
 
 /**
  * LoginController - Xử lý màn hình Login qua Server Socket
  */
 public class LoginController {
 
-    @FXML private Label loginTitleLabel;
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
@@ -49,7 +45,6 @@ public class LoginController {
 
     @FXML
     public void initialize() {
-        applyTitleFont();
         progressIndicator.setVisible(false);
         messageLabel.setText("");
         mkShow.setVisible(false);
@@ -62,23 +57,6 @@ public class LoginController {
         mkShow.setOnAction(e -> handleLogin());
 
         LoggerUtil.info("? LoginController initialized");
-    }
-
-    private void applyTitleFont() {
-        if (loginTitleLabel == null) {
-            return;
-        }
-
-        try (InputStream input = getClass().getResourceAsStream("/CSS/DarleySans-Regular.otf")) {
-            Font font = input == null ? null : Font.loadFont(input, 36);
-            if (font != null) {
-                loginTitleLabel.setFont(font);
-            } else {
-                loginTitleLabel.setFont(Font.font("Darley Sans Regular", 36));
-            }
-        } catch (Exception e) {
-            LoggerUtil.warn("Could not apply Darley font to login title: " + e.getMessage());
-        }
     }
 
     @FXML
@@ -125,7 +103,6 @@ public class LoginController {
             if (onAdminLoginSuccess != null) {
                 onAdminLoginSuccess.run();
             } else {
-                // SỬ DỤNG navigateTo cho Admin
                 nav.goToAdminHome();
             }
         } else if (currentUser instanceof server.model.RegularUser) {

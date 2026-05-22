@@ -9,7 +9,7 @@ import server.model.User;
 import java.util.Map;
 import java.util.Set;
 
-public class NotificationClientService {
+public class NotificationClientService implements NotificationClient {
     public enum NotificationScope {
         BIDDER,
         SELLER
@@ -78,6 +78,17 @@ public class NotificationClientService {
                     NotificationAction.AUCTION_DETAIL,
                     NotificationAction.SELLER_DASHBOARD,
                     Set.of(NotificationScope.BIDDER)
+            ),
+            "PROFILE_UPDATE", new NotificationPresentation(
+                    "i",
+                    "-fx-background-color: #e0f2fe; -fx-background-radius: 30;",
+                    "#075985",
+                    "#1a1a1a",
+                    "-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 8 20 8 20;",
+                    DEFAULT_UNREAD_CONTAINER_STYLE,
+                    NotificationAction.PROFILE,
+                    NotificationAction.PROFILE,
+                    Set.of(NotificationScope.BIDDER, NotificationScope.SELLER)
             ),
             "SYSTEM", new NotificationPresentation("i", DEFAULT_ICON_BOX_STYLE, "#075985", "#1a1a1a", DEFAULT_BUTTON_STYLE, DEFAULT_UNREAD_CONTAINER_STYLE, NotificationAction.PROFILE, NotificationAction.SELLER_DASHBOARD, Set.of(NotificationScope.BIDDER)),
             "PAYMENT", new NotificationPresentation("i", "-fx-background-color: #dbeafe; -fx-background-radius: 30;", "#1d4ed8", "#1a1a1a", "-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-padding: 8 20 8 20;", DEFAULT_UNREAD_CONTAINER_STYLE, NotificationAction.WALLET, NotificationAction.WALLET, Set.of(NotificationScope.BIDDER, NotificationScope.SELLER)),

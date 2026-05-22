@@ -35,6 +35,7 @@ public class BidRepositoryInterfaceTest {
         when(auction.getAuctionId()).thenReturn("A3");
         when(auction.getSellerId()).thenReturn("seller1");
 
+        when(auctionRepository.getAuctionById("A3")).thenReturn(auction);
         when(auctionRepository.getAllAuctions()).thenReturn(java.util.List.of(auction));
 
         server.service.AuctionService service = new server.service.AuctionService(auctionRepository, null, null,

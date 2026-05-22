@@ -33,6 +33,10 @@ public final class DialogUtil {
         showAlert(type, title, null, content, null);
     }
 
+    public static void showAlert(Alert.AlertType type, String title, String content, Node ownerNode) {
+        showAlert(type, title, null, content, ownerNode);
+    }
+
     public static void showAlert(Alert.AlertType type, String title, String header, String content) {
         showAlert(type, title, header, content, null);
     }

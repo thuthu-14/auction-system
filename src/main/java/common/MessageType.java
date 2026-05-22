@@ -34,6 +34,7 @@ public enum MessageType implements Serializable {
 
     // --- USER & ADMIN ---
     UPGRADE_SELLER,
+    UPDATE_PROFILE,
     GET_ALL_USERS,
     BAN_USER,
     UPDATE_USER_STATUS,

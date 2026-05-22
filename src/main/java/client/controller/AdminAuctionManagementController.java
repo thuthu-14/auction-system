@@ -1,6 +1,7 @@
 package client.controller;
 
 import client.network.ClientSocket;
+import client.service.AdminClient;
 import client.service.AdminClientService;
 import common.AuctionStatus;
 import javafx.application.Platform;
@@ -53,9 +54,17 @@ public class AdminAuctionManagementController {
     @FXML private Label totalLabel;
 
     private final ObservableList<AdminAuctionRow> allRows = FXCollections.observableArrayList();
-    private final AdminClientService adminClientService = new AdminClientService();
+    private final AdminClient adminClientService;
     private User currentUser;
     private ClientSocket clientSocket;
+
+    public AdminAuctionManagementController() {
+        this(new AdminClientService());
+    }
+
+    AdminAuctionManagementController(AdminClient adminClientService) {
+        this.adminClientService = adminClientService;
+    }
 
     @FXML
     public void initialize() {
@@ -82,7 +91,7 @@ public class AdminAuctionManagementController {
 
     private void setupFilters() {
         filterStatus.setItems(FXCollections.observableArrayList(
-                "Tất cả", "DRAFT", "OPEN", "RUNNING", "FINISHED", "CANCELLED"
+                "Tất cả", "RUNNING", "FINISHED", "CANCELLED"
         ));
         filterStatus.setValue("Tất cả");
 
@@ -102,7 +111,7 @@ public class AdminAuctionManagementController {
     }
 
     private void loadAuctions() {
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 List<Auction> auctions = adminClientService.fetchAllAuctions(clientSocket, currentUser);
                 Platform.runLater(() -> {
@@ -117,7 +126,7 @@ public class AdminAuctionManagementController {
                     updateTotal(0);
                 });
             }
-        }, "AdminLoadAuctionsThread").start();
+        });
     }
 
     private void applyFilters() {

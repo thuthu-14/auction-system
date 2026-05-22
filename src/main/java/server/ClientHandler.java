@@ -52,7 +52,7 @@ public class ClientHandler implements Runnable {
                     isConnected = false;
                 } catch (ClassNotFoundException e) {
                     ServerExceptionHandler.handle(ServerErrorType.DATA, "Read client message", e);
-                    sendError("Loi du lieu: " + e.getMessage());
+                    sendError("Lỗi dữ liệu: " + e.getMessage());
                 }
             }
         } catch (IOException e) {
@@ -68,7 +68,7 @@ public class ClientHandler implements Runnable {
             messageDispatcher.dispatch(message);
         } catch (Exception e) {
             ServerExceptionHandler.handle("Handle message " + message.getType(), e);
-            sendError("Loi server: " + e.getMessage());
+            sendError("Lỗi server: " + e.getMessage());
         }
     }
 

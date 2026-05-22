@@ -18,7 +18,7 @@ public class SchemaInitializer {
                   role TEXT NOT NULL,
                   wallet REAL DEFAULT 0,
                   active INTEGER DEFAULT 1,
-                  created_at INTEGER,
+                  created_at BIGINT,
                   is_seller INTEGER DEFAULT 0,
                   shop_name TEXT,
                   shop_phone TEXT,
@@ -36,7 +36,7 @@ public class SchemaInitializer {
                   starting_price REAL NOT NULL,
                   category TEXT NOT NULL,
                   seller_id TEXT,
-                  created_at INTEGER,
+                  created_at BIGINT,
 
                   brand TEXT,
                   warranty_period TEXT,
@@ -57,7 +57,7 @@ public class SchemaInitializer {
       image_size INTEGER,
       image_type TEXT DEFAULT 'jpg',
       sort_index INTEGER DEFAULT 0,
-      created_at INTEGER,
+      created_at BIGINT,
       FOREIGN KEY (item_id) REFERENCES items(item_id)
     )
 """);
@@ -74,9 +74,9 @@ public class SchemaInitializer {
                   highest_bidder_id TEXT,
                   highest_bidder_name TEXT,
                   status TEXT,
-                  start_time INTEGER,
-                  end_time INTEGER,
-                  created_at INTEGER,
+                  start_time BIGINT,
+                  end_time BIGINT,
+                  created_at BIGINT,
                   reserve_price REAL,
                   minimum_bid_increment REAL,
                   view_count INTEGER DEFAULT 0
@@ -90,7 +90,7 @@ public class SchemaInitializer {
                   bidder_id TEXT NOT NULL,
                   bidder_name TEXT NOT NULL,
                   amount REAL NOT NULL,
-                  bid_time INTEGER,
+                  bid_time BIGINT,
                   status TEXT
                 )
             """);
@@ -102,7 +102,7 @@ public class SchemaInitializer {
                   type TEXT,
                   title TEXT,
                   description TEXT,
-                  created_at INTEGER,
+                  created_at BIGINT,
                   time_ago TEXT,
                   button_text TEXT,
                   reference_id TEXT,
@@ -118,7 +118,7 @@ public class SchemaInitializer {
                   amount REAL NOT NULL,
                   balance_after REAL NOT NULL,
                   description TEXT,
-                  timestamp INTEGER
+                  timestamp BIGINT
                 )
             """);
 
@@ -130,7 +130,7 @@ public class SchemaInitializer {
                   bank_name TEXT,
                   account_number TEXT,
                   initial_balance REAL,
-                  created_at INTEGER
+                  created_at BIGINT
                 )
             """);
 

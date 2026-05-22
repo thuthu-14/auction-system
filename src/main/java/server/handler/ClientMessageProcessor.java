@@ -56,6 +56,10 @@ public class ClientMessageProcessor {
         authUserProcessor.handleUpgradeSeller(message);
     }
 
+    public void handleUpdateProfile(Message message) throws IOException, ClassNotFoundException {
+        authUserProcessor.handleUpdateProfile(message);
+    }
+
     public void handleCreateAuction(Message message) throws IOException, ClassNotFoundException {
         auctionBidProcessor.handleCreateAuction(message);
     }

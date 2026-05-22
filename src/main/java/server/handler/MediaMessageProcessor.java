@@ -11,10 +11,15 @@ import java.io.IOException;
 
 public class MediaMessageProcessor {
     private final ClientSessionContext context;
-    private final ImageService imageService = new ImageService();
+    private final ImageService imageService;
 
     public MediaMessageProcessor(ClientSessionContext context) {
+        this(context, new ImageService());
+    }
+
+    MediaMessageProcessor(ClientSessionContext context, ImageService imageService) {
         this.context = context;
+        this.imageService = imageService;
     }
 
     public void handleUploadImage(Message message) throws IOException {

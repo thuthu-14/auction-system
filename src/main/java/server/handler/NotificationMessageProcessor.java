@@ -11,10 +11,15 @@ import java.util.List;
 
 public class NotificationMessageProcessor {
     private final ClientSessionContext context;
-    private final NotificationService notificationService = new NotificationService();
+    private final NotificationService notificationService;
 
     public NotificationMessageProcessor(ClientSessionContext context) {
+        this(context, new NotificationService());
+    }
+
+    NotificationMessageProcessor(ClientSessionContext context, NotificationService notificationService) {
         this.context = context;
+        this.notificationService = notificationService;
     }
 
     public void handleGetNotifications(Message message) throws IOException {

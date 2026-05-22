@@ -1,13 +1,13 @@
 package client.exception;
 
 public enum ClientErrorType {
-    VALIDATION("Du lieu khong hop le"),
-    NETWORK("Loi ket noi"),
-    NAVIGATION("Loi dieu huong"),
-    AUTHENTICATION("Loi dang nhap"),
-    DATA("Loi du lieu"),
-    UI("Loi giao dien"),
-    UNKNOWN("Loi he thong");
+    VALIDATION("Dữ liệu không hợp lệ"),
+    NETWORK("Lỗi kết nối"),
+    NAVIGATION("Lỗi điều hướng"),
+    AUTHENTICATION("Lỗi đăng nhập"),
+    DATA("Lỗi dữ liệu"),
+    UI("Lỗi giao diện"),
+    UNKNOWN("Lỗi hệ thống");
 
     private final String defaultTitle;
 

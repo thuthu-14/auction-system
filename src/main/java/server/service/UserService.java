@@ -78,12 +78,8 @@ public class UserService {
 
     public void setUserStatusForAdmin(User currentUser, Object data) throws Exception {
         requireAdmin(currentUser);
-        Map<String, Object> payload = RequestPayloadUtil.objectMap(data);
-        String userId = RequestPayloadUtil.text(payload.get("userId"));
-        if (userId == null) {
-            throw new IOException("User not found");
-        }
-        setUserStatus(userId, RequestPayloadUtil.booleanValue(payload.get("active")));
+        SetUserStatusRequest request = SetUserStatusRequest.from(data);
+        setUserStatus(request.userId(), request.active());
     }
 
     public void banUserAsAdmin(User currentUser, Object data) throws Exception {
@@ -103,7 +99,7 @@ public class UserService {
                                                        String shopEmail) throws Exception {
         User user = userRepository.getUserById(userId);
         if (user == null) {
-            throw new IOException("Khong tim thay tai khoan!");
+            throw new IOException("Không tìm thấy tài khoản!");
         }
         if (!(user instanceof RegularUser regularUser)) {
             throw new IOException("Only RegularUser can be upgraded to Seller");
@@ -112,7 +108,7 @@ public class UserService {
             throw new IOException("User is already a Seller");
         }
         if (password == null || password.isBlank() || !password.equals(user.getPassword())) {
-            throw new IOException("Mat khau khong dung!");
+            throw new IOException("Mật khẩu không đúng!");
         }
 
         regularUser.upgradeSeller(shopName, shopPhone, shopAddress, shopEmail);
@@ -123,41 +119,71 @@ public class UserService {
 
     public RegularUser upgradeUserToSellerWithPassword(User currentUser, Object data) throws Exception {
         if (!(currentUser instanceof RegularUser)) {
-            throw new IOException("Ban phai dang nhap");
+            throw new IOException("Bạn phải đăng nhập");
         }
-        Map<String, String> sellerData = RequestPayloadUtil.stringMap(data);
+        UpgradeSellerRequest request = UpgradeSellerRequest.from(data);
         return upgradeUserToSellerWithPassword(
                 currentUser.getUserId(),
-                sellerData.get("password"),
-                sellerData.get("shopName"),
-                sellerData.get("phone"),
-                sellerData.get("address"),
-                sellerData.get("email")
+                request.password(),
+                request.shopName(),
+                request.phone(),
+                request.address(),
+                request.email()
         );
+    }
+
+    public User updateProfile(User currentUser, Object data) throws Exception {
+        if (!(currentUser instanceof RegularUser)) {
+            throw new IOException("Bạn phải đăng nhập bằng tài khoản người dùng");
+        }
+        User user = userRepository.getUserById(currentUser.getUserId());
+        if (!(user instanceof RegularUser regularUser)) {
+            throw new IOException("Không tìm thấy tài khoản");
+        }
+
+        UpdateProfileRequest request = UpdateProfileRequest.from(data);
+        if (request.name().isBlank() || request.phone().isBlank() || request.address().isBlank()) {
+            throw new IOException("Vui lòng cập nhật đầy đủ họ tên, số điện thoại và địa chỉ");
+        }
+        if (!request.phone().matches("\\d{10,11}")) {
+            throw new IOException("Số điện thoại phải gồm 10-11 chữ số");
+        }
+
+        regularUser.setUsername(request.name());
+        regularUser.setShopName(request.name());
+        regularUser.setShopPhone(request.phone());
+        regularUser.setShopAddress(request.address());
+        regularUser.setShopEmail(nonBlank(regularUser.getShopEmail(), regularUser.getEmail()));
+        if (!request.password().isBlank()) {
+            regularUser.setPassword(request.password());
+        }
+        userRepository.saveUser(regularUser);
+        LoggerUtil.info("User profile updated: " + regularUser.getUsername());
+        return regularUser;
     }
 
     public Map<String, String> getSellerContact(String sellerId) throws Exception {
         String resolvedSellerId = RequestPayloadUtil.text(sellerId);
         if (resolvedSellerId == null) {
-            throw new IOException("Khong tim thay nguoi ban");
+            throw new IOException("Không tìm thấy người bán");
         }
 
         User seller = userRepository.getUserById(resolvedSellerId);
         if (seller == null) {
-            throw new IOException("Khong tim thay nguoi ban");
+            throw new IOException("Không tìm thấy người bán");
         }
 
         Map<String, String> contact = new HashMap<>();
         contact.put("name", seller.getUsername());
         contact.put("email", seller.getEmail());
-        contact.put("phone", "Chua cap nhat");
-        contact.put("address", "Chua cap nhat");
+        contact.put("phone", "Chưa cập nhật");
+        contact.put("address", "Chưa cập nhật");
 
         if (seller instanceof RegularUser regularSeller) {
             contact.put("name", nonBlank(regularSeller.getShopName(), seller.getUsername()));
             contact.put("email", nonBlank(regularSeller.getShopEmail(), seller.getEmail()));
-            contact.put("phone", nonBlank(regularSeller.getShopPhone(), "Chua cap nhat"));
-            contact.put("address", nonBlank(regularSeller.getShopAddress(), "Chua cap nhat"));
+            contact.put("phone", nonBlank(regularSeller.getShopPhone(), "Chưa cập nhật"));
+            contact.put("address", nonBlank(regularSeller.getShopAddress(), "Chưa cập nhật"));
         }
         return contact;
     }
@@ -229,6 +255,11 @@ public class UserService {
     public static RegularUser upgradeSellerWithPassword(User currentUser, Object data)
             throws IOException, ClassNotFoundException {
         return call(() -> DEFAULT.upgradeUserToSellerWithPassword(currentUser, data));
+    }
+
+    public static User updateUserProfile(User currentUser, Object data)
+            throws IOException, ClassNotFoundException {
+        return call(() -> DEFAULT.updateProfile(currentUser, data));
     }
 
     public static Map<String, String> getSellerContactById(String sellerId)

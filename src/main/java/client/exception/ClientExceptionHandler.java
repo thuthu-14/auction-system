@@ -106,7 +106,7 @@ public final class ClientExceptionHandler {
 
     private static Throwable unwrap(Throwable throwable) {
         if (throwable == null) {
-            return new ClientException(ClientErrorType.UNKNOWN, "Da xay ra loi khong xac dinh.");
+            return new ClientException(ClientErrorType.UNKNOWN, "Đã xảy ra lỗi không xác định.");
         }
         Throwable current = throwable;
         while ((current instanceof CompletionException || current instanceof RuntimeException)
@@ -144,13 +144,13 @@ public final class ClientExceptionHandler {
         }
 
         return switch (type) {
-            case NETWORK -> "Khong the ket noi toi server. Vui long kiem tra lai ket noi.";
-            case VALIDATION -> "Du lieu nhap vao khong hop le.";
-            case NAVIGATION -> "Khong the mo man hinh duoc yeu cau.";
-            case AUTHENTICATION -> "Khong the xac thuc tai khoan.";
-            case DATA -> "Khong the doc hoac luu du lieu.";
+            case NETWORK -> "Không thể kết nối tới server. Vui lòng kiểm tra lại kết nối.";
+            case VALIDATION -> "Dữ liệu nhập vào không hợp lệ.";
+            case NAVIGATION -> "Không thể mở màn hình được yêu cầu.";
+            case AUTHENTICATION -> "Không thể xác thực tài khoản.";
+            case DATA -> "Không thể đọc hoặc lưu dữ liệu.";
             case UI -> "Giao dien chua san sang de thuc hien thao tac.";
-            default -> "Da xay ra loi he thong. Vui long thu lai.";
+            default -> "Đã xảy ra lỗi hệ thống. Vui lòng thử lại.";
         };
     }
 

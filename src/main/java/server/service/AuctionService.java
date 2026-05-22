@@ -9,13 +9,12 @@ import server.model.Item;
 import server.model.RegularUser;
 import server.model.User;
 import server.concurrency.ConcurrentBidManager;
-import server.observer.AuctionManager;
 import server.repository.*;
-import server.storage.ImageUploadManager;
 import util.ItemValidationUtil;
 import util.LoggerUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,9 @@ public class AuctionService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BidRepository bidRepository;
-    private final SqlTransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
+    private final AuctionEventPublisher eventPublisher;
+    private final ImageCleanupService imageCleanupService;
 
     public AuctionService(AuctionRepository auctionRepository,
                           ItemRepository itemRepository,
@@ -45,12 +46,25 @@ public class AuctionService {
                           ItemRepository itemRepository,
                           UserRepository userRepository,
                           BidRepository bidRepository,
-                          SqlTransactionRepository transactionRepository) {
+                          TransactionRepository transactionRepository) {
+        this(auctionRepository, itemRepository, userRepository, bidRepository, transactionRepository,
+                new DefaultAuctionEventPublisher(), new DefaultImageCleanupService());
+    }
+
+    public AuctionService(AuctionRepository auctionRepository,
+                          ItemRepository itemRepository,
+                          UserRepository userRepository,
+                          BidRepository bidRepository,
+                          TransactionRepository transactionRepository,
+                          AuctionEventPublisher eventPublisher,
+                          ImageCleanupService imageCleanupService) {
         this.auctionRepository = auctionRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.bidRepository = bidRepository;
         this.transactionRepository = transactionRepository;
+        this.eventPublisher = eventPublisher;
+        this.imageCleanupService = imageCleanupService;
     }
 
     public Auction create(RegularUser seller, Item item, int durationMinutes) throws Exception {
@@ -102,7 +116,7 @@ public class AuctionService {
         }
 
         LoggerUtil.info("Auction created: " + auctionId + " by " + seller.getUsername());
-        AuctionManager.getInstance().notifyAuctionCreated(auction);
+        eventPublisher.notifyAuctionCreated(auction);
         return auction;
     }
 
@@ -121,7 +135,7 @@ public class AuctionService {
     public Auction getById(String auctionId) throws Exception {
         Auction auction = findAuctionByAuctionOrItemId(RequestPayloadUtil.requiredAuctionId(auctionId));
         if (auction == null) {
-            throw new IOException("Khong tim thay phien dau gia");
+            throw new IOException("Không tìm thấy phiên đấu giá");
         }
         return auction;
     }
@@ -141,9 +155,10 @@ public class AuctionService {
             if (auction != null && auction.getStatus() != AuctionStatus.FINISHED
                     && auction.getStatus() != AuctionStatus.CANCELLED) {
                 refundLosingBids(auction);
+                creditSellerForWinningBid(auction);
                 auction.setStatus(AuctionStatus.FINISHED);
                 auctionRepository.saveAuction(auction);
-                AuctionManager.getInstance().notifyAuctionFinished(auction);
+                eventPublisher.notifyAuctionFinished(auction);
                 LoggerUtil.info("Auction finished: " + auctionId);
             }
             return null;
@@ -173,7 +188,7 @@ public class AuctionService {
             auction.setHighestBidderId(null);
             auction.setHighestBidderName(null);
             auctionRepository.saveAuction(auction);
-            AuctionManager.getInstance().notifyAuctionCancelled(auction);
+            eventPublisher.notifyAuctionCancelled(auction);
             LoggerUtil.info("Auction cancelled: " + auctionId + " by seller " + sellerId);
             return auction;
         });
@@ -181,7 +196,7 @@ public class AuctionService {
 
     public Auction cancel(User currentUser, Object data) throws Exception {
         RegularUser seller = requireSeller(currentUser);
-        return cancel(RequestPayloadUtil.requiredAuctionId(data), seller.getUserId());
+        return cancel(AuctionIdRequest.from(data).auctionId(), seller.getUserId());
     }
 
     private void refundLosingBids(Auction auction) throws Exception {
@@ -213,6 +228,35 @@ public class AuctionService {
         }
     }
 
+    private void creditSellerForWinningBid(Auction auction) throws Exception {
+        if (auction == null
+                || auction.getHighestBidderId() == null
+                || auction.getHighestBidderId().isBlank()
+                || auction.getSellerId() == null
+                || auction.getSellerId().isBlank()
+                || auction.getCurrentPrice() <= 0) {
+            return;
+        }
+
+        User seller = userRepository.getUserById(auction.getSellerId());
+        if (seller == null) {
+            LoggerUtil.warn("Cannot credit seller for finished auction: seller not found " + auction.getSellerId());
+            return;
+        }
+
+        double payoutAmount = auction.getCurrentPrice();
+        seller.addFunds(payoutAmount);
+        userRepository.saveUser(seller);
+        transactionRepository.saveTransaction(new Transaction(
+                seller.getUserId(),
+                "DEPOSIT",
+                payoutAmount,
+                seller.getWallet(),
+                "Nh\u1eadn ti\u1ec1n b\u00e1n \u0111\u1ea5u gi\u00e1 s\u1ea3n ph\u1ea9m "
+                        + productName(auction) + " (auction " + auction.getAuctionId() + ")"
+        ));
+    }
+
     private void refundAllBidsForCancelledAuction(Auction auction, List<Bid> bids) throws Exception {
         if (bids == null || bids.isEmpty()) {
             return;
@@ -239,12 +283,18 @@ public class AuctionService {
     }
 
     private Map<String, Double> calculateRefundsByUser(Auction auction, List<Bid> bids, boolean includeWinner) {
-        bids.sort((first, second) -> Long.compare(first.getBidTime(), second.getBidTime()));
+        List<Bid> sortedBids = new ArrayList<>();
+        for (Bid bid : bids) {
+            if (bid != null) {
+                sortedBids.add(bid);
+            }
+        }
+        sortedBids.sort((first, second) -> Long.compare(first.getBidTime(), second.getBidTime()));
         Map<String, Double> refundsByUser = new HashMap<>();
         Map<String, Double> previousBidAmountByUser = new HashMap<>();
 
-        for (Bid bid : bids) {
-            if (bid == null || bid.getBidderId() == null || bid.getBidderId().isBlank()) {
+        for (Bid bid : sortedBids) {
+            if (bid.getBidderId() == null || bid.getBidderId().isBlank()) {
                 continue;
             }
             double previousUserBidAmount = previousBidAmountByUser.getOrDefault(bid.getBidderId(), 0.0);
@@ -277,7 +327,7 @@ public class AuctionService {
 
     public String deleteForAdmin(User currentUser, Object data) throws Exception {
         requireAdmin(currentUser);
-        String auctionId = RequestPayloadUtil.requiredAuctionId(data);
+        String auctionId = AuctionIdRequest.from(data).auctionId();
         delete(auctionId);
         return auctionId;
     }
@@ -405,7 +455,7 @@ public class AuctionService {
     public static Auction getAuctionByRequest(Object data)
             throws IOException, ClassNotFoundException {
         try {
-            return DEFAULT.getById(RequestPayloadUtil.requiredAuctionId(data));
+            return DEFAULT.getById(AuctionIdRequest.from(data).auctionId());
         } catch (IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {
@@ -470,10 +520,10 @@ public class AuctionService {
 
     private RegularUser requireSeller(User user) throws PermissionDeniedException {
         if (!(user instanceof RegularUser seller)) {
-            throw new PermissionDeniedException("Ban phai dang nhap bang tai khoan nguoi ban");
+            throw new PermissionDeniedException("Bạn phải đăng nhập bằng tài khoản người bán");
         }
         if (!seller.isSeller()) {
-            throw new PermissionDeniedException("Ban khong phai Seller");
+            throw new PermissionDeniedException("Bạn không phải Seller");
         }
         return seller;
     }
@@ -508,7 +558,7 @@ public class AuctionService {
         } catch (IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOException(e.getMessage() != null ? e.getMessage() : "Khong the huy phien");
+            throw new IOException(e.getMessage() != null ? e.getMessage() : "Không thể hủy phiên");
         }
     }
     public static Auction cancelAuction(User currentUser, Object data)
@@ -520,7 +570,7 @@ public class AuctionService {
         } catch (IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            throw new IOException(e.getMessage() != null ? e.getMessage() : "Khong the huy phien");
+            throw new IOException(e.getMessage() != null ? e.getMessage() : "Không thể hủy phiên");
         }
     }
     /**
@@ -537,7 +587,7 @@ public class AuctionService {
             // [2] Xóa tất cả ảnh của item (từ DB)
             if (auction != null && auction.getItem() != null) {
                 try {
-                    ImageUploadManager.deleteItemImages(auction.getItem().getItemId());
+                    imageCleanupService.deleteItemImages(auction.getItem().getItemId());
                 } catch (Exception e) {
                     LoggerUtil.warn("Failed to delete item images: " + auctionId + " | " + e.getMessage());
                 }

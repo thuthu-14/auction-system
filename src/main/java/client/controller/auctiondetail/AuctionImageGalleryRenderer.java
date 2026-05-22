@@ -73,7 +73,7 @@ public class AuctionImageGalleryRenderer {
         thumbnailFrame.setMaxSize(88, 88);
         thumbnailFrame.setStyle(getThumbnailStyle(index == 0));
 
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 ClientSocket socket = getActiveImageSocket();
                 if (socket == null || !socket.isConnected()) {
@@ -93,13 +93,13 @@ public class AuctionImageGalleryRenderer {
             } catch (Exception e) {
                 LoggerUtil.error("Failed to load thumbnail " + imageId + ": " + e.getMessage());
             }
-        }, "LoadThumbnailThread-" + index).start();
+        });
 
         return thumbnailFrame;
     }
 
     private void loadAndDisplayImage(String imageId, ImageView imageView) {
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 ClientSocket socket = getActiveImageSocket();
                 if (socket == null || !socket.isConnected()) {
@@ -113,7 +113,7 @@ public class AuctionImageGalleryRenderer {
             } catch (Exception e) {
                 LoggerUtil.error("Failed to load image " + imageId + ": " + e.getMessage());
             }
-        }, "LoadImageThread").start();
+        });
     }
 
     private ClientSocket getActiveImageSocket() {

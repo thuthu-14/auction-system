@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AdminClientService {
+public class AdminClientService implements AdminClient {
 
     public List<User> fetchAllUsers(MessageTransport transport, User adminUser) throws Exception {
         Message response = sendAdminRequest(transport, MessageType.GET_ALL_USERS, null, adminUser);

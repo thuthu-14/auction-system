@@ -5,7 +5,8 @@ import server.storage.DatabaseManager;
 
 import java.sql.Connection;
 
-public final class TestDbUtils {
+public final class
+TestDbUtils {
     public static void initSchema() {
         SchemaInitializer.init();
     }

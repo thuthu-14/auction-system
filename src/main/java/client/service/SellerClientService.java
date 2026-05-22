@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SellerClientService {
+public class SellerClientService implements SellerClient {
     private final DashboardClientService auctionExtractor = new DashboardClientService();
 
     public void upgradeSeller(MessageTransport transport, RegularUser user,

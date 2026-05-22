@@ -182,7 +182,11 @@ public class HomeScreenController {
     public void loadProfileView() {
         showingSearchResults = false;
         updateMenuSelection(null);
-        navigateContent("/fxml/BidderView/ProfileView.fxml", null);
+        navigateContent("/fxml/BidderView/ProfileView.fxml", controller -> {
+            if (controller instanceof ProfileController profileController) {
+                profileController.setUserData(currentUser);
+            }
+        });
     }
 
     public void loadCategoryView(String fxmlPath) {

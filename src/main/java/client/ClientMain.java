@@ -62,7 +62,7 @@ public class ClientMain extends Application {
             loginController.setOnAdminLoginSuccess(this::showAdminPanel);
             loginController.setOnLoginSuccess(this::showHomeScreen);
 
-            primaryStage.setTitle("He thong Dau gia - Dang nhap");
+            primaryStage.setTitle("Hệ thống Đấu giá - Đăng nhập");
             primaryStage.setScene(scene);
             primaryStage.setMaximized(true);
             primaryStage.show();

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WalletService {
+public class WalletService implements WalletClient {
     public static class BankAccountEntry {
         public String userId;
         public String username;

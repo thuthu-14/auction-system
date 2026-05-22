@@ -5,6 +5,7 @@ import client.exception.ClientExceptionHandler;
 import client.controller.DashboardController;
 import client.controller.HomeScreenController;
 import client.controller.AdminHomeController;
+import client.controller.ProfileController;
 import client.controller.SellerDashboardController;
 import client.controller.SellerHomeController;
 import client.controller.WalletController;
@@ -131,6 +132,8 @@ public class NavigationManager {
             dc.setUserData(currentUser, clientSocket);
         } else if (controller instanceof WalletController wc) {
             wc.setUserData(currentUser, clientSocket);
+        } else if (controller instanceof ProfileController pc) {
+            pc.setUserData(currentUser);
         } else if (controller instanceof SellerHomeController shc) {
             shc.setUserData(currentUser, clientSocket);
         } else if (controller instanceof SellerDashboardController sdc) {

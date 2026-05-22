@@ -7,8 +7,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SqlTransactionRepository {
+public class SqlTransactionRepository implements TransactionRepository {
 
+    @Override
     public void saveTransaction(Transaction t) throws Exception {
         String sql = """
             INSERT INTO transactions

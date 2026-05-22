@@ -8,9 +8,16 @@ import static org.junit.jupiter.api.Assertions.*;
 public class InitializeDataServiceTest {
 
     @Test
-    public void init_runsWithoutException() {
-        // simply call schema init (idempotent)
+    public void schemaInit_runsWithoutException() {
         assertDoesNotThrow(SchemaInitializer::init);
+    }
+
+    @Test
+    public void initializeDefaultData_runsWithoutException() {
+        SchemaInitializer.init();
+
+        assertDoesNotThrow(InitializeDataService::initializeDefaultData);
+        assertDoesNotThrow(InitializeDataService::initializeDefaultData);
     }
 }
 

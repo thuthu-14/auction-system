@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AuctionBidClientService {
+public class AuctionBidClientService implements AuctionBidClient {
     private final LocalAuctionDataService localDataService;
 
     public AuctionBidClientService() {
@@ -23,6 +23,7 @@ public class AuctionBidClientService {
         this.localDataService = localDataService;
     }
 
+    @Override
     public Message placeBid(MessageTransport transport, User user, String auctionId, double amount) throws Exception {
         ensureConnected(transport);
         if (user == null) {
@@ -36,12 +37,14 @@ public class AuctionBidClientService {
         return transport.sendAndReceive(new Message(MessageType.PLACE_BID, payload, user.getUsername()));
     }
 
+    @Override
     public Message fetchBidHistory(MessageTransport transport, User user, String auctionId) throws Exception {
         ensureConnected(transport);
         String sender = user != null ? user.getUsername() : "CLIENT";
         return transport.sendAndReceive(new Message(MessageType.GET_BID_HISTORY, (Object) auctionId, sender));
     }
 
+    @Override
     public List<Bid> fetchBidHistoryWithFallback(MessageTransport transport, User user, String auctionId) throws Exception {
         if (transport == null || !transport.isConnected()) {
             return localDataService.loadBidsForAuction(auctionId);
@@ -55,10 +58,12 @@ public class AuctionBidClientService {
         return localDataService.loadBidsForAuction(auctionId);
     }
 
+    @Override
     public List<Bid> loadLocalBidHistory(String auctionId) {
         return localDataService.loadBidsForAuction(auctionId);
     }
 
+    @Override
     public List<Bid> extractBidList(Object rawData) {
         if (!(rawData instanceof List<?> rawList)) {
             return List.of();

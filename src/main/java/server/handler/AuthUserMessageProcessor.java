@@ -103,4 +103,17 @@ public class AuthUserMessageProcessor {
             context.sendError(e.getMessage());
         }
     }
+
+    public void handleUpdateProfile(Message message) throws IOException, ClassNotFoundException {
+        try {
+            User user = UserService.updateUserProfile(context.getCurrentUser(), message.getData());
+            context.setCurrentUser(user);
+
+            Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Profile updated successfully");
+            response.setData(user);
+            context.sendMessage(response);
+        } catch (Exception e) {
+            context.sendError(e.getMessage());
+        }
+    }
 }

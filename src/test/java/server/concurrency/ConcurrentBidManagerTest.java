@@ -19,6 +19,10 @@ public class ConcurrentBidManagerTest {
             manager.removeLock("TEST-AUCTION-1");
             manager.removeLock("TEST-AUCTION-2");
             manager.removeLock("TEST-AUCTION-3");
+            manager.removeLock("ACTION-FAIL-AUCTION");
+            manager.removeLock("READ-BLOCKS-WRITE-AUCTION");
+            manager.removeLock("DIFFERENT-AUCTION-1");
+            manager.removeLock("DIFFERENT-AUCTION-2");
         } catch (Exception ignored) {
         }
     }
@@ -170,6 +174,96 @@ public class ConcurrentBidManagerTest {
     public void withAuctionWriteLock_nullOrBlank_throws() {
         assertThrows(IllegalArgumentException.class, () -> manager.withAuctionWriteLock(null, () -> null));
         assertThrows(IllegalArgumentException.class, () -> manager.withAuctionWriteLock("  ", () -> null));
+    }
+
+    @Test
+    public void withAuctionReadLock_nullOrBlank_throws() {
+        assertThrows(IllegalArgumentException.class, () -> manager.withAuctionReadLock(null, () -> null));
+        assertThrows(IllegalArgumentException.class, () -> manager.withAuctionReadLock("  ", () -> null));
+    }
+
+    @Test
+    public void withAuctionLocks_nullAction_throws() {
+        assertThrows(NullPointerException.class, () -> manager.withAuctionWriteLock("TEST-AUCTION-1", null));
+        assertThrows(NullPointerException.class, () -> manager.withAuctionReadLock("TEST-AUCTION-1", null));
+    }
+
+    @Test
+    public void withAuctionWriteLock_releasesLockWhenActionThrows() throws Exception {
+        RuntimeException error = assertThrows(RuntimeException.class,
+                () -> manager.withAuctionWriteLock("ACTION-FAIL-AUCTION", () -> {
+                    throw new RuntimeException("boom");
+                }));
+        assertEquals("boom", error.getMessage());
+
+        String result = manager.withAuctionWriteLock("ACTION-FAIL-AUCTION", () -> "second call");
+
+        assertEquals("second call", result);
+    }
+
+    @Test
+    public void readLock_blocksWriterUntilReleased() throws Exception {
+        ExecutorService ex = Executors.newFixedThreadPool(2);
+        CountDownLatch readEntered = new CountDownLatch(1);
+        CountDownLatch releaseRead = new CountDownLatch(1);
+        AtomicInteger writerEntered = new AtomicInteger(0);
+
+        try {
+            Future<Void> reader = ex.submit(() -> manager.withAuctionReadLock("READ-BLOCKS-WRITE-AUCTION", () -> {
+                readEntered.countDown();
+                assertTrue(releaseRead.await(2, TimeUnit.SECONDS));
+                return null;
+            }));
+            assertTrue(readEntered.await(1, TimeUnit.SECONDS));
+
+            Future<Void> writer = ex.submit(() -> manager.withAuctionWriteLock("READ-BLOCKS-WRITE-AUCTION", () -> {
+                writerEntered.incrementAndGet();
+                return null;
+            }));
+
+            Thread.sleep(75);
+            assertEquals(0, writerEntered.get(), "Writer should wait while read lock is held");
+
+            releaseRead.countDown();
+            reader.get(2, TimeUnit.SECONDS);
+            writer.get(2, TimeUnit.SECONDS);
+            assertEquals(1, writerEntered.get());
+        } finally {
+            releaseRead.countDown();
+            ex.shutdownNow();
+            manager.removeLock("READ-BLOCKS-WRITE-AUCTION");
+        }
+    }
+
+    @Test
+    public void writeLocksForDifferentAuctions_canRunConcurrently() throws Exception {
+        ExecutorService ex = Executors.newFixedThreadPool(2);
+        CountDownLatch bothEntered = new CountDownLatch(2);
+        CountDownLatch release = new CountDownLatch(1);
+
+        try {
+            Future<Void> first = ex.submit(() -> manager.withAuctionWriteLock("DIFFERENT-AUCTION-1", () -> {
+                bothEntered.countDown();
+                assertTrue(release.await(2, TimeUnit.SECONDS));
+                return null;
+            }));
+            Future<Void> second = ex.submit(() -> manager.withAuctionWriteLock("DIFFERENT-AUCTION-2", () -> {
+                bothEntered.countDown();
+                assertTrue(release.await(2, TimeUnit.SECONDS));
+                return null;
+            }));
+
+            assertTrue(bothEntered.await(1, TimeUnit.SECONDS),
+                    "Different auction locks should not block each other");
+            release.countDown();
+            first.get(2, TimeUnit.SECONDS);
+            second.get(2, TimeUnit.SECONDS);
+        } finally {
+            release.countDown();
+            ex.shutdownNow();
+            manager.removeLock("DIFFERENT-AUCTION-1");
+            manager.removeLock("DIFFERENT-AUCTION-2");
+        }
     }
 
 }

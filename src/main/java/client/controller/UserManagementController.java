@@ -1,6 +1,8 @@
 package client.controller;
 
+import client.logic.UserManagementLogic;
 import client.network.ClientSocket;
+import client.service.AdminClient;
 import client.service.AdminClientService;
 import common.UserRole;
 import javafx.application.Platform;
@@ -31,9 +33,17 @@ public class UserManagementController {
     @FXML private TableColumn<UserRow, String> colStatus;
 
     private final ObservableList<User> allUsers = FXCollections.observableArrayList();
-    private final AdminClientService adminClientService = new AdminClientService();
+    private final AdminClient adminClientService;
     private User currentUser;
     private ClientSocket clientSocket;
+
+    public UserManagementController() {
+        this(new AdminClientService());
+    }
+
+    UserManagementController(AdminClient adminClientService) {
+        this.adminClientService = adminClientService;
+    }
 
     @FXML
     public void initialize() {
@@ -62,7 +72,7 @@ public class UserManagementController {
     }
 
     private void loadUsers() {
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 List<User> users = adminClientService.fetchAllUsers(clientSocket, currentUser);
                 Platform.runLater(() -> {
@@ -76,7 +86,7 @@ public class UserManagementController {
                     showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể tải danh sách người dùng từ server.");
                 });
             }
-        }, "AdminLoadUsersThread").start();
+        });
     }
 
     private void applySearch() {
@@ -85,7 +95,7 @@ public class UserManagementController {
                 : searchUserInput.getText().trim().toLowerCase();
 
         List<UserRow> rows = allUsers.stream()
-                .filter(user -> keyword.isEmpty() || matches(user, keyword))
+                .filter(user -> keyword.isEmpty() || UserManagementLogic.matches(user, keyword))
                 .map(UserRow::new)
                 .collect(Collectors.toList());
 
@@ -93,11 +103,7 @@ public class UserManagementController {
     }
 
     private boolean matches(User user, String keyword) {
-        return value(user.getUserId()).toLowerCase().contains(keyword)
-                || value(user.getUsername()).toLowerCase().contains(keyword)
-                || value(user.getEmail()).toLowerCase().contains(keyword)
-                || roleText(user.getRole()).toLowerCase().contains(keyword)
-                || statusText(user.isActive()).toLowerCase().contains(keyword);
+        return UserManagementLogic.matches(user, keyword);
     }
 
     @FXML
@@ -123,7 +129,7 @@ public class UserManagementController {
         }
 
         User user = selectedRow.getUser();
-        new Thread(() -> {
+        client.util.ClientTaskRunner.run(() -> {
             try {
                 adminClientService.updateUserStatus(clientSocket, currentUser, user.getUserId(), active);
                 Platform.runLater(() -> {
@@ -138,7 +144,7 @@ public class UserManagementController {
             } catch (Exception e) {
                 Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể cập nhật trạng thái người dùng trên server."));
             }
-        }, "AdminUpdateUserStatusThread").start();
+        });
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
@@ -176,21 +182,19 @@ public class UserManagementController {
         }
 
         public SimpleStringProperty idProperty() {
-            return new SimpleStringProperty(value(user.getUserId()));
+            return new SimpleStringProperty(UserManagementLogic.value(user.getUserId()));
         }
 
         public SimpleStringProperty usernameProperty() {
-            String username = value(user.getUsername());
-            String email = value(user.getEmail());
-            return new SimpleStringProperty(email.isBlank() ? username : username + " (" + email + ")");
+            return new SimpleStringProperty(UserManagementLogic.displayUsername(user));
         }
 
         public SimpleStringProperty roleProperty() {
-            return new SimpleStringProperty(roleText(user.getRole()));
+            return new SimpleStringProperty(UserManagementLogic.roleText(user.getRole()));
         }
 
         public SimpleStringProperty statusProperty() {
-            return new SimpleStringProperty(statusText(user.isActive()));
+            return new SimpleStringProperty(UserManagementLogic.statusText(user.isActive()));
         }
     }
 }

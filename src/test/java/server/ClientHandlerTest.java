@@ -5,6 +5,7 @@ import common.MessageType;
 import org.junit.jupiter.api.Test;
 
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -23,6 +24,8 @@ public class ClientHandlerTest {
 
             // accept server side socket
             Socket serverSide = serverSocket.accept();
+            ObjectOutputStream clientOutput = new ObjectOutputStream(client.getOutputStream());
+            clientOutput.flush();
 
             // create handler with server-side socket
             AuctionServer serverMock = mock(AuctionServer.class);
@@ -54,6 +57,8 @@ public class ClientHandlerTest {
             int port = serverSocket.getLocalPort();
             Socket client = new Socket("127.0.0.1", port);
             Socket serverSide = serverSocket.accept();
+            ObjectOutputStream clientOutput = new ObjectOutputStream(client.getOutputStream());
+            clientOutput.flush();
             AuctionServer serverMock = mock(AuctionServer.class);
             ClientHandler handler = new ClientHandler(serverSide, serverMock);
             ObjectInputStream ois = new ObjectInputStream(client.getInputStream());

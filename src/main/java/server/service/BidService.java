@@ -14,7 +14,6 @@ import server.concurrency.ConcurrentBidManager;
 import server.repository.*;
 import util.ItemValidationUtil;
 import util.LoggerUtil;
-import util.ValidationUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,25 +32,52 @@ public class BidService {
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
+    private final TransactionRepository transactionRepository;
+    private final BidValidator bidValidator;
+    private final BidChargeCalculator chargeCalculator;
 
     public BidService(BidRepository bidRepository,
                       AuctionRepository auctionRepository,
                       UserRepository userRepository) {
+        this(bidRepository, auctionRepository, userRepository, new SqlTransactionRepository());
+    }
+
+    public BidService(BidRepository bidRepository,
+                      AuctionRepository auctionRepository,
+                      UserRepository userRepository,
+                      TransactionRepository transactionRepository) {
+        this(bidRepository, auctionRepository, userRepository, transactionRepository,
+                new BidValidator(), new BidChargeCalculator());
+    }
+
+    public BidService(BidRepository bidRepository,
+                      AuctionRepository auctionRepository,
+                      UserRepository userRepository,
+                      TransactionRepository transactionRepository,
+                      BidValidator bidValidator,
+                      BidChargeCalculator chargeCalculator) {
         this.bidRepository = bidRepository;
         this.auctionRepository = auctionRepository;
         this.userRepository = userRepository;
+        this.transactionRepository = transactionRepository;
+        this.bidValidator = bidValidator;
+        this.chargeCalculator = chargeCalculator;
     }
 
     public Bid place(RegularUser bidder, Auction auction, double amount)
             throws Exception {
-        validateBidderAndAuction(bidder, auction, amount);
+        bidValidator.validateBidderAndAuction(bidder, auction, amount);
 
         return ConcurrentBidManager.getInstance().withAuctionWriteLock(auction.getAuctionId(), () -> {
-            common.ItemCategory category = auction.getItem().getCategory();
+            Auction latestAuction = auctionRepository.getAuctionById(auction.getAuctionId());
+            Auction auctionToPersist = latestAuction != null ? latestAuction : auction;
+            common.ItemCategory category = auctionToPersist.getItem() != null
+                    ? auctionToPersist.getItem().getCategory()
+                    : auction.getItem().getCategory();
 
-            synchronized (auction) {
-            if (auction.getStatus() != AuctionStatus.OPEN &&
-                    auction.getStatus() != AuctionStatus.RUNNING) {
+            synchronized (auctionToPersist) {
+            if (auctionToPersist.getStatus() != AuctionStatus.OPEN &&
+                    auctionToPersist.getStatus() != AuctionStatus.RUNNING) {
                 throw new AuctionClosedException("Phiên đấu giá đã kết thúc.");
             }
 
@@ -62,12 +88,12 @@ public class BidService {
                 throw new InvalidBidException(bidError);
             }
 
-            if (bidder.getUserId().equals(auction.getSellerId())) {
+            if (bidder.getUserId().equals(auctionToPersist.getSellerId())) {
                 throw new PermissionDeniedException("Bạn không thể đặt giá trên phiên đấu giá của mình.");
             }
 
-            double previousUserBidAmount = getHighestUserBidAmount(bidder.getUserId(), auction);
-            double chargeAmount = calculateChargeAmount(amount, previousUserBidAmount);
+            double previousUserBidAmount = getHighestUserBidAmount(bidder.getUserId(), auctionToPersist);
+            double chargeAmount = chargeCalculator.calculateChargeAmount(amount, previousUserBidAmount);
             if (chargeAmount <= 0) {
                 throw new InvalidBidException("Gi\u00e1 \u0111\u1eb7t kh\u00f4ng h\u1ee3p l\u1ec7.");
             }
@@ -75,14 +101,16 @@ public class BidService {
                 throw new InsufficientFundsException("S\u1ed1 d\u01b0 v\u00ed kh\u00f4ng \u0111\u1ee7 \u0111\u1ec3 thanh to\u00e1n gi\u00e1 \u0111\u1ea5u n\u00e0y.");
             }
 
-            String bidId = "BID" + System.currentTimeMillis();
+            String bidId = "BID" + System.currentTimeMillis() + "-" + System.nanoTime();
             Bid bid = new Bid(bidId, auction.getAuctionId(), bidder.getUserId(),
                     bidder.getUsername(), amount);
 
             try {
-                auction.placeBid(bidder.getUserId(), bidder.getUsername(), amount);
-                auction.addBidId(bidId);
-                auction.extendAuctionIfNeeded();
+                if (amount > auctionToPersist.getCurrentPrice()) {
+                    auctionToPersist.placeBid(bidder.getUserId(), bidder.getUsername(), amount);
+                }
+                auctionToPersist.addBidId(bidId);
+                auctionToPersist.extendAuctionIfNeeded();
             } catch (Exception e) {
                 throw new InvalidBidException(e.getMessage());
             }
@@ -91,15 +119,15 @@ public class BidService {
                 throw new InsufficientFundsException("S\u1ed1 d\u01b0 v\u00ed kh\u00f4ng \u0111\u1ee7 \u0111\u1ec3 thanh to\u00e1n gi\u00e1 \u0111\u1ea5u n\u00e0y.");
             }
             bidRepository.saveBid(bid);
-            auctionRepository.saveAuction(auction);
+            auctionRepository.saveAuction(auctionToPersist);
             bidder.addBidId(bidId);
             userRepository.saveUser(bidder);
-            new SqlTransactionRepository().saveTransaction(new Transaction(
+            transactionRepository.saveTransaction(new Transaction(
                     bidder.getUserId(),
                     "PAYMENT",
                     chargeAmount,
                     bidder.getWallet(),
-                    "Thanh to\u00e1n \u0111\u1ea5u gi\u00e1 s\u1ea3n ph\u1ea9m " + productName(auction)
+                    "Thanh to\u00e1n \u0111\u1ea5u gi\u00e1 s\u1ea3n ph\u1ea9m " + productName(auctionToPersist)
             ));
 
             LoggerUtil.info("Bid placed: " + amount + " by " + bidder.getUsername() +
@@ -144,17 +172,20 @@ public class BidService {
     public BidPlacementResult placeForCurrentUser(User currentUser, String auctionId, double amount)
             throws Exception {
         if (!(currentUser instanceof RegularUser bidder)) {
-            throw new PermissionDeniedException("Ban phai dang nhap bang tai khoan bidder!");
+            throw new PermissionDeniedException("Bạn phải đăng nhập bằng tài khoản bidder!");
         }
 
         Auction auction = auctionRepository.getAuctionById(auctionId);
         if (auction == null) {
-            throw new PermissionDeniedException("Khong tim thay phien dau gia");
+            throw new PermissionDeniedException("Không tìm thấy phiên đấu giá");
         }
 
         User latestUser = userRepository.getUserById(currentUser.getUserId());
         if (latestUser instanceof RegularUser latestRegularUser) {
             bidder = latestRegularUser;
+        }
+        if (!hasCompleteBidProfile(bidder)) {
+            throw new PermissionDeniedException("Vui lòng cập nhật số điện thoại và địa chỉ trong hồ sơ trước khi đấu giá.");
         }
 
         String previousHighestBidderId = auction.getHighestBidderId();
@@ -162,48 +193,31 @@ public class BidService {
         return new BidPlacementResult(bid, auction, bidder, previousHighestBidderId);
     }
 
+    private boolean hasCompleteBidProfile(RegularUser user) {
+        return user != null
+                && user.getShopPhone() != null && !user.getShopPhone().isBlank()
+                && user.getShopAddress() != null && !user.getShopAddress().isBlank();
+    }
+
     public BidPlacementResult placeForCurrentUser(User currentUser, Object data)
             throws Exception {
-        java.util.Map<String, Object> payload = RequestPayloadUtil.objectMap(data);
-        return placeForCurrentUser(
-                currentUser,
-                RequestPayloadUtil.requiredAuctionId(payload),
-                RequestPayloadUtil.requiredDouble(payload, "amount")
-        );
+        PlaceBidRequest request = PlaceBidRequest.from(data);
+        return placeForCurrentUser(currentUser, request.auctionId(), request.amount());
     }
 
     public List<Bid> getHistory(Object data) throws Exception {
-        return getHistory(RequestPayloadUtil.requiredAuctionId(data));
+        return getHistory(AuctionIdRequest.from(data).auctionId());
     }
 
     public List<Bid> getUserBidList(User currentUser, Object data) throws Exception {
         String userId = RequestPayloadUtil.text(data);
         if (userId == null) {
             if (currentUser == null) {
-                throw new IllegalStateException("Ban phai dang nhap");
+                throw new IllegalStateException("Bạn phải đăng nhập");
             }
             userId = currentUser.getUserId();
         }
         return getUserBidList(userId);
-    }
-
-    private void validateBidderAndAuction(RegularUser bidder, Auction auction, double amount)
-            throws InvalidBidException, PermissionDeniedException, InsufficientFundsException {
-        if (bidder == null) {
-            throw new PermissionDeniedException("Người đấu giá không hợp lệ.");
-        }
-        if (auction == null) {
-            throw new PermissionDeniedException("Phiên đấu giá không hợp lệ.");
-        }
-        if (!ValidationUtil.isValidBidAmount(amount)) {
-            throw new InvalidBidException("Giá đặt không hợp lệ.");
-        }
-        if (bidder.getWallet() <= 0) {
-            throw new PermissionDeniedException("Bạn cần liên kết ngân hàng và nạp tiền vào ví trước khi đấu giá.");
-        }
-        if (auction.getItem() == null || auction.getItem().getCategory() == null) {
-            throw new InvalidBidException("Phiên đấu giá không có thông tin sản phẩm hợp lệ.");
-        }
     }
 
     private static boolean isSameBid(Bid existingBid, Bid newBid) {
@@ -246,10 +260,6 @@ public class BidService {
             }
         }
         return value;
-    }
-
-    private double calculateChargeAmount(double amount, double previousUserBidAmount) {
-        return amount - previousUserBidAmount;
     }
 
     private String productName(Auction auction) {

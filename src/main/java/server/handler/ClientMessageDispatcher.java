@@ -30,6 +30,7 @@ public class ClientMessageDispatcher {
         register(MessageType.DELETE_AUCTION_ADMIN, processor::handleDeleteAuctionAdmin);
         register(MessageType.CANCEL_AUCTION, processor::handleCancelAuction);
         register(MessageType.UPGRADE_SELLER, processor::handleUpgradeSeller);
+        register(MessageType.UPDATE_PROFILE, processor::handleUpdateProfile);
         register(MessageType.GET_SELLER_AUCTIONS, processor::handleGetSellerAuctions);
         register(MessageType.CREATE_SELLER_ITEM, processor::handleCreateSellerItem);
         register(MessageType.DELETE_SELLER_ITEM, processor::handleDeleteSellerItem);

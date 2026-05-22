@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AddAuctionProductClientService {
+public class AddAuctionProductClientService implements AddAuctionProductClient {
     @FunctionalInterface
     private interface CategoryPayloadBuilder {
         CategoryBuildResult build(Map<String, Object> payload, CategoryFieldReader fields);
@@ -82,7 +82,7 @@ public class AddAuctionProductClientService {
                                             List<String> imagePaths, CategoryFieldReader fields) throws Exception {
         validateBase(name, description, category, imagePaths);
         if (transport == null || !transport.isConnected()) {
-            throw new ValidationException("Loi mang", "Khong the upload anh vi mat ket noi may chu!");
+            throw new ValidationException("Lỗi mạng", "Không thể upload ảnh vì mất kết nối máy chủ!");
         }
         if (user == null) {
             throw new ValidationException("Lỗi mạng", "Bạn chưa đăng nhập hoặc mất kết nối máy chủ!");
@@ -179,10 +179,10 @@ public class AddAuctionProductClientService {
 
         File imageFile = path.toFile();
         if (!imageFile.exists() || !imageFile.isFile()) {
-            throw new Exception("Khong tim thay file anh");
+            throw new Exception("Không tìm thấy file ảnh");
         }
         if (!imageFile.canRead()) {
-            throw new Exception("Khong co quyen doc file anh");
+            throw new Exception("Không có quyền đọc file ảnh");
         }
         return imageFile;
     }

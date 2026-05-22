@@ -8,13 +8,14 @@ import server.model.Auction;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DashboardClientService {
+public class DashboardClientService implements AuctionQueryClient {
+    @Override
     public List<Auction> fetchAllAuctions(MessageTransport transport) throws Exception {
         if (transport == null || !transport.isConnected()) {
             throw new java.io.IOException("Socket is not connected");
         }
 
-        Message response = transport.sendAndReceive(new Message(MessageType.GET_ALL_AUCTIONS, null, "client"));
+        Message response = transport.sendAndReceive(new Message(MessageType.GET_ALL_AUCTIONS, (Object) null, "client"));
         if (response == null || !"SUCCESS".equals(response.getStatus())) {
             throw new java.io.IOException(response != null && response.getMessage() != null
                     ? response.getMessage()

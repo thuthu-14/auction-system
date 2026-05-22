@@ -13,7 +13,7 @@ import util.LoggerUtil;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AuthClientService {
+public class AuthClientService implements AuthClient {
     public MessageTransport ensureConnected(MessageTransport currentTransport) throws Exception {
         if (currentTransport != null && currentTransport.isConnected()) {
             return currentTransport;

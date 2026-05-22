@@ -1,13 +1,13 @@
 package server.exception;
 
 public enum ServerErrorType {
-    AUTHENTICATION("Loi xac thuc"),
-    PERMISSION("Khong co quyen"),
-    VALIDATION("Du lieu khong hop le"),
-    BID("Loi dat gia"),
-    DATA("Loi du lieu"),
-    NETWORK("Loi ket noi"),
-    SYSTEM("Loi he thong");
+    AUTHENTICATION("Lỗi xác thực"),
+    PERMISSION("Không có quyền"),
+    VALIDATION("Dữ liệu không hợp lệ"),
+    BID("Lỗi đặt giá"),
+    DATA("Lỗi dữ liệu"),
+    NETWORK("Lỗi kết nối"),
+    SYSTEM("Lỗi hệ thống");
 
     private final String defaultMessage;
 

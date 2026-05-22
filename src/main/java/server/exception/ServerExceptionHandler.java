@@ -58,7 +58,7 @@ public final class ServerExceptionHandler {
 
     private static Throwable unwrap(Throwable throwable) {
         if (throwable == null) {
-            return new ServerException(ServerErrorType.SYSTEM, "Da xay ra loi server.");
+            return new ServerException(ServerErrorType.SYSTEM, "Đã xảy ra lỗi server.");
         }
 
         Throwable current = throwable;
@@ -104,13 +104,13 @@ public final class ServerExceptionHandler {
         }
 
         return switch (type) {
-            case AUTHENTICATION -> "Thong tin dang nhap khong hop le.";
-            case PERMISSION -> "Ban khong co quyen thuc hien thao tac nay.";
-            case VALIDATION -> "Du lieu gui len khong hop le.";
-            case BID -> "Khong the dat gia voi thong tin hien tai.";
-            case DATA -> "Khong the doc hoac luu du lieu.";
-            case NETWORK -> "Ket noi toi server bi gian doan.";
-            default -> "Da xay ra loi server. Vui long thu lai.";
+            case AUTHENTICATION -> "Thông tin đăng nhập không hợp lệ.";
+            case PERMISSION -> "Bạn không có quyền thực hiện thao tác này.";
+            case VALIDATION -> "Dữ liệu gửi lên không hợp lệ.";
+            case BID -> "Không thể đặt giá với thông tin hiện tại.";
+            case DATA -> "Không thể đọc hoặc lưu dữ liệu.";
+            case NETWORK -> "Kết nối tới server bị gián đoạn.";
+            default -> "Đã xảy ra lỗi server. Vui lòng thử lại.";
         };
     }
 

@@ -34,7 +34,7 @@ public class SqlNotificationObserver implements NotificationObserver {
 
     private User requireUser(User user) {
         if (user == null) {
-            throw new IllegalStateException("Ban phai dang nhap");
+            throw new IllegalStateException("Bạn phải đăng nhập");
         }
         return user;
     }

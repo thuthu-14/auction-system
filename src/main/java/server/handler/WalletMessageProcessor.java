@@ -13,17 +13,22 @@ import java.util.Map;
 
 public class WalletMessageProcessor {
     private final ClientSessionContext context;
-    private final WalletAccountService walletAccountService = new WalletAccountService();
+    private final WalletAccountService walletAccountService;
 
     public WalletMessageProcessor(ClientSessionContext context) {
+        this(context, new WalletAccountService());
+    }
+
+    WalletMessageProcessor(ClientSessionContext context, WalletAccountService walletAccountService) {
         this.context = context;
+        this.walletAccountService = walletAccountService;
     }
 
     public void handleAddFunds(Message message) throws IOException {
         try {
             User user = walletAccountService.addFunds(context.getCurrentUser(), message.getData());
             syncCurrentUser(user);
-            Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Nap tien thanh cong");
+            Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Nạp tiền thành công");
             response.setData(user);
             context.sendMessage(response);
         } catch (Exception e) {
@@ -35,7 +40,7 @@ public class WalletMessageProcessor {
         try {
             User user = walletAccountService.withdraw(context.getCurrentUser(), message.getData());
             syncCurrentUser(user);
-            Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Rut tien thanh cong");
+            Message response = new Message(MessageType.SUCCESS, "SUCCESS", "Rút tiền thành công");
             response.setData(user);
             context.sendMessage(response);
         } catch (Exception e) {
@@ -48,7 +53,7 @@ public class WalletMessageProcessor {
             walletAccountService.linkBank(context.getCurrentUser(), message.getData());
             Message response = new Message(MessageType.SUCCESS, "Bank linked successfully", "SERVER");
             response.setStatus("SUCCESS");
-            response.setMessage("Lien ket ngan hang thanh cong!");
+            response.setMessage("Liên kết ngân hàng thành công!");
             context.sendMessage(response);
         } catch (Exception e) {
             ServerExceptionHandler.handle("Link bank", e);

@@ -11,32 +11,51 @@ import java.util.List;
 import java.util.Map;
 
 public class SellerAuctionService {
+    private final AuctionService auctionService;
+
+    public SellerAuctionService() {
+        this(new AuctionService(
+                new server.repository.SqlAuctionRepository(),
+                new server.repository.SqlItemRepository(),
+                new server.repository.SqlUserRepository()
+        ));
+    }
+
+    public SellerAuctionService(AuctionService auctionService) {
+        this.auctionService = auctionService;
+    }
+
     public Auction createSellerAuction(RegularUser seller, Map<String, Object> auctionData) throws Exception {
-        return createAuctionInternal(seller, auctionData, true);
+        return createAuctionInternal(seller, CreateAuctionRequest.from(auctionData), true);
     }
 
     public Auction createSellerAuction(User currentUser, Object data) throws Exception {
-        return createSellerAuction(requireRegularUser(currentUser), RequestPayloadUtil.objectMap(data));
+        return createAuctionInternal(requireRegularUser(currentUser), CreateAuctionRequest.from(data), true);
     }
 
     public Auction createAuction(RegularUser seller, Map<String, Object> auctionData) throws Exception {
-        return createAuctionInternal(seller, auctionData, false);
+        return createAuctionInternal(seller, CreateAuctionRequest.from(auctionData), false);
     }
 
     public Auction createAuction(User currentUser, Object data) throws Exception {
-        return createAuction(requireRegularUser(currentUser), RequestPayloadUtil.objectMap(data));
+        return createAuctionInternal(requireRegularUser(currentUser), CreateAuctionRequest.from(data), false);
     }
 
-    private Auction createAuctionInternal(RegularUser seller, Map<String, Object> auctionData, boolean sellerRequired)
+    public Auction createAuction(RegularUser seller, CreateAuctionRequest request) throws Exception {
+        return createAuctionInternal(seller, request, false);
+    }
+
+    private Auction createAuctionInternal(RegularUser seller, CreateAuctionRequest request, boolean sellerRequired)
             throws Exception {
         if (sellerRequired) {
             requireSeller(seller);
         } else if (seller == null) {
-            throw new PermissionDeniedException("Ban phai dang nhap bang tai khoan nguoi ban");
+            throw new PermissionDeniedException("Bạn phải đăng nhập bằng tài khoản người bán");
         }
+        Map<String, Object> auctionData = request.payload();
         String itemType = firstText(auctionData, "itemType", "Type", "type");
         if (itemType == null) {
-            throw new IllegalArgumentException("Thieu loai san pham");
+            throw new IllegalArgumentException("Thiếu loại sản phẩm");
         }
         itemType = itemType.toUpperCase();
         ItemCategory category = parseCategory(itemType);
@@ -56,23 +75,23 @@ public class SellerAuctionService {
         validateCategoryFields(itemType, auctionData);
 
         Item item = createItemFromData(seller.getUserId(), itemType, auctionData);
-        return AuctionService.createAuction(seller, item, startTime, endTime, reservePrice, minimumBidIncrement);
+        return auctionService.create(seller, item, startTime, endTime, reservePrice, minimumBidIncrement);
     }
 
     public void deleteSellerAuction(RegularUser seller, String auctionId) throws Exception {
         requireSeller(seller);
-        Auction auction = AuctionService.getAuctionById(auctionId);
+        Auction auction = auctionService.getById(auctionId);
         if (auction == null) {
-            throw new IllegalArgumentException("Phien dau gia khong ton tai");
+            throw new IllegalArgumentException("Phiên đấu giá không tồn tại");
         }
         if (!seller.getUserId().equals(auction.getSellerId())) {
-            throw new PermissionDeniedException("Ban khong phai chu cua phien dau gia nay");
+            throw new PermissionDeniedException("Bạn không phải chủ của phiên đấu giá này");
         }
-        AuctionService.deleteAuction(auctionId);
+        auctionService.delete(auctionId);
     }
 
     public String deleteSellerAuction(User currentUser, Object data) throws Exception {
-        String auctionId = RequestPayloadUtil.requiredAuctionId(data);
+        String auctionId = AuctionIdRequest.from(data).auctionId();
         deleteSellerAuction(requireRegularUser(currentUser), auctionId);
         return auctionId;
     }
@@ -101,10 +120,10 @@ public class SellerAuctionService {
 
     private void validateCommon(ItemCategory category, String name, String description, double price, int duration) {
         if (!ValidationUtil.isValidItemName(name)) {
-            throw new IllegalArgumentException("Ten san pham khong hop le");
+            throw new IllegalArgumentException("Tên sản phẩm không hợp lệ");
         }
         if (!ValidationUtil.isValidDescription(description)) {
-            throw new IllegalArgumentException("Mo ta san pham khong hop le");
+            throw new IllegalArgumentException("Mô tả sản phẩm không hợp lệ");
         }
         String priceError = ItemValidationUtil.getStartingPriceErrorMessage(category, price);
         if (priceError != null) {
@@ -130,47 +149,47 @@ public class SellerAuctionService {
         switch (itemType) {
             case "ELECTRONICS" -> {
                 if (!ItemValidationUtil.isValidBrand(text(data.get("brand")))) {
-                    throw new IllegalArgumentException("Hang san xuat khong hop le");
+                    throw new IllegalArgumentException("Hãng sản xuất không hợp lệ");
                 }
                 if (!ItemValidationUtil.isValidWarrantyPeriod(firstText(data, "warranty", "warrantyPeriod"))) {
-                    throw new IllegalArgumentException("Thoi gian bao hanh khong hop le");
+                    throw new IllegalArgumentException("Thời gian bảo hành không hợp lệ");
                 }
             }
             case "ART" -> {
                 if (!ItemValidationUtil.isValidBrand(text(data.get("creator")))) {
-                    throw new IllegalArgumentException("Ten nguoi tao khong hop le");
+                    throw new IllegalArgumentException("Tên người tạo không hợp lệ");
                 }
                 if (!ItemValidationUtil.isValidMaterial(text(data.get("material")))) {
-                    throw new IllegalArgumentException("Chat lieu khong hop le");
+                    throw new IllegalArgumentException("Chất liệu không hợp lệ");
                 }
             }
             case "VEHICLE" -> {
                 if (!ItemValidationUtil.isValidBrand(text(data.get("model")))) {
-                    throw new IllegalArgumentException("Doi xe khong hop le");
+                    throw new IllegalArgumentException("Đời xe không hợp lệ");
                 }
                 if (!ItemValidationUtil.isValidOdometer(intValue(data.get("odometer"), -1))) {
-                    throw new IllegalArgumentException("So km khong hop le");
+                    throw new IllegalArgumentException("Số km không hợp lệ");
                 }
             }
             case "FASHION" -> {
                 if (!ItemValidationUtil.isValidBrand(text(data.get("brand")))) {
-                    throw new IllegalArgumentException("Hang khong hop le");
+                    throw new IllegalArgumentException("Hãng không hợp lệ");
                 }
                 if (!ItemValidationUtil.isValidMaterial(text(data.get("material")))) {
-                    throw new IllegalArgumentException("Chat lieu khong hop le");
+                    throw new IllegalArgumentException("Chất liệu không hợp lệ");
                 }
             }
             case "JEWELRY" -> {
                 if (!ItemValidationUtil.isValidMaterial(text(data.get("material")))) {
-                    throw new IllegalArgumentException("Chat lieu khong hop le");
+                    throw new IllegalArgumentException("Chất liệu không hợp lệ");
                 }
                 if (!ItemValidationUtil.isValidWeight(numberValue(data.get("weight"), -1.0))) {
-                    throw new IllegalArgumentException("Trong luong khong hop le");
+                    throw new IllegalArgumentException("Trọng lượng không hợp lệ");
                 }
             }
             case "OTHER" -> {
             }
-            default -> throw new IllegalArgumentException("Loai san pham khong hop le");
+            default -> throw new IllegalArgumentException("Loại sản phẩm không hợp lệ");
         }
     }
 
@@ -178,22 +197,22 @@ public class SellerAuctionService {
         try {
             return ItemCategory.valueOf(itemType);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Loai san pham khong hop le: " + itemType);
+            throw new IllegalArgumentException("Loại sản phẩm không hợp lệ: " + itemType);
         }
     }
 
     private void requireSeller(RegularUser seller) throws PermissionDeniedException {
         if (seller == null) {
-            throw new PermissionDeniedException("Ban phai dang nhap bang tai khoan nguoi ban");
+            throw new PermissionDeniedException("Bạn phải đăng nhập bằng tài khoản người bán");
         }
         if (!seller.isSeller()) {
-            throw new PermissionDeniedException("Ban khong phai Seller");
+            throw new PermissionDeniedException("Bạn không phải Seller");
         }
     }
 
     private RegularUser requireRegularUser(User user) throws PermissionDeniedException {
         if (!(user instanceof RegularUser regularUser)) {
-            throw new PermissionDeniedException("Ban phai dang nhap bang tai khoan nguoi ban");
+            throw new PermissionDeniedException("Bạn phải đăng nhập bằng tài khoản người bán");
         }
         return regularUser;
     }
@@ -205,7 +224,7 @@ public class SellerAuctionService {
                 return number;
             }
         }
-        throw new IllegalArgumentException("Thieu du lieu so: " + String.join("/", keys));
+        throw new IllegalArgumentException("Thiếu dữ liệu số: " + String.join("/", keys));
     }
 
     private double optionalNumber(Map<String, Object> data, String... keys) {
