@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<VBox alignment="TOP_CENTER" maxWidth="280.0" minWidth="280.0" prefHeight="405.0" prefWidth="280.0" spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #eef2f7; -fx-border-radius: 12; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AuctionCardController">
+    <padding>
+        <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
+    </padding>
+    <children>
+        <StackPane fx:id="imageContainer" alignment="CENTER" maxHeight="252.0" maxWidth="252.0" minHeight="252.0" minWidth="252.0" prefHeight="252.0" prefWidth="252.0" style="-fx-background-color: #f8fafc; -fx-background-radius: 8;" VBox.vgrow="NEVER">
+            <children>
+                <ImageView fx:id="productImageView" fitHeight="252.0" fitWidth="252.0" pickOnBounds="true" preserveRatio="false" smooth="true" />
+            </children>
+        </StackPane>
+        <Label fx:id="productNameLabel" alignment="CENTER_LEFT" maxHeight="48.0" maxWidth="252.0" minHeight="48.0" minWidth="252.0" prefHeight="48.0" prefWidth="252.0" text="MacBook Pro M3 Max 36GB" textFill="#113254" wrapText="true">
+            <font>
+                <Font name="System Bold" size="15.0" />
+            </font>
+        </Label>
+        <HBox fx:id="metaRow" alignment="CENTER_LEFT" maxWidth="252.0" minHeight="30.0" minWidth="252.0" prefHeight="30.0" prefWidth="252.0">
+            <children>
+                <Label fx:id="timerLabel" alignment="CENTER_LEFT" text="⏰ Còn 00:05:12" textFill="#e53e3e" HBox.hgrow="NEVER">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="priceLabel" alignment="CENTER_RIGHT" text="55.500.000 đ" textFill="#000000" HBox.hgrow="NEVER">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Label>
+            </children>
+        </HBox>
+        <Button fx:id="bidButton" alignment="CENTER" contentDisplay="CENTER" maxWidth="252.0" minHeight="38.0" minWidth="252.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="252.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 19; -fx-cursor: hand; -fx-padding: 0;" text="Đặt giá" textAlignment="CENTER" textFill="white">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Button>
+    </children>
+</VBox>

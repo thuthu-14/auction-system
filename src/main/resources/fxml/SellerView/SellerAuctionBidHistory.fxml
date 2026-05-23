@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox fillWidth="true" spacing="35" style="-fx-background-color: #fcfcfc; -fx-padding: 40 60 40 60;" stylesheets="@/CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerAuctionBidHistoryController">
+    <Label style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #111827;" text="Chi tiết phiên đấu giá" />
+    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="10" style="-fx-background-color: #edf2f7; -fx-background-radius: 12; -fx-padding: 6;">
+        <Button maxWidth="Infinity" onAction="#handleDetails" style="-fx-background-color: transparent; -fx-text-fill: #718096; -fx-font-size: 15px; -fx-padding: 10 30; -fx-cursor: hand;" text="Thông tin" HBox.hgrow="ALWAYS" />
+        <Button maxWidth="Infinity" onAction="#handleBidHistory" style="-fx-background-color: white; -fx-text-fill: #111827; -fx-font-weight: bold; -fx-font-size: 15px; -fx-padding: 10 30; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 5, 0, 0, 1); -fx-cursor: hand;" text="Lịch sử đặt giá" HBox.hgrow="ALWAYS" />
+        <Button maxWidth="Infinity" onAction="#handleWinnerInfo" style="-fx-background-color: transparent; -fx-text-fill: #718096; -fx-font-size: 15px; -fx-padding: 10 30; -fx-cursor: hand;" text="Thông tin người trúng" HBox.hgrow="ALWAYS" />
+    </HBox>
+    <VBox spacing="20" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 35; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);" VBox.vgrow="ALWAYS">
+        <VBox spacing="5">
+            <Label style="-fx-font-size: 14px; -fx-text-fill: #718096; -fx-font-weight: bold; -fx-letter-spacing: 1px;" text="LỊCH SỬ ĐẶT GIÁ" />
+            <Label fx:id="summaryLabel" style="-fx-font-size: 15px; -fx-text-fill: #64748b;" text="Đang tải lịch sử đặt giá..." />
+        </VBox>
+        <TableView fx:id="bidTable" prefHeight="420" styleClass="auction-table" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colBidder" prefWidth="220" text="      Người đặt" />
+                <TableColumn fx:id="colAmount" prefWidth="180" text="Mức giá" />
+                <TableColumn fx:id="colTime" prefWidth="220" text="Thời gian" />
+                <TableColumn fx:id="colStatus" prefWidth="140" text="Trạng thái" />
+            </columns>
+            <placeholder>
+                <Label text="Chưa có lượt đặt giá nào" />
+            </placeholder>
+        </TableView>
+    </VBox>
+</VBox>

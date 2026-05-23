@@ -1,0 +1,338 @@
+package client.controller;
+
+import client.util.RecommendationTracker;
+import client.exception.ClientErrorType;
+import client.exception.ClientExceptionHandler;
+import client.network.ClientSocket;
+import navigation.NavigationManager;
+import server.model.RegularUser;
+import server.model.User;
+
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import util.LoggerUtil;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class HomeScreenController {
+
+    @FXML private HBox menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings;
+    private List<HBox> allMenus;
+
+    @FXML private StackPane rootPane;
+    @FXML private StackPane contentArea;
+    @FXML private TextField productSearchInput;
+    @FXML private Button clearSearchBtn;
+    @FXML private Button themeToggleBtn;
+
+    private boolean isNightMode = false;
+    private User currentUser;
+    private ClientSocket clientSocket;
+    private Runnable onLogout;
+    private boolean showingSearchResults = false;
+
+    @FXML
+    public void initialize() {
+        allMenus = Arrays.asList(menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings);
+
+        // Mặc định load Dashboard
+        loadDashboardView();
+
+        // Xử lý thanh tìm kiếm
+        if (productSearchInput != null && clearSearchBtn != null) {
+            productSearchInput.textProperty().addListener((observable, oldValue, newValue) -> {
+                clearSearchBtn.setVisible(!newValue.trim().isEmpty());
+            });
+        }
+
+        // Phím tắt Ctrl + K để focus thanh tìm kiếm
+        Platform.runLater(() -> {
+            if (rootPane != null && rootPane.getScene() != null) {
+                KeyCombination ctrlK = new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN);
+                rootPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (ctrlK.match(event) && productSearchInput != null) {
+                        productSearchInput.requestFocus();
+                        event.consume();
+                    }
+                });
+            }
+        });
+
+        // LƯU Ý: Không gọi updateMenuBasedOnSellerStatus() ở đây vì currentUser đang là null!
+    }
+
+    // ================= DATA INJECTION =================
+
+    public void setUserData(User user, ClientSocket socket) {
+        this.currentUser = user;
+        this.clientSocket = socket;
+        NavigationManager.getInstance().setCurrentUser(user);
+        NavigationManager.getInstance().setClientSocket(socket);
+
+        // Gọi ở đây mới đúng, vì lúc này user đã được truyền từ Login/Signup sang
+        updateMenuBasedOnSellerStatus();
+        loadDashboardView();
+    }
+
+    public void setOnLogout(Runnable onLogout) {
+        this.onLogout = onLogout;
+    }
+
+    private void updateMenuBasedOnSellerStatus() {
+        if (menuUpgrade == null || menuUpgrade.getChildren().isEmpty()) {
+            return;
+        }
+
+        menuUpgrade.setVisible(true);
+        menuUpgrade.setManaged(true);
+
+        if (menuUpgrade.getChildren().get(0) instanceof Button upgradeButton) {
+            if (currentUser instanceof RegularUser regularUser && regularUser.isSeller()) {
+                upgradeButton.setText("👨‍🏫  Trở về Seller");
+            } else {
+                upgradeButton.setText("👨‍🏫  Trở thành Seller");
+            }
+        }
+    }
+
+    // ================= MENU ACTIONS =================
+
+    @FXML
+    private void handleMenuClick(MouseEvent event) {
+        if (event.getSource() instanceof HBox) {
+            HBox clickedMenu = (HBox) event.getSource();
+            if (clickedMenu == menuHome) {
+                loadDashboardView();
+            } else if (clickedMenu == menuRecent) {
+                loadAuctionHistoryView();
+            } else if (clickedMenu == menuMsg) {
+                loadNotificationsView();
+            } else if (clickedMenu == menuPay) {
+                loadWalletView();
+            } else if (clickedMenu == menuUpgrade) {
+                if (currentUser instanceof RegularUser regularUser && regularUser.isSeller()) {
+                    goToSellerHome();
+                } else {
+                    openBecomeSeller();
+                }
+            } else if (clickedMenu == menuSettings) {
+                handleLogout();
+            } else {
+                updateMenuSelection(clickedMenu);
+            }
+        }
+    }
+
+    private void updateMenuSelection(HBox selectedMenu) {
+        for (HBox menu : allMenus) {
+            if (menu == null || menu.getChildren().isEmpty()) continue;
+            menu.getStyleClass().remove("menu-item-active");
+
+            try {
+                Button btn = (Button) menu.getChildren().get(0);
+                if (menu == selectedMenu) {
+                    if (!menu.getStyleClass().contains("menu-item-active")) {
+                        menu.getStyleClass().add("menu-item-active");
+                    }
+                    menu.setStyle("-fx-background-radius: 8; -fx-cursor: hand;");
+                    btn.setStyle("-fx-background-color: transparent;");
+                } else {
+                    menu.setStyle("-fx-background-radius: 8; -fx-cursor: hand;");
+                    if (menu == menuUpgrade || menu == menuSettings) {
+                        btn.setStyle("-fx-background-color: transparent;");
+                    } else {
+                        btn.setStyle("-fx-background-color: transparent;");
+                    }
+                }
+            } catch (ClassCastException e) {
+                ClientExceptionHandler.handle(ClientErrorType.UI, "Bidder menu selection", e);
+                ClientExceptionHandler.handle(ClientErrorType.UNKNOWN, "Client error", new RuntimeException(String.valueOf("Element trong menu không phải là Button")));
+            }
+        }
+    }
+
+    // ================= VIEW LOADERS =================
+
+    @FXML
+    public void loadDashboardView() {
+        showingSearchResults = false;
+        updateMenuSelection(menuHome);
+        navigateContent("/fxml/BidderView/Dashboard.fxml", controller -> {
+            // ← THÊM: Refresh data khi load
+            if (controller instanceof DashboardController && currentUser != null && clientSocket != null) {
+                DashboardController dashCtrl = (DashboardController) controller;
+                dashCtrl.setHomeScreenController(this);  // ← Truyền reference của Home screen
+                dashCtrl.setUserData(currentUser, clientSocket);
+            }
+        });
+    }
+
+
+
+    public void loadProfileView() {
+        showingSearchResults = false;
+        updateMenuSelection(null);
+        navigateContent("/fxml/BidderView/ProfileView.fxml", controller -> {
+            if (controller instanceof ProfileController profileController) {
+                profileController.setUserData(currentUser);
+            }
+        });
+    }
+
+    public void loadCategoryView(String fxmlPath) {
+        showingSearchResults = false;
+        updateMenuSelection(null);
+        navigateContent(fxmlPath, controller -> {
+            if (controller instanceof CategoryController categoryController) {
+                categoryController.setHomeScreenController(this);
+                categoryController.setUserData(currentUser, clientSocket);
+            }
+        });
+    }
+
+    public void loadNotificationsView() {
+        showingSearchResults = false;
+        updateMenuSelection(menuMsg);
+        navigateContent("/fxml/BidderView/BidderNotifications.fxml", controller -> {
+            if (controller instanceof NotificationsController notificationsController) {
+                notificationsController.setHomeController(this);
+                notificationsController.setUserData(currentUser, clientSocket);
+            }
+        });
+    }
+
+    public void loadWalletView() {
+        showingSearchResults = false;
+        updateMenuSelection(menuPay);
+        navigateContent("/fxml/WalletView.fxml", controller -> {
+            if (controller instanceof WalletController walletController) {
+                User user = NavigationManager.getInstance().getCurrentUser();
+                if (user != null) {
+                    this.currentUser = user;
+                }
+
+                ClientSocket socket = NavigationManager.getInstance().getClientSocket();
+                if (socket != null) {
+                    this.clientSocket = socket;
+                }
+                walletController.setViewMode(WalletController.WalletViewMode.BIDDER);
+                walletController.setUserData(user, socket);
+                walletController.reloadWalletData();
+            }
+        });
+    }
+    @FXML
+    public void loadAuctionHistoryView() {
+        showingSearchResults = false;
+        updateMenuSelection(menuRecent);
+        navigateContent("/fxml/BidderView/AuctionHistory.fxml", controller -> {
+            if (controller instanceof AuctionHistoryController historyController) {
+                User user = NavigationManager.getInstance().getCurrentUser();
+                ClientSocket socket = NavigationManager.getInstance().getClientSocket();
+                historyController.setContext(user, socket, this);
+            }
+        });
+    }
+    @FXML
+    private void openBecomeSeller() {
+        showingSearchResults = false;
+        updateMenuSelection(menuUpgrade);
+        navigateContent("/fxml/BidderView/BecomeSeller.fxml", controller -> {
+            if (controller instanceof BecomeSellerController) {
+                ((BecomeSellerController) controller).setCurrentUser(currentUser);
+            }
+        });
+    }
+
+    private void goToSellerHome() {
+        NavigationManager.getInstance().setCurrentUser(currentUser);
+        NavigationManager.getInstance().setClientSocket(clientSocket);
+        NavigationManager.getInstance().goToSellerHome();
+    }
+
+    public void loadAuctionDetailView(server.model.Auction auction) {
+        loadAuctionDetailView(auction, false);
+    }
+
+    public void loadAuctionDetailView(server.model.Auction auction, boolean endedMode) {
+        showingSearchResults = false;
+        RecommendationTracker.recordAuctionClick(auction);
+        updateMenuSelection(null);
+        navigateContent("/fxml/BidderView/AuctionDetail.fxml", controller -> {
+            if (controller instanceof AuctionDetailController && auction != null) {
+                AuctionDetailController detailController = (AuctionDetailController) controller;
+                detailController.setEndedMode(endedMode);
+                detailController.loadAuctionData(auction);
+            }
+        });
+    }
+
+    /**
+     * Hàm Helper dùng chung để load các file FXML vào contentArea
+     * Giúp giảm thiểu code lặp lại (Boilerplate code)
+     */
+    private void navigateContent(String fxmlPath, java.util.function.Consumer<Object> controllerSetup) {
+        NavigationManager.getInstance().loadContent(contentArea, fxmlPath, controllerSetup);
+    }
+
+    // ================= UTILITIES =================
+
+    @FXML
+    private void handleProductSearch() {
+        if (productSearchInput == null) return;
+        String keyword = productSearchInput.getText().trim();
+        if (!keyword.isEmpty()) {
+            loadProductSearchView(keyword);
+        }
+    }
+
+    @FXML
+    private void clearSearch() {
+        if (productSearchInput != null) {
+            productSearchInput.clear();
+            productSearchInput.requestFocus();
+        }
+        if (showingSearchResults) {
+            loadDashboardView();
+        }
+    }
+
+    private void loadProductSearchView(String keyword) {
+        showingSearchResults = true;
+        updateMenuSelection(null);
+        navigateContent("/fxml/BidderView/ProductSearch.fxml", controller -> {
+            if (controller instanceof ProductSearchController searchController) {
+                searchController.setHomeScreenController(this);
+                searchController.setUserData(currentUser, clientSocket);
+                searchController.search(keyword);
+            }
+        });
+    }
+    
+
+    @FXML
+    private void handleLogout() {
+        if (onLogout != null) {
+            onLogout.run();
+            return;
+        }
+        NavigationManager.getInstance().goToLogin();
+    }
+    /**
+     * [THÊM MỚI] Để controller con lấy ClientSocket
+     */
+    public ClientSocket getClientSocket() {
+        return this.clientSocket;  // Thay "clientSocket" với tên biến thực tế trong HomeScreenController
+    }
+}
+

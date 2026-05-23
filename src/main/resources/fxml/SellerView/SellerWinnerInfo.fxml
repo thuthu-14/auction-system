@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox fillWidth="true" spacing="35" style="-fx-background-color: #fcfcfc; -fx-padding: 40 60 40 60;" stylesheets="@../../CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerWinnerInfoController">
+    <Label style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #111827;" text="Chi tiết phiên đấu giá" />
+    <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="10" style="-fx-background-color: #edf2f7; -fx-background-radius: 12; -fx-padding: 6;">
+        <Button maxWidth="Infinity" onAction="#handleDetails" style="-fx-background-color: transparent; -fx-text-fill: #718096; -fx-font-size: 15px; -fx-padding: 10 30; -fx-cursor: hand;" text="Thông tin" HBox.hgrow="ALWAYS" />
+        <Button maxWidth="Infinity" onAction="#handleBidHistory" style="-fx-background-color: transparent; -fx-text-fill: #718096; -fx-font-size: 15px; -fx-padding: 10 30; -fx-cursor: hand;" text="Lịch sử đặt giá" HBox.hgrow="ALWAYS" />
+        <Button maxWidth="Infinity" onAction="#handleWinnerInfo" style="-fx-background-color: white; -fx-text-fill: #111827; -fx-font-weight: bold; -fx-font-size: 15px; -fx-padding: 10 30; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 5, 0, 0, 1); -fx-cursor: hand;" text="Thông tin người trúng" HBox.hgrow="ALWAYS" />
+    </HBox>
+    <VBox spacing="30" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 35; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);" VBox.vgrow="ALWAYS">
+        <VBox spacing="5">
+            <Label style="-fx-font-size: 14px; -fx-text-fill: #718096; -fx-font-weight: bold; -fx-letter-spacing: 1px;" text="NGƯỜI CHIẾN THẮNG PHIÊN ĐẤU GIÁ" />
+            <Label style="-fx-font-size: 15px; -fx-text-fill: #64748b;" text="Thông tin người đang dẫn đầu hoặc người trúng khi phiên kết thúc." />
+        </VBox>
+        <Separator style="-fx-opacity: 0.5;" />
+        <GridPane hgap="60" vgap="25">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="45" />
+                <ColumnConstraints percentWidth="55" />
+            </columnConstraints>
+            <VBox spacing="20" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <StackPane style="-fx-background-color: #e2e8f0; -fx-min-width: 70; -fx-min-height: 70; -fx-background-radius: 35;">
+                        <Label style="-fx-font-size: 30px; -fx-text-fill: #94a3b8;" text="👤" />
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label fx:id="winnerName" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #111827;" text="--" />
+                        <Label fx:id="winnerUsername" style="-fx-font-size: 15px; -fx-text-fill: #64748b;" />
+                    </VBox>
+                </HBox>
+                <VBox spacing="15" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <Label style="-fx-font-size: 16px;" text="☎" />
+                        <VBox>
+                            <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;" text="Số điện thoại" />
+                            <Label fx:id="winnerPhone" style="-fx-font-size: 16px; -fx-text-fill: #111827; -fx-font-weight: bold;" text="--" />
+                        </VBox>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <Label style="-fx-font-size: 16px;" text="✉" />
+                        <VBox>
+                            <Label style="-fx-font-size: 13px; -fx-text-fill: #64748b;" text="Email liên hệ" />
+                            <Label fx:id="winnerEmail" style="-fx-font-size: 16px; -fx-text-fill: #111827; -fx-font-weight: bold;" text="--" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+            <VBox spacing="20" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <HBox spacing="20">
+                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                        <Label style="-fx-font-size: 14px; -fx-text-fill: #64748b;" text="Mức giá chốt" />
+                        <Label fx:id="winningPrice" style="-fx-font-size: 26px; -fx-text-fill: #dc2626; -fx-font-weight: 900;" text="--" />
+                    </VBox>
+                    <VBox alignment="TOP_RIGHT" spacing="5">
+                        <Label style="-fx-font-size: 14px; -fx-text-fill: #64748b;" text="Trạng thái thanh toán" />
+                        <Label fx:id="paymentStatus" style="-fx-background-color: #f3f4f6; -fx-text-fill: #374151; -fx-padding: 8 16; -fx-background-radius: 20; -fx-font-weight: bold; -fx-font-size: 13px;" text="--" />
+                    </VBox>
+                </HBox>
+                <VBox spacing="10" style="-fx-background-color: #f8fafc; -fx-padding: 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                    <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #111827;" text="📍 Địa chỉ giao hàng" />
+                    <Label fx:id="shippingAddress" style="-fx-font-size: 15px; -fx-text-fill: #4a5568;" text="--" wrapText="true" />
+                </VBox>
+            </VBox>
+        </GridPane>
+        <Region VBox.vgrow="ALWAYS" />
+        <Separator style="-fx-opacity: 0.5;" />
+        <HBox alignment="CENTER_RIGHT" spacing="20">
+            <Label fx:id="noWinnerLabel" style="-fx-font-size: 15px; -fx-text-fill: #94a3b8; -fx-font-style: italic;" text="Đang chờ người trúng giải..." visible="false" />
+            <Region HBox.hgrow="ALWAYS" />
+        </HBox>
+    </VBox>
+</VBox>

@@ -1,0 +1,871 @@
+@font-face {
+    font-family: "Darley Sans";
+    src: url("DarleySans-Regular.otf");
+}
+
+.root {
+    -fx-font-family: "System";
+}
+
+
+.my-darley {
+    -fx-font-family: "Darley Sans" !important;
+    -fx-font-size: 36px;
+    -fx-font-weight: normal;
+    -fx-font-smoothing-type: lcd;
+}
+
+.menu-item {
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-min-height: 45px;
+    -fx-pref-height: 45px;
+    -fx-max-height: 45px;
+}
+
+.menu-item .button {
+    -fx-font-size: 17px;
+    -fx-font-weight: normal;
+    -fx-background-color: transparent;
+}
+
+.menu-item:hover {
+    -fx-background-color: #f3f4f6;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.08), 10, 0, 0, 2);
+}
+
+.menu-item:hover .button {
+    -fx-text-fill: #1a1a1a;
+    -fx-font-size: 17px;
+    -fx-font-weight: normal;
+}
+
+.menu-item-active {
+    -fx-background-color: #e6f0fd;
+    -fx-background-radius: 8;
+}
+
+.menu-item-active .button {
+    -fx-text-fill: #3b82f6;
+    -fx-font-size: 17px;
+    -fx-font-weight: normal;
+}
+
+.eye-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.eye-button:hover {
+    -fx-opacity: 0.7;
+}
+
+.form-button {
+    -fx-background-color: #111827;
+    -fx-text-fill: white;
+    -fx-background-radius: 25;
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 25;
+    -fx-cursor: hand;
+}
+
+.form-button:hover {
+    -fx-background-color: #374151;
+}
+
+.custom-header-box {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 16 24 16 24;
+}
+
+.custom-title-label {
+    -fx-font-family: "System";
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111827;
+}
+
+.product-search-title {
+    -fx-font-family: "System";
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a1a1a;
+}
+
+.product-search-summary {
+    -fx-font-family: "System";
+    -fx-font-size: 14px;
+    -fx-text-fill: #718096;
+}
+
+.my-custom-alert.dialog-pane {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 14;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.18), 16, 0.14, 0, 6);
+    -fx-padding: 0;
+    -fx-min-width: 340px;
+    -fx-max-width: 430px;
+    -alert-accent: #f59e0b;
+    -alert-accent-hover: #d97706;
+}
+
+.my-custom-alert.dialog-pane header {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-background-radius: 14;
+}
+
+.my-custom-alert.dialog-pane > *.content {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+}
+
+.my-custom-alert.alert-info {
+    -alert-accent: #3b82f6;
+    -alert-accent-hover: #2563eb;
+}
+
+.my-custom-alert.alert-warning,
+.my-custom-alert.alert-confirmation {
+    -alert-accent: #f59e0b;
+    -alert-accent-hover: #d97706;
+}
+
+.my-custom-alert.alert-error {
+    -alert-accent: #ef4444;
+    -alert-accent-hover: #dc2626;
+}
+
+.app-dialog-overlay {
+    -fx-background-color: rgba(17, 24, 39, 0.34);
+}
+
+.my-custom-alert.dialog-pane > .header-panel {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 18 24 6 24;
+}
+
+.my-custom-alert.dialog-pane > .header-panel .label {
+    -fx-font-family: "System";
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -alert-accent;
+}
+
+.my-custom-alert.dialog-pane > .content.label {
+    -fx-background-color: transparent;
+    -fx-font-family: "System";
+    -fx-font-size: 15px;
+    -fx-text-fill: #111827;
+    -fx-padding: 6 24 12 24;
+    -fx-line-spacing: 4px;
+    -fx-wrap-text: true;
+    -fx-pref-width: 300px;
+    -fx-max-width: 300px;
+}
+
+.my-custom-alert.dialog-pane > .button-bar {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 4 24 20 24;
+}
+
+.my-custom-alert.dialog-pane > .button-bar > .container {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.my-custom-alert.dialog-pane .button {
+    -fx-background-radius: 9;
+    -fx-background-insets: 0;
+    -fx-border-radius: 9;
+    -fx-border-insets: 0;
+    -fx-font-family: "System";
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 7 18;
+    -fx-min-width: 76px;
+    -fx-pref-width: 82px;
+}
+
+.my-custom-alert.dialog-pane .alert-primary-button {
+    -fx-background-color: -alert-accent;
+    -fx-text-fill: white;
+}
+
+.my-custom-alert.dialog-pane .alert-primary-button:hover {
+    -fx-background-color: -alert-accent-hover;
+}
+
+.my-custom-alert.dialog-pane .alert-secondary-button {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-text-fill: #4b5563;
+}
+
+.my-custom-alert.dialog-pane .alert-secondary-button:hover {
+    -fx-background-color: #f3f4f6;
+}
+
+.my-custom-alert.dialog-pane .button:focused {
+    -fx-background-insets: 0;
+    -fx-border-color: -alert-accent;
+}
+
+.seller-contact-dialog.dialog-pane {
+    -fx-min-width: 380px;
+    -fx-pref-width: 380px;
+    -fx-max-width: 380px;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -alert-accent: #f59e0b;
+}
+
+.seller-contact-dialog.dialog-pane > .header-panel {
+    -fx-padding: 16 22 4 22;
+}
+
+.seller-contact-dialog.dialog-pane > .header-panel .label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f59e0b;
+}
+
+.seller-contact-dialog.dialog-pane > *.content {
+    -fx-padding: 8 22 12 22;
+}
+
+.seller-contact-dialog.dialog-pane > .button-bar {
+    -fx-padding: 4 22 16 22;
+}
+
+.seller-contact-dialog.dialog-pane .seller-contact-ok-button {
+    -fx-background-color: #b7dff0;
+    -fx-text-fill: #1f2937;
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 1;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-min-width: 78px;
+    -fx-pref-width: 78px;
+    -fx-min-height: 34px;
+    -fx-pref-height: 34px;
+    -fx-padding: 0;
+}
+
+.seller-contact-dialog.dialog-pane .seller-contact-ok-button:hover {
+    -fx-background-color: #a8d5e9;
+}
+
+/* Container */
+.dashboard-cards-container {
+    -fx-padding: 24 32 24 32;
+    -fx-spacing: 16;
+    -fx-background-color: #ffffff;
+}
+
+.bar,
+.bar:focused,
+.bar > .viewport,
+.bar > .corner {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0;
+}
+
+/* ── Card base ── */
+.dashboard-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16;
+    -fx-border-color: #edf2f7;
+    -fx-border-width: 1;
+    -fx-border-radius: 16;
+    -fx-padding: 24 30 20 30;
+    -fx-spacing: 12;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.03), 8, 0, 0, 2);
+}
+
+.dashboard-card:hover {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dbe4ef;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.08), 14, 0, 0, 5);
+}
+
+/* ── Icon badges — monochrome ── */
+.card-icon-badge {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-font-size: 32px;
+    -fx-min-width: 42;
+    -fx-min-height: 42;
+    -fx-alignment: CENTER;
+    -fx-text-fill: #1f2937;
+}
+
+.card-icon-purple,
+.card-icon-teal,
+.card-icon-orange,
+.card-icon-pink,
+.card-icon-blue {
+    -fx-background-color: #f3f4f6;
+}
+
+/* ── Text ── */
+.card-title {
+    -fx-font-family: "System";
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.card-desc {
+    -fx-font-family: "System";
+    -fx-font-size: 17px;
+    -fx-text-fill: #718096;
+    -fx-wrap-text: true;
+}
+
+/* ── CTA ── */
+.card-cta {
+    -fx-font-family: "System";
+    -fx-font-size: 15px;
+    -fx-font-weight: normal;
+    -fx-text-fill: #1a1a1a;
+}
+
+.card-cta-purple,
+.card-cta-teal,
+.card-cta-orange,
+.card-cta-pink,
+.card-cta-blue {
+    -fx-text-fill: #1a1a1a;
+}
+
+/* ════════════════════════════════════════════════════════
+   MANAGE AUCTIONS STYLES
+════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════
+   1. ROOT & BACKGROUND
+═════════════════════════════════════════════════════ */
+.manage-auctions-root {
+    -fx-background-color: white;
+}
+
+/* ══════════════════════════════════════════════════════
+   2. TABS
+══════════════════════════════════════════════════════ */
+.auction-tab {
+    -fx-padding: 12 16 10 16;
+    -fx-cursor: hand;
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+.auction-tab:hover .tab-label {
+    -fx-text-fill: #111827;
+}
+
+.auction-tab-active {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #111827 transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+.tab-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6b7280;
+    -fx-font-family: "System";
+    -fx-font-weight: normal;
+}
+
+.auction-tab-active .tab-label {
+    -fx-text-fill: #111827;
+    -fx-font-weight: bold;
+}
+
+.tab-count-badge {
+    -fx-font-size: 11px;
+    -fx-font-family: "System";
+    -fx-text-fill: #6b7280;
+    -fx-background-color: #f3f4f6;
+    -fx-background-radius: 20;
+    -fx-padding: 1 7;
+}
+
+.auction-tab-active .tab-count-badge {
+    -fx-background-color: #e5e7eb;
+    -fx-text-fill: #374151;
+}
+
+/* ══════════════════════════════════════════════════════
+   3. STATUS PILLS
+══════════════════════════════════════════════════════ */
+.status-pill-active {
+    -fx-background-color: #dcfce7;
+    -fx-text-fill: #166534;
+    -fx-background-radius: 20;
+    -fx-padding: 3 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "System";
+}
+
+.status-pill-pending {
+    -fx-background-color: #fef3c7;
+    -fx-text-fill: #92400e;
+    -fx-background-radius: 20;
+    -fx-padding: 3 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "System";
+}
+
+.status-pill-ended {
+    -fx-background-color: #f3f4f6;
+    -fx-text-fill: #4b5563;
+    -fx-background-radius: 20;
+    -fx-padding: 3 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "System";
+}
+
+.status-pill-cancelled {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #991b1b;
+    -fx-background-radius: 20;
+    -fx-padding: 3 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-font-family: "System";
+}
+
+/* ══════════════════════════════════════════════════════
+   4. TABLEVIEW
+══════════════════════════════════════════════════════ */
+.auction-table {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-font-size: 13px;
+    -fx-font-family: "System";
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.auction-table:focused {
+    -fx-background-insets: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* Header */
+.auction-table .column-header-background {
+    -fx-background-color: #f9fafb;
+    -fx-background-insets: 0;
+    -fx-background-radius: 12 12 0 0;
+}
+
+.auction-table .column-header {
+    -fx-background-color: #f9fafb;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-size: 40;
+}
+
+.auction-table .filler {
+    -fx-background-color: #f9fafb;
+    -fx-background-radius: 0 12 0 0;
+    -fx-border-color: transparent transparent #e5e7eb transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.auction-table .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6b7280;
+    -fx-font-family: "System";
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 8;
+}
+
+.auction-table .column-header .arrow {
+    -fx-background-color: #9ca3af;
+    -fx-padding: 3 4;
+}
+
+/* Rows */
+.auction-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent transparent #f3f4f6 transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cell-size: 54px;
+    -fx-padding: 0;
+}
+
+.auction-table .table-row-cell:odd {
+    -fx-background-color: white;
+}
+
+.auction-table .table-row-cell:hover {
+    -fx-background-color: #f9fafb;
+}
+
+.auction-table .table-row-cell:selected,
+.auction-table .table-row-cell:filled:selected,
+.auction-table .table-row-cell:filled:focused:selected,
+.auction-table .table-row-cell:filled:selected:hover {
+    -fx-background-color: #eff6ff;
+    -fx-background-insets: 0;
+}
+
+.auction-table .table-row-cell:selected .label,
+.auction-table .table-row-cell:filled:selected .label {
+    -fx-text-fill: #111827;
+}
+
+.auction-table .table-row-cell:empty {
+    -fx-background-color: white;
+    -fx-border-color: transparent;
+}
+
+/* Cells */
+.auction-table .table-cell {
+    -fx-padding: 0 12;
+    -fx-alignment: CENTER_LEFT;
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+    -fx-text-fill: #111827;
+    -fx-font-size: 13px;
+}
+
+.auction-table .table-cell:focused {
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+}
+
+/* Placeholder */
+.auction-table .placeholder {
+    -fx-background-color: white;
+}
+
+.auction-table .placeholder .label {
+    -fx-text-fill: #9ca3af;
+    -fx-font-size: 13px;
+    -fx-font-family: "System";
+}
+
+/* Scrollbar */
+.auction-table .virtual-flow .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+
+.seller-revenue-chart {
+    -fx-background-color: white;
+    -fx-text-fill: #111827;
+}
+
+.seller-revenue-chart .chart-plot-background {
+    -fx-background-color: white;
+}
+
+.seller-revenue-chart .axis {
+    -fx-tick-label-fill: #111827;
+}
+
+.seller-revenue-chart .axis-label {
+    -fx-text-fill: #111827;
+}
+
+.auction-table .virtual-flow .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.auction-table .virtual-flow .scroll-bar:vertical .thumb {
+    -fx-background-color: #d1d5db;
+    -fx-background-radius: 4;
+}
+
+.auction-table .virtual-flow .scroll-bar .increment-button,
+.auction-table .virtual-flow .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.auction-table .virtual-flow .scroll-bar .increment-arrow,
+.auction-table .virtual-flow .scroll-bar .decrement-arrow {
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+
+/* ══════════════════════════════════════════════════════
+   5. BUTTONS
+══════════════════════════════════════════════════════ */
+
+/* Outline nhỏ — Xuất dữ liệu, Đặt lại */
+.btn-outline-small {
+    -fx-background-color: white;
+    -fx-border-color: #d1d5db;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 7 16;
+    -fx-font-size: 13px;
+    -fx-font-family: "System";
+    -fx-font-weight: normal;
+    -fx-text-fill: #374151;
+    -fx-cursor: hand;
+}
+
+.btn-outline-small:hover {
+    -fx-background-color: #f9fafb;
+    -fx-border-color: #9ca3af;
+}
+
+.btn-outline-small:pressed {
+    -fx-background-color: #f3f4f6;
+}
+
+/* Action nhỏ trong bảng — Xem, Chỉnh sửa */
+.action-btn {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 4 12;
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
+    -fx-text-fill: #374151;
+    -fx-font-family: "System";
+    -fx-cursor: hand;
+}
+
+.action-btn:hover {
+    -fx-background-color: #f3f4f6;
+    -fx-border-color: #d1d5db;
+}
+
+.action-btn:pressed {
+    -fx-background-color: #e5e7eb;
+}
+
+/* Danger — Hủy */
+.action-btn-danger {
+    -fx-background-color: white;
+    -fx-border-color: #fca5a5;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 4 12;
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
+    -fx-text-fill: #dc2626;
+    -fx-font-family: "System";
+    -fx-cursor: hand;
+}
+
+.action-btn-danger:hover {
+    -fx-background-color: #fee2e2;
+    -fx-border-color: #f87171;
+}
+
+/* Pagination */
+.page-btn {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-min-width: 30;
+    -fx-min-height: 30;
+    -fx-max-width: 30;
+    -fx-max-height: 30;
+    -fx-font-size: 12px;
+    -fx-font-family: "System";
+    -fx-text-fill: #374151;
+    -fx-cursor: hand;
+}
+
+.page-btn:hover {
+    -fx-background-color: #f3f4f6;
+}
+
+.page-btn-active {
+    -fx-background-color: #111827;
+    -fx-border-color: #111827;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-min-width: 30;
+    -fx-min-height: 30;
+    -fx-max-width: 30;
+    -fx-max-height: 30;
+    -fx-font-size: 12px;
+    -fx-font-family: "System";
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.page-btn-active:hover {
+    -fx-background-color: #1f2937;
+}
+
+/* ══════════════════════════════════════════════════════
+   6. FILTER BAR
+══════════════════════════════════════════════════════ */
+.filter-search-field {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 7 12;
+    -fx-font-size: 13px;
+    -fx-font-family: "System";
+    -fx-text-fill: #111827;
+    -fx-prompt-text-fill: #9ca3af;
+    -fx-background-insets: 0;
+}
+
+.filter-search-field:focused {
+    -fx-border-color: #111827;
+    -fx-background-insets: 0;
+}
+
+.filter-combo {
+    -fx-background-color: white;
+    -fx-border-color: #e5e7eb;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-font-family: "System";
+    -fx-background-insets: 0;
+    -fx-padding: 7 12;
+}
+
+.filter-combo .list-cell {
+    -fx-font-size: 13px;
+    -fx-font-family: "System";
+    -fx-padding: 4 10;
+}
+
+.filter-combo:focused {
+    -fx-border-color: #111827;
+    -fx-background-insets: 0;
+}
+
+.filter-combo .combo-box-popup .list-view {
+    -fx-background-color: white;
+}
+
+.filter-combo .combo-box-popup .list-view .list-cell {
+    -fx-background-color: white;
+    -fx-text-fill: #111827;
+    -fx-padding: 6 10;
+}
+
+.filter-combo .combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #f3f4f6;
+}
+
+.filter-combo .combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: #eff6ff;
+}
+/* ==========================================================
+   NUKE MODENA: ÉP TABPANE PHẢI THEO Ý MÌNH
+========================================================== */
+
+/* 1. Xóa nền toàn bộ TabPane */
+.my-clean-tabpane.tab-pane {
+    -fx-background-color: transparent !important;
+}
+
+/* 2. Dọn sạch cái background xám xịt mặc định */
+.my-clean-tabpane.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: transparent !important;
+    -fx-border-width: 0 !important;
+}
+
+/* Khoảng cách giữa các tab và nội dung bên dưới */
+.my-clean-tabpane.tab-pane > .tab-header-area {
+    -fx-padding: 0 0 15 0 !important;
+}
+
+/* 3. Khối xám bo tròn bọc ngoài các Tab */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region {
+    -fx-background-color: #e5e7eb !important;
+    -fx-background-radius: 8 !important;
+    -fx-padding: 4 !important;
+}
+
+/* 4. Triệt tiêu toàn bộ viền và nền của từng Tab */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-color: transparent !important;
+    -fx-background-insets: 0 !important;
+    -fx-border-width: 0 !important;
+    -fx-background-radius: 6 !important;
+    -fx-padding: 8 20 8 20 !important;
+    -fx-cursor: hand !important;
+}
+
+/* Chữ Tab bình thường */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region > .tab .tab-label {
+    -fx-text-fill: #6b7280 !important;
+    -fx-font-size: 14px !important;
+}
+
+/* 5. Tab khi được chọn (Bật nền trắng, đổ bóng) */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region > .tab:selected {
+    -fx-background-color: white !important;
+    -fx-background-insets: 0 !important;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 1) !important;
+}
+
+/* Chữ Tab khi được chọn */
+.my-clean-tabpane.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
+    -fx-text-fill: #111827 !important;
+    -fx-font-weight: bold !important;
+}
+
+/* 6. Xóa cái viền focus màu xanh dương lúc bấm chuột */
+.my-clean-tabpane.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0 !important;
+}
+
+/* 7. Xóa viền của khung nội dung bên dưới */
+.my-clean-tabpane.tab-pane > .tab-content-area {
+    -fx-border-width: 0 !important;
+    -fx-background-color: transparent !important;
+}

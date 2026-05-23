@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" stylesheets="@/CSS/style.css" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ProductSearchController">
+    <VBox alignment="TOP_LEFT" spacing="28.0" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+        </padding>
+        <children>
+            <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="20.0">
+                <children>
+                    <VBox alignment="CENTER_LEFT" spacing="4.0" HBox.hgrow="ALWAYS">
+                        <children>
+                            <Label fx:id="titleLabel" maxWidth="Infinity" styleClass="product-search-title" text="Tìm kiếm sản phẩm">
+                                <font>
+                                    <Font name="System Bold" size="28.0" />
+                                </font>
+                            </Label>
+                            <Label fx:id="summaryLabel" maxWidth="Infinity" styleClass="product-search-summary" text="Nhập từ khóa trên thanh tìm kiếm để xem sản phẩm.">
+                                <font>
+                                    <Font size="14.0" />
+                                </font>
+                            </Label>
+                        </children>
+                    </VBox>
+                </children>
+            </HBox>
+            <FlowPane fx:id="resultsFlowPane" alignment="TOP_LEFT" columnHalignment="LEFT" hgap="25.0" prefWrapLength="900.0" rowValignment="TOP" vgap="25.0" />
+        </children>
+    </VBox>
+</ScrollPane>

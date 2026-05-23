@@ -1,0 +1,13 @@
+source/data/json/bids.json
+source/data/json/items.json
+source/src/main/resources/fxml/a.fxml
+source/src/main/resources/fxml/home.fxml
+source/src/main/resources/fxml/logindemo.fxml
+source/src/main/resources/fxml/signup.fxml
+source/src/test/java/server/model/AuctionTest.java
+source/src/test/java/server/model/ItemTest.java
+source/src/test/java/server/model/UserTest.java
+source/src/test/java/server/service/AuctionServiceTest.java
+source/src/test/java/server/service/AuthServiceTest.java
+source/src/test/java/server/service/BidServiceTest.java
+source/src/test/java/server/service/ConcurrentBidTest.java
