@@ -194,7 +194,7 @@ public class AuctionServiceTest {
             long end = now + 10_000L;
 
             assertThrows(PermissionDeniedException.class, () ->
-                    service.create(seller, item, start, end, 0.0, 0.0));
+                    service.create(seller, item, start, end, 0.0, 0.0, false));
         }
     }
 
@@ -690,18 +690,16 @@ public class AuctionServiceTest {
 
         seller.setActive(false);
         assertThrows(PermissionDeniedException.class,
-                () -> service.create(seller, item, now + 1_000L, now + 2_000L, 0, 0));
-
+                () -> service.create(seller, item, now + 1_000L, now + 2_000L, 0, 0, false));
         seller.setActive(true);
         seller.setSeller(false);
         assertThrows(PermissionDeniedException.class,
-                () -> service.create(seller, item, now + 1_000L, now + 2_000L, 0, 0));
-
+                () -> service.create(seller, item, now + 1_000L, now + 2_000L, 0, 0, false));
         seller.setSeller(true);
         assertThrows(PermissionDeniedException.class,
-                () -> service.create(seller, null, now + 1_000L, now + 2_000L, 0, 0));
+                () -> service.create(seller, null, now + 1_000L, now + 2_000L, 0, 0, false));
         assertThrows(PermissionDeniedException.class,
-                () -> service.create(seller, item, now + 2_000L, now + 1_000L, 0, 0));
+                () -> service.create(seller, item, now + 2_000L, now + 1_000L, 0, 0, false));
     }
 
     @Test
