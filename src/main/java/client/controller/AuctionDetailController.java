@@ -124,7 +124,7 @@ public class AuctionDetailController implements AuctionListener {
         loadAuctionData(dataMapper.toDetailData(auction));
         loadBidHistoryGraph();
         startBidHistoryRefresh();
-        startCountdown(auction.getEndTime());
+        startCountdown(auction.getStartTime(), auction.getEndTime());
         applyEndedMode();
     }
 
@@ -248,20 +248,41 @@ public class AuctionDetailController implements AuctionListener {
         });
     }
 
-    public void startCountdown(long endTime) {
+    public void startCountdown(long startTime, long endTime) {
         if (countdownTimer != null) {
             countdownTimer.stop();
         }
 
         countdownTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            if (!DateTimeUtil.isExpired(endTime)) {
-                long remainingMs = endTime - System.currentTimeMillis();
+            long now = System.currentTimeMillis();
+
+            if (now < startTime) {
+                long remainingMs = startTime - now;
                 String[] parts = DateTimeUtil.formatTimestamp(remainingMs).split(":");
                 Platform.runLater(() -> {
                     if (parts.length >= 3) {
                         if (hourLabel != null) hourLabel.setText(parts[0]);
                         if (minuteLabel != null) minuteLabel.setText(parts[1]);
                         if (secondLabel != null) secondLabel.setText(parts[2]);
+                    }
+                    if (confirmBidBtn != null) {
+                        confirmBidBtn.setDisable(true);
+                    }
+                });
+                return;
+            }
+
+            if (!DateTimeUtil.isExpired(endTime)) {
+                long remainingMs = endTime - now;
+                String[] parts = DateTimeUtil.formatTimestamp(remainingMs).split(":");
+                Platform.runLater(() -> {
+                    if (parts.length >= 3) {
+                        if (hourLabel != null) hourLabel.setText(parts[0]);
+                        if (minuteLabel != null) minuteLabel.setText(parts[1]);
+                        if (secondLabel != null) secondLabel.setText(parts[2]);
+                    }
+                    if (!endedMode && confirmBidBtn != null) {
+                        confirmBidBtn.setDisable(false);
                     }
                 });
             } else {
@@ -529,7 +550,7 @@ public class AuctionDetailController implements AuctionListener {
     @Override
     public void onAuctionExtended(Auction auction) {
         if (isCurrentAuction(auction)) {
-            startCountdown(auction.getEndTime());
+            startCountdown(auction.getStartTime(), auction.getEndTime());
             applyLatestBidPrice(auction.getCurrentPrice());
         }
     }

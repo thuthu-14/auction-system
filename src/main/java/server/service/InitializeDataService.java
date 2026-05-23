@@ -45,24 +45,5 @@ public class InitializeDataService {
         }
     }
 
-    /**
-     * Kiểm tra + tạo empty JSON files nếu chưa tồn tại
-     * Đã xóa bỏ phần tạo file .dat
-     */
-    private static void initializeEmptyDataFiles() throws IOException {
-        String[] jsonFiles = {
-                DataManager.JSON_ITEMS,
-                DataManager.JSON_AUCTIONS,
-                DataManager.JSON_BIDS,
-                DataManager.JSON_USERS,
-                DataManager.JSON_BANK_ACCOUNTS
-        };
 
-        for (String filePath : jsonFiles) {
-            if (!JsonUtil.fileExists(filePath)) {
-                JsonUtil.createFileIfNotExists(filePath);
-                LoggerUtil.info("✓ Created empty JSON file: " + filePath);
-            }
-        }
-    }
 }

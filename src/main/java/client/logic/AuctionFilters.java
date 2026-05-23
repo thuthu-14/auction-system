@@ -11,7 +11,9 @@ public final class AuctionFilters {
     public static AuctionFilterStrategy visibleActive() {
         return auction -> auction != null
                 && auction.getItem() != null
-                && (auction.getStatus() == AuctionStatus.OPEN || auction.getStatus() == AuctionStatus.RUNNING);
+                && (auction.getStatus() == AuctionStatus.WAITING
+                || auction.getStatus() == AuctionStatus.OPEN
+                || auction.getStatus() == AuctionStatus.RUNNING);
     }
 
     public static AuctionFilterStrategy hasTimeRemaining() {

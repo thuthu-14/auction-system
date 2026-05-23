@@ -81,9 +81,9 @@ public class BidService {
                 throw new AuctionClosedException("Phiên đấu giá đã kết thúc.");
             }
 
-            String bidError = auction.getMinimumBidIncrement() > 0
-                    ? ItemValidationUtil.getBidAmountErrorMessage(auction.getCurrentPrice(), amount, auction.getMinimumBidIncrement())
-                    : ItemValidationUtil.getBidAmountErrorMessage(category, auction.getCurrentPrice(), amount);
+                String bidError = auctionToPersist.getMinimumBidIncrement() > 0
+                        ? ItemValidationUtil.getBidAmountErrorMessage(auctionToPersist.getCurrentPrice(), amount, auctionToPersist.getMinimumBidIncrement())
+                        : ItemValidationUtil.getBidAmountErrorMessage(category, auctionToPersist.getCurrentPrice(), amount);
             if (bidError != null) {
                 throw new InvalidBidException(bidError);
             }

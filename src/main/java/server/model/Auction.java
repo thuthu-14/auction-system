@@ -221,20 +221,21 @@ public class Auction implements Serializable {
 
         if (status == AuctionStatus.CLOSED || status == AuctionStatus.FINISHED ||
                 status == AuctionStatus.CANCELLED) {
-            return;  // Không cập nhật trạng thái kết thúc
+            return;
         }
 
-        // Nếu chưa đến giờ bắt đầu → WAITING
-        if (now < startTime && status != AuctionStatus.WAITING) {
+        if (now < startTime) {
             this.status = AuctionStatus.WAITING;
+            return;
         }
 
-        // Nếu quá giờ kết thúc → cần CLOSED
-        if (now > endTime && (status == AuctionStatus.WAITING ||
-                status == AuctionStatus.OPEN || status == AuctionStatus.RUNNING)) {
-            // Lưu ý: không tự động set FINISHED ở đây, cần server signal
-            // Chỉ set CLOSED tạm thời để khóa đấu giá
+        if (now > endTime) {
             this.status = AuctionStatus.CLOSED;
+            return;
+        }
+
+        if (status == AuctionStatus.WAITING) {
+            this.status = AuctionStatus.OPEN;
         }
     }
 }

@@ -30,16 +30,20 @@ public class SqlAuctionRepository implements AuctionRepository {
 
     @Override
     public List<Auction> getActiveAuctions() throws Exception {
-        String sql = "SELECT * FROM auctions WHERE status IN (?, ?)";
+        String sql = "SELECT * FROM auctions WHERE status IN (?, ?, ?)";
         List<Auction> list = new ArrayList<>();
 
         try (Connection c = DatabaseManager.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, AuctionStatus.OPEN.name());
-            ps.setString(2, AuctionStatus.RUNNING.name());
+            ps.setString(1, AuctionStatus.WAITING.name());
+            ps.setString(2, AuctionStatus.OPEN.name());
+            ps.setString(3, AuctionStatus.RUNNING.name());
+
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                list.add(mapAuction(rs));
+                Auction auction = mapAuction(rs);
+                auction.syncStatusWithTime();
+                list.add(auction);
             }
         }
         return list;

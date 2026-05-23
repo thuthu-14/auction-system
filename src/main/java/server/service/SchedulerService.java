@@ -31,10 +31,12 @@ public class SchedulerService {
         long now = System.currentTimeMillis();
 
         for (Auction auction : auctions) {
-            if ((auction.getStatus() == AuctionStatus.OPEN ||
+            auction.syncStatusWithTime();
+
+            if ((auction.getStatus() == AuctionStatus.CLOSED ||
+                    auction.getStatus() == AuctionStatus.OPEN ||
                     auction.getStatus() == AuctionStatus.RUNNING) &&
                     now > auction.getEndTime()) {
-
                 AuctionService.finishAuction(auction.getAuctionId());
 
                 String winner = auction.getHighestBidderName() != null ?
