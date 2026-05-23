@@ -144,7 +144,7 @@ class AddAuctionProductClientServicePayloadTest {
                         ), -1, 1)));
 
         FakeMessageTransport failedUpload = new FakeMessageTransport()
-                .respondWith(new Message(MessageType.UPLOAD_IMAGE, "ERROR", "upload rejected"));
+                .respondWith(new Message(MessageType.UPLOAD_IMAGE, "FAILED", "upload rejected"));
         assertThrows(AddAuctionProductClientService.ValidationException.class,
                 () -> service.buildPayload(failedUpload, user, "Item", "Desc", "Khac",
                         List.of(image.toString()), fields(Map.of(
@@ -200,6 +200,11 @@ class AddAuctionProductClientServicePayloadTest {
             @Override
             public String comboValue(String fieldId) {
                 return "00:00";
+            }
+
+            @Override
+            public boolean isCheckboxSelected(String checkboxId) {
+                return false;
             }
         };
     }
