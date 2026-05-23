@@ -75,15 +75,16 @@ public class AuctionService {
                           double reservePrice, double minimumBidIncrement) throws Exception {
         long startTimeMillis = System.currentTimeMillis();
         long endTimeMillis = startTimeMillis + durationMinutes * 60_000L;
-        return create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement);
+        return create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement, false);
     }
 
     public Auction create(RegularUser seller, Item item, long startTimeMillis, long endTimeMillis,
-                          double reservePrice, double minimumBidIncrement) throws Exception {
+                          double reservePrice, double minimumBidIncrement, boolean isStartNow) throws Exception {
         int durationMinutes = (int) ((endTimeMillis - startTimeMillis) / 60_000L);
         validateCreateAuction(seller, item, durationMinutes);
-        validateTimeWindow(startTimeMillis, endTimeMillis);
-
+        if (!isStartNow) {
+            validateTimeWindow(startTimeMillis, endTimeMillis);  // ← Chỉ validate khi không phải "Đẩu Ngay"
+        }
         String auctionId = "AU" + System.currentTimeMillis();
         String itemId = "IT" + System.currentTimeMillis();
         item.setItemId(itemId);
@@ -121,7 +122,13 @@ public class AuctionService {
     }
 
     public List<Auction> getActive() throws Exception {
-        return auctionRepository.getActiveAuctions();
+        List<Auction> auctions = auctionRepository.getActiveAuctions();
+        for (Auction auction : auctions) {
+            if (auction != null) {
+                auction.syncStatusWithTime();  // ← THÊM DÒNG NÀY
+            }
+        }
+        return auctions;
     }
 
     public List<Auction> getAll() throws Exception {
@@ -137,6 +144,7 @@ public class AuctionService {
         if (auction == null) {
             throw new IOException("Không tìm thấy phiên đấu giá");
         }
+        auction.syncStatusWithTime();  // ← THÊM DÒNG NÀY
         return auction;
     }
 
@@ -400,7 +408,7 @@ public class AuctionService {
                                         double reservePrice, double minimumBidIncrement)
             throws PermissionDeniedException, IOException, ClassNotFoundException {
         try {
-            return DEFAULT.create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement);
+            return DEFAULT.create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement, false);
         } catch (PermissionDeniedException | IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {

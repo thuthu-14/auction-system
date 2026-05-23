@@ -64,8 +64,12 @@ public class SellerAuctionService {
         String description = text(auctionData.get("description"));
         double price = requiredNumber(auctionData, "price", "startingPrice").doubleValue();
         int duration = requiredNumber(auctionData, "duration").intValue();
-        long startTime = longValue(auctionData.get("startTime"), System.currentTimeMillis());
-        long endTime = longValue(auctionData.get("endTime"), startTime + duration * 60_000L);
+        boolean isStartNow = auctionData.get("isStartNow") instanceof Boolean b && b;
+        long startTime = isStartNow ? System.currentTimeMillis() : longValue(auctionData.get("startTime"), System.currentTimeMillis());
+        // Nếu isStartNow, tính lại endTime từ startTime mới; ngược lại dùng giá trị client gửi
+        long endTime = isStartNow ?
+                (startTime + duration * 60_000L) :
+                longValue(auctionData.get("endTime"), startTime + duration * 60_000L);
         duration = (int) ((endTime - startTime) / 60_000L);
         double reservePrice = numberValue(auctionData.get("reservePrice"), 0.0);
         double minimumBidIncrement = numberValue(auctionData.get("minimumBidIncrement"), 0.0);
@@ -75,7 +79,7 @@ public class SellerAuctionService {
         validateCategoryFields(itemType, auctionData);
 
         Item item = createItemFromData(seller.getUserId(), itemType, auctionData);
-        return auctionService.create(seller, item, startTime, endTime, reservePrice, minimumBidIncrement);
+        return auctionService.create(seller, item, startTime, endTime, reservePrice, minimumBidIncrement, isStartNow);
     }
 
     public void deleteSellerAuction(RegularUser seller, String auctionId) throws Exception {
@@ -137,11 +141,10 @@ public class SellerAuctionService {
 
     private void validateTimeWindow(long startTime, long endTime) {
         long now = System.currentTimeMillis();
-        if (startTime < now - 60_000L) {
-            throw new IllegalArgumentException("Thoi gian bat dau phai tu thoi diem hien tai tro di");
-        }
-        if (endTime <= startTime) {
-            throw new IllegalArgumentException("Thoi gian ket thuc phai sau thoi gian bat dau");
+
+
+        if (startTime < now - 5000L) {  // ✓ Buffer 5 giây
+            throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu");
         }
     }
 
