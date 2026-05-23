@@ -23,6 +23,10 @@ jobs:
     name: Build and Test
     runs-on: windows-latest
 
+    # 🔽 THÊM ĐOẠN NÀY VÀO ĐỂ SỬA LỖI JAVAFX & SOCKET 🔽
+    env:
+      JAVA_TOOL_OPTIONS: "-Dglass.platform=Monocle -Dmonocle.platform=Headless -Dprism.order=sw"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,9 +38,11 @@ jobs:
           java-version: "17"
           cache: maven
 
+      # Bạn nên đổi từ lệnh `verify` sang `clean verify` để xóa sạch cache cũ của máy ảo nếu có
       - name: Verify with Maven
         shell: pwsh
-        run: .\mvnw.cmd --batch-mode --no-transfer-progress verify
+        run: .\mvnw.cmd --batch-mode --no-transfer-progress clean verify
+
 
       - name: Upload test reports
         if: always()
