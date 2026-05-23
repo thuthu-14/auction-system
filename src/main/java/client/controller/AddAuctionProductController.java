@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class    AddAuctionProductController implements Initializable {
+public class AddAuctionProductController implements Initializable {
 
     @FXML
     private TextField productNameField;
@@ -164,36 +164,67 @@ public class    AddAuctionProductController implements Initializable {
     }
 
     private void setupTimeOptions(Parent formNode, CategoryFormConfig config) {
-        LocalDateTime nextStartDateTime = nextAvailableStartDateTime();
-        LocalDate startDate = nextStartDateTime.toLocalDate();
-        LocalTime nextStartTime = nextStartDateTime.toLocalTime();
-        LocalDate endDate = startDate.plusDays(1);
-
+        // Lấy checkbox
+        CheckBox startNowCheckbox = (CheckBox) formNode.lookup(config.startNowCheckboxId());
         ComboBox<?> startHourCombo = (ComboBox<?>) formNode.lookup(config.startHourId());
         ComboBox<?> endHourCombo = (ComboBox<?>) formNode.lookup(config.endHourId());
         DatePicker startDatePicker = (DatePicker) formNode.lookup(config.startDateId());
         DatePicker endDatePicker = (DatePicker) formNode.lookup(config.endDateId());
+
+        if (startNowCheckbox != null) {
+            startNowCheckbox.setOnAction(e -> {
+                boolean isStartNow = startNowCheckbox.isSelected();
+                if (isStartNow) {
+                    // Khi TICK: reset về bây giờ
+                    if (startDatePicker != null) startDatePicker.setValue(LocalDate.now());
+                    if (startHourCombo != null) {
+                        @SuppressWarnings("unchecked")
+                        ComboBox<String> comboBox = (ComboBox<String>) startHourCombo;
+                        LocalTime now = LocalTime.now();
+                        comboBox.getSelectionModel().select(String.format("%02d:%02d", now.getHour(), now.getMinute() < 30 ? 0 : 30));
+                    }
+                }
+                // Disable/Enable các field thời gian bắt đầu
+                if (startDatePicker != null) startDatePicker.setDisable(isStartNow);
+                if (startHourCombo != null) startHourCombo.setDisable(isStartNow);
+            });
+        }
+        if (startNowCheckbox != null) {
+            boolean isStartNow = startNowCheckbox.isSelected();
+            if (startDatePicker != null) startDatePicker.setDisable(isStartNow);
+            if (startHourCombo != null) startHourCombo.setDisable(isStartNow);
+        }
+
+
+        LocalDateTime nextStartDateTime = nextAvailableStartDateTime();
+        LocalDate startDate = nextStartDateTime.toLocalDate();
+        LocalTime nextStartTime = nextStartDateTime.toLocalTime();
+        LocalDate endDate = startDate.plusDays(1);
 
         if (startDatePicker != null) startDatePicker.setValue(startDate);
         if (endDatePicker != null) endDatePicker.setValue(endDate);
         applyCalendarStyles(startDatePicker, endDatePicker);
 
         if (startHourCombo != null) {
-            @SuppressWarnings("unchecked") ComboBox<String> comboBox = (ComboBox<String>) startHourCombo;
+            @SuppressWarnings("unchecked")
+            ComboBox<String> comboBox = (ComboBox<String>) startHourCombo;
             comboBox.setItems(timeOptions);
             comboBox.getSelectionModel().select(nextStartTime.toString());
         }
         if (endHourCombo != null) {
-            @SuppressWarnings("unchecked") ComboBox<String> comboBox = (ComboBox<String>) endHourCombo;
+            @SuppressWarnings("unchecked")
+            ComboBox<String> comboBox = (ComboBox<String>) endHourCombo;
             comboBox.setItems(timeOptions);
             comboBox.getSelectionModel().select(nextStartTime.toString());
         }
     }
 
     private LocalDateTime nextAvailableStartDateTime() {
-        LocalDateTime now = LocalDateTime.now().plusMinutes(30);
-        int minute = now.getMinute() <= 30 ? 30 : 60;
-        return now.withMinute(0).withSecond(0).withNano(0).plusMinutes(minute);
+        LocalDateTime now = LocalDateTime.now();  // ← Xóa .plusMinutes(30)
+        // Làm tròn phút gần nhất (30 phút hoặc full hour)
+        int minute = now.getMinute() <= 30 ? 30 : 0;
+        int hour = now.getMinute() <= 30 ? 0 : 1;
+        return now.withMinute(0).withSecond(0).withNano(0).plusMinutes(minute).plusHours(hour);
     }
     private void applyCalendarStyles(DatePicker... datePickers) {
         String calendarCss = getCalendarStylesheet();
@@ -284,6 +315,11 @@ public class    AddAuctionProductController implements Initializable {
                         @Override
                         public String comboValue(String fieldId) {
                             return getComboValue(fieldId);
+                        }
+
+                        @Override
+                        public boolean isCheckboxSelected(String checkboxId) {  // ← THÊM
+                            return isCheckboxChecked(checkboxId);
                         }
                     });
 
@@ -398,6 +434,16 @@ public class    AddAuctionProductController implements Initializable {
             }
         }
         return null;
+    }
+    private boolean isCheckboxChecked(String checkboxId) {
+        if (categoryFormPane != null && !categoryFormPane.getChildren().isEmpty()) {
+            Node node = categoryFormPane.getChildren().get(0);
+            if (node instanceof Parent form) {
+                CheckBox checkbox = (CheckBox) form.lookup(checkboxId);
+                return checkbox != null && checkbox.isSelected();
+            }
+        }
+        return false;
     }
 
 }
