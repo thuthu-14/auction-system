@@ -59,7 +59,7 @@ class AddAuctionProductControllerTest {
             ComboBox<String> endHour = new ComboBox<>();
             endHour.setId("endHour");
             form.getChildren().addAll(startDate, endDate, startHour, endHour);
-            Object config = categoryFormConfig("Any", "/missing.fxml", "#startDate", "#startHour", "#endDate", "#endHour");
+            Object config = categoryFormConfig("Any", "/missing.fxml", "#startDate", "#startHour", "#endDate", "#endHour", "#startNowCheckbox");
 
             invoke(controller, "setupTimeOptions", form, config);
 
