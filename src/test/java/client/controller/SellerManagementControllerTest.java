@@ -35,7 +35,7 @@ class SellerManagementControllerTest {
         assertEquals("2", active.bidsProperty().get());
 
         SellerManagementController.AuctionItem pending = new SellerManagementController.AuctionItem(
-                auction("A2", "Draft", ItemCategory.FASHION, AuctionStatus.DRAFT, System.currentTimeMillis() + 60_000L, 0));
+                auction("A2", "Draft", ItemCategory.FASHION, AuctionStatus.WAITING, System.currentTimeMillis() + 60_000L, 0));
         assertTrue(pending.isPending());
         assertEquals("pending", pending.getStatusKey());
 
@@ -68,7 +68,7 @@ class SellerManagementControllerTest {
             SellerManagementController controller = controllerWithControls();
             addItems(controller,
                     auction("A1", "Active", ItemCategory.ELECTRONICS, AuctionStatus.OPEN, System.currentTimeMillis() + 60_000L, 1),
-                    auction("A2", "Pending", ItemCategory.FASHION, AuctionStatus.DRAFT, System.currentTimeMillis() + 60_000L, 0),
+                    auction("A2", "Pending", ItemCategory.FASHION, AuctionStatus.WAITING, System.currentTimeMillis() + 60_000L, 0),
                     auction("A3", "Ended", ItemCategory.JEWELRY, AuctionStatus.FINISHED, System.currentTimeMillis() - 60_000L, 2),
                     auction("A4", "Cancelled", ItemCategory.OTHER, AuctionStatus.CANCELLED, System.currentTimeMillis() - 60_000L, 0));
 
@@ -89,7 +89,7 @@ class SellerManagementControllerTest {
             addItems(controller,
                     auction("A1", "Camera", ItemCategory.ELECTRONICS, AuctionStatus.OPEN, System.currentTimeMillis() + 60_000L, 1),
                     auction("A2", "Ring", ItemCategory.JEWELRY, AuctionStatus.FINISHED, System.currentTimeMillis() - 60_000L, 2),
-                    auction("A3", "Coat", ItemCategory.FASHION, AuctionStatus.DRAFT, System.currentTimeMillis() + 60_000L, 0));
+                    auction("A3", "Coat", ItemCategory.FASHION, AuctionStatus.WAITING, System.currentTimeMillis() + 60_000L, 0));
             combo(controller, "sortCombo").getItems().addAll("Mới nhất", "Cũ nhất", "Giá cao", "Giá thấp");
             combo(controller, "sortCombo").getSelectionModel().select("Mới nhất");
             combo(controller, "categoryCombo").getItems().addAll("Tất cả", "Điện tử", "Thời trang", "Trang sức", "Sưu tầm", "Xe cộ", "Khác");
