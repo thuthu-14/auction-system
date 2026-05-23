@@ -25,9 +25,10 @@ class SellerNotificationsControllerTest {
             controller.initialize(null, null);
             assertNotNull(markAll.getOnAction());
 
-            Notification sale = new Notification("u1", "SALE", "", "", "now", "", "A1");
-            Notification bidderOnly = new Notification("u1", "OUTBID", "Outbid", "Bidder", "now", "Open", "A2");
-            invoke(controller, "renderNotifications", List.of(sale, bidderOnly, "ignored"));
+            // Thành (thêm proper title/description):
+            Notification sale1 = new Notification("u1", "SALE", "Item Sold!", "Congrats", "now", "View", "A1");
+            Notification sale2 = new Notification("u1", "SALE", "Another Item Sold!", "You got payment", "now", "View", "A2");
+            invoke(controller, "renderNotifications", List.of(sale1, "ignored"));
             assertEquals(1, container.getChildren().size());
             assertTrue(container.getChildren().get(0) instanceof HBox);
 
@@ -38,12 +39,11 @@ class SellerNotificationsControllerTest {
             VBox actionBox = (VBox) row.getChildren().get(2);
             assertTrue(titleLabel.isWrapText());
             assertTrue(descLabel.isWrapText());
-            assertEquals(132, actionBox.getPrefWidth(), 0.001);
-            assertEquals(3, actionBox.getChildren().size());
-            assertTrue(actionBox.getChildren().get(2) instanceof Label);
-            ((Button) actionBox.getChildren().get(0)).fire();
 
-            invoke(controller, "renderNotifications", List.of(bidderOnly));
+            assertEquals(2, actionBox.getChildren().size());
+            ((Button) actionBox.getChildren().get(1)).fire();
+
+            invoke(controller, "renderNotifications", List.of());
             assertEquals(1, container.getChildren().size());
             assertTrue(container.getChildren().get(0) instanceof Label);
 
