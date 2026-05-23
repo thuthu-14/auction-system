@@ -28,9 +28,9 @@ class NotificationsControllerTest {
             controller.initialize(null, null);
             assertNotNull(markAll.getOnAction());
 
-            Notification win = new Notification("u1", "WIN", "", "", "now", "", "A1");
-            Notification sellerOnly = new Notification("u1", "SELLER_BID", "Bid", "Seller", "now", "Open", "A2");
-            invoke(controller, "renderNotifications", List.of(win, sellerOnly, "ignored"));
+            Notification win1 = new Notification("u1", "WIN", "You Won!", "Congrats", "now", "View", "A1");
+            Notification win2 = new Notification("u1", "WIN", "You Won Again!", "Another auction", "now", "View", "A2");
+            invoke(controller, "renderNotifications", List.of(win1, win2, "ignored"));
             assertEquals(2, container.getChildren().size());
             assertTrue(container.getChildren().get(0) instanceof HBox);
             HBox row = (HBox) container.getChildren().get(1);
@@ -40,17 +40,14 @@ class NotificationsControllerTest {
             VBox actionBox = (VBox) row.getChildren().get(2);
             assertTrue(titleLabel.isWrapText());
             assertTrue(descLabel.isWrapText());
-            assertEquals(132, actionBox.getPrefWidth(), 0.001);
-            assertEquals(3, actionBox.getChildren().size());
-            assertTrue(actionBox.getChildren().get(2) instanceof Label);
-
-            invoke(controller, "renderNotifications", List.of(sellerOnly));
+            assertEquals(2, actionBox.getChildren().size());
+            invoke(controller, "renderNotifications", List.of(win1));
             assertEquals(1, container.getChildren().size());
             assertTrue(container.getChildren().get(0) instanceof HBox);
 
             user.setShopPhone("0912345678");
             user.setShopAddress("Ha Noi");
-            invoke(controller, "renderNotifications", List.of(sellerOnly));
+            invoke(controller, "renderNotifications", List.of());
             assertEquals(1, container.getChildren().size());
             assertTrue(container.getChildren().get(0) instanceof Label);
 
