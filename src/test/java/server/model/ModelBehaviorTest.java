@@ -22,8 +22,10 @@ class ModelBehaviorTest {
         assertEquals(AuctionStatus.RUNNING, auction.getStatus());
         assertThrows(Exception.class, () -> auction.placeBid("u2", "other", 110.0));
 
-        auction.setStatus(AuctionStatus.FINISHED);
-        assertThrows(Exception.class, () -> auction.placeBid("u2", "other", 120.0));
+        long nowTest = System.currentTimeMillis();
+        Auction finishedAuction = new Auction("A2", "IT2", "seller-1", "seller",
+                item(), 100.0, nowTest - 60_000L, nowTest - 10_000L);
+        assertThrows(Exception.class, () -> finishedAuction.placeBid("u2", "other", 120.0));
     }
 
     @Test
