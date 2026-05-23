@@ -133,6 +133,7 @@ public class NotificationsController implements Initializable {
 
         Label titleLabel = new Label(defaultText(data.getTitle(), "Thông báo"));
         titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        titleLabel.setWrapText(true);
         titleLabel.setStyle("-fx-text-fill: " + getTitleColor(data) + ";");
 
         Label descLabel = new Label(defaultText(data.getDescription(), ""));
