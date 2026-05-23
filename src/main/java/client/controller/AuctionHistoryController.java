@@ -6,7 +6,6 @@ import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.AuctionHistoryClient;
 import client.service.AuctionHistoryClientService;
-import client.ui.AuctionHistoryViewFactory;
 import client.util.DialogUtil;
 import common.AuctionStatus;
 import common.Message;
@@ -68,7 +67,6 @@ public class AuctionHistoryController {
 
     private final ObservableList<HistoryRow> visibleRows = FXCollections.observableArrayList();
     private final List<HistoryRow> allRows = new ArrayList<>();
-    private final AuctionHistoryViewFactory viewFactory = new AuctionHistoryViewFactory();
     private User currentUser;
     private ClientSocket clientSocket;
     private HomeScreenController homeController;
@@ -308,7 +306,7 @@ public class AuctionHistoryController {
         pane.getStyleClass().add("seller-contact-dialog");
         pane.getButtonTypes().add(ButtonType.OK);
         pane.setHeaderText("Li\u00ean h\u1ec7 ng\u01b0\u1eddi b\u00e1n");
-        pane.setContent(viewFactory.createContactContent(
+        pane.setContent(createContactContent(
                 safeContact(name, auction != null ? auction.getSellerName() : "Ng\u01b0\u1eddi b\u00e1n"),
                 safeContact(email, "Ch\u01b0a c\u1eadp nh\u1eadt"),
                 safeContact(phone, "Ch\u01b0a c\u1eadp nh\u1eadt"),
@@ -322,14 +320,36 @@ public class AuctionHistoryController {
         dialog.showAndWait();
     }
 
+    private VBox createContactContent(String name, String email, String phone, String address) {
+        VBox content = new VBox(8);
+        content.setPadding(new Insets(4, 0, 0, 0));
+        content.setPrefWidth(340);
+        content.setMinWidth(340);
+        content.setMaxWidth(340);
+        content.getChildren().addAll(
+                contactLine("T\u00ean: " + name),
+                contactLine("Email: " + email),
+                contactLine("S\u0110T: " + phone),
+                contactLine("\u0110\u1ecba ch\u1ec9: " + address)
+        );
+        return content;
+    }
+
+    private Label contactLine(String text) {
+        Label label = new Label(text);
+        label.setWrapText(true);
+        label.setMinWidth(0);
+        label.setPrefWidth(340);
+        label.setMaxWidth(340);
+        label.setMinHeight(Region.USE_PREF_SIZE);
+        label.setStyle("-fx-font-size: 14px; -fx-text-fill: #020617;");
+        return label;
+    }
+
     private boolean hasUsefulContact(Map<String, String> contact) {
         return contact != null
                 && (!"Ch\u01b0a c\u1eadp nh\u1eadt".equals(contact.get("phone"))
                 || !"Ch\u01b0a c\u1eadp nh\u1eadt".equals(contact.get("email")));
-    }
-
-    private VBox createContactContent(String name, String email, String phone, String address) {
-        return viewFactory.createContactContent(name, email, phone, address);
     }
 
     private String safeContact(String value, String fallback) {
@@ -416,7 +436,11 @@ public class AuctionHistoryController {
     }
 
     private class ActionCell extends TableCell<HistoryRow, Void> {
-        private final Button button = viewFactory.createActionButton();
+        private final Button button = new Button();
+
+        private ActionCell() {
+            button.setMaxWidth(Double.MAX_VALUE);
+        }
 
         @Override
         protected void updateItem(Void item, boolean empty) {
@@ -428,13 +452,16 @@ public class AuctionHistoryController {
 
             HistoryRow row = getTableView().getItems().get(getIndex());
             if (row.isActive()) {
-                viewFactory.configureActiveButton(button, row.isOutbid());
+                button.setText(row.isOutbid() ? "Tr\u1ea3 gi\u00e1 ti\u1ebfp" : "\u0110\u1ea5u gi\u00e1 ngay");
+                button.setStyle("-fx-background-color: #111827; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-weight: 700; -fx-cursor: hand;");
                 button.setOnAction(event -> homeController.loadAuctionDetailView(row.auction, false));
             } else if (row.isWinner()) {
-                viewFactory.configureWinnerButton(button);
+                button.setText("Li\u00ean h\u1ec7");
+                button.setStyle("-fx-background-color: #2563eb; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-weight: 700; -fx-cursor: hand;");
                 button.setOnAction(event -> showSellerContact(row.auction));
             } else {
-                viewFactory.configureEndedButton(button);
+                button.setText("Xem chi ti\u1ebft");
+                button.setStyle("-fx-background-color: #e5e7eb; -fx-text-fill: #4b5563; -fx-background-radius: 6; -fx-font-weight: 700; -fx-cursor: hand;");
                 button.setOnAction(event -> homeController.loadAuctionDetailView(row.auction, true));
             }
             setGraphic(button);

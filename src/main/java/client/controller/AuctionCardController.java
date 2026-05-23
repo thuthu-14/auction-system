@@ -156,25 +156,34 @@ public class AuctionCardController {
         if (countdownTimer != null) countdownTimer.stop();
 
         countdownTimer = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            if (currentAuction == null) return;
+
+            long now = System.currentTimeMillis();
+            long startTime = currentAuction.getStartTime();
             long endTime = currentAuction.getEndTime();
 
+            // Kiểm tra trạng thái WAITING - chưa đến giờ bắt đầu
+            if (now < startTime) {
+                long waitMs = startTime - now;
+                timerLabel.setText("⏱ Bắt đầu trong: " + DateTimeUtil.formatTimestamp(waitMs));
+                timerLabel.setTextFill(Color.web("#f59e0b"));  // Màu vàng cho WAITING
+                bidButton.setDisable(true);  // Vô hiệu hóa nút đấu giá khi chưa bắt đầu
+                forceVisibleTextColors();
+                return;
+            }
+
+            // Đã bắt đầu nhưng chưa kết thúc - hiển thị countdown endTime
             if (!DateTimeUtil.isExpired(endTime)) {
-                long remainingMs = endTime - System.currentTimeMillis();
-                timerLabel.setText("\u23f1 C\u00f2n " + DateTimeUtil.formatTimestamp(remainingMs));
-                timerLabel.setTextFill(Color.web("#e53e3e"));
+                long remainingMs = endTime - now;
+                timerLabel.setText("⏱ Còn " + DateTimeUtil.formatTimestamp(remainingMs));
+                timerLabel.setTextFill(Color.web("#e53e3e"));  // Màu đỏ cho RUNNING
+                bidButton.setDisable(false);
                 forceVisibleTextColors();
             } else {
-                timerLabel.setText("\u23f1 \u0110\u00e3 k\u1ebft th\u00fac");
-                timerLabel.setTextFill(Color.web("#6b7280"));
+                // Đã kết thúc
+                timerLabel.setText("⏱ Đã kết thúc");
+                timerLabel.setTextFill(Color.web("#6b7280"));  // Màu xám
                 timerLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-weight: bold; -fx-font-size: 12px;");
-                if (productNameLabel != null) {
-                    productNameLabel.setTextFill(Color.web("#113254"));
-                    productNameLabel.setStyle("-fx-text-fill: #113254; -fx-font-weight: bold; -fx-font-size: 15px;");
-                }
-                if (priceLabel != null) {
-                    priceLabel.setTextFill(Color.web("#111827"));
-                    priceLabel.setStyle("-fx-text-fill: #111827; -fx-font-weight: bold; -fx-font-size: 14px;");
-                }
                 bidButton.setDisable(true);
                 countdownTimer.stop();
             }

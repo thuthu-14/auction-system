@@ -42,7 +42,14 @@ public class Auction implements Serializable {
         this.highestBidderId = null;
         this.highestBidderName = null;
 
-        this.status = AuctionStatus.OPEN;
+        long now = System.currentTimeMillis();
+        // ← SET TRẠNG THÁI ĐÚNG DỰA TRÊN THỜI GIAN
+        if (startTimeMillis > now) {
+            this.status = AuctionStatus.WAITING;  // Chưa đến giờ
+        } else {
+            this.status = AuctionStatus.OPEN;     // Đã đến giờ, mở đấu
+        }
+
         this.startTime = startTimeMillis;
         this.endTime = endTimeMillis;
         this.createdAt = System.currentTimeMillis();
@@ -66,6 +73,7 @@ public class Auction implements Serializable {
         this.highestBidderId = null;
         this.highestBidderName = null;
 
+        // Với constructor này, startTime lúc nào cũng = now, nên trạng thái là OPEN
         this.status = AuctionStatus.OPEN;
         this.startTime = System.currentTimeMillis();
         this.endTime = startTime + (durationMinutes * 60 * 1000L);
@@ -76,24 +84,27 @@ public class Auction implements Serializable {
         this.bidIds = new ArrayList<>();
         this.viewCount = 0;
     }
-
-    // Constructor 3: Empty
+    // Constructor 3: Empty (dùng cho mapping database)
     public Auction() {
         this.bidIds = new ArrayList<>();
     }
 
+    // Constructor 3: Empty
     public synchronized boolean placeBid(String bidderId, String bidderName, double amount) throws Exception {
         long now = System.currentTimeMillis();
-        if (status != AuctionStatus.OPEN && status != AuctionStatus.RUNNING) {
-            throw new Exception("Phiên đấu giá đã kết thúc!");
-        }
+
+        // Nếu chưa đến thời gian bắt đầu
         if (now < startTime) {
-            throw new Exception("Phiên đấu giá chưa bắt đầu!");
+            throw new Exception("Phiên đấu giá chưa bắt đầu! Vui lòng đợi đến " +
+                    new java.util.Date(startTime));
         }
+
+        // Nếu quá thời gian kết thúc
         if (now > endTime) {
             throw new Exception("Phiên đấu giá đã kết thúc!");
         }
 
+        // Kiểm tra giá
         if (amount <= currentPrice) {
             throw new Exception("Giá đấu phải cao hơn: $" + currentPrice);
         }
@@ -101,7 +112,12 @@ public class Auction implements Serializable {
         this.currentPrice = amount;
         this.highestBidderId = bidderId;
         this.highestBidderName = bidderName;
-        this.status = AuctionStatus.RUNNING;
+
+        // ← THAY ĐỔI: Chuyển từ WAITING → OPEN → RUNNING
+        if (status == AuctionStatus.WAITING) {
+            this.status = AuctionStatus.OPEN;  // Chuyển từ "chờ bắt đầu" sang "đang mở"
+        }
+        this.status = AuctionStatus.RUNNING;   // Rồi chuyển sang "đang diễn ra"
 
         return true;
     }
@@ -194,5 +210,31 @@ public class Auction implements Serializable {
 
     public void incrementViewCount() {
         this.viewCount++;
+    }
+
+    /**
+     * Kiểm tra và cập nhật trạng thái dựa trên thời gian hiện tại
+     * Gọi method này mỗi khi load auction hoặc trước khi hiển thị
+     */
+    public synchronized void syncStatusWithTime() {
+        long now = System.currentTimeMillis();
+
+        if (status == AuctionStatus.CLOSED || status == AuctionStatus.FINISHED ||
+                status == AuctionStatus.CANCELLED) {
+            return;  // Không cập nhật trạng thái kết thúc
+        }
+
+        // Nếu chưa đến giờ bắt đầu → WAITING
+        if (now < startTime && status != AuctionStatus.WAITING) {
+            this.status = AuctionStatus.WAITING;
+        }
+
+        // Nếu quá giờ kết thúc → cần CLOSED
+        if (now > endTime && (status == AuctionStatus.WAITING ||
+                status == AuctionStatus.OPEN || status == AuctionStatus.RUNNING)) {
+            // Lưu ý: không tự động set FINISHED ở đây, cần server signal
+            // Chỉ set CLOSED tạm thời để khóa đấu giá
+            this.status = AuctionStatus.CLOSED;
+        }
     }
 }

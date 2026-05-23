@@ -3,7 +3,7 @@ package common;
 import java.io.Serializable;
 
 public enum AuctionStatus implements Serializable {
-    DRAFT("Bản nháp - Chưa công bố"),
+    WAITING("Chờ bắt đầu - Chưa đến giờ"),  // ← THÊM TRẠNG THÁI NÀY
     OPEN("Mở - Đang chờ người trả giá"),
     RUNNING("Đang diễn ra - Có người đã trả giá"),
     CLOSED(""),

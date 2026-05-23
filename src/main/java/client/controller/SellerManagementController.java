@@ -6,7 +6,6 @@ import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.SellerClient;
 import client.service.SellerClientService;
-import client.ui.SellerAuctionTableCellFactory;
 import common.AuctionStatus;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -58,7 +57,6 @@ public class SellerManagementController {
 
     private final ObservableList<AuctionItem> allItems = FXCollections.observableArrayList();
     private final SellerClient sellerClientService;
-    private final SellerAuctionTableCellFactory tableCellFactory = new SellerAuctionTableCellFactory();
 
     private List<HBox> allTabs;
     private String currentTab = "all";
@@ -129,26 +127,88 @@ public class SellerManagementController {
         auctionTable.setEditable(true);
 
         colProduct.setCellValueFactory(cell -> cell.getValue().nameProperty());
-        colProduct.setCellFactory(col -> tableCellFactory.productCell());
+        colProduct.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                    setGraphic(null);
+                    return;
+                }
+                AuctionItem row = getTableView().getItems().get(getIndex());
+                VBox box = new VBox(2);
+                Label name = new Label(row.getName());
+                name.setStyle("-fx-font-weight: bold; -fx-text-fill: #111827;");
+                Label id = new Label("ID: " + row.getId());
+                id.setStyle("-fx-font-size: 10px; -fx-text-fill: #9ca3af;");
+                box.getChildren().addAll(name, id);
+                setGraphic(box);
+            }
+        });
 
         colId.setCellValueFactory(cell -> cell.getValue().idProperty());
         colPrice.setCellValueFactory(cell -> cell.getValue().priceProperty());
-        colPrice.setCellFactory(col -> tableCellFactory.priceCell());
+        colPrice.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                    setGraphic(null);
+                    return;
+                }
+                AuctionItem row = getTableView().getItems().get(getIndex());
+                VBox box = new VBox(2);
+                Label current = new Label(formatVnd(row.getCurrentPrice()));
+                current.setStyle("-fx-font-weight: bold; -fx-text-fill: #111827;");
+                Label start = new Label("Gốc: " + formatVnd(row.getStartPrice()));
+                start.setStyle("-fx-font-size: 10px; -fx-text-fill: #9ca3af;");
+                box.getChildren().addAll(current, start);
+                setGraphic(box);
+            }
+        });
 
         colBids.setCellValueFactory(cell -> cell.getValue().bidsProperty());
         colTimeLeft.setCellValueFactory(cell -> cell.getValue().timeLeftStrProperty());
         colStatus.setCellValueFactory(cell -> cell.getValue().statusTextProperty());
-        colStatus.setCellFactory(col -> tableCellFactory.statusCell());
+        colStatus.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                    setGraphic(null);
+                    return;
+                }
+                AuctionItem row = getTableView().getItems().get(getIndex());
+                Label label = new Label(row.getStatusText());
+                label.setStyle(statusStyle(row.getStatusKey()));
+                setGraphic(label);
+            }
+        });
 
-        colActions.setCellFactory(col -> tableCellFactory.actionCell(this::openAuctionDetails));
-    }
-
-    private void openAuctionDetails(String auctionId) {
-        if (sellerHomeController != null) {
-            sellerHomeController.loadSellerAuctionDetailsView(auctionId);
-        } else {
-            LoggerUtil.warn("SellerHomeController is null, cannot open auction details: " + auctionId);
-        }
+        colActions.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                    return;
+                }
+                Button button = new Button("Chi tiết");
+                button.setStyle("-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-radius: 5; -fx-cursor: hand;");
+                button.setOnAction(event -> {
+                    if (getIndex() < 0 || getIndex() >= getTableView().getItems().size()) {
+                        return;
+                    }
+                    AuctionItem row = getTableView().getItems().get(getIndex());
+                    if (sellerHomeController != null) {
+                        sellerHomeController.loadSellerAuctionDetailsView(row.getId());
+                    } else {
+                        LoggerUtil.warn("SellerHomeController is null, cannot open auction details: " + row.getId());
+                    }
+                });
+                setGraphic(button);
+            }
+        });
     }
 
     public void refreshAuctions() {
@@ -360,6 +420,7 @@ public class SellerManagementController {
         private final AuctionStatus status;
         private final long startPrice;
         private final long currentPrice;
+        private final long startTime;      // ← THÊM DÒNG NÀY
         private final long endTime;
         private final long createdAt;
         private final int bids;
@@ -377,6 +438,7 @@ public class SellerManagementController {
             status = auction.getStatus();
             startPrice = Math.round(item.getStartingPrice());
             currentPrice = Math.round(auction.getCurrentPrice());
+            startTime = auction.getStartTime();  // ← THÊM DÒNG NÀY
             endTime = auction.getEndTime();
             createdAt = auction.getCreatedAt();
             bids = auction.getBidIds() == null ? 0 : auction.getBidIds().size();
@@ -389,8 +451,18 @@ public class SellerManagementController {
             } else if (endTime <= 0) {
                 timeLeftStr.set("--");
             } else {
-                long remainingMs = Math.max(0, endTime - System.currentTimeMillis());
-                timeLeftStr.set(DateTimeUtil.formatTimestamp(remainingMs));
+                long now = System.currentTimeMillis();
+
+                // ← KIỂM TRA TRẠNG THÁI WAITING
+                if (isPending() && now < startTime) {
+                    // Trạng thái WAITING - hiển thị thời gian bắt đầu
+                    long waitingMs = Math.max(0, startTime - now);
+                    timeLeftStr.set("Bắt đầu trong: " + DateTimeUtil.formatTimestamp(waitingMs));
+                } else {
+                    // Trạng thái OPEN hoặc RUNNING - hiển thị thời gian kết thúc
+                    long remainingMs = Math.max(0, endTime - now);
+                    timeLeftStr.set(DateTimeUtil.formatTimestamp(remainingMs));
+                }
             }
         }
 
@@ -399,7 +471,7 @@ public class SellerManagementController {
         }
 
         public boolean isPending() {
-            return status == AuctionStatus.DRAFT;
+            return status == AuctionStatus.WAITING;
         }
 
         public boolean isEnded() {

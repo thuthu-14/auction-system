@@ -35,34 +35,31 @@ public class SchemaInitializer {
                   description TEXT,
                   starting_price REAL NOT NULL,
                   category TEXT NOT NULL,
-                  seller_id TEXT,
+                  seller_id TEXT NOT NULL,
                   created_at BIGINT,
-
                   brand TEXT,
                   warranty_period TEXT,
                   model TEXT,
                   odometer INTEGER,
                   material TEXT,
                   weight REAL,
-                  creator TEXT
+                  creator TEXT,
+                  FOREIGN KEY (seller_id) REFERENCES users(user_id) ON DELETE CASCADE
                 )
             """);
 
-
             st.executeUpdate("""
-    CREATE TABLE IF NOT EXISTS item_images (
-      image_id TEXT PRIMARY KEY,
-      item_id TEXT NOT NULL,
-      image_data BLOB NOT NULL,
-      image_size INTEGER,
-      image_type TEXT DEFAULT 'jpg',
-      sort_index INTEGER DEFAULT 0,
-      created_at BIGINT,
-      FOREIGN KEY (item_id) REFERENCES items(item_id)
-    )
-""");
-
-
+                CREATE TABLE IF NOT EXISTS item_images (
+                  image_id TEXT PRIMARY KEY,
+                  item_id TEXT NOT NULL,
+                  image_data BLOB NOT NULL,
+                  image_size INTEGER,
+                  image_type TEXT DEFAULT 'jpg',
+                  sort_index INTEGER DEFAULT 0,
+                  created_at BIGINT,
+                  FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE
+                )
+            """);
 
             st.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS auctions (
@@ -79,7 +76,10 @@ public class SchemaInitializer {
                   created_at BIGINT,
                   reserve_price REAL,
                   minimum_bid_increment REAL,
-                  view_count INTEGER DEFAULT 0
+                  view_count INTEGER DEFAULT 0,
+                  FOREIGN KEY (item_id) REFERENCES items(item_id) ON DELETE CASCADE,
+                  FOREIGN KEY (seller_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                  FOREIGN KEY (highest_bidder_id) REFERENCES users(user_id) ON DELETE SET NULL
                 )
             """);
 
@@ -91,7 +91,9 @@ public class SchemaInitializer {
                   bidder_name TEXT NOT NULL,
                   amount REAL NOT NULL,
                   bid_time BIGINT,
-                  status TEXT
+                  status TEXT,
+                  FOREIGN KEY (auction_id) REFERENCES auctions(auction_id) ON DELETE CASCADE,
+                  FOREIGN KEY (bidder_id) REFERENCES users(user_id) ON DELETE CASCADE
                 )
             """);
 
@@ -106,7 +108,8 @@ public class SchemaInitializer {
                   time_ago TEXT,
                   button_text TEXT,
                   reference_id TEXT,
-                  is_read INTEGER DEFAULT 0
+                  is_read INTEGER DEFAULT 0,
+                  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
                 )
             """);
 
@@ -118,7 +121,8 @@ public class SchemaInitializer {
                   amount REAL NOT NULL,
                   balance_after REAL NOT NULL,
                   description TEXT,
-                  timestamp BIGINT
+                  timestamp BIGINT,
+                  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
                 )
             """);
 
@@ -130,7 +134,8 @@ public class SchemaInitializer {
                   bank_name TEXT,
                   account_number TEXT,
                   initial_balance REAL,
-                  created_at BIGINT
+                  created_at BIGINT,
+                  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
                 )
             """);
 
@@ -138,7 +143,9 @@ public class SchemaInitializer {
                 CREATE TABLE IF NOT EXISTS user_owned_auctions (
                   user_id TEXT NOT NULL,
                   auction_id TEXT NOT NULL,
-                  PRIMARY KEY (user_id, auction_id)
+                  PRIMARY KEY (user_id, auction_id),
+                  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                  FOREIGN KEY (auction_id) REFERENCES auctions(auction_id) ON DELETE CASCADE
                 )
             """);
 
@@ -146,7 +153,9 @@ public class SchemaInitializer {
                 CREATE TABLE IF NOT EXISTS user_bids (
                   user_id TEXT NOT NULL,
                   bid_id TEXT NOT NULL,
-                  PRIMARY KEY (user_id, bid_id)
+                  PRIMARY KEY (user_id, bid_id),
+                  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                  FOREIGN KEY (bid_id) REFERENCES bids(bid_id) ON DELETE CASCADE
                 )
             """);
 
@@ -154,7 +163,9 @@ public class SchemaInitializer {
                 CREATE TABLE IF NOT EXISTS auction_bids (
                   auction_id TEXT NOT NULL,
                   bid_id TEXT NOT NULL,
-                  PRIMARY KEY (auction_id, bid_id)
+                  PRIMARY KEY (auction_id, bid_id),
+                  FOREIGN KEY (auction_id) REFERENCES auctions(auction_id) ON DELETE CASCADE,
+                  FOREIGN KEY (bid_id) REFERENCES bids(bid_id) ON DELETE CASCADE
                 )
             """);
 

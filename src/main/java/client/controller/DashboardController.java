@@ -9,7 +9,6 @@ import client.network.ConnectionManager;
 import client.service.AuctionQueryClient;
 import client.service.DashboardClientService;
 import client.ui.AuctionCardFactory;
-import client.ui.DashboardViewFactory;
 import common.AuctionStatus;
 import common.ItemCategory;
 import server.model.Auction;
@@ -69,7 +68,7 @@ public class DashboardController implements Initializable {
     private HomeScreenController homeScreenController;
     private final AuctionQueryClient auctionQueryClient;
     private final DashboardLogic dashboardLogic;
-    private final DashboardViewFactory dashboardViewFactory;
+    private final AuctionCardFactory auctionCardFactory;
 
     public DashboardController() {
         this(new DashboardClientService(), new DashboardLogic(), new AuctionCardFactory());
@@ -80,7 +79,7 @@ public class DashboardController implements Initializable {
                         AuctionCardFactory auctionCardFactory) {
         this.auctionQueryClient = auctionQueryClient;
         this.dashboardLogic = dashboardLogic;
-        this.dashboardViewFactory = new DashboardViewFactory(auctionCardFactory);
+        this.auctionCardFactory = auctionCardFactory;
     }
 
     public void setUserData(User user, ClientSocket socket) {
@@ -191,7 +190,7 @@ public class DashboardController implements Initializable {
         for (Auction auction : endingSoonAuctions) {
             VBox card = createAuctionCard(auction);
             if (card != null) {
-                dashboardViewFactory.applyCompactCardSize(card);
+                applyCompactCardSize(card);
                 endingSoonHBox.getChildren().add(card);
             }
         }
@@ -222,7 +221,7 @@ public class DashboardController implements Initializable {
         for (Auction auction : suggestions) {
             VBox card = createAuctionCard(auction);
             if (card != null) {
-                dashboardViewFactory.applySuggestionCardSize(card);
+                applySuggestionCardSize(card);
                 suggestedHBox.getChildren().add(card);
             }
         }
@@ -336,12 +335,166 @@ public class DashboardController implements Initializable {
         nextSuggestedBtn.toFront();
     }
 
+    private void applyCompactCardSize(VBox card) {
+        double cardWidth = 238;
+        double contentWidth = 216;
+        card.setAlignment(Pos.TOP_CENTER);
+        card.setSpacing(8);
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #eef2f7; -fx-border-radius: 10; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 8, 0, 0, 3); -fx-padding: 11;");
+        card.setMinWidth(cardWidth);
+        card.setPrefWidth(cardWidth);
+        card.setMaxWidth(cardWidth);
+        card.setMinHeight(362);
+        card.setPrefHeight(362);
+        card.setMaxHeight(362);
+
+        javafx.scene.Node imageContainer = card.lookup("#imageContainer");
+        if (imageContainer instanceof Region region) {
+            region.setMinSize(216, 204);
+            region.setPrefSize(216, 204);
+            region.setMaxSize(216, 204);
+            region.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 8;");
+            VBox.setMargin(region, new javafx.geometry.Insets(0, 0, 0, 0));
+            if (region instanceof StackPane stackPane) {
+                stackPane.setAlignment(Pos.CENTER);
+            }
+        }
+
+        javafx.scene.Node productImage = card.lookup("#productImageView");
+        if (productImage instanceof ImageView imageView) {
+            imageView.setFitWidth(216);
+            imageView.setFitHeight(204);
+        }
+
+        javafx.scene.Node productName = card.lookup("#productNameLabel");
+        if (productName instanceof Label label) {
+            setRegionWidth(label, contentWidth);
+            label.setMinHeight(40);
+            label.setPrefHeight(40);
+            label.setMaxHeight(40);
+            label.setStyle("-fx-text-fill: #113254; -fx-font-size: 14px; -fx-font-weight: bold;");
+            VBox.setMargin(label, new javafx.geometry.Insets(4, 0, 0, 0));
+        }
+
+        
+        resizeMetaRow(card, contentWidth, 27, 12, 12);
+
+        javafx.scene.Node bidButton = card.lookup("#bidButton");
+        if (bidButton instanceof Button button) {
+            setRegionWidth(button, contentWidth);
+            button.setMinHeight(32);
+            button.setPrefHeight(32);
+            button.setMaxHeight(32);
+            button.setStyle("-fx-background-color: #1a1a1a; -fx-background-radius: 16; -fx-cursor: hand; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 0;");
+        }
+    }
+
+    private void applySuggestionCardSize(VBox card) {
+        double cardWidth = 218;
+        double contentWidth = 198;
+        card.setAlignment(Pos.TOP_CENTER);
+        card.setSpacing(7);
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #eef2f7; -fx-border-radius: 10; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 8, 0, 0, 3); -fx-padding: 10;");
+
+        card.setMinWidth(cardWidth);
+        card.setPrefWidth(cardWidth);
+        card.setMaxWidth(cardWidth);
+        card.setMinHeight(336);
+        card.setPrefHeight(336);
+        card.setMaxHeight(336);
+
+        javafx.scene.Node imageContainer = card.lookup("#imageContainer");
+        if (imageContainer instanceof Region region) {
+            region.setMinSize(188, 188);
+            region.setPrefSize(188, 188);
+            region.setMaxSize(188, 188);
+            region.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 8;");
+            VBox.setMargin(region, new javafx.geometry.Insets(0, 0, 0, 0));
+            if (region instanceof StackPane stackPane) {
+                stackPane.setAlignment(Pos.CENTER);
+            }
+        }
+
+        javafx.scene.Node productImage = card.lookup("#productImageView");
+        if (productImage instanceof ImageView imageView) {
+            imageView.setFitWidth(188);
+            imageView.setFitHeight(188);
+        }
+
+        javafx.scene.Node productName = card.lookup("#productNameLabel");
+        if (productName instanceof Label label) {
+            setRegionWidth(label, contentWidth);
+            label.setMinHeight(40);
+            label.setPrefHeight(40);
+            label.setMaxHeight(40);
+            label.setStyle("-fx-text-fill: #113254; -fx-font-size: 13px; -fx-font-weight: bold;");
+            VBox.setMargin(label, new javafx.geometry.Insets(4, 0, 0, 0));
+        }
+
+        resizeMetaRow(card, contentWidth, 25, 11, 11);
+
+        javafx.scene.Node bidButton = card.lookup("#bidButton");
+        if (bidButton instanceof Button button) {
+            setRegionWidth(button, contentWidth);
+            button.setMinHeight(28);
+            button.setPrefHeight(28);
+            button.setMaxHeight(28);
+            button.setStyle("-fx-background-color: #1a1a1a; -fx-background-radius: 14; -fx-cursor: hand; -fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 0;");
+        }
+    }
+
+    private void resizeMetaRow(VBox card, double rowWidth, double rowHeight, double timerFontSize, double priceFontSize) {
+        javafx.scene.Node metaRow = card.lookup("#metaRow");
+        if (metaRow instanceof HBox row) {
+            setRegionWidth(row, rowWidth);
+            row.setMinHeight(rowHeight);
+            row.setPrefHeight(rowHeight);
+            row.setMaxHeight(rowHeight);
+        }
+
+        javafx.scene.Node timer = card.lookup("#timerLabel");
+        if (timer instanceof Label label) {
+            label.setMinWidth(Region.USE_COMPUTED_SIZE);
+            label.setPrefWidth(Region.USE_COMPUTED_SIZE);
+            label.setMaxWidth(Double.MAX_VALUE);
+            label.setStyle("-fx-text-fill: #e53e3e; -fx-font-size: " + timerFontSize + "px; -fx-font-weight: bold;");
+        }
+
+        javafx.scene.Node price = card.lookup("#priceLabel");
+        if (price instanceof Label label) {
+            label.setMinWidth(Region.USE_COMPUTED_SIZE);
+            label.setPrefWidth(Region.USE_COMPUTED_SIZE);
+            label.setMaxWidth(Double.MAX_VALUE);
+            label.setStyle("-fx-text-fill: #000000; -fx-font-size: " + priceFontSize + "px; -fx-font-weight: bold;");
+        }
+    }
+
+    private void setRegionWidth(Region region, double width) {
+        region.setMinWidth(width);
+        region.setPrefWidth(width);
+        region.setMaxWidth(width);
+    }
+
     private VBox createEmptyState() {
-        return dashboardViewFactory.createEmptyState();
+        VBox box = new VBox(8);
+        box.setAlignment(Pos.CENTER);
+        box.setMinHeight(140);
+        box.setMaxWidth(Double.MAX_VALUE);
+        box.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12; -fx-padding: 24;");
+
+        Label title = new Label("Ch\u01b0a c\u00f3 phi\u00ean \u0111\u1ea5u gi\u00e1 ph\u00f9 h\u1ee3p");
+        title.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #111827;");
+
+        Label subtitle = new Label("C\u00e1c phi\u00ean \u0111ang di\u1ec5n ra s\u1ebd hi\u1ec3n th\u1ecb \u1edf \u0111\u00e2y.");
+        subtitle.setStyle("-fx-font-size: 13px; -fx-text-fill: #6b7280;");
+
+        box.getChildren().addAll(title, subtitle);
+        return box;
     }
 
     private VBox createAuctionCard(Auction auction) {
-        return dashboardViewFactory.createAuctionCard(auction, homeScreenController, "dashboard");
+        VBox card = auctionCardFactory.create(auction, homeScreenController, "dashboard");
+        return card != null ? card : new VBox();
     }
 
     // ==============================================================

@@ -1,5 +1,5 @@
 package client.controller;
-
+
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.logic.WalletLogic;
@@ -8,7 +8,6 @@ import client.network.ConnectionManager;
 import client.service.WalletClient;
 import client.service.WalletService;
 import client.service.WalletService.BankAccountEntry;
-import client.ui.WalletTransactionDialogFactory;
 import common.Transaction;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -73,8 +72,6 @@ public class WalletController implements Initializable {
     private WalletLogic.TransactionFilter activeTransactionFilter = WalletLogic.TransactionFilter.ALL;
     private final WalletClient walletService;
     private final WalletLogic walletLogic = new WalletLogic();
-    private final WalletTransactionDialogFactory transactionDialogFactory =
-            new WalletTransactionDialogFactory(walletLogic);
     private WalletViewMode viewMode = WalletViewMode.BIDDER;
 
     public WalletController() {
@@ -178,16 +175,80 @@ public class WalletController implements Initializable {
         if (transaction == null) {
             return;
         }
-        transactionDialogFactory.show(transaction,
-                rootPane != null && rootPane.getScene() != null ? rootPane.getScene().getWindow() : null);
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Chi tiết giao dịch");
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        if (rootPane != null && rootPane.getScene() != null && rootPane.getScene().getWindow() != null) {
+            dialog.initOwner(rootPane.getScene().getWindow());
+        }
+
+        DialogPane pane = dialog.getDialogPane();
+        pane.getButtonTypes().add(ButtonType.CLOSE);
+        pane.setStyle("-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e5e7eb; -fx-border-radius: 14;"
+                + " -fx-padding: 0 0 14 0;");
+
+        VBox content = new VBox(16);
+        content.setPadding(new Insets(18, 22, 18, 22));
+        content.setPrefWidth(520);
+
+        Label title = new Label(transaction.getTypeLabel());
+        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #111827;");
+
+        Label amount = new Label(formatSignedTransactionAmount(transaction));
+        amount.setAlignment(Pos.CENTER_LEFT);
+        amount.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: "
+                + (isMoneyIn(transaction) ? "#047857" : "#dc2626") + ";");
+
+        GridPane detailGrid = new GridPane();
+        detailGrid.setHgap(24);
+        detailGrid.setVgap(12);
+        detailGrid.setStyle("-fx-background-color: #f8fafc; -fx-background-radius: 10; -fx-padding: 16;");
+
+        addTransactionDetailRow(detailGrid, 0, "Mã giao dịch", safeText(transaction.id));
+        addTransactionDetailRow(detailGrid, 1, "Thời gian", transaction.getFormattedDate());
+        addTransactionDetailRow(detailGrid, 2, "Loại giao dịch", transaction.getTypeLabel());
+        addTransactionDetailRow(detailGrid, 3, "Tiền vào", walletLogic.emptyToDash(transaction.getMoneyIn()));
+        addTransactionDetailRow(detailGrid, 4, "Tiền ra", walletLogic.emptyToDash(transaction.getMoneyOut()));
+        addTransactionDetailRow(detailGrid, 5, "Số dư sau", transaction.getFormattedBalanceAfter());
+        addTransactionDetailRow(detailGrid, 6, "Mô tả", safeText(transaction.getDescription()));
+
+        content.getChildren().addAll(title, amount, detailGrid);
+        pane.setContent(content);
+        styleTransactionDetailCloseButton(pane);
+        dialog.showAndWait();
     }
 
     private void styleTransactionDetailCloseButton(DialogPane pane) {
-        // Kept for reflection-based tests; styling is handled by WalletTransactionDialogFactory.
+        Node closeNode = pane.lookupButton(ButtonType.CLOSE);
+        if (closeNode instanceof Button closeButton) {
+            closeButton.setText("Đóng");
+            closeButton.setMinHeight(40);
+            closeButton.setPrefHeight(40);
+            closeButton.setMinWidth(110);
+            closeButton.setDefaultButton(true);
+            closeButton.setStyle("-fx-background-color: #111827;"
+                    + " -fx-text-fill: white;"
+                    + " -fx-font-size: 14px;"
+                    + " -fx-font-weight: bold;"
+                    + " -fx-background-radius: 20;"
+                    + " -fx-cursor: hand;"
+                    + " -fx-padding: 0 24 0 24;");
+        }
     }
 
     private void addTransactionDetailRow(GridPane grid, int rowIndex, String labelText, String valueText) {
-        transactionDialogFactory.addTransactionDetailRow(grid, rowIndex, labelText, valueText);
+        Label label = new Label(labelText);
+        label.setMinWidth(130);
+        label.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #64748b;");
+
+        Label value = new Label(valueText);
+        value.setWrapText(true);
+        value.setMaxWidth(320);
+        value.setStyle("-fx-font-size: 14px; -fx-text-fill: #111827;");
+
+        grid.add(label, 0, rowIndex);
+        grid.add(value, 1, rowIndex);
     }
 
     private String formatSignedTransactionAmount(Transaction transaction) {
