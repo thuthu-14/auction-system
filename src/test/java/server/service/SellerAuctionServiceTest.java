@@ -118,7 +118,7 @@ public class SellerAuctionServiceTest {
         Auction expected = mock(Auction.class);
 
         when(auctionService.create(
-                same(seller), any(OtherItem.class), anyLong(), anyLong(), eq(25.0), eq(5.0)))
+                same(seller), any(OtherItem.class), anyLong(), anyLong(), eq(25.0), eq(5.0), anyBoolean()))
                 .thenReturn(expected);
 
         Map<String, Object> data = new java.util.HashMap<>(validOtherAuctionData());
@@ -151,7 +151,7 @@ public class SellerAuctionServiceTest {
         payload.put("images", "not-a-list");
 
         when(auctionService.create(
-                same(seller), any(Electronics.class), anyLong(), anyLong(), anyDouble(), anyDouble()))
+                same(seller), any(Electronics.class), anyLong(), anyLong(), anyDouble(), anyDouble(), anyBoolean()))
                 .thenReturn(expected);
 
         assertThrows(PermissionDeniedException.class, () -> service.createAuction(anonymous, payload));
@@ -253,7 +253,7 @@ public class SellerAuctionServiceTest {
         Auction expected = mock(Auction.class);
 
         when(auctionService.create(
-                same(seller), any(expectedItemType), anyLong(), anyLong(), anyDouble(), anyDouble()))
+                same(seller), any(expectedItemType), anyLong(), anyLong(), anyDouble(), anyDouble(), anyBoolean()))
                 .thenReturn(expected);
 
         assertSame(expected, service.createAuction(seller, payload));
