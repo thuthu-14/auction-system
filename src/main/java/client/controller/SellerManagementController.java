@@ -417,7 +417,7 @@ public class SellerManagementController {
         private final String itemId;
         private final String name;
         private final String categoryLabel;
-        private final AuctionStatus status;
+        private AuctionStatus status;
         private final long startPrice;
         private final long currentPrice;
         private final long startTime;      // ← THÊM DÒNG NÀY
@@ -446,23 +446,22 @@ public class SellerManagementController {
         }
 
         public void updateTime() {
+            long now = System.currentTimeMillis();
+
+            if (status == AuctionStatus.WAITING && now >= startTime && now < endTime) {
+                status = AuctionStatus.OPEN;
+            }
+
             if (isEnded() || isCancelled()) {
                 timeLeftStr.set(isCancelled() ? "Đã hủy" : "Đã kết thúc");
             } else if (endTime <= 0) {
                 timeLeftStr.set("--");
+            } else if (isPending() && now < startTime) {
+                long waitingMs = Math.max(0, startTime - now);
+                timeLeftStr.set("Bắt đầu trong: " + DateTimeUtil.formatTimestamp(waitingMs));
             } else {
-                long now = System.currentTimeMillis();
-
-                // ← KIỂM TRA TRẠNG THÁI WAITING
-                if (isPending() && now < startTime) {
-                    // Trạng thái WAITING - hiển thị thời gian bắt đầu
-                    long waitingMs = Math.max(0, startTime - now);
-                    timeLeftStr.set("Bắt đầu trong: " + DateTimeUtil.formatTimestamp(waitingMs));
-                } else {
-                    // Trạng thái OPEN hoặc RUNNING - hiển thị thời gian kết thúc
-                    long remainingMs = Math.max(0, endTime - now);
-                    timeLeftStr.set(DateTimeUtil.formatTimestamp(remainingMs));
-                }
+                long remainingMs = Math.max(0, endTime - now);
+                timeLeftStr.set(DateTimeUtil.formatTimestamp(remainingMs));
             }
         }
 

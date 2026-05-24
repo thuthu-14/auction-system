@@ -149,12 +149,24 @@ public class AuctionService {
     }
 
     public List<Auction> getBySeller(String sellerId) throws Exception {
-        return auctionRepository.getAuctionsBySellerId(sellerId);
+        List<Auction> auctions = auctionRepository.getAuctionsBySellerId(sellerId);
+        for (Auction auction : auctions) {
+            if (auction != null) {
+                auction.syncStatusWithTime();
+            }
+        }
+        return auctions;
     }
 
     public List<Auction> getBySeller(User currentUser) throws Exception {
         RegularUser seller = requireSeller(currentUser);
-        return auctionRepository.getAuctionsBySellerId(seller.getUserId());
+        List<Auction> auctions = auctionRepository.getAuctionsBySellerId(seller.getUserId());
+        for (Auction auction : auctions) {
+            if (auction != null) {
+                auction.syncStatusWithTime();
+            }
+        }
+        return auctions;
     }
 
     public void finish(String auctionId) throws Exception {
