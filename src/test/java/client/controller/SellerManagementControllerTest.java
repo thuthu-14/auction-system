@@ -195,10 +195,16 @@ class SellerManagementControllerTest {
 
     private static Auction auction(String id, String name, ItemCategory category, AuctionStatus status, long endTime, int bids) {
         long now = System.currentTimeMillis();
+        long startTime = status == AuctionStatus.WAITING
+                ? Math.min(now + 30_000L, endTime - 1_000L)
+                : now - bids * 1_000L;
+
         OtherItem item = new OtherItem("IT-" + id, name, "desc", 100, "seller", List.of());
         item.setCategory(category);
-        Auction auction = new Auction(id, item.getItemId(), "seller", "Seller", item, 100 + bids, now - bids * 1_000L, endTime);
+
+        Auction auction = new Auction(id, item.getItemId(), "seller", "Seller", item, 100 + bids, startTime, endTime);
         auction.setStatus(status);
+
         for (int i = 0; i < bids; i++) {
             auction.addBidId("B" + i);
         }
