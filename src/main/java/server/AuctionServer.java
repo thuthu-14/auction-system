@@ -106,13 +106,4 @@ public class AuctionServer {
         LoggerUtil.info("Client removed - Active clients: " + clients.size());
     }
 
-    public static void main(String[] args) {
-        try {
-            AuctionServer server = new AuctionServer();
-            server.start();
-        } catch (IOException e) {
-            ServerExceptionHandler.handle(ServerErrorType.NETWORK, "Start server", e);
-            System.exit(1);
-        }
-    }
 }
