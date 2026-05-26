@@ -164,52 +164,40 @@ public class AddAuctionProductController implements Initializable {
     }
 
     private void setupTimeOptions(Parent formNode, CategoryFormConfig config) {
-        // Lấy checkbox
-        CheckBox startNowCheckbox = (CheckBox) formNode.lookup(config.startNowCheckboxId());
         ComboBox<?> startHourCombo = (ComboBox<?>) formNode.lookup(config.startHourId());
         ComboBox<?> endHourCombo = (ComboBox<?>) formNode.lookup(config.endHourId());
         DatePicker startDatePicker = (DatePicker) formNode.lookup(config.startDateId());
         DatePicker endDatePicker = (DatePicker) formNode.lookup(config.endDateId());
-
-        if (startNowCheckbox != null) {
-            startNowCheckbox.setOnAction(e -> {
-                boolean isStartNow = startNowCheckbox.isSelected();
-                if (isStartNow) {
-                    // Khi TICK: reset về bây giờ
-                    if (startDatePicker != null) startDatePicker.setValue(LocalDate.now());
-                    if (startHourCombo != null) {
-                        @SuppressWarnings("unchecked")
-                        ComboBox<String> comboBox = (ComboBox<String>) startHourCombo;
-                        LocalTime now = LocalTime.now();
-                        comboBox.getSelectionModel().select(String.format("%02d:%02d", now.getHour(), now.getMinute() < 30 ? 0 : 30));
-                    }
-                }
-                // Disable/Enable các field thời gian bắt đầu
-                if (startDatePicker != null) startDatePicker.setDisable(isStartNow);
-                if (startHourCombo != null) startHourCombo.setDisable(isStartNow);
-            });
-        }
-        if (startNowCheckbox != null) {
-            boolean isStartNow = startNowCheckbox.isSelected();
-            if (startDatePicker != null) startDatePicker.setDisable(isStartNow);
-            if (startHourCombo != null) startHourCombo.setDisable(isStartNow);
-        }
-
 
         LocalDateTime nextStartDateTime = nextAvailableStartDateTime();
         LocalDate startDate = nextStartDateTime.toLocalDate();
         LocalTime nextStartTime = nextStartDateTime.toLocalTime();
         LocalDate endDate = startDate.plusDays(1);
 
-        if (startDatePicker != null) startDatePicker.setValue(startDate);
+        if (startDatePicker != null) {
+            startDatePicker.setDayCellFactory(picker -> new DateCell() {
+                @Override
+                public void updateItem(LocalDate date, boolean empty) {
+                    super.updateItem(date, empty);
+                    LocalDate minDate = nextAvailableStartDateTime().toLocalDate();
+                    setDisable(empty || date.isBefore(minDate));
+                }
+            });
+            startDatePicker.setValue(startDate);
+        }
         if (endDatePicker != null) endDatePicker.setValue(endDate);
         applyCalendarStyles(startDatePicker, endDatePicker);
 
         if (startHourCombo != null) {
             @SuppressWarnings("unchecked")
             ComboBox<String> comboBox = (ComboBox<String>) startHourCombo;
-            comboBox.setItems(timeOptions);
+            comboBox.setItems(startTimeOptionsFor(startDate, nextStartDateTime));
             comboBox.getSelectionModel().select(nextStartTime.toString());
+            if (startDatePicker != null) {
+                startDatePicker.valueProperty().addListener((obs, oldDate, newDate) ->
+                        updateStartTimeOptions(startDatePicker, comboBox));
+                comboBox.setOnShowing(event -> updateStartTimeOptions(startDatePicker, comboBox));
+            }
         }
         if (endHourCombo != null) {
             @SuppressWarnings("unchecked")
@@ -220,12 +208,54 @@ public class AddAuctionProductController implements Initializable {
     }
 
     private LocalDateTime nextAvailableStartDateTime() {
-        LocalDateTime now = LocalDateTime.now();  // ← Xóa .plusMinutes(30)
-        // Làm tròn phút gần nhất (30 phút hoặc full hour)
-        int minute = now.getMinute() <= 30 ? 30 : 0;
-        int hour = now.getMinute() <= 30 ? 0 : 1;
-        return now.withMinute(0).withSecond(0).withNano(0).plusMinutes(minute).plusHours(hour);
+        LocalDateTime now = LocalDateTime.now();
+        int roundedMinute = now.getMinute() < 30 ? 30 : 0;
+        int hourOffset = now.getMinute() < 30 ? 0 : 1;
+        LocalDateTime candidate = now.withMinute(roundedMinute).withSecond(0).withNano(0).plusHours(hourOffset);
+        return candidate.isAfter(now) ? candidate : candidate.plusMinutes(30);
     }
+
+    private void updateStartTimeOptions(DatePicker startDatePicker, ComboBox<String> startHourCombo) {
+        if (startDatePicker == null || startHourCombo == null) return;
+
+        LocalDateTime minStart = nextAvailableStartDateTime();
+        LocalDate selectedDate = startDatePicker.getValue();
+        if (selectedDate == null || selectedDate.isBefore(minStart.toLocalDate())) {
+            selectedDate = minStart.toLocalDate();
+            startDatePicker.setValue(selectedDate);
+        }
+
+        javafx.collections.ObservableList<String> validOptions = startTimeOptionsFor(selectedDate, minStart);
+        String selectedTime = startHourCombo.getValue();
+        startHourCombo.setItems(validOptions);
+        if (selectedTime != null && validOptions.contains(selectedTime)) {
+            startHourCombo.getSelectionModel().select(selectedTime);
+        } else if (!validOptions.isEmpty()) {
+            startHourCombo.getSelectionModel().selectFirst();
+        } else {
+            startHourCombo.getSelectionModel().clearSelection();
+        }
+    }
+
+    private javafx.collections.ObservableList<String> startTimeOptionsFor(LocalDate selectedDate, LocalDateTime minStart) {
+        javafx.collections.ObservableList<String> options = FXCollections.observableArrayList();
+        if (selectedDate == null || selectedDate.isBefore(minStart.toLocalDate())) {
+            return options;
+        }
+        if (selectedDate.isAfter(minStart.toLocalDate())) {
+            options.addAll(timeOptions);
+            return options;
+        }
+
+        LocalTime minTime = minStart.toLocalTime();
+        for (String timeOption : timeOptions) {
+            if (!LocalTime.parse(timeOption).isBefore(minTime)) {
+                options.add(timeOption);
+            }
+        }
+        return options;
+    }
+
     private void applyCalendarStyles(DatePicker... datePickers) {
         String calendarCss = getCalendarStylesheet();
         if (calendarCss == null) return;
@@ -317,10 +347,6 @@ public class AddAuctionProductController implements Initializable {
                             return getComboValue(fieldId);
                         }
 
-                        @Override
-                        public boolean isCheckboxSelected(String checkboxId) {  // ← THÊM
-                            return isCheckboxChecked(checkboxId);
-                        }
                     });
 
             client.util.ClientTaskRunner.run(() -> {
@@ -328,7 +354,7 @@ public class AddAuctionProductController implements Initializable {
                     Message response = productService.publish(socket, currentUser, payload);
                     Platform.runLater(() -> {
                         if (response != null && "SUCCESS".equals(response.getStatus())) {
-                            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Sản phẩm đã được đẩy lên Sàn Đấu Giá!");
+                            showAlert(Alert.AlertType.INFORMATION, "Thành công", "Phiên đấu giá đã được tạo thành công!");
                             clearForm();
                         } else {
                             showAlert(Alert.AlertType.ERROR, "Thất bại", "Server từ chối: " + (response != null ? response.getMessage() : ""));
@@ -435,15 +461,4 @@ public class AddAuctionProductController implements Initializable {
         }
         return null;
     }
-    private boolean isCheckboxChecked(String checkboxId) {
-        if (categoryFormPane != null && !categoryFormPane.getChildren().isEmpty()) {
-            Node node = categoryFormPane.getChildren().get(0);
-            if (node instanceof Parent form) {
-                CheckBox checkbox = (CheckBox) form.lookup(checkboxId);
-                return checkbox != null && checkbox.isSelected();
-            }
-        }
-        return false;
-    }
-
 }

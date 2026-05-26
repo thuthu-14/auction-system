@@ -64,10 +64,6 @@
             </VBox>
         </VBox>
     </HBox>
-    <HBox spacing="10.0" style="-fx-padding: 8 0;">
-        <CheckBox fx:id="vehicleStartNowCheckbox" text="✓ Đẩy lên Sàn Đấu Giá Ngay Lập Tức"
-                  selected="true"                  style="-fx-font-size: 12px; -fx-text-fill: #059669; -fx-font-weight: bold;" />
-    </HBox>
     <Separator />
     <Label text="Thời gian phiên đấu giá: 1-7 ngày" textFill="#1a1a1a" styleClass="field-label">
         <font>

@@ -75,16 +75,14 @@ public class AuctionService {
                           double reservePrice, double minimumBidIncrement) throws Exception {
         long startTimeMillis = System.currentTimeMillis();
         long endTimeMillis = startTimeMillis + durationMinutes * 60_000L;
-        return create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement, false);
+        return create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement);
     }
 
     public Auction create(RegularUser seller, Item item, long startTimeMillis, long endTimeMillis,
-                          double reservePrice, double minimumBidIncrement, boolean isStartNow) throws Exception {
+                          double reservePrice, double minimumBidIncrement) throws Exception {
         int durationMinutes = (int) ((endTimeMillis - startTimeMillis) / 60_000L);
         validateCreateAuction(seller, item, durationMinutes);
-        if (!isStartNow) {
-            validateTimeWindow(startTimeMillis, endTimeMillis);  // ← Chỉ validate khi không phải "Đẩu Ngay"
-        }
+        validateTimeWindow(startTimeMillis, endTimeMillis);
         String auctionId = "AU" + System.currentTimeMillis();
         String itemId = "IT" + System.currentTimeMillis();
         item.setItemId(itemId);
@@ -420,7 +418,7 @@ public class AuctionService {
                                         double reservePrice, double minimumBidIncrement)
             throws PermissionDeniedException, IOException, ClassNotFoundException {
         try {
-            return DEFAULT.create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement, false);
+            return DEFAULT.create(seller, item, startTimeMillis, endTimeMillis, reservePrice, minimumBidIncrement);
         } catch (PermissionDeniedException | IOException | ClassNotFoundException e) {
             throw e;
         } catch (Exception e) {

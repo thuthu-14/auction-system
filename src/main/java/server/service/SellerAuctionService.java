@@ -64,12 +64,8 @@ public class SellerAuctionService {
         String description = text(auctionData.get("description"));
         double price = requiredNumber(auctionData, "price", "startingPrice").doubleValue();
         int duration = requiredNumber(auctionData, "duration").intValue();
-        boolean isStartNow = auctionData.get("isStartNow") instanceof Boolean b && b;
-        long startTime = isStartNow ? System.currentTimeMillis() : longValue(auctionData.get("startTime"), System.currentTimeMillis());
-        // Nếu isStartNow, tính lại endTime từ startTime mới; ngược lại dùng giá trị client gửi
-        long endTime = isStartNow ?
-                (startTime + duration * 60_000L) :
-                longValue(auctionData.get("endTime"), startTime + duration * 60_000L);
+        long startTime = longValue(auctionData.get("startTime"), System.currentTimeMillis());
+        long endTime = longValue(auctionData.get("endTime"), startTime + duration * 60_000L);
         duration = (int) ((endTime - startTime) / 60_000L);
         double reservePrice = numberValue(auctionData.get("reservePrice"), 0.0);
         double minimumBidIncrement = numberValue(auctionData.get("minimumBidIncrement"), 0.0);
@@ -79,7 +75,7 @@ public class SellerAuctionService {
         validateCategoryFields(itemType, auctionData);
 
         Item item = createItemFromData(seller.getUserId(), itemType, auctionData);
-        return auctionService.create(seller, item, startTime, endTime, reservePrice, minimumBidIncrement, isStartNow);
+        return auctionService.create(seller, item, startTime, endTime, reservePrice, minimumBidIncrement);
     }
 
     public void deleteSellerAuction(RegularUser seller, String auctionId) throws Exception {
@@ -141,10 +137,11 @@ public class SellerAuctionService {
 
     private void validateTimeWindow(long startTime, long endTime) {
         long now = System.currentTimeMillis();
-
-
-        if (startTime < now - 5000L) {  // ✓ Buffer 5 giây
+        if (endTime <= startTime) {
             throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu");
+        }
+        if (startTime <= now) {
+            throw new IllegalArgumentException("Thời gian bắt đầu phải sau thời điểm tạo sản phẩm");
         }
     }
 

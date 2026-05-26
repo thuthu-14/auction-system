@@ -74,12 +74,16 @@ public class BidService {
             common.ItemCategory category = auctionToPersist.getItem() != null
                     ? auctionToPersist.getItem().getCategory()
                     : auction.getItem().getCategory();
+            auctionToPersist.syncStatusWithTime();
 
             synchronized (auctionToPersist) {
-            if (auctionToPersist.getStatus() != AuctionStatus.OPEN &&
-                    auctionToPersist.getStatus() != AuctionStatus.RUNNING) {
-                throw new AuctionClosedException("Phiên đấu giá đã kết thúc.");
-            }
+                if (auctionToPersist.getStatus() == AuctionStatus.WAITING) {
+                    throw new AuctionClosedException("Phiên đấu giá chưa bắt đầu.");
+                }
+                if (auctionToPersist.getStatus() != AuctionStatus.OPEN &&
+                        auctionToPersist.getStatus() != AuctionStatus.RUNNING) {
+                    throw new AuctionClosedException("Phiên đấu giá đã kết thúc.");
+                }
 
                 String bidError = auctionToPersist.getMinimumBidIncrement() > 0
                         ? ItemValidationUtil.getBidAmountErrorMessage(auctionToPersist.getCurrentPrice(), amount, auctionToPersist.getMinimumBidIncrement())

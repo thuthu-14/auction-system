@@ -215,6 +215,43 @@ class BidServiceTest {
     }
 
     @Test
+    void place_rejectsBidBeforeAuctionStartTime() throws Exception {
+        BidService service = new BidService(bidRepository, auctionRepository, userRepository, transactionRepository);
+        RegularUser bidder = new RegularUser("u1", "bidder", "password", "u1@example.com");
+        bidder.setWallet(500.0);
+        Auction auction = auction("A1", 100.0);
+        long now = System.currentTimeMillis();
+        auction.setStartTime(now + 60_000L);
+        auction.setEndTime(now + 120_000L);
+        auction.setStatus(common.AuctionStatus.WAITING);
+        when(auctionRepository.getAuctionById("A1")).thenReturn(auction);
+
+        assertThrows(AuctionClosedException.class, () -> service.place(bidder, auction, 120.0));
+
+        verify(bidRepository, never()).saveBid(any());
+        verify(auctionRepository, never()).saveAuction(any());
+        verify(userRepository, never()).saveUser(any());
+    }
+
+    @Test
+    void place_syncsWaitingAuctionAfterStartTimeBeforeValidatingStatus() throws Exception {
+        BidService service = new BidService(bidRepository, auctionRepository, userRepository, transactionRepository);
+        RegularUser bidder = new RegularUser("u1", "bidder", "password", "u1@example.com");
+        bidder.setWallet(500.0);
+        Auction auction = auction("A1", 100.0);
+        auction.setStatus(common.AuctionStatus.WAITING);
+        when(auctionRepository.getAuctionById("A1")).thenReturn(auction);
+        when(bidRepository.getBidsByAuctionId("A1")).thenReturn(List.of());
+
+        Bid placed = service.place(bidder, auction, 120.0);
+
+        assertEquals(120.0, placed.getAmount(), 0.001);
+        assertEquals(common.AuctionStatus.RUNNING, auction.getStatus());
+        verify(bidRepository).saveBid(placed);
+        verify(auctionRepository).saveAuction(auction);
+    }
+
+    @Test
     void place_rejectsSellerBiddingOnOwnAuction() throws Exception {
         BidService service = new BidService(bidRepository, auctionRepository, userRepository, transactionRepository);
         RegularUser seller = new RegularUser("seller-1", "seller", "password", "seller@example.com");

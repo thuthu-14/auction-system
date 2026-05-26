@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -59,13 +60,21 @@ class AddAuctionProductControllerTest {
             ComboBox<String> endHour = new ComboBox<>();
             endHour.setId("endHour");
             form.getChildren().addAll(startDate, endDate, startHour, endHour);
-            Object config = categoryFormConfig("Any", "/missing.fxml", "#startDate", "#startHour", "#endDate", "#endHour", "#startNowCheckbox");
+            Object config = categoryFormConfig("Any", "/missing.fxml", "#startDate", "#startHour", "#endDate", "#endHour");
 
             invoke(controller, "setupTimeOptions", form, config);
 
             assertNotNull(startDate.getValue());
             assertEquals(startDate.getValue().plusDays(1), endDate.getValue());
-            assertEquals(48, startHour.getItems().size());
+            assertFalse(startHour.getItems().isEmpty());
+            assertTrue(startHour.getItems().size() <= 48);
+            if (startDate.getValue().equals(LocalDate.now())) {
+                LocalTime selectedStartTime = LocalTime.parse(startHour.getValue());
+                assertTrue(startHour.getItems().stream()
+                        .map(LocalTime::parse)
+                        .allMatch(time -> !time.isBefore(selectedStartTime)));
+            }
+            assertEquals(48, endHour.getItems().size());
             assertEquals(startHour.getValue(), endHour.getValue());
         });
     }

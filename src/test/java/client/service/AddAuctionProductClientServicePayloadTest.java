@@ -202,10 +202,6 @@ class AddAuctionProductClientServicePayloadTest {
                 return "00:00";
             }
 
-            @Override
-            public boolean isCheckboxSelected(String checkboxId) {
-                return false;
-            }
         };
     }
 }

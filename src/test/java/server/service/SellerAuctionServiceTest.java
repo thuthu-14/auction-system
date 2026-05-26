@@ -118,7 +118,7 @@ public class SellerAuctionServiceTest {
         Auction expected = mock(Auction.class);
 
         when(auctionService.create(
-                same(seller), any(OtherItem.class), anyLong(), anyLong(), eq(25.0), eq(5.0), anyBoolean()))
+                same(seller), any(OtherItem.class), anyLong(), anyLong(), eq(25.0), eq(5.0)))
                 .thenReturn(expected);
 
         Map<String, Object> data = new java.util.HashMap<>(validOtherAuctionData());
@@ -144,14 +144,14 @@ public class SellerAuctionServiceTest {
         payload.put("description", "Valid description");
         payload.put("startingPrice", 50_000.0);
         payload.put("duration", ItemCategory.ELECTRONICS.getMinDurationMinutes());
-        payload.put("startTime", String.valueOf(now + 1_000L));
+        payload.put("startTime", String.valueOf(now + 60_000L));
         payload.put("endTime", String.valueOf(now + (ItemCategory.ELECTRONICS.getMinDurationMinutes() + 1L) * 60_000L));
         payload.put("brand", "Brand");
         payload.put("warranty", "12 months");
         payload.put("images", "not-a-list");
 
         when(auctionService.create(
-                same(seller), any(Electronics.class), anyLong(), anyLong(), anyDouble(), anyDouble(), anyBoolean()))
+                same(seller), any(Electronics.class), anyLong(), anyLong(), anyDouble(), anyDouble()))
                 .thenReturn(expected);
 
         assertThrows(PermissionDeniedException.class, () -> service.createAuction(anonymous, payload));
@@ -253,7 +253,7 @@ public class SellerAuctionServiceTest {
         Auction expected = mock(Auction.class);
 
         when(auctionService.create(
-                same(seller), any(expectedItemType), anyLong(), anyLong(), anyDouble(), anyDouble(), anyBoolean()))
+                same(seller), any(expectedItemType), anyLong(), anyLong(), anyDouble(), anyDouble()))
                 .thenReturn(expected);
 
         assertSame(expected, service.createAuction(seller, payload));
@@ -325,7 +325,7 @@ public class SellerAuctionServiceTest {
                 "description", "Valid description",
                 "price", 10.0,
                 "duration", ItemCategory.OTHER.getMinDurationMinutes(),
-                "startTime", now + 1_000L,
+        "startTime", now + 60_000L,
                 "endTime", now + (ItemCategory.OTHER.getMinDurationMinutes() + 1L) * 60_000L
         );
     }
@@ -354,7 +354,7 @@ public class SellerAuctionServiceTest {
         payload.put("description", "Valid description");
         payload.put("price", price);
         payload.put("duration", ItemCategory.valueOf(itemType).getMinDurationMinutes());
-        payload.put("startTime", now + 1_000L);
+        payload.put("startTime", now + 60_000L);
         payload.put("endTime", now + (ItemCategory.valueOf(itemType).getMinDurationMinutes() + 1L) * 60_000L);
         payload.putAll(extra);
         return payload;
