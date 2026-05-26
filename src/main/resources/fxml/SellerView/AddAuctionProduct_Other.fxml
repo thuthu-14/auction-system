@@ -57,26 +57,27 @@
         </font>
     </Label>
     <HBox maxWidth="1.7976931348623157E308" spacing="20.0">
-        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+        <VBox spacing="5.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
             <Label styleClass="field-label" text="* Bắt đầu" textFill="#4a5568">
                 <font>
                     <Font name="System Bold" size="13.0" />
                 </font>
             </Label>
-            <HBox spacing="5.0">
+            <HBox spacing="5.0" maxWidth="1.7976931348623157E308">
                 <DatePicker fx:id="otherStartDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Chọn ngày" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;" HBox.hgrow="ALWAYS" />
-                <ComboBox fx:id="otherStartHourCombo" prefHeight="40.0" prefWidth="100.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;" />
+                <ComboBox fx:id="otherStartHourCombo" prefHeight="40.0" prefWidth="112.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;" />
+                <ToggleButton fx:id="otherCustomizeStartButton" prefHeight="40.0" prefWidth="78.0" text="Hẹn giờ" style="-fx-background-color: #f8fafc; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5; -fx-text-fill: #1f2937; -fx-font-size: 13px; -fx-padding: 0; -fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-cursor: hand;" />
             </HBox>
         </VBox>
-        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+        <VBox spacing="5.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
             <Label styleClass="field-label" text="* Kết thúc" textFill="#4a5568">
                 <font>
                     <Font name="System Bold" size="13.0" />
                 </font>
             </Label>
-            <HBox spacing="5.0">
+            <HBox spacing="5.0" maxWidth="1.7976931348623157E308">
                 <DatePicker fx:id="otherEndDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Chọn ngày" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;" HBox.hgrow="ALWAYS" />
-                <ComboBox fx:id="otherEndHourCombo" prefHeight="40.0" prefWidth="100.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;" />
+                <ComboBox fx:id="otherEndHourCombo" prefHeight="40.0" prefWidth="130.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;" />
             </HBox>
         </VBox>
     </HBox>

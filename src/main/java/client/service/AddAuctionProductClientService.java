@@ -35,6 +35,7 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
             String fxmlPath,
             String startDateId,
             String startHourId,
+            String customizeStartButtonId,
             String endDateId,
             String endHourId
     ) {
@@ -46,15 +47,17 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
         LocalDate dateValue(String fieldId);
 
         String comboValue(String fieldId);
+
+        boolean isSelected(String fieldId);
     }
 
     private final List<CategoryFormConfig> categoryForms = List.of(
-            new CategoryFormConfig("Đồ điện tử", "/fxml/SellerView/AddAuctionProduct_Electronics.fxml", "#elecStartDatePicker", "#elecStartHourCombo", "#elecEndDatePicker", "#elecEndHourCombo"),
-            new CategoryFormConfig("Thời trang", "/fxml/SellerView/AddAuctionProduct_Fashion.fxml", "#fashionStartDatePicker", "#fashionStartHourCombo", "#fashionEndDatePicker", "#fashionEndHourCombo"),
-            new CategoryFormConfig("Trang sức", "/fxml/SellerView/AddAuctionProduct_Jewelry.fxml", "#jewelryStartDatePicker", "#jewelryStartHourCombo", "#jewelryEndDatePicker", "#jewelryEndHourCombo"),
-            new CategoryFormConfig("Sưu tầm", "/fxml/SellerView/AddAuctionProduct_Art.fxml", "#artStartDatePicker", "#artStartHourCombo", "#artEndDatePicker", "#artEndHourCombo"),
-            new CategoryFormConfig("Xe cộ", "/fxml/SellerView/AddAuctionProduct_Vehicle.fxml", "#vehicleStartDatePicker", "#vehicleStartHourCombo", "#vehicleEndDatePicker", "#vehicleEndHourCombo"),
-            new CategoryFormConfig("Khác", "/fxml/SellerView/AddAuctionProduct_Other.fxml", "#otherStartDatePicker", "#otherStartHourCombo", "#otherEndDatePicker", "#otherEndHourCombo")
+            new CategoryFormConfig("Đồ điện tử", "/fxml/SellerView/AddAuctionProduct_Electronics.fxml", "#elecStartDatePicker", "#elecStartHourCombo", "#elecCustomizeStartButton", "#elecEndDatePicker", "#elecEndHourCombo"),
+            new CategoryFormConfig("Thời trang", "/fxml/SellerView/AddAuctionProduct_Fashion.fxml", "#fashionStartDatePicker", "#fashionStartHourCombo", "#fashionCustomizeStartButton", "#fashionEndDatePicker", "#fashionEndHourCombo"),
+            new CategoryFormConfig("Trang sức", "/fxml/SellerView/AddAuctionProduct_Jewelry.fxml", "#jewelryStartDatePicker", "#jewelryStartHourCombo", "#jewelryCustomizeStartButton", "#jewelryEndDatePicker", "#jewelryEndHourCombo"),
+            new CategoryFormConfig("Sưu tầm", "/fxml/SellerView/AddAuctionProduct_Art.fxml", "#artStartDatePicker", "#artStartHourCombo", "#artCustomizeStartButton", "#artEndDatePicker", "#artEndHourCombo"),
+            new CategoryFormConfig("Xe cộ", "/fxml/SellerView/AddAuctionProduct_Vehicle.fxml", "#vehicleStartDatePicker", "#vehicleStartHourCombo", "#vehicleCustomizeStartButton", "#vehicleEndDatePicker", "#vehicleEndHourCombo"),
+            new CategoryFormConfig("Khác", "/fxml/SellerView/AddAuctionProduct_Other.fxml", "#otherStartDatePicker", "#otherStartHourCombo", "#otherCustomizeStartButton", "#otherEndDatePicker", "#otherEndHourCombo")
     );
 
     private final Map<String, CategoryPayloadBuilder> categoryBuilders = Map.of(
@@ -106,6 +109,7 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
         payload.put("startingPrice", categoryResult.startPrice);
         payload.put("duration", categoryResult.durationMinutes);
         payload.put("startTime", categoryResult.startTimeMillis);
+        payload.put("isStartNow", categoryResult.startNow);
         payload.put("endTime", categoryResult.endTimeMillis);
         return payload;
     }
@@ -220,55 +224,55 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
         payload.put("type", "ELECTRONICS");
         double startPrice = parsePrice(fields.fieldValue("#elecStartPriceField", ""), "Giá khởi điểm", 50000.0);
 
-        TimeWindow timeWindow = checkedTimeWindow(fields, "#elecStartDatePicker", "#elecStartHourCombo", "#elecEndDatePicker", "#elecEndHourCombo", 1440, 10080);
+        TimeWindow timeWindow = checkedTimeWindow(fields, "#elecStartDatePicker", "#elecStartHourCombo", "#elecCustomizeStartButton", "#elecEndDatePicker", "#elecEndHourCombo", 1440, 10080);
 
         payload.put("brand", fields.fieldValue("#elecBrandField", ""));
         payload.put("warrantyPeriod", fields.fieldValue("#elecWarrantyField", ""));
-        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis());
+        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis(), timeWindow.startNow);
     }
 
     private CategoryBuildResult buildFashion(Map<String, Object> payload, CategoryFieldReader fields) {
         payload.put("type", "FASHION");
         double startPrice = parsePrice(fields.fieldValue("#fashionStartPriceField", ""), "Giá khởi điểm", 10000.0);
 
-        TimeWindow timeWindow = checkedTimeWindow(fields, "#fashionStartDatePicker", "#fashionStartHourCombo", "#fashionEndDatePicker", "#fashionEndHourCombo", 1440, 4320);
+        TimeWindow timeWindow = checkedTimeWindow(fields, "#fashionStartDatePicker", "#fashionStartHourCombo", "#fashionCustomizeStartButton", "#fashionEndDatePicker", "#fashionEndHourCombo", 1440, 4320);
 
         payload.put("brand", fields.fieldValue("#fashionBrandField", ""));
         payload.put("material", fields.fieldValue("#fashionMaterialField", ""));
-        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis());
+        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis(), timeWindow.startNow);
     }
 
     private CategoryBuildResult buildJewelry(Map<String, Object> payload, CategoryFieldReader fields) {
         payload.put("type", "JEWELRY");
         double startPrice = parsePrice(fields.fieldValue("#jewelryStartPriceField", ""), "Giá khởi điểm", 25000.0);
 
-        TimeWindow timeWindow = checkedTimeWindow(fields, "#jewelryStartDatePicker", "#jewelryStartHourCombo", "#jewelryEndDatePicker", "#jewelryEndHourCombo", 1440, 7200);
+        TimeWindow timeWindow = checkedTimeWindow(fields, "#jewelryStartDatePicker", "#jewelryStartHourCombo", "#jewelryCustomizeStartButton", "#jewelryEndDatePicker", "#jewelryEndHourCombo", 1440, 7200);
 
         payload.put("material", fields.fieldValue("#jewelryMaterialField", ""));
         payload.put("weight", parseDouble(fields.fieldValue("#jewelryWeightField", ""), "Trọng lượng", 0.1, 100000));
-        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis());
+        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis(), timeWindow.startNow);
     }
 
     private CategoryBuildResult buildArt(Map<String, Object> payload, CategoryFieldReader fields) {
         payload.put("type", "ART");
         double startPrice = parsePrice(fields.fieldValue("#artStartPriceField", ""), "Giá khởi điểm", 100000.0);
 
-        TimeWindow timeWindow = checkedTimeWindow(fields, "#artStartDatePicker", "#artStartHourCombo", "#artEndDatePicker", "#artEndHourCombo", 1440, 20160);
+        TimeWindow timeWindow = checkedTimeWindow(fields, "#artStartDatePicker", "#artStartHourCombo", "#artCustomizeStartButton", "#artEndDatePicker", "#artEndHourCombo", 1440, 20160);
 
         payload.put("creator", fields.fieldValue("#artCreatorField", ""));
         payload.put("material", fields.fieldValue("#artMaterialField", ""));
-        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis());
+        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis(), timeWindow.startNow);
     }
 
     private CategoryBuildResult buildVehicle(Map<String, Object> payload, CategoryFieldReader fields) {
         payload.put("type", "VEHICLE");
         double startPrice = parsePrice(fields.fieldValue("#vehicleStartPriceField", ""), "Giá khởi điểm", 500000.0);
 
-        TimeWindow timeWindow = checkedTimeWindow(fields, "#vehicleStartDatePicker", "#vehicleStartHourCombo", "#vehicleEndDatePicker", "#vehicleEndHourCombo", 1440, 10080);
+        TimeWindow timeWindow = checkedTimeWindow(fields, "#vehicleStartDatePicker", "#vehicleStartHourCombo", "#vehicleCustomizeStartButton", "#vehicleEndDatePicker", "#vehicleEndHourCombo", 1440, 10080);
 
         payload.put("model", fields.fieldValue("#vehicleYearField", ""));
         payload.put("odometer", parseInt(fields.fieldValue("#vehicleOdometerField", ""), "Số km", 0, 10000000));
-        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis());
+        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis(), timeWindow.startNow);
     }
 
     private CategoryBuildResult buildOther(Map<String, Object> payload, CategoryFieldReader fields) {
@@ -282,20 +286,23 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
         payload.put("reservePrice", reservePrice);
         payload.put("minimumBidIncrement", minimumBidIncrement);
 
-        TimeWindow timeWindow = checkedTimeWindow(fields, "#otherStartDatePicker", "#otherStartHourCombo", "#otherEndDatePicker", "#otherEndHourCombo", 1440, 43200);
+        TimeWindow timeWindow = checkedTimeWindow(fields, "#otherStartDatePicker", "#otherStartHourCombo", "#otherCustomizeStartButton", "#otherEndDatePicker", "#otherEndHourCombo", 1440, 43200);
 
-        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis());
+        return new CategoryBuildResult(startPrice, timeWindow.durationMinutes, timeWindow.startTimeMillis(), timeWindow.endTimeMillis(), timeWindow.startNow);
     }
 
     private TimeWindow checkedTimeWindow(CategoryFieldReader fields, String startDateId, String startHourId,
+                                         String customizeStartButtonId,
                                          String endDateId, String endHourId, int min, int max) {
+        boolean customStart = fields.isSelected(customizeStartButtonId);
         TimeWindow timeWindow = calculateTimeWindow(
                 fields.dateValue(startDateId),
                 fields.comboValue(startHourId),
                 fields.dateValue(endDateId),
-                fields.comboValue(endHourId));
+                fields.comboValue(endHourId),
+                customStart);
         long duration = timeWindow.durationMinutes;
-        if (!timeWindow.startTime.isAfter(LocalDateTime.now())) {
+        if (customStart && !timeWindow.startTime.isAfter(LocalDateTime.now())) {
             throw new ValidationException("Lỗi thời gian", "Thời gian bắt đầu phải sau thời điểm tạo sản phẩm.");
         }
         if (duration < min || duration > max) {
@@ -304,15 +311,18 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
         return timeWindow;
     }
 
-    private TimeWindow calculateTimeWindow(LocalDate startDate, String startHour, LocalDate endDate, String endHour) {
-        if (startDate == null || startHour == null || endDate == null || endHour == null) {
+    private TimeWindow calculateTimeWindow(LocalDate startDate, String startHour, LocalDate endDate, String endHour,
+                                           boolean customStart) {
+        if (endDate == null || endHour == null) {
             LocalDateTime startTime = LocalDateTime.now();
             LocalDateTime endTime = startTime.plusDays(1);
-            return new TimeWindow(startTime, endTime, 1440);
+            return new TimeWindow(startTime, endTime, 1440, !customStart);
         }
-        LocalDateTime startTime = LocalDateTime.of(startDate, LocalTime.parse(startHour));
+        LocalDateTime startTime = customStart && startDate != null && startHour != null
+                ? LocalDateTime.of(startDate, LocalTime.parse(startHour))
+                : LocalDateTime.now();
         LocalDateTime endTime = LocalDateTime.of(endDate, LocalTime.parse(endHour));
-        return new TimeWindow(startTime, endTime, Duration.between(startTime, endTime).toMinutes());
+        return new TimeWindow(startTime, endTime, Duration.between(startTime, endTime).toMinutes(), !customStart);
     }
 
     private double parsePrice(String value, String fieldName, double minValue) {
@@ -356,7 +366,7 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
         }
     }
 
-    private record TimeWindow(LocalDateTime startTime, LocalDateTime endTime, long durationMinutes) {
+    private record TimeWindow(LocalDateTime startTime, LocalDateTime endTime, long durationMinutes, boolean startNow) {
         private long startTimeMillis() {
             return startTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         }
@@ -366,7 +376,8 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
         }
     }
 
-    private record CategoryBuildResult(double startPrice, long durationMinutes, long startTimeMillis, long endTimeMillis) {
+    private record CategoryBuildResult(double startPrice, long durationMinutes, long startTimeMillis, long endTimeMillis,
+                                       boolean startNow) {
     }
 
 

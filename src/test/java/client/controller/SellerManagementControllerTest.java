@@ -4,6 +4,7 @@ import common.AuctionStatus;
 import common.ItemCategory;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -23,6 +24,16 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SellerManagementControllerTest {
+    @Test
+    void sellerManageAuctionsFxmlLoads() throws Exception {
+        runFx(() -> {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SellerView/SellerManageAuctions.fxml"));
+            assertNotNull(loader.load());
+            assertTrue(loader.getController() instanceof SellerManagementController);
+            stopTimer(loader.getController());
+        });
+    }
+
     @Test
     void auctionItemDerivesStatusCategoryAndTimeText() {
         SellerManagementController.AuctionItem active = new SellerManagementController.AuctionItem(

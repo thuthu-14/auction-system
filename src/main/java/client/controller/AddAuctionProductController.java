@@ -34,12 +34,15 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 public class AddAuctionProductController implements Initializable {
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final String START_NOW_LABEL = "Bắt đầu ngay";
 
     @FXML
     private TextField productNameField;
@@ -166,12 +169,14 @@ public class AddAuctionProductController implements Initializable {
     private void setupTimeOptions(Parent formNode, CategoryFormConfig config) {
         ComboBox<?> startHourCombo = (ComboBox<?>) formNode.lookup(config.startHourId());
         ComboBox<?> endHourCombo = (ComboBox<?>) formNode.lookup(config.endHourId());
+        ToggleButton customizeStartButton = (ToggleButton) formNode.lookup(config.customizeStartButtonId());
         DatePicker startDatePicker = (DatePicker) formNode.lookup(config.startDateId());
         DatePicker endDatePicker = (DatePicker) formNode.lookup(config.endDateId());
 
         LocalDateTime nextStartDateTime = nextAvailableStartDateTime();
         LocalDate startDate = nextStartDateTime.toLocalDate();
         LocalTime nextStartTime = nextStartDateTime.toLocalTime();
+        String nextStartTimeText = formatTime(nextStartTime);
         LocalDate endDate = startDate.plusDays(1);
 
         if (startDatePicker != null) {
@@ -192,7 +197,7 @@ public class AddAuctionProductController implements Initializable {
             @SuppressWarnings("unchecked")
             ComboBox<String> comboBox = (ComboBox<String>) startHourCombo;
             comboBox.setItems(startTimeOptionsFor(startDate, nextStartDateTime));
-            comboBox.getSelectionModel().select(nextStartTime.toString());
+            comboBox.getSelectionModel().select(nextStartTimeText);
             if (startDatePicker != null) {
                 startDatePicker.valueProperty().addListener((obs, oldDate, newDate) ->
                         updateStartTimeOptions(startDatePicker, comboBox));
@@ -202,17 +207,14 @@ public class AddAuctionProductController implements Initializable {
         if (endHourCombo != null) {
             @SuppressWarnings("unchecked")
             ComboBox<String> comboBox = (ComboBox<String>) endHourCombo;
-            comboBox.setItems(timeOptions);
-            comboBox.getSelectionModel().select(nextStartTime.toString());
+            comboBox.setItems(timeOptionsWith(nextStartTime));
+            comboBox.getSelectionModel().select(nextStartTimeText);
         }
+        setupStartModeToggle(customizeStartButton, startDatePicker, startHourCombo);
     }
 
     private LocalDateTime nextAvailableStartDateTime() {
-        LocalDateTime now = LocalDateTime.now();
-        int roundedMinute = now.getMinute() < 30 ? 30 : 0;
-        int hourOffset = now.getMinute() < 30 ? 0 : 1;
-        LocalDateTime candidate = now.withMinute(roundedMinute).withSecond(0).withNano(0).plusHours(hourOffset);
-        return candidate.isAfter(now) ? candidate : candidate.plusMinutes(30);
+        return LocalDateTime.now().withNano(0);
     }
 
     private void updateStartTimeOptions(DatePicker startDatePicker, ComboBox<String> startHourCombo) {
@@ -248,12 +250,78 @@ public class AddAuctionProductController implements Initializable {
         }
 
         LocalTime minTime = minStart.toLocalTime();
+        String minTimeText = formatTime(minTime);
+        options.add(minTimeText);
         for (String timeOption : timeOptions) {
-            if (!LocalTime.parse(timeOption).isBefore(minTime)) {
+            if (!parseTime(timeOption).isBefore(minTime) && !timeOption.equals(minTimeText)) {
                 options.add(timeOption);
             }
         }
         return options;
+    }
+
+    private void setupStartModeToggle(ToggleButton customizeStartButton, DatePicker startDatePicker, ComboBox<?> startHourCombo) {
+        if (customizeStartButton == null) {
+            setStartControlsDisabled(startDatePicker, startHourCombo, false);
+            return;
+        }
+        customizeStartButton.setSelected(false);
+        applyStartMode(customizeStartButton, startDatePicker, startHourCombo);
+        customizeStartButton.setOnAction(event -> applyStartMode(customizeStartButton, startDatePicker, startHourCombo));
+    }
+
+    private void applyStartMode(ToggleButton customizeStartButton, DatePicker startDatePicker, ComboBox<?> startHourCombo) {
+        boolean customStart = customizeStartButton.isSelected();
+        customizeStartButton.setText("Hẹn giờ");
+        customizeStartButton.setTooltip(new Tooltip(customStart ? START_NOW_LABEL : "Hẹn giờ bắt đầu"));
+        applyCustomizeStartButtonStyle(customizeStartButton, customStart);
+        updateStartHourModeValue(startDatePicker, startHourCombo, customStart);
+        setStartControlsDisabled(startDatePicker, startHourCombo, !customStart);
+    }
+
+    private void applyCustomizeStartButtonStyle(ToggleButton button, boolean selected) {
+        String background = selected ? "#e0f2fe" : "#f8fafc";
+        String border = selected ? "#38bdf8" : "#cbd5e1";
+        button.setStyle(
+                "-fx-background-color: " + background + ";"
+                        + "-fx-background-radius: 8;"
+                        + "-fx-border-color: " + border + ";"
+                        + "-fx-border-radius: 8;"
+                        + "-fx-border-width: 1.5;"
+                        + "-fx-text-fill: #1f2937;"
+                        + "-fx-font-size: 13px;"
+                        + "-fx-padding: 0;"
+                        + "-fx-focus-color: transparent;"
+                        + "-fx-faint-focus-color: transparent;"
+                        + "-fx-cursor: hand;"
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    private void updateStartHourModeValue(DatePicker startDatePicker, ComboBox<?> startHourCombo, boolean customStart) {
+        if (startHourCombo == null) {
+            return;
+        }
+
+        ComboBox<String> typedComboBox = (ComboBox<String>) startHourCombo;
+        if (!customStart) {
+            typedComboBox.setItems(FXCollections.observableArrayList(START_NOW_LABEL));
+            typedComboBox.getSelectionModel().select(START_NOW_LABEL);
+            return;
+        }
+
+        if (startDatePicker != null) {
+            updateStartTimeOptions(startDatePicker, typedComboBox);
+        }
+    }
+
+    private void setStartControlsDisabled(DatePicker startDatePicker, ComboBox<?> startHourCombo, boolean disabled) {
+        if (startDatePicker != null) {
+            startDatePicker.setDisable(disabled);
+        }
+        if (startHourCombo != null) {
+            startHourCombo.setDisable(disabled);
+        }
     }
 
     private void applyCalendarStyles(DatePicker... datePickers) {
@@ -303,10 +371,31 @@ public class AddAuctionProductController implements Initializable {
     private javafx.collections.ObservableList<String> generateTimeOptions() {
         javafx.collections.ObservableList<String> times = FXCollections.observableArrayList();
         for (int h = 0; h < 24; h++) {
-            times.add(String.format("%02d:00", h));
-            times.add(String.format("%02d:30", h));
+            for (int m = 0; m < 60; m++) {
+                times.add(String.format("%02d:%02d:00", h, m));
+            }
         }
         return times;
+    }
+
+    private javafx.collections.ObservableList<String> timeOptionsWith(LocalTime selectedTime) {
+        javafx.collections.ObservableList<String> options = FXCollections.observableArrayList();
+        String selectedTimeText = formatTime(selectedTime);
+        options.add(selectedTimeText);
+        for (String timeOption : timeOptions) {
+            if (!timeOption.equals(selectedTimeText)) {
+                options.add(timeOption);
+            }
+        }
+        return options;
+    }
+
+    private String formatTime(LocalTime time) {
+        return TIME_FORMATTER.format(time);
+    }
+
+    private LocalTime parseTime(String time) {
+        return LocalTime.parse(time.trim());
     }
 
     @FXML
@@ -345,6 +434,11 @@ public class AddAuctionProductController implements Initializable {
                         @Override
                         public String comboValue(String fieldId) {
                             return getComboValue(fieldId);
+                        }
+
+                        @Override
+                        public boolean isSelected(String fieldId) {
+                            return getSelectedValue(fieldId);
                         }
 
                     });
@@ -450,6 +544,14 @@ public class AddAuctionProductController implements Initializable {
         return node instanceof ComboBox<?> comboBox && comboBox.getValue() != null
                 ? comboBox.getValue().toString()
                 : null;
+    }
+
+    private boolean getSelectedValue(String fieldId) {
+        Node node = lookupCategoryNode(fieldId);
+        if (node instanceof ToggleButton toggleButton) {
+            return toggleButton.isSelected();
+        }
+        return node instanceof CheckBox checkBox && checkBox.isSelected();
     }
 
     private Node lookupCategoryNode(String fieldId) {

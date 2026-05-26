@@ -64,14 +64,17 @@ public class SellerAuctionService {
         String description = text(auctionData.get("description"));
         double price = requiredNumber(auctionData, "price", "startingPrice").doubleValue();
         int duration = requiredNumber(auctionData, "duration").intValue();
-        long startTime = longValue(auctionData.get("startTime"), System.currentTimeMillis());
-        long endTime = longValue(auctionData.get("endTime"), startTime + duration * 60_000L);
+        boolean isStartNow = auctionData.get("isStartNow") instanceof Boolean value && value;
+        long startTime = isStartNow ? System.currentTimeMillis() : longValue(auctionData.get("startTime"), System.currentTimeMillis());
+        long endTime = isStartNow
+                ? startTime + duration * 60_000L
+                : longValue(auctionData.get("endTime"), startTime + duration * 60_000L);
         duration = (int) ((endTime - startTime) / 60_000L);
         double reservePrice = numberValue(auctionData.get("reservePrice"), 0.0);
         double minimumBidIncrement = numberValue(auctionData.get("minimumBidIncrement"), 0.0);
 
         validateCommon(category, name, description, price, duration);
-        validateTimeWindow(startTime, endTime);
+        validateTimeWindow(startTime, endTime, isStartNow);
         validateCategoryFields(itemType, auctionData);
 
         Item item = createItemFromData(seller.getUserId(), itemType, auctionData);
@@ -135,12 +138,12 @@ public class SellerAuctionService {
         }
     }
 
-    private void validateTimeWindow(long startTime, long endTime) {
+    private void validateTimeWindow(long startTime, long endTime, boolean isStartNow) {
         long now = System.currentTimeMillis();
         if (endTime <= startTime) {
             throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu");
         }
-        if (startTime <= now) {
+        if (!isStartNow && startTime <= now) {
             throw new IllegalArgumentException("Thời gian bắt đầu phải sau thời điểm tạo sản phẩm");
         }
     }

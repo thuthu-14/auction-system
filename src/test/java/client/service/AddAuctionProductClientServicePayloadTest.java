@@ -112,6 +112,24 @@ class AddAuctionProductClientServicePayloadTest {
     }
 
     @Test
+    void buildPayloadDefaultsStartTimeToNowWhenStartIsNotCustomized() throws Exception {
+        Path image = imageFile("now.jpg");
+        long before = System.currentTimeMillis();
+
+        Map<String, Object> payload = service.buildPayload(uploadTransport("NOW1"), user, "Other", "Desc", "Khac",
+                List.of(image.toString()), fields(Map.of(
+                        "#otherStartPriceField", "100",
+                        "#otherReservePriceField", "",
+                        "#otherStepPriceField", "5"
+                ), 2, 4, false));
+
+        long after = System.currentTimeMillis();
+        long startTime = (long) payload.get("startTime");
+        assertTrue(startTime >= before && startTime <= after);
+        assertEquals(true, payload.get("isStartNow"));
+    }
+
+    @Test
     void buildPayloadRejectsBadCategoryPriceTimeAndUploadResponses() throws Exception {
         Path image = imageFile("bad.jpg");
 
@@ -183,6 +201,13 @@ class AddAuctionProductClientServicePayloadTest {
     private AddAuctionProductClientService.CategoryFieldReader fields(Map<String, String> values,
                                                                       int startDaysFromNow,
                                                                       int endDaysFromNow) {
+        return fields(values, startDaysFromNow, endDaysFromNow, true);
+    }
+
+    private AddAuctionProductClientService.CategoryFieldReader fields(Map<String, String> values,
+                                                                      int startDaysFromNow,
+                                                                      int endDaysFromNow,
+                                                                      boolean customStart) {
         return new AddAuctionProductClientService.CategoryFieldReader() {
             @Override
             public String fieldValue(String fieldId, String defaultValue) {
@@ -200,6 +225,11 @@ class AddAuctionProductClientServicePayloadTest {
             @Override
             public String comboValue(String fieldId) {
                 return "00:00";
+            }
+
+            @Override
+            public boolean isSelected(String fieldId) {
+                return customStart;
             }
 
         };

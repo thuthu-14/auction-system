@@ -131,6 +131,31 @@ public class SellerAuctionServiceTest {
     }
 
     @Test
+    public void createAuction_startNowUsesServerCurrentTime() throws Exception {
+        SellerAuctionService service = new SellerAuctionService(auctionService);
+        RegularUser seller = new RegularUser("seller-1", "seller", "password", "seller@example.com");
+        seller.setSeller(true);
+        Auction expected = mock(Auction.class);
+        when(auctionService.create(
+                same(seller), any(OtherItem.class), anyLong(), anyLong(), anyDouble(), anyDouble()))
+                .thenReturn(expected);
+
+        Map<String, Object> data = new java.util.HashMap<>(validOtherAuctionData());
+        data.put("isStartNow", true);
+        data.put("startTime", System.currentTimeMillis() - 60_000L);
+        long before = System.currentTimeMillis();
+
+        assertSame(expected, service.createSellerAuction(seller, data));
+
+        org.mockito.ArgumentCaptor<Long> startCaptor = org.mockito.ArgumentCaptor.forClass(Long.class);
+        org.mockito.ArgumentCaptor<Long> endCaptor = org.mockito.ArgumentCaptor.forClass(Long.class);
+        verify(auctionService).create(same(seller), any(OtherItem.class), startCaptor.capture(), endCaptor.capture(), anyDouble(), anyDouble());
+        long startTime = startCaptor.getValue();
+        assertTrue(startTime >= before && startTime <= System.currentTimeMillis());
+        assertEquals(ItemCategory.OTHER.getMinDurationMinutes(), (endCaptor.getValue() - startTime) / 60_000L);
+    }
+
+    @Test
     public void createAuction_userWrappersRequireRegularUserAndAcceptFallbackKeys() throws Exception {
         SellerAuctionService service = new SellerAuctionService(auctionService);
         RegularUser seller = new RegularUser("seller-1", "seller", "password", "seller@example.com");

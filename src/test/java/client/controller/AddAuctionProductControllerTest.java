@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -39,9 +40,9 @@ class AddAuctionProductControllerTest {
             assertFalse(category.getItems().isEmpty());
             @SuppressWarnings("unchecked")
             List<String> timeOptions = (List<String>) field(controller, "timeOptions");
-            assertEquals(48, timeOptions.size());
-            assertEquals("00:00", timeOptions.get(0));
-            assertEquals("23:30", timeOptions.get(47));
+            assertEquals(1440, timeOptions.size());
+            assertEquals("00:00:00", timeOptions.get(0));
+            assertEquals("23:59:00", timeOptions.get(1439));
         });
     }
 
@@ -59,23 +60,37 @@ class AddAuctionProductControllerTest {
             startHour.setId("startHour");
             ComboBox<String> endHour = new ComboBox<>();
             endHour.setId("endHour");
-            form.getChildren().addAll(startDate, endDate, startHour, endHour);
-            Object config = categoryFormConfig("Any", "/missing.fxml", "#startDate", "#startHour", "#endDate", "#endHour");
+            ToggleButton customizeStart = new ToggleButton();
+            customizeStart.setId("customizeStart");
+            form.getChildren().addAll(startDate, endDate, startHour, endHour, customizeStart);
+            Object config = categoryFormConfig("Any", "/missing.fxml", "#startDate", "#startHour", "#customizeStart", "#endDate", "#endHour");
 
             invoke(controller, "setupTimeOptions", form, config);
 
             assertNotNull(startDate.getValue());
             assertEquals(startDate.getValue().plusDays(1), endDate.getValue());
+            assertEquals(List.of("Bắt đầu ngay"), startHour.getItems());
+            assertEquals("Bắt đầu ngay", startHour.getValue());
+            assertTrue(endHour.getItems().size() >= 1440);
+            assertFalse(customizeStart.isSelected());
+            assertEquals("Hẹn giờ", customizeStart.getText());
+            assertTrue(startDate.isDisabled());
+            assertTrue(startHour.isDisabled());
+
+            customizeStart.fire();
+
+            assertTrue(customizeStart.isSelected());
+            assertEquals("Hẹn giờ", customizeStart.getText());
+            assertFalse(startDate.isDisabled());
+            assertFalse(startHour.isDisabled());
             assertFalse(startHour.getItems().isEmpty());
-            assertTrue(startHour.getItems().size() <= 48);
+            assertTrue(startHour.getItems().size() <= 1441);
             if (startDate.getValue().equals(LocalDate.now())) {
                 LocalTime selectedStartTime = LocalTime.parse(startHour.getValue());
                 assertTrue(startHour.getItems().stream()
                         .map(LocalTime::parse)
                         .allMatch(time -> !time.isBefore(selectedStartTime)));
             }
-            assertEquals(48, endHour.getItems().size());
-            assertEquals(startHour.getValue(), endHour.getValue());
         });
     }
 
@@ -98,12 +113,16 @@ class AddAuctionProductControllerTest {
             hour.setId("hour");
             hour.getItems().add("10:30");
             hour.setValue("10:30");
-            form.getChildren().addAll(brand, date, hour);
+            ToggleButton customizeStart = new ToggleButton();
+            customizeStart.setId("customizeStart");
+            customizeStart.setSelected(true);
+            form.getChildren().addAll(brand, date, hour, customizeStart);
             pane.getChildren().add(form);
 
             assertEquals("Canon", invoke(controller, "getFieldValue", "#brand", "default"));
             assertEquals(date.getValue(), invoke(controller, "getDateValue", "#date"));
             assertEquals("10:30", invoke(controller, "getComboValue", "#hour"));
+            assertEquals(true, invoke(controller, "getSelectedValue", "#customizeStart"));
             assertSame(hour, invoke(controller, "lookupCategoryNode", "#hour"));
         });
     }
@@ -159,14 +178,15 @@ class AddAuctionProductControllerTest {
     }
 
     @Test
-    void nextAvailableStartDateTimeIsRoundedToHourOrHalfHour() throws Exception {
+    void nextAvailableStartDateTimeKeepsCurrentSecondPrecision() throws Exception {
         AddAuctionProductController controller = new AddAuctionProductController();
+        LocalDateTime before = LocalDateTime.now().minusSeconds(1);
         LocalDateTime next = (LocalDateTime) invoke(controller, "nextAvailableStartDateTime");
+        LocalDateTime after = LocalDateTime.now().plusSeconds(1);
 
-        assertEquals(0, next.getSecond());
         assertEquals(0, next.getNano());
-        assertTrue(next.getMinute() == 0 || next.getMinute() == 30);
-        assertTrue(next.isAfter(LocalDateTime.now()));
+        assertFalse(next.isBefore(before));
+        assertFalse(next.isAfter(after));
     }
 
     private static AddAuctionProductController baseController() throws Exception {
