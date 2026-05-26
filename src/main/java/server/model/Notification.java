@@ -17,7 +17,7 @@ public class Notification implements Serializable {
     private String referenceId; // ID tham chiếu (Mã đấu giá, mã giao dịch...)
     private boolean isRead;     // Trạng thái đã đọc hay chưa
 
-    // Constructor rỗng (Bắt buộc phải có cho thư viện JSON như Jackson/Gson)
+
     public Notification() {
     }
 

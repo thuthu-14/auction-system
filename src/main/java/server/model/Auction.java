@@ -89,7 +89,7 @@ public class Auction implements Serializable {
         this.bidIds = new ArrayList<>();
     }
 
-    // Constructor 3: Empty
+
     public synchronized boolean placeBid(String bidderId, String bidderName, double amount) throws Exception {
         long now = System.currentTimeMillis();
 
@@ -124,7 +124,7 @@ public class Auction implements Serializable {
 
     public synchronized void extendAuctionIfNeeded() {
         long now = System.currentTimeMillis();
-        long remainingMillis = endTime - now;
+        long remainingMillis = endTime - now;// thời gian còn lại của phiên đấu
         long antiSnipeWindowMillis = Constants.ANTI_SNIPE_MINUTES * 60 * 1000L;
 
         if (isOpenForBidding() && remainingMillis > 0 && remainingMillis <= antiSnipeWindowMillis) {

@@ -6,9 +6,6 @@ public class Constants {
     public static final int THREAD_POOL_SIZE = 100;
     public static final int SOCKET_TIMEOUT = 15000;
 
-    public static final String JSON_DIR = "data/json";
-    public static final String SERIALIZED_DIR = "data/serialized";
-    public static final String LOGS_DIR = "logs";
 
     public static final double ADMIN_WALLET = 1000000.0;
     public static final double USER_INITIAL_WALLET = 0.0;

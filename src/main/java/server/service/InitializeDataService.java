@@ -9,10 +9,7 @@ import util.JsonUtil; // Import thêm JsonUtil
 import java.io.IOException;
 import java.util.*;
 
-/**
- * InitializeDataService - Tạo dữ liệu mặc định khi server khởi động
- * Đã lược bỏ hoàn toàn Serialization để dùng thuần JSON.
- */
+
 public class InitializeDataService {
 
     /**
