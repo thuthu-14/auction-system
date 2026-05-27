@@ -55,6 +55,7 @@ public class CategoryController {
     @FXML private Label heroDescriptionLabel;
     @FXML private ImageView heroImageView;
     @FXML private Label heroIconLabel;
+    @FXML private Label productCountLabel;
 
     private final AuctionQueryClient auctionQueryClient;
     private final AuctionCardFactory auctionCardFactory;
@@ -139,6 +140,7 @@ public class CategoryController {
                 .filter(filter::accepts)
                 .sorted(getAuctionComparator())
                 .toList();
+        updateProductCountLabel(countCurrentCategoryAuctions(auctions, filter));
 
         if (filteredAuctions.isEmpty()) {
             flowPane.getChildren().add(createEmptyState());
@@ -347,6 +349,25 @@ public class CategoryController {
             return 0;
         }
         return auction.getBidIds().size();
+    }
+
+    private int countCurrentCategoryAuctions(List<Auction> auctions, AuctionFilterStrategy filter) {
+        if (auctions == null || filter == null) {
+            return 0;
+        }
+        return (int) auctions.stream().filter(filter::accepts).count();
+    }
+
+    private void updateProductCountLabel(int count) {
+        if (productCountLabel != null) {
+            String currentText = productCountLabel.getText();
+            String prefix = "Tất cả sản phẩm";
+            int countStart = currentText != null ? currentText.lastIndexOf('(') : -1;
+            if (countStart > 0) {
+                prefix = currentText.substring(0, countStart).trim();
+            }
+            productCountLabel.setText(prefix + " (" + count + ")");
+        }
     }
 
     private boolean isVisibleAuction(Auction auction) {

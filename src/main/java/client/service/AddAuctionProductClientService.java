@@ -223,6 +223,7 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
     private CategoryBuildResult buildElectronics(Map<String, Object> payload, CategoryFieldReader fields) {
         payload.put("type", "ELECTRONICS");
         double startPrice = parsePrice(fields.fieldValue("#elecStartPriceField", ""), "Giá khởi điểm", 50000.0);
+        payload.put("minimumBidIncrement", parsePrice(fields.fieldValue("#elecStepPriceField", "50000"), "Bước giá", 1.0));
 
         TimeWindow timeWindow = checkedTimeWindow(fields, "#elecStartDatePicker", "#elecStartHourCombo", "#elecCustomizeStartButton", "#elecEndDatePicker", "#elecEndHourCombo", 1440, 10080);
 
@@ -234,6 +235,7 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
     private CategoryBuildResult buildFashion(Map<String, Object> payload, CategoryFieldReader fields) {
         payload.put("type", "FASHION");
         double startPrice = parsePrice(fields.fieldValue("#fashionStartPriceField", ""), "Giá khởi điểm", 10000.0);
+        payload.put("minimumBidIncrement", parsePrice(fields.fieldValue("#fashionStepPriceField", "10000"), "Bước giá", 1.0));
 
         TimeWindow timeWindow = checkedTimeWindow(fields, "#fashionStartDatePicker", "#fashionStartHourCombo", "#fashionCustomizeStartButton", "#fashionEndDatePicker", "#fashionEndHourCombo", 1440, 4320);
 
@@ -245,6 +247,7 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
     private CategoryBuildResult buildJewelry(Map<String, Object> payload, CategoryFieldReader fields) {
         payload.put("type", "JEWELRY");
         double startPrice = parsePrice(fields.fieldValue("#jewelryStartPriceField", ""), "Giá khởi điểm", 25000.0);
+        payload.put("minimumBidIncrement", parsePrice(fields.fieldValue("#jewelryStepPriceField", "25000"), "Bước giá", 1.0));
 
         TimeWindow timeWindow = checkedTimeWindow(fields, "#jewelryStartDatePicker", "#jewelryStartHourCombo", "#jewelryCustomizeStartButton", "#jewelryEndDatePicker", "#jewelryEndHourCombo", 1440, 7200);
 
@@ -256,6 +259,7 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
     private CategoryBuildResult buildArt(Map<String, Object> payload, CategoryFieldReader fields) {
         payload.put("type", "ART");
         double startPrice = parsePrice(fields.fieldValue("#artStartPriceField", ""), "Giá khởi điểm", 100000.0);
+        payload.put("minimumBidIncrement", parsePrice(fields.fieldValue("#artStepPriceField", "100000"), "Bước giá", 1.0));
 
         TimeWindow timeWindow = checkedTimeWindow(fields, "#artStartDatePicker", "#artStartHourCombo", "#artCustomizeStartButton", "#artEndDatePicker", "#artEndHourCombo", 1440, 20160);
 
@@ -267,6 +271,7 @@ public class AddAuctionProductClientService implements AddAuctionProductClient {
     private CategoryBuildResult buildVehicle(Map<String, Object> payload, CategoryFieldReader fields) {
         payload.put("type", "VEHICLE");
         double startPrice = parsePrice(fields.fieldValue("#vehicleStartPriceField", ""), "Giá khởi điểm", 500000.0);
+        payload.put("minimumBidIncrement", parsePrice(fields.fieldValue("#vehicleStepPriceField", "500000"), "Bước giá", 1.0));
 
         TimeWindow timeWindow = checkedTimeWindow(fields, "#vehicleStartDatePicker", "#vehicleStartHourCombo", "#vehicleCustomizeStartButton", "#vehicleEndDatePicker", "#vehicleEndHourCombo", 1440, 10080);
 

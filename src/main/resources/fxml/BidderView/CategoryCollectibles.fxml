@@ -74,7 +74,7 @@
             </StackPane>
             <HBox alignment="CENTER_LEFT" spacing="15.0">
                 <children>
-                    <Label text="Tất cả sản phẩm (124)" textFill="#718096">
+                    <Label fx:id="productCountLabel" text="Tất cả sản phẩm (0)" textFill="#718096">
                         <font>
                             <Font name="System Bold" size="16.0" />
                         </font>
