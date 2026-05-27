@@ -6,6 +6,7 @@ import client.exception.ClientExceptionHandler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -30,6 +31,7 @@ public class ClientMain extends Application {
         primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
 
         loadCustomFonts();
+        loadWindowIcon();
         LoggerUtil.info("Auction system client started");
         showLoginScreen();
 
@@ -41,6 +43,18 @@ public class ClientMain extends Application {
 
     private void loadCustomFonts() {
         loadFont("/CSS/DarleySans-Regular.otf");
+    }
+
+    private void loadWindowIcon() {
+        try (InputStream input = getClass().getResourceAsStream("/CSS/logo.png")) {
+            if (input == null) {
+                LoggerUtil.warn("Could not load window icon: /CSS/logo.png");
+                return;
+            }
+            primaryStage.getIcons().add(new Image(input));
+        } catch (IOException e) {
+            LoggerUtil.warn("Could not load window icon: /CSS/logo.png - " + e.getMessage());
+        }
     }
 
     private void loadFont(String resourcePath) {
