@@ -14,6 +14,8 @@ Hệ thống hỗ trợ nhiều vai trò người dùng:
 - **Seller**: người bán, tạo và quản lý sản phẩm hoặc phiên đấu giá.
 - **Admin**: quản trị viên, quản lý người dùng và các phiên đấu giá trong hệ thống.
 
+Lưu ý về mô hình kế thừa trong code: hệ thống chỉ định nghĩa hai lớp con trực tiếp của `User` là `Admin` và `RegularUser`. `Bidder` và `Seller` không phải là lớp riêng; đây là hai vai trò nghiệp vụ của `RegularUser`, được quản lý bằng `UserRole` và cờ `isSeller`. Khi người dùng đăng ký, tài khoản mặc định là `BIDDER`; khi đăng ký trở thành người bán, `RegularUser.upgradeSeller(...)` cập nhật vai trò thành `SELLER` và bổ sung thông tin cửa hàng. Vì vậy UML class diagram thể hiện quan hệ `Admin is-a User` và `RegularUser is-a User`, còn `Bidder/Seller` là role của `RegularUser`.
+
 Phạm vi hệ thống bao gồm:
 
 - Quản lý tài khoản người dùng.

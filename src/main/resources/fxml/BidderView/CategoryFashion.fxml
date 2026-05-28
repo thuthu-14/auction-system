@@ -4,69 +4,84 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<ScrollPane fx:id="categoryRoot" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.CategoryController">
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:id="categoryRoot" fitToWidth="true"
+            hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;"
+            vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12"
+            fx:controller="client.controller.CategoryController">
     <VBox alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
         <padding>
-            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
         </padding>
         <children>
             <HBox alignment="CENTER_LEFT" spacing="20.0">
                 <children>
-                    <Button fx:id="backBtn" style="-fx-background-color: white; -fx-background-radius: 20; -fx-border-color: #e2e8f0; -fx-border-radius: 20; -fx-cursor: hand;" text="&lt; Dashboard" textFill="#1a1a1a">
+                    <Button fx:id="backBtn"
+                            style="-fx-background-color: white; -fx-background-radius: 20; -fx-border-color: #e2e8f0; -fx-border-radius: 20; -fx-cursor: hand;"
+                            text="&lt; Dashboard" textFill="#1a1a1a">
                         <font>
-                            <Font name="System Bold" size="14.0" />
+                            <Font name="System Bold" size="14.0"/>
                         </font>
                         <padding>
-                            <Insets bottom="8.0" left="15.0" right="15.0" top="8.0" />
+                            <Insets bottom="8.0" left="15.0" right="15.0" top="8.0"/>
                         </padding>
                     </Button>
-                    <Region HBox.hgrow="ALWAYS" />
+                    <Region HBox.hgrow="ALWAYS"/>
                     <Label text="👗 Thời trang &amp; Phụ kiện" textFill="#1a1a1a">
                         <font>
-                            <Font name="System Bold" size="28.0" />
+                            <Font name="System Bold" size="28.0"/>
                         </font>
                     </Label>
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Region minWidth="118.0" prefWidth="118.0" />
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Region minWidth="118.0" prefWidth="118.0"/>
                 </children>
             </HBox>
-            <StackPane prefHeight="245.0" style="-fx-background-color: #ffe4e6; -fx-background-radius: 25; -fx-effect: dropshadow(three-pass-box, rgba(225,29,72,0.1), 15, 0, 0, 8);" VBox.vgrow="NEVER">
+            <StackPane prefHeight="245.0"
+                       style="-fx-background-color: #ffe4e6; -fx-background-radius: 25; -fx-effect: dropshadow(three-pass-box, rgba(225,29,72,0.1), 15, 0, 0, 8);"
+                       VBox.vgrow="NEVER">
                 <children>
                     <HBox alignment="CENTER_LEFT" spacing="40.0">
                         <padding>
-                            <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
+                            <Insets bottom="30.0" left="50.0" right="50.0" top="30.0"/>
                         </padding>
                         <children>
                             <VBox alignment="CENTER_LEFT" spacing="15.0" HBox.hgrow="ALWAYS">
                                 <children>
-                                    <Label style="-fx-background-color: #e11d48; -fx-background-radius: 10; -fx-padding: 5 10 5 10;" text="HOT DEAL 💎" textFill="white">
+                                    <Label style="-fx-background-color: #e11d48; -fx-background-radius: 10; -fx-padding: 5 10 5 10;"
+                                           text="HOT DEAL 💎" textFill="white">
                                         <font>
-                                            <Font name="System Bold" size="12.0" />
+                                            <Font name="System Bold" size="12.0"/>
                                         </font>
                                     </Label>
-                                    <Label fx:id="heroTitleLabel" text="Túi xách Hermès Birkin 30" textFill="#1a1a1a" wrapText="true">
+                                    <Label fx:id="heroTitleLabel" text="Túi xách Hermès Birkin 30" textFill="#1a1a1a"
+                                           wrapText="true">
                                         <font>
-                                            <Font name="System Bold" size="32.0" />
+                                            <Font name="System Bold" size="32.0"/>
                                         </font>
                                     </Label>
-                                    <Label fx:id="heroDescriptionLabel" maxWidth="450.0" text="kèm mô tả sản phẩm" textFill="#881337" wrapText="true">
+                                    <Label fx:id="heroDescriptionLabel" maxWidth="450.0" text="kèm mô tả sản phẩm"
+                                           textFill="#881337" wrapText="true">
                                         <font>
-                                            <Font size="15.0" />
+                                            <Font size="15.0"/>
                                         </font>
                                     </Label>
-                                    <Button fx:id="heroBidButton" style="-fx-background-color: #1a1a1a; -fx-background-radius: 20; -fx-cursor: hand;" text="Đấu giá ngay" textFill="white">
+                                    <Button fx:id="heroBidButton"
+                                            style="-fx-background-color: #1a1a1a; -fx-background-radius: 20; -fx-cursor: hand;"
+                                            text="Đấu giá ngay" textFill="white">
                                         <font>
-                                            <Font name="System Bold" size="14.0" />
+                                            <Font name="System Bold" size="14.0"/>
                                         </font>
                                         <padding>
-                                            <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />
+                                            <Insets bottom="10.0" left="25.0" right="25.0" top="10.0"/>
                                         </padding>
                                     </Button>
                                 </children>
                             </VBox>
-                            <StackPane maxHeight="190.0" maxWidth="190.0" minHeight="190.0" minWidth="190.0" prefHeight="190.0" prefWidth="190.0" style="-fx-background-color: white; -fx-background-radius: 24; -fx-border-color: rgba(255,255,255,0.85); -fx-border-radius: 24; -fx-border-width: 2; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 12, 0, 0, 6);">
-                                <ImageView fx:id="heroImageView" fitHeight="190.0" fitWidth="190.0" preserveRatio="false" smooth="true" visible="false" />
-                                <Label fx:id="heroIconLabel" style="-fx-font-size: 80;" text="👜" />
+                            <StackPane maxHeight="190.0" maxWidth="190.0" minHeight="190.0" minWidth="190.0"
+                                       prefHeight="190.0" prefWidth="190.0"
+                                       style="-fx-background-color: white; -fx-background-radius: 24; -fx-border-color: rgba(255,255,255,0.85); -fx-border-radius: 24; -fx-border-width: 2; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 12, 0, 0, 6);">
+                                <ImageView fx:id="heroImageView" fitHeight="190.0" fitWidth="190.0"
+                                           preserveRatio="false" smooth="true" visible="false"/>
+                                <Label fx:id="heroIconLabel" style="-fx-font-size: 80;" text="👜"/>
                             </StackPane>
                         </children>
                     </HBox>
@@ -76,12 +91,14 @@
                 <children>
                     <Label fx:id="productCountLabel" text="Sản phẩm thời trang (0)" textFill="#718096">
                         <font>
-                            <Font name="System Bold" size="16.0" />
+                            <Font name="System Bold" size="16.0"/>
                         </font>
                     </Label>
-                    <Region HBox.hgrow="ALWAYS" />
-                    <ComboBox prefWidth="150.0" promptText="Thương hiệu" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
-                    <ComboBox fx:id="sortCombo" prefWidth="180.0" promptText="Sắp xếp" style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;" />
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <ComboBox prefWidth="150.0" promptText="Thương hiệu"
+                              style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;"/>
+                    <ComboBox fx:id="sortCombo" prefWidth="180.0" promptText="Sắp xếp"
+                              style="-fx-background-color: #f3f4f6; -fx-background-radius: 10; -fx-font-size: 14px;"/>
                 </children>
             </HBox>
             <FlowPane fx:id="fashionFlowPane" hgap="25.0" vgap="25.0">

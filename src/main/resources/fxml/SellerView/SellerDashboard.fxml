@@ -1,81 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox spacing="0" stylesheets="@/CSS/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.SellerDashboardController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" spacing="0" stylesheets="@/CSS/style.css"
+      xmlns="http://javafx.com/javafx/17.0.12" fx:controller="client.controller.SellerDashboardController">
     <!-- CARDS GRID -->
     <ScrollPane vbarPolicy="NEVER" fitToWidth="true" focusTraversable="false" styleClass="bar" VBox.vgrow="ALWAYS">
         <VBox styleClass="dashboard-cards-container">
             <!-- ROW 1: Tạo phiên + Quản lý phiên -->
             <HBox spacing="16">
-                <VBox fx:id="cardTaoPhien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+                <VBox fx:id="cardTaoPhien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter"
+                      onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-purple" text="+" />
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;"
+                               styleClass="card-icon-badge card-icon-purple" text="+"/>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label styleClass="card-title" text="Tạo phiên mới" />
-                            <Label styleClass="card-desc" text="Khởi tạo phiên đấu giá với sản phẩm của bạn" wrapText="true" />
+                            <Label styleClass="card-title" text="Tạo phiên mới"/>
+                            <Label styleClass="card-desc" text="Khởi tạo phiên đấu giá với sản phẩm của bạn"
+                                   wrapText="true"/>
                         </VBox>
                     </HBox>
-                    <Region VBox.vgrow="ALWAYS" />
+                    <Region VBox.vgrow="ALWAYS"/>
                     <HBox alignment="CENTER_RIGHT">
-                        <Label styleClass="card-cta card-cta-purple" text="Bắt đầu →" />
+                        <Label styleClass="card-cta card-cta-purple" text="Bắt đầu →"/>
                     </HBox>
                 </VBox>
-                <VBox fx:id="cardQuanLyPhien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+                <VBox fx:id="cardQuanLyPhien" minHeight="120" onMouseClicked="#onCardClick"
+                      onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card"
+                      HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-teal" text="⚖" />
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;"
+                               styleClass="card-icon-badge card-icon-teal" text="⚖"/>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label styleClass="card-title" text="Quản lý phiên" />
-                            <Label styleClass="card-desc" text="Theo dõi và điều phối các phiên đang diễn ra" wrapText="true" />
+                            <Label styleClass="card-title" text="Quản lý phiên"/>
+                            <Label styleClass="card-desc" text="Theo dõi và điều phối các phiên đang diễn ra"
+                                   wrapText="true"/>
                         </VBox>
                     </HBox>
-                    <Region VBox.vgrow="ALWAYS" />
+                    <Region VBox.vgrow="ALWAYS"/>
                     <HBox alignment="CENTER_RIGHT">
-                        <Label styleClass="card-cta card-cta-teal" text="Xem ngày →" />
+                        <Label styleClass="card-cta card-cta-teal" text="Xem ngày →"/>
                     </HBox>
                 </VBox>
             </HBox>
             <!-- ROW 2: Thống kê + Thông báo -->
             <HBox spacing="16">
-                <VBox fx:id="cardThongKe" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+                <VBox fx:id="cardThongKe" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter"
+                      onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-orange" text="📊" />
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;"
+                               styleClass="card-icon-badge card-icon-orange" text="📊"/>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label styleClass="card-title" text="Thống kê" />
-                            <Label styleClass="card-desc" text="Xem báo cáo doanh thu và hiệu suất bán hàng" wrapText="true" />
+                            <Label styleClass="card-title" text="Thống kê"/>
+                            <Label styleClass="card-desc" text="Xem báo cáo doanh thu và hiệu suất bán hàng"
+                                   wrapText="true"/>
                         </VBox>
                     </HBox>
-                    <Region VBox.vgrow="ALWAYS" />
+                    <Region VBox.vgrow="ALWAYS"/>
                     <HBox alignment="CENTER_RIGHT">
-                        <Label styleClass="card-cta card-cta-orange" text="Phân tích →" />
+                        <Label styleClass="card-cta card-cta-orange" text="Phân tích →"/>
                     </HBox>
                 </VBox>
-                <VBox fx:id="cardThongBao" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+                <VBox fx:id="cardThongBao" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter"
+                      onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-pink" text="🔔" />
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;"
+                               styleClass="card-icon-badge card-icon-pink" text="🔔"/>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label styleClass="card-title" text="Thông báo" />
-                            <Label styleClass="card-desc" text="Cập nhật tin tức về các phiên và người đấu giá" wrapText="true" />
+                            <Label styleClass="card-title" text="Thông báo"/>
+                            <Label styleClass="card-desc" text="Cập nhật tin tức về các phiên và người đấu giá"
+                                   wrapText="true"/>
                         </VBox>
                     </HBox>
-                    <Region VBox.vgrow="ALWAYS" />
+                    <Region VBox.vgrow="ALWAYS"/>
                     <HBox alignment="CENTER_RIGHT">
-                        <Label styleClass="card-cta card-cta-pink" text="Đọc thêm →" />
+                        <Label styleClass="card-cta card-cta-pink" text="Đọc thêm →"/>
                     </HBox>
                 </VBox>
             </HBox>
             <!-- ROW 3: Ví tiền full width -->
             <HBox>
-                <VBox fx:id="cardViTien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter" onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
+                <VBox fx:id="cardViTien" minHeight="120" onMouseClicked="#onCardClick" onMouseEntered="#onCardEnter"
+                      onMouseExited="#onCardExit" styleClass="dashboard-card" HBox.hgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT" spacing="14">
-                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;" styleClass="card-icon-badge card-icon-blue" text="💳" />
+                        <Label style="-fx-text-fill: #1f2937; -fx-font-size: 30px; -fx-background-color: transparent;"
+                               styleClass="card-icon-badge card-icon-blue" text="💳"/>
                         <VBox spacing="4" HBox.hgrow="ALWAYS">
-                            <Label styleClass="card-title" text="Ví tiền" />
-                            <Label styleClass="card-desc" text="Quản lý số dư, nạp tiền và lịch sử giao dịch của bạn" wrapText="true" />
+                            <Label styleClass="card-title" text="Ví tiền"/>
+                            <Label styleClass="card-desc" text="Quản lý số dư, nạp tiền và lịch sử giao dịch của bạn"
+                                   wrapText="true"/>
                         </VBox>
                     </HBox>
-                    <Region VBox.vgrow="ALWAYS" />
+                    <Region VBox.vgrow="ALWAYS"/>
                     <HBox alignment="CENTER_RIGHT">
-                        <Label styleClass="card-cta card-cta-blue" text="Quản lý →" />
+                        <Label styleClass="card-cta card-cta-blue" text="Quản lý →"/>
                     </HBox>
                 </VBox>
             </HBox>

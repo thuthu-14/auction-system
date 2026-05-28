@@ -6,47 +6,57 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<ScrollPane fx:id="dashboardRoot" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.DashboardController">
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fx:id="dashboardRoot" fitToWidth="true"
+            hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;"
+            vbarPolicy="NEVER" xmlns="http://javafx.com/javafx/17.0.12"
+            fx:controller="client.controller.DashboardController">
     <VBox alignment="TOP_LEFT" spacing="35.0" style="-fx-background-color: #fcfcfc;" VBox.vgrow="ALWAYS">
         <padding>
-            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
         </padding>
         <children>
             <VBox spacing="5.0">
                 <children>
                     <Label text="Khám phá BubblyBid" textFill="#1a1a1a">
                         <font>
-                            <Font name="System Bold" size="28.0" />
+                            <Font name="System Bold" size="28.0"/>
                         </font>
                     </Label>
                     <Label text="Hàng ngàn sản phẩm độc đáo đang chờ bạn chốt giá ngày hôm nay!" textFill="#718096">
                         <font>
-                            <Font size="15.0" />
+                            <Font size="15.0"/>
                         </font>
                     </Label>
                 </children>
             </VBox>
-            <StackPane style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 5);" VBox.vgrow="NEVER">
+            <StackPane style="-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 5);"
+                       VBox.vgrow="NEVER">
                 <children>
-                    <Button maxWidth="Infinity" style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
+                    <Button maxWidth="Infinity"
+                            style="-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;">
                         <graphic>
-                            <ImageView fx:id="bannerImageView" fitHeight="250.0" fitWidth="800.0" preserveRatio="false" smooth="true" />
+                            <ImageView fx:id="bannerImageView" fitHeight="250.0" fitWidth="800.0" preserveRatio="false"
+                                       smooth="true"/>
                         </graphic>
                     </Button>
-                    <Button fx:id="prevBannerBtn" focusTraversable="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" text="&lt;" StackPane.alignment="CENTER_LEFT">
+                    <Button fx:id="prevBannerBtn" focusTraversable="false" prefHeight="40.0" prefWidth="40.0"
+                            style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;"
+                            text="&lt;" StackPane.alignment="CENTER_LEFT">
                         <font>
-                            <Font name="System Bold" size="18.0" />
+                            <Font name="System Bold" size="18.0"/>
                         </font>
                         <StackPane.margin>
-                            <Insets left="20.0" />
+                            <Insets left="20.0"/>
                         </StackPane.margin>
                     </Button>
-                    <Button fx:id="nextBannerBtn" focusTraversable="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" text="&gt;" StackPane.alignment="CENTER_RIGHT">
+                    <Button fx:id="nextBannerBtn" focusTraversable="false" prefHeight="40.0" prefWidth="40.0"
+                            style="-fx-background-color: rgba(0,0,0,0.4); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;"
+                            text="&gt;" StackPane.alignment="CENTER_RIGHT">
                         <font>
-                            <Font name="System Bold" size="18.0" />
+                            <Font name="System Bold" size="18.0"/>
                         </font>
                         <StackPane.margin>
-                            <Insets right="20.0" />
+                            <Insets right="20.0"/>
                         </StackPane.margin>
                     </Button>
                 </children>
@@ -55,79 +65,98 @@
                 <children>
                     <Label text="📂 Danh mục sản phẩm" textFill="#1a1a1a">
                         <font>
-                            <Font name="System Bold" size="22.0" />
+                            <Font name="System Bold" size="22.0"/>
                         </font>
                     </Label>
                     <HBox alignment="CENTER" maxWidth="Infinity">
                         <children>
-                            <VBox alignment="CENTER" onMouseClicked="#openCollectiblesCategory" spacing="12.0" style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
+                            <VBox alignment="CENTER" onMouseClicked="#openCollectiblesCategory" spacing="12.0"
+                                  style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
                                 <children>
-                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #fef3c7; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
-                                        <Label alignment="BOTTOM_CENTER" contentDisplay="BOTTOM" prefHeight="42.0" prefWidth="36.0" style="-fx-font-size: 36; -fx-text-fill: #ffffff;" styleClass="category-icon" text="🏺" textAlignment="JUSTIFY" />
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0"
+                                               style="-fx-background-color: #fef3c7; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label alignment="BOTTOM_CENTER" contentDisplay="BOTTOM" prefHeight="42.0"
+                                               prefWidth="36.0" style="-fx-font-size: 36; -fx-text-fill: #ffffff;"
+                                               styleClass="category-icon" text="🏺" textAlignment="JUSTIFY"/>
                                     </StackPane>
                                     <Label text="Đồ sưu tầm" textFill="#4a5568">
                                         <font>
-                                            <Font name="System Bold" size="14.0" />
+                                            <Font name="System Bold" size="14.0"/>
                                         </font>
                                     </Label>
                                 </children>
                             </VBox>
-                            <VBox alignment="CENTER" onMouseClicked="#openElectronicsCategory" spacing="12.0" style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
+                            <VBox alignment="CENTER" onMouseClicked="#openElectronicsCategory" spacing="12.0"
+                                  style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
                                 <children>
-                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #e0f2fe; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
-                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;" styleClass="category-icon" text="💻" />
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0"
+                                               style="-fx-background-color: #e0f2fe; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;"
+                                               styleClass="category-icon" text="💻"/>
                                     </StackPane>
                                     <Label text="Điện tử" textFill="#4a5568">
                                         <font>
-                                            <Font name="System Bold" size="14.0" />
+                                            <Font name="System Bold" size="14.0"/>
                                         </font>
                                     </Label>
                                 </children>
                             </VBox>
-                            <VBox alignment="CENTER" onMouseClicked="#openFashionCategory" spacing="12.0" style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
+                            <VBox alignment="CENTER" onMouseClicked="#openFashionCategory" spacing="12.0"
+                                  style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
                                 <children>
-                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #ffedd5; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
-                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;" styleClass="category-icon" text="👕" />
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0"
+                                               style="-fx-background-color: #ffedd5; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;"
+                                               styleClass="category-icon" text="👕"/>
                                     </StackPane>
                                     <Label text="Thời trang" textFill="#4a5568">
                                         <font>
-                                            <Font name="System Bold" size="14.0" />
+                                            <Font name="System Bold" size="14.0"/>
                                         </font>
                                     </Label>
                                 </children>
                             </VBox>
-                            <VBox alignment="CENTER" onMouseClicked="#openJewelryCategory" spacing="12.0" style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
+                            <VBox alignment="CENTER" onMouseClicked="#openJewelryCategory" spacing="12.0"
+                                  style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
                                 <children>
-                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #f3e8ff; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
-                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;" styleClass="category-icon" text="💎" />
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0"
+                                               style="-fx-background-color: #f3e8ff; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;"
+                                               styleClass="category-icon" text="💎"/>
                                     </StackPane>
                                     <Label text="Trang sức" textFill="#4a5568">
                                         <font>
-                                            <Font name="System Bold" size="14.0" />
+                                            <Font name="System Bold" size="14.0"/>
                                         </font>
                                     </Label>
                                 </children>
                             </VBox>
-                            <VBox alignment="CENTER" onMouseClicked="#openVehiclesCategory" spacing="12.0" style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
+                            <VBox alignment="CENTER" onMouseClicked="#openVehiclesCategory" spacing="12.0"
+                                  style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
                                 <children>
-                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #dcfce7; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
-                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;" styleClass="category-icon" text="🚗" />
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0"
+                                               style="-fx-background-color: #dcfce7; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;"
+                                               styleClass="category-icon" text="🚗"/>
                                     </StackPane>
                                     <Label text="Xe cộ" textFill="#4a5568">
                                         <font>
-                                            <Font name="System Bold" size="14.0" />
+                                            <Font name="System Bold" size="14.0"/>
                                         </font>
                                     </Label>
                                 </children>
                             </VBox>
-                            <VBox alignment="CENTER" onMouseClicked="#openOtherCategory" spacing="12.0" style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
+                            <VBox alignment="CENTER" onMouseClicked="#openOtherCategory" spacing="12.0"
+                                  style="-fx-cursor: hand;" styleClass="dashboard-category-card" HBox.hgrow="ALWAYS">
                                 <children>
-                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #f1f5f9; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
-                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;" styleClass="category-icon" text="📦" />
+                                    <StackPane maxWidth="80.0" prefHeight="80.0" prefWidth="80.0"
+                                               style="-fx-background-color: #f1f5f9; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 5, 0, 0, 2);">
+                                        <Label style="-fx-font-size: 36; -fx-text-fill: #ffffff;"
+                                               styleClass="category-icon" text="📦"/>
                                     </StackPane>
                                     <Label text="Khác" textFill="#4a5568">
                                         <font>
-                                            <Font name="System Bold" size="14.0" />
+                                            <Font name="System Bold" size="14.0"/>
                                         </font>
                                     </Label>
                                 </children>
@@ -142,33 +171,43 @@
                         <children>
                             <Label text="🔥 Sắp kết thúc - Chốt ngay!" textFill="#1a1a1a">
                                 <font>
-                                    <Font name="System Bold" size="22.0" />
+                                    <Font name="System Bold" size="22.0"/>
                                 </font>
                             </Label>
-                            <Region HBox.hgrow="ALWAYS" />
+                            <Region HBox.hgrow="ALWAYS"/>
                         </children>
                     </HBox>
-                    <StackPane alignment="CENTER" maxWidth="Infinity" minHeight="372.0" prefHeight="372.0" style="-fx-padding: 0 24 0 24;">
+                    <StackPane alignment="CENTER" maxWidth="Infinity" minHeight="372.0" prefHeight="372.0"
+                               style="-fx-padding: 0 24 0 24;">
                         <children>
-                            <ScrollPane fx:id="endingSoonScroll" fitToHeight="true" hbarPolicy="NEVER" maxWidth="Infinity" prefHeight="372.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                            <ScrollPane fx:id="endingSoonScroll" fitToHeight="true" hbarPolicy="NEVER"
+                                        maxWidth="Infinity" prefHeight="372.0"
+                                        style="-fx-background-color: transparent; -fx-background: transparent;"
+                                        vbarPolicy="NEVER">
                                 <content>
-                                    <HBox fx:id="endingSoonHBox" alignment="CENTER_LEFT" spacing="16.0" />
+                                    <HBox fx:id="endingSoonHBox" alignment="CENTER_LEFT" spacing="16.0"/>
                                 </content>
                             </ScrollPane>
-                            <Button fx:id="prevEndingBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;" text="&lt;" StackPane.alignment="CENTER_LEFT">
+                            <Button fx:id="prevEndingBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0"
+                                    maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0"
+                                    style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;"
+                                    text="&lt;" StackPane.alignment="CENTER_LEFT">
                                 <font>
-                                    <Font name="System Bold" size="16.0" />
+                                    <Font name="System Bold" size="16.0"/>
                                 </font>
                                 <StackPane.margin>
-                                    <Insets left="-52.0" />
+                                    <Insets left="-52.0"/>
                                 </StackPane.margin>
                             </Button>
-                            <Button fx:id="nextEndingBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;" text="&gt;" StackPane.alignment="CENTER_RIGHT">
+                            <Button fx:id="nextEndingBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0"
+                                    maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0"
+                                    style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;"
+                                    text="&gt;" StackPane.alignment="CENTER_RIGHT">
                                 <font>
-                                    <Font name="System Bold" size="16.0" />
+                                    <Font name="System Bold" size="16.0"/>
                                 </font>
                                 <StackPane.margin>
-                                    <Insets right="-52.0" />
+                                    <Insets right="-52.0"/>
                                 </StackPane.margin>
                             </Button>
                         </children>
@@ -179,30 +218,42 @@
                 <children>
                     <Label text="🛍 Gợi ý dành riêng cho bạn" textFill="#1a1a1a">
                         <font>
-                            <Font name="System Bold" size="20.0" />
+                            <Font name="System Bold" size="20.0"/>
                         </font>
                     </Label>
-                    <StackPane alignment="CENTER" maxWidth="Infinity" minHeight="346.0" prefHeight="346.0" style="-fx-padding: 0 24 0 24;">
+                    <StackPane alignment="CENTER" maxWidth="Infinity" minHeight="346.0" prefHeight="346.0"
+                               style="-fx-padding: 0 24 0 24;">
                         <children>
-                            <ScrollPane fx:id="suggestedScroll" fitToHeight="true" hbarPolicy="NEVER" maxWidth="Infinity" prefHeight="346.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                            <ScrollPane fx:id="suggestedScroll" fitToHeight="true" hbarPolicy="NEVER"
+                                        maxWidth="Infinity" prefHeight="346.0"
+                                        style="-fx-background-color: transparent; -fx-background: transparent;"
+                                        vbarPolicy="NEVER">
                                 <content>
-                                    <HBox fx:id="suggestedHBox" alignment="CENTER_LEFT" spacing="16.0" />
+                                    <HBox fx:id="suggestedHBox" alignment="CENTER_LEFT" spacing="16.0"/>
                                 </content>
                             </ScrollPane>
-                            <Button fx:id="prevSuggestedBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;" text="&lt;" StackPane.alignment="CENTER_LEFT">
+                            <Button fx:id="prevSuggestedBtn" alignment="CENTER" focusTraversable="false"
+                                    maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0"
+                                    prefWidth="40.0"
+                                    style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;"
+                                    text="&lt;" StackPane.alignment="CENTER_LEFT">
                                 <font>
-                                    <Font name="System Bold" size="16.0" />
+                                    <Font name="System Bold" size="16.0"/>
                                 </font>
                                 <StackPane.margin>
-                                    <Insets left="-52.0" />
+                                    <Insets left="-52.0"/>
                                 </StackPane.margin>
                             </Button>
-                            <Button fx:id="nextSuggestedBtn" alignment="CENTER" focusTraversable="false" maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;" text="&gt;" StackPane.alignment="CENTER_RIGHT">
+                            <Button fx:id="nextSuggestedBtn" alignment="CENTER" focusTraversable="false"
+                                    maxHeight="40.0" maxWidth="40.0" minHeight="40.0" minWidth="40.0" prefHeight="40.0"
+                                    prefWidth="40.0"
+                                    style="-fx-background-color: rgba(17,24,39,0.82); -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.75); -fx-border-radius: 20; -fx-padding: 0;"
+                                    text="&gt;" StackPane.alignment="CENTER_RIGHT">
                                 <font>
-                                    <Font name="System Bold" size="16.0" />
+                                    <Font name="System Bold" size="16.0"/>
                                 </font>
                                 <StackPane.margin>
-                                    <Insets right="-52.0" />
+                                    <Insets right="-52.0"/>
                                 </StackPane.margin>
                             </Button>
                         </children>

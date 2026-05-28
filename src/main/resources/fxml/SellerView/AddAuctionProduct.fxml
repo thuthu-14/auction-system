@@ -5,104 +5,131 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<HBox alignment="TOP_LEFT" fillHeight="false" spacing="25.0" style="-fx-background-color: #fcfcfc;" stylesheets="@../../CSS/table.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.AddAuctionProductController">
+<HBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_LEFT" fillHeight="false" spacing="25.0"
+      style="-fx-background-color: #fcfcfc;" stylesheets="@../../CSS/table.css" xmlns="http://javafx.com/javafx/17.0.12"
+      fx:controller="client.controller.AddAuctionProductController">
     <padding>
-        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+        <Insets bottom="30.0" left="40.0" right="40.0" top="30.0"/>
     </padding>
-    <VBox minHeight="210.0" minWidth="250.0" prefHeight="210.0" prefWidth="250.0" spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
+    <VBox minHeight="210.0" minWidth="250.0" prefHeight="210.0" prefWidth="250.0" spacing="12.0"
+          style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
         </padding>
-        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #1a1a1a;" styleClass="field-label" text="Gợi ý điền Thông tin" textFill="#1a1a1a" wrapText="true">
+        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #1a1a1a;" styleClass="field-label"
+               text="Gợi ý điền Thông tin" textFill="#1a1a1a" wrapText="true">
             <font>
-                <Font name="System Bold" size="16.0" />
+                <Font name="System Bold" size="16.0"/>
             </font>
         </Label>
-        <Separator />
-        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #718096;" text="✓ Thêm ít nhất 3 hình ảnh" textFill="#718096" wrapText="true" />
-        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #718096;" text="✓ Tên sản phẩm 25~100 kí tự" textFill="#718096" wrapText="true" />
-        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #718096;" text="✓ Thiết lập thời gian rõ ràng" textFill="#718096" wrapText="true" />
-        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #718096;" text="✓ Đặt mức giá mong muốn hợp lý" textFill="#718096" wrapText="true" />
+        <Separator/>
+        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #718096;" text="✓ Thêm ít nhất 3 hình ảnh"
+               textFill="#718096" wrapText="true"/>
+        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #718096;" text="✓ Tên sản phẩm 25~100 kí tự"
+               textFill="#718096" wrapText="true"/>
+        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #718096;" text="✓ Thiết lập thời gian rõ ràng"
+               textFill="#718096" wrapText="true"/>
+        <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #718096;" text="✓ Đặt mức giá mong muốn hợp lý"
+               textFill="#718096" wrapText="true"/>
     </VBox>
-    <ScrollPane fx:id="formScrollPane" fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" HBox.hgrow="ALWAYS">
+    <ScrollPane fx:id="formScrollPane" fitToWidth="true" hbarPolicy="NEVER"
+                style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER"
+                HBox.hgrow="ALWAYS">
         <content>
             <VBox maxWidth="1.7976931348623157E308" spacing="25.0">
-                <VBox maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
+                <VBox maxWidth="1.7976931348623157E308" spacing="15.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
                     <padding>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
                     </padding>
                     <Label styleClass="field-label" text="Thông tin cơ bản" textFill="#1a1a1a">
                         <font>
-                            <Font name="System Bold" size="18.0" />
+                            <Font name="System Bold" size="18.0"/>
                         </font>
                     </Label>
                     <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
                         <Label styleClass="field-label" text="* Tên sản phẩm" textFill="#4a5568">
                             <font>
-                                <Font name="System Bold" size="13.0" />
+                                <Font name="System Bold" size="13.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="productNameField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Tên sản phẩm + Thương hiệu + Model..." style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+                        <TextField fx:id="productNameField" maxWidth="1.7976931348623157E308" prefHeight="40.0"
+                                   promptText="Tên sản phẩm + Thương hiệu + Model..."
+                                   style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;"/>
                     </VBox>
                     <VBox maxWidth="1.7976931348623157E308" spacing="5.0">
                         <Label styleClass="field-label" text="* Ngành hàng" textFill="#4a5568">
                             <font>
-                                <Font name="System Bold" size="13.0" />
+                                <Font name="System Bold" size="13.0"/>
                             </font>
                         </Label>
-                        <ComboBox fx:id="categoryComboBox" maxWidth="1.7976931348623157E308" onAction="#handleCategoryChange" prefHeight="40.0" promptText="Chọn ngành hàng" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+                        <ComboBox fx:id="categoryComboBox" maxWidth="1.7976931348623157E308"
+                                  onAction="#handleCategoryChange" prefHeight="40.0" promptText="Chọn ngành hàng"
+                                  style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;"/>
                     </VBox>
                 </VBox>
-                <VBox fx:id="categoryFormPane" maxWidth="1.7976931348623157E308" minHeight="400.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
+                <VBox fx:id="categoryFormPane" maxWidth="1.7976931348623157E308" minHeight="400.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
                     <VBox alignment="CENTER" spacing="10.0">
                         <padding>
-                            <Insets bottom="20.0" left="20.0" right="20.0" top="55.0" />
+                            <Insets bottom="20.0" left="20.0" right="20.0" top="55.0"/>
                         </padding>
                         <Label styleClass="field-label" text="Chọn ngành hàng để bắt đầu" textFill="#a0aec0">
                             <font>
-                                <Font size="20.0" />
+                                <Font size="20.0"/>
                             </font>
                         </Label>
                     </VBox>
                 </VBox>
-                <VBox maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
+                <VBox maxWidth="1.7976931348623157E308" spacing="15.0"
+                      style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;">
                     <padding>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
                     </padding>
                     <Label styleClass="field-label" text="Mô tả chi tiết" textFill="#1a1a1a">
                         <font>
-                            <Font name="System Bold" size="18.0" />
+                            <Font name="System Bold" size="18.0"/>
                         </font>
                     </Label>
                     <VBox maxWidth="1.7976931348623157E308" spacing="10.0">
-                        <Label styleClass="field-label" text="Hình ảnh sản phẩm (Tối đa 5 ảnh - Tỷ lệ 1:1)" textFill="#4a5568">
+                        <Label styleClass="field-label" text="Hình ảnh sản phẩm (Tối đa 5 ảnh - Tỷ lệ 1:1)"
+                               textFill="#4a5568">
                             <font>
-                                <Font name="System Bold" size="13.0" />
+                                <Font name="System Bold" size="13.0"/>
                             </font>
                         </Label>
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <Button onAction="#handleSelectImage" style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-width: 2; -fx-text-fill: #4a5568; -fx-pref-width: 84; -fx-pref-height: 84; -fx-font-size: 12px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;" text="+ Thêm ảnh" />
-                            <HBox fx:id="imagePreviewContainer" alignment="CENTER_LEFT" spacing="8.0" />
+                            <Button onAction="#handleSelectImage"
+                                    style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-width: 2; -fx-text-fill: #4a5568; -fx-pref-width: 84; -fx-pref-height: 84; -fx-font-size: 12px; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;"
+                                    text="+ Thêm ảnh"/>
+                            <HBox fx:id="imagePreviewContainer" alignment="CENTER_LEFT" spacing="8.0"/>
                         </HBox>
                     </VBox>
                     <VBox maxWidth="1.7976931348623157E308" spacing="5.0" VBox.vgrow="ALWAYS">
                         <Label styleClass="field-label" text="* Mô tả sản phẩm" textFill="#4a5568">
                             <font>
-                                <Font name="System Bold" size="13.0" />
+                                <Font name="System Bold" size="13.0"/>
                             </font>
                         </Label>
-                        <TextArea fx:id="descriptionArea" maxWidth="1.7976931348623157E308" prefHeight="150.0" promptText="Nhập mô tả sản phẩm..." style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-control-inner-background: #f8fafc;" />
+                        <TextArea fx:id="descriptionArea" maxWidth="1.7976931348623157E308" prefHeight="150.0"
+                                  promptText="Nhập mô tả sản phẩm..."
+                                  style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-control-inner-background: #f8fafc;"/>
                     </VBox>
                 </VBox>
-                <HBox alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-padding: 10 0 0 0;">
-                    <Button onAction="#handleCancel" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: transparent; -fx-border-color: #cbd5e1; -fx-border-radius: 20; -fx-text-fill: #4a5568; -fx-cursor: hand;" text="Hủy">
+                <HBox alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" spacing="15.0"
+                      style="-fx-padding: 10 0 0 0;">
+                    <Button onAction="#handleCancel" prefHeight="40.0" prefWidth="100.0"
+                            style="-fx-background-color: transparent; -fx-border-color: #cbd5e1; -fx-border-radius: 20; -fx-text-fill: #4a5568; -fx-cursor: hand;"
+                            text="Hủy">
                         <font>
-                            <Font name="System Bold" size="14.0" />
+                            <Font name="System Bold" size="14.0"/>
                         </font>
                     </Button>
-                    <Button onAction="#handleSaveAndPublish" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;" text="Lưu &amp; Hiển thị">
+                    <Button onAction="#handleSaveAndPublish" prefHeight="40.0" prefWidth="150.0"
+                            style="-fx-background-color: #1a1a1a; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand;"
+                            text="Lưu &amp; Hiển thị">
                         <font>
-                            <Font name="System Bold" size="14.0" />
+                            <Font name="System Bold" size="14.0"/>
                         </font>
                     </Button>
                 </HBox>

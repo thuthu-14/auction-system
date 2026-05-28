@@ -166,7 +166,7 @@ public class SqlAuctionRepository implements AuctionRepository {
         auction.setAuctionId(rs.getString("auction_id"));
         auction.setItemId(rs.getString("item_id"));
         auction.setSellerId(rs.getString("seller_id"));
-        auction.setSellerName(rs.getString("seller_name"));
+        auction.setSellerName(resolveSellerDisplayName(rs.getString("seller_id"), rs.getString("seller_name")));
         auction.setCurrentPrice(rs.getDouble("current_price"));
         auction.setHighestBidderId(rs.getString("highest_bidder_id"));
         auction.setHighestBidderName(rs.getString("highest_bidder_name"));
@@ -189,6 +189,34 @@ public class SqlAuctionRepository implements AuctionRepository {
 
         auction.setBidIds(loadBidIds(auction.getAuctionId()));
         return auction;
+    }
+
+    private String resolveSellerDisplayName(String sellerId, String fallbackSellerName) {
+        if (sellerId == null || sellerId.isBlank()) {
+            return fallbackSellerName;
+        }
+
+        String sql = "SELECT username, shop_name FROM users WHERE user_id = ?";
+        try (Connection c = DatabaseManager.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, sellerId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String shopName = rs.getString("shop_name");
+                if (shopName != null && !shopName.isBlank()) {
+                    return shopName;
+                }
+
+                String username = rs.getString("username");
+                if (username != null && !username.isBlank()) {
+                    return username;
+                }
+            }
+        } catch (SQLException ignored) {
+            // Some repository tests build a minimal schema without the users table.
+        }
+
+        return fallbackSellerName;
     }
 
     private List<String> loadBidIds(String auctionId) throws Exception {

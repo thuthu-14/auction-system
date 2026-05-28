@@ -3,19 +3,23 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<VBox maxWidth="1.7976931348623157E308" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<VBox xmlns:fx="http://javafx.com/fxml/1" maxWidth="1.7976931348623157E308"
+      spacing="15.0"
+      style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #f3f4f6; -fx-border-radius: 12; -fx-border-width: 1;" xmlns="http://javafx.com/javafx/17.0.12">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
     <HBox style="-fx-background-color: #f0e6ff; -fx-background-radius: 8; -fx-padding: 12 16; -fx-border-color: #cbd5e1; -fx-border-radius: 8;">
         <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="🎨 NGHỆ THUẬT - Tranh, Tượng, Điêu khắc..." style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;" />
-            <Label text="💰 Giá tối thiểu: 100,000 VNĐ  |  📈 Mỗi lượt đặt: 100,000 VNĐ  |  ⏱ 1-14 ngày" style="-fx-font-size: 12px; -fx-text-fill: #4a5568;" />
+            <Label text="🎨 NGHỆ THUẬT - Tranh, Tượng, Điêu khắc..."
+                   style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;"/>
+            <Label text="💰 Giá tối thiểu: 100,000 VNĐ  |  📈 Mỗi lượt đặt: 100,000 VNĐ  |  ⏱ 1-14 ngày"
+                   style="-fx-font-size: 12px; -fx-text-fill: #4a5568;"/>
         </VBox>
     </HBox>
     <Label text="Thông tin Sưu tầm/Nghệ thuật" textFill="#1a1a1a" styleClass="field-label">
         <font>
-            <Font name="System Bold" size="18.0" />
+            <Font name="System Bold" size="18.0"/>
         </font>
     </Label>
     <HBox spacing="20.0" maxWidth="1.7976931348623157E308">
@@ -23,75 +27,90 @@
             <VBox spacing="5.0">
                 <Label text="* Giá khởi điểm (VNĐ) - Tối thiểu: 100,000" textFill="#4a5568" styleClass="field-label">
                     <font>
-                        <Font name="System Bold" size="13.0" />
+                        <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="artStartPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Nhập giá khởi điểm" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+                <TextField fx:id="artStartPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0"
+                           promptText="Nhập giá khởi điểm"
+                           style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;"/>
             </VBox>
             <VBox spacing="5.0">
                 <Label text="Giá bảo lưu (VNĐ)" textFill="#4a5568" styleClass="field-label">
                     <font>
-                        <Font name="System Bold" size="13.0" />
+                        <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="artReservePriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" promptText="Để trống nếu bán mọi giá" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+                <TextField fx:id="artReservePriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0"
+                           promptText="Để trống nếu bán mọi giá"
+                           style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;"/>
             </VBox>
             <VBox spacing="5.0">
                 <Label text="* Bước giá (VNĐ)" textFill="#4a5568" styleClass="field-label">
                     <font>
-                        <Font name="System Bold" size="13.0" />
+                        <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="artStepPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="100000" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+                <TextField fx:id="artStepPriceField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="100000"
+                           style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;"/>
             </VBox>
         </VBox>
         <VBox spacing="15.0" HBox.hgrow="ALWAYS">
             <VBox spacing="5.0">
                 <Label text="* Người tạo" textFill="#4a5568" styleClass="field-label">
                     <font>
-                        <Font name="System Bold" size="13.0" />
+                        <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="artCreatorField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="Chưa rõ tác giả" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+                <TextField fx:id="artCreatorField" maxWidth="1.7976931348623157E308" prefHeight="40.0"
+                           text="Chưa rõ tác giả"
+                           style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;"/>
             </VBox>
             <VBox spacing="5.0">
                 <Label text="* Chất liệu" textFill="#4a5568" styleClass="field-label">
                     <font>
-                        <Font name="System Bold" size="13.0" />
+                        <Font name="System Bold" size="13.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="artMaterialField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="Canvas" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;" />
+                <TextField fx:id="artMaterialField" maxWidth="1.7976931348623157E308" prefHeight="40.0" text="Canvas"
+                           style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-color: #f8fafc;"/>
             </VBox>
         </VBox>
     </HBox>
-    <Separator />
+    <Separator/>
     <Label text="Thời gian phiên đấu giá: 1-14 ngày" textFill="#1a1a1a" styleClass="field-label">
         <font>
-            <Font name="System Bold" size="14.0" />
+            <Font name="System Bold" size="14.0"/>
         </font>
     </Label>
     <HBox spacing="20.0" maxWidth="1.7976931348623157E308">
         <VBox spacing="5.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
             <Label text="* Bắt đầu" textFill="#4a5568" styleClass="field-label">
                 <font>
-                    <Font name="System Bold" size="13.0" />
+                    <Font name="System Bold" size="13.0"/>
                 </font>
             </Label>
             <HBox spacing="5.0" maxWidth="1.7976931348623157E308">
-                <DatePicker fx:id="artStartDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" HBox.hgrow="ALWAYS" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;" promptText="Chọn ngày" />
-                <ComboBox fx:id="artStartHourCombo" prefWidth="112.0" prefHeight="40.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;" />
-                <ToggleButton fx:id="artCustomizeStartButton" prefHeight="40.0" prefWidth="78.0" text="Hẹn giờ" style="-fx-background-color: #f8fafc; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5; -fx-text-fill: #1f2937; -fx-font-size: 13px; -fx-padding: 0; -fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-cursor: hand;" />
+                <DatePicker fx:id="artStartDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0"
+                            HBox.hgrow="ALWAYS" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;"
+                            promptText="Chọn ngày"/>
+                <ComboBox fx:id="artStartHourCombo" prefWidth="112.0" prefHeight="40.0" promptText="Giờ"
+                          style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;"/>
+                <ToggleButton fx:id="artCustomizeStartButton" prefHeight="40.0" prefWidth="78.0" text="Hẹn giờ"
+                              style="-fx-background-color: #f8fafc; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-border-width: 1.5; -fx-text-fill: #1f2937; -fx-font-size: 13px; -fx-padding: 0; -fx-focus-color: transparent; -fx-faint-focus-color: transparent; -fx-cursor: hand;"/>
             </HBox>
         </VBox>
         <VBox spacing="5.0" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
             <Label text="* Kết thúc" textFill="#4a5568" styleClass="field-label">
                 <font>
-                    <Font name="System Bold" size="13.0" />
+                    <Font name="System Bold" size="13.0"/>
                 </font>
             </Label>
             <HBox spacing="5.0" maxWidth="1.7976931348623157E308">
-                <DatePicker fx:id="artEndDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0" HBox.hgrow="ALWAYS" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;" promptText="Chọn ngày" />
-                <ComboBox fx:id="artEndHourCombo" prefWidth="130.0" prefHeight="40.0" promptText="Giờ" style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;" />
+                <DatePicker fx:id="artEndDatePicker" maxWidth="1.7976931348623157E308" prefHeight="40.0"
+                            HBox.hgrow="ALWAYS" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1;"
+                            promptText="Chọn ngày"/>
+                <ComboBox fx:id="artEndHourCombo" prefWidth="130.0" prefHeight="40.0" promptText="Giờ"
+                          style="-fx-background-color: #f3f4f6; -fx-background-radius: 6;"/>
             </HBox>
         </VBox>
     </HBox>

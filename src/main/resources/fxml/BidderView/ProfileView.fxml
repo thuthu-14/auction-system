@@ -4,58 +4,64 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<VBox fx:id="profileRoot" alignment="TOP_LEFT" spacing="30.0" style="-fx-background-color: #fcfcfc;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.ProfileController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="profileRoot" alignment="TOP_LEFT" spacing="30.0"
+      style="-fx-background-color: #fcfcfc;" xmlns="http://javafx.com/javafx/17.0.12"
+      fx:controller="client.controller.ProfileController">
     <padding>
-        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
     </padding>
     <children>
         <VBox spacing="5.0">
             <children>
                 <Label text="Chỉnh sửa hồ sơ" textFill="#1a1a1a">
                     <font>
-                        <Font name="System Bold" size="28.0" />
+                        <Font name="System Bold" size="28.0"/>
                     </font>
                 </Label>
                 <Label text="Quản lý thông tin tài khoản của bạn tại BubblyBid" textFill="#718096">
                     <font>
-                        <Font size="15.0" />
+                        <Font size="15.0"/>
                     </font>
                 </Label>
             </children>
         </VBox>
-        <Separator prefWidth="200.0" style="-fx-opacity: 0.3;" />
+        <Separator prefWidth="200.0" style="-fx-opacity: 0.3;"/>
         <HBox spacing="60.0" VBox.vgrow="ALWAYS">
             <children>
                 <VBox alignment="TOP_CENTER" minWidth="240.0" prefWidth="240.0" spacing="20.0">
                     <children>
-                        <StackPane maxHeight="160.0" maxWidth="160.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 80;">
+                        <StackPane maxHeight="160.0" maxWidth="160.0"
+                                   style="-fx-background-color: #f3f4f6; -fx-background-radius: 80;">
                             <children>
                                 <Label text="👤" textFill="#a0aec0">
                                     <font>
-                                        <Font size="55.0" />
+                                        <Font size="55.0"/>
                                     </font>
                                 </Label>
-                                <ImageView fx:id="avatarPreview" fitHeight="160.0" fitWidth="160.0" pickOnBounds="true" preserveRatio="true" />
+                                <ImageView fx:id="avatarPreview" fitHeight="160.0" fitWidth="160.0" pickOnBounds="true"
+                                           preserveRatio="true"/>
                             </children>
                         </StackPane>
                         <VBox alignment="CENTER" spacing="2.0">
                             <children>
                                 <Label text="Mã người dùng (ID)" textFill="#a0aec0">
                                     <font>
-                                        <Font size="12.0" />
+                                        <Font size="12.0"/>
                                     </font>
                                 </Label>
                                 <Label fx:id="userIdLabel" text="#BUBBLY-8899" textFill="#4a5568">
                                     <font>
-                                        <Font name="System Bold" size="14.0" />
+                                        <Font name="System Bold" size="14.0"/>
                                     </font>
                                 </Label>
                             </children>
                         </VBox>
-                        <Region VBox.vgrow="ALWAYS" />
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleLogout" prefHeight="45.0" style="-fx-background-color: transparent; -fx-background-radius: 22.5; -fx-border-color: #e53e3e; -fx-border-radius: 22.5; -fx-cursor: hand;" text="Đăng xuất" textFill="#e53e3e">
+                        <Region VBox.vgrow="ALWAYS"/>
+                        <Button maxWidth="1.7976931348623157E308" onAction="#handleLogout" prefHeight="45.0"
+                                style="-fx-background-color: transparent; -fx-background-radius: 22.5; -fx-border-color: #e53e3e; -fx-border-radius: 22.5; -fx-cursor: hand;"
+                                text="Đăng xuất" textFill="#e53e3e">
                             <font>
-                                <Font name="System Bold" size="14.0" />
+                                <Font name="System Bold" size="14.0"/>
                             </font>
                         </Button>
                     </children>
@@ -64,77 +70,86 @@
                     <children>
                         <GridPane hgap="30.0" vgap="25.0">
                             <columnConstraints>
-                                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
                             </columnConstraints>
                             <rowConstraints>
-                                <RowConstraints minHeight="10.0" prefHeight="75.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" prefHeight="75.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" prefHeight="75.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="75.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="75.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="75.0" vgrow="SOMETIMES"/>
                             </rowConstraints>
                             <children>
                                 <VBox spacing="8.0">
                                     <children>
                                         <Label text="Họ và tên" textFill="#4a5568">
                                             <font>
-                                                <Font name="System Bold" size="14.0" />
+                                                <Font name="System Bold" size="14.0"/>
                                             </font>
                                         </Label>
-                                        <TextField fx:id="fullNameField" prefHeight="48.0" promptText="Họ và tên của bạn" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
+                                        <TextField fx:id="fullNameField" prefHeight="48.0"
+                                                   promptText="Họ và tên của bạn"
+                                                   style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;"/>
                                     </children>
                                 </VBox>
                                 <VBox spacing="8.0" GridPane.columnIndex="1">
                                     <children>
                                         <Label text="Email" textFill="#4a5568">
                                             <font>
-                                                <Font name="System Bold" size="14.0" />
+                                                <Font name="System Bold" size="14.0"/>
                                             </font>
                                         </Label>
-                                        <TextField fx:id="emailField" editable="false" focusTraversable="false" prefHeight="48.0" style="-fx-background-radius: 10; -fx-background-color: #edf2f7; -fx-opacity: 1; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
+                                        <TextField fx:id="emailField" editable="false" focusTraversable="false"
+                                                   prefHeight="48.0"
+                                                   style="-fx-background-radius: 10; -fx-background-color: #edf2f7; -fx-opacity: 1; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;"/>
                                     </children>
                                 </VBox>
                                 <VBox spacing="8.0" GridPane.rowIndex="1">
                                     <children>
                                         <Label text="Số điện thoại" textFill="#4a5568">
                                             <font>
-                                                <Font name="System Bold" size="14.0" />
+                                                <Font name="System Bold" size="14.0"/>
                                             </font>
                                         </Label>
-                                        <TextField fx:id="phoneField" prefHeight="48.0" promptText="09xx xxx xxx" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
+                                        <TextField fx:id="phoneField" prefHeight="48.0" promptText="09xx xxx xxx"
+                                                   style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;"/>
                                     </children>
                                 </VBox>
                                 <VBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                     <children>
                                         <Label text="Địa chỉ" textFill="#4a5568">
                                             <font>
-                                                <Font name="System Bold" size="14.0" />
+                                                <Font name="System Bold" size="14.0"/>
                                             </font>
                                         </Label>
-                                        <TextField fx:id="addressField" prefHeight="48.0" promptText="Địa chỉ nhận hàng" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
+                                        <TextField fx:id="addressField" prefHeight="48.0" promptText="Địa chỉ nhận hàng"
+                                                   style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;"/>
                                     </children>
                                 </VBox>
                                 <VBox spacing="8.0" GridPane.rowIndex="2">
                                     <children>
                                         <Label text="Mật khẩu" textFill="#4a5568">
                                             <font>
-                                                <Font name="System Bold" size="14.0" />
+                                                <Font name="System Bold" size="14.0"/>
                                             </font>
                                         </Label>
-                                        <PasswordField fx:id="passwordField" prefHeight="48.0" promptText="••••••••" style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;" />
+                                        <PasswordField fx:id="passwordField" prefHeight="48.0" promptText="••••••••"
+                                                       style="-fx-background-radius: 10; -fx-background-color: #f3f4f6; -fx-border-color: transparent; -fx-padding: 0 15 0 15; -fx-text-fill: #1a1a1a; -fx-prompt-text-fill: #9ca3af;"/>
                                     </children>
                                 </VBox>
                             </children>
                         </GridPane>
                         <HBox alignment="CENTER_RIGHT">
                             <children>
-                                <Button onAction="#handleSaveProfile" prefHeight="38.0" prefWidth="140.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 25; -fx-cursor: hand;" text="Lưu thay đổi" textFill="white">
+                                <Button onAction="#handleSaveProfile" prefHeight="38.0" prefWidth="140.0"
+                                        style="-fx-background-color: #1a1a1a; -fx-background-radius: 25; -fx-cursor: hand;"
+                                        text="Lưu thay đổi" textFill="white">
                                     <font>
-                                        <Font name="System Bold" size="13.0" />
+                                        <Font name="System Bold" size="13.0"/>
                                     </font>
                                 </Button>
                             </children>
                             <VBox.margin>
-                                <Insets top="10.0" />
+                                <Insets top="10.0"/>
                             </VBox.margin>
                         </HBox>
                     </children>

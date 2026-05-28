@@ -3,63 +3,71 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<VBox prefWidth="450.0" spacing="20.0" style="-fx-background-color: white; -fx-background-radius: 20;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.controller.WalletTransactionDialogController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefWidth="450.0" spacing="20.0"
+      style="-fx-background-color: white; -fx-background-radius: 20;" xmlns="http://javafx.com/javafx/17.0.12"
+      fx:controller="client.controller.WalletTransactionDialogController">
     <padding>
-        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
     </padding>
     <children>
         <VBox spacing="5.0">
             <children>
                 <Label fx:id="titleLabel" text="Nạp tiền" textFill="#1a1a1a">
                     <font>
-                        <Font name="System Bold" size="22.0" />
+                        <Font name="System Bold" size="22.0"/>
                     </font>
                 </Label>
-                <Label fx:id="subtitleLabel" text="Nhập số tiền muốn nạp vào ví của bạn" textFill="#718096" wrapText="true">
+                <Label fx:id="subtitleLabel" text="Nhập số tiền muốn nạp vào ví của bạn" textFill="#718096"
+                       wrapText="true">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </Label>
             </children>
             <VBox.margin>
-                <Insets bottom="10.0" />
+                <Insets bottom="10.0"/>
             </VBox.margin>
         </VBox>
         <VBox spacing="8.0">
             <children>
                 <Label fx:id="amountLabel" text="Số tiền" textFill="#4a5568">
                     <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font name="System Bold" size="14.0"/>
                     </font>
                 </Label>
-                <TextField fx:id="amountField" prefHeight="45.0" promptText="VD: 1.000.000" style="-fx-background-color: #f3f4f6; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 0 15 0 15;">
+                <TextField fx:id="amountField" prefHeight="45.0" promptText="VD: 1.000.000"
+                           style="-fx-background-color: #f3f4f6; -fx-background-radius: 8; -fx-border-color: transparent; -fx-padding: 0 15 0 15;">
                     <font>
-                        <Font size="14.0" />
+                        <Font size="14.0"/>
                     </font>
                 </TextField>
             </children>
         </VBox>
         <HBox alignment="CENTER_RIGHT" spacing="15.0">
             <children>
-                <Button onAction="#closePopup" prefHeight="45.0" style="-fx-background-color: #f3f4f6; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Hủy bỏ" textFill="#4a5568">
+                <Button onAction="#closePopup" prefHeight="45.0"
+                        style="-fx-background-color: #f3f4f6; -fx-background-radius: 22.5; -fx-cursor: hand;"
+                        text="Hủy bỏ" textFill="#4a5568">
                     <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font name="System Bold" size="14.0"/>
                     </font>
                     <padding>
-                        <Insets left="25.0" right="25.0" />
+                        <Insets left="25.0" right="25.0"/>
                     </padding>
                 </Button>
-                <Button fx:id="confirmButton" onAction="#handleConfirm" prefHeight="45.0" style="-fx-background-color: #1a1a1a; -fx-background-radius: 22.5; -fx-cursor: hand;" text="Xác nhận" textFill="white">
+                <Button fx:id="confirmButton" onAction="#handleConfirm" prefHeight="45.0"
+                        style="-fx-background-color: #1a1a1a; -fx-background-radius: 22.5; -fx-cursor: hand;"
+                        text="Xác nhận" textFill="white">
                     <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font name="System Bold" size="14.0"/>
                     </font>
                     <padding>
-                        <Insets left="25.0" right="25.0" />
+                        <Insets left="25.0" right="25.0"/>
                     </padding>
                 </Button>
             </children>
             <VBox.margin>
-                <Insets top="15.0" />
+                <Insets top="15.0"/>
             </VBox.margin>
         </HBox>
     </children>

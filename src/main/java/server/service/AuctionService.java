@@ -91,7 +91,7 @@ public class AuctionService {
                 auctionId,
                 itemId,
                 seller.getUserId(),
-                seller.getUsername(),
+                sellerDisplayName(seller),
                 item,
                 item.getStartingPrice(),
                 startTimeMillis,
@@ -335,6 +335,17 @@ public class AuctionService {
             return auction.getItem().getName();
         }
         return auction != null && auction.getAuctionId() != null ? auction.getAuctionId() : "";
+    }
+
+    private String sellerDisplayName(RegularUser seller) {
+        if (seller == null) {
+            return "";
+        }
+        String shopName = seller.getShopName();
+        if (shopName != null && !shopName.isBlank()) {
+            return shopName;
+        }
+        return seller.getUsername();
     }
 
     public void delete(String auctionId) throws Exception {

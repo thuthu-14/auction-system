@@ -1,4 +1,4 @@
-package client;
+    package client;
 
 import client.controller.LoginController;
 import client.exception.ClientErrorType;

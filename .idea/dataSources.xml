@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:sqlite:D:\BTL LTNC\auction-system\data\auction.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="auction.db [2]" uuid="9ed381a2-4855-42d6-867a-11625910b5e1">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:D:\BTL\auction-system\data\auction.db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
