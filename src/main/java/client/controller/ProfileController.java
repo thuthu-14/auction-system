@@ -17,11 +17,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import navigation.NavigationContextAware;
 import navigation.NavigationManager;
 import server.model.RegularUser;
 import server.model.User;
 
-public class ProfileController {
+public class ProfileController implements NavigationContextAware {
 
     @FXML
     private VBox profileRoot;
@@ -56,8 +57,13 @@ public class ProfileController {
     }
 
     public void setUserData(User user) {
+        setUserData(user, NavigationManager.getInstance().getClientSocket());
+    }
+
+    @Override
+    public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user != null ? user : NavigationManager.getInstance().getCurrentUser();
-        this.clientSocket = NavigationManager.getInstance().getClientSocket();
+        this.clientSocket = socket != null ? socket : NavigationManager.getInstance().getClientSocket();
         populateUserData();
         Platform.runLater(this::forceProfileTextColors);
     }

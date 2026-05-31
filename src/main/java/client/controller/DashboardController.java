@@ -11,6 +11,7 @@ import client.service.DashboardClientService;
 import client.ui.AuctionCardFactory;
 import common.AuctionStatus;
 import common.ItemCategory;
+import navigation.NavigationContextAware;
 import server.model.Auction;
 import server.model.User;
 import javafx.animation.FadeTransition;
@@ -43,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class DashboardController implements Initializable {
+public class DashboardController implements Initializable, NavigationContextAware {
 
     
     @FXML private ImageView bannerImageView;
@@ -82,6 +83,7 @@ public class DashboardController implements Initializable {
         this.auctionCardFactory = auctionCardFactory;
     }
 
+    @Override
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;

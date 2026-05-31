@@ -1,6 +1,7 @@
 package client.controller;
 
 import client.network.ClientSocket;
+import navigation.NavigationContextAware;
 import server.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.input.MouseEvent;
@@ -10,7 +11,7 @@ import util.LoggerUtil;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SellerDashboardController {
+public class SellerDashboardController implements NavigationContextAware {
 
     @FXML private VBox cardTaoPhien;
     @FXML private VBox cardQuanLyPhien;
@@ -33,6 +34,7 @@ public class SellerDashboardController {
         cardActions.put("cardViTien", () -> sellerHomeController.loadWalletView());
     }
 
+    @Override
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;
