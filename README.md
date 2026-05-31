@@ -1,4 +1,7 @@
 # Auction System
+Link Báo Cáo Và Video Demo
+
+ https://drive.google.com/drive/folders/1LdJhMEp2U1pNVfnxWCPZY1rICp9ZNAO-?usp=drive_link
 
 Bài tập lớn môn Lập trình nâng cao.
 
@@ -222,7 +225,11 @@ Trên Linux/macOS:
 ```bash
 ./mvnw clean package
 ```
-
+Dự án sử dụng Java 17. Nếu máy chưa cấu hình `JAVA_HOME`, có thể set tạm trong PowerShell trước khi build/chạy:
+```bash
+$env:JAVA_HOME="<path-to-jdk-17>"
+$env:Path="$env:JAVA_HOME\bin;$env:Path"
+```
 ### Bước 2: Chạy Server
 
 Server phải được chạy trước Client.
@@ -447,22 +454,27 @@ Nếu giao diện không chạy được, kiểm tra:
 - Maven dependencies đã được tải đầy đủ.
 - Project được import đúng dạng Maven project trong IDE.
 
-## 12. Link Báo Cáo Và Video Demo
 
-- Báo cáo PDF: Cập nhật link báo cáo tại đây.
-- Video demo: Cập nhật link video demo tại đây.
 
-## 13. Phân Công Nhiệm Vụ
+## 12. Phân Công Nhiệm Vụ
 
 | Thành viên | Vai trò đảm nhiệm | Nhiệm vụ chính |
 | --- | --- | --- |
-| Phạm Yến Nhi | Hạ tầng và đa luồng | Xây dựng tiện ích dùng chung, quản lý thread pool, xử lý đồng bộ dữ liệu và network. |
-| Đinh Hà Ngân | Logic nghiệp vụ backend | Khởi tạo server, xử lý client request, xây dựng nghiệp vụ đăng nhập, đấu giá và đặt giá. |
-| Nguyễn Thị Thu | Dữ liệu và sự kiện | Thiết kế model, lưu trữ dữ liệu, xử lý ngoại lệ, thông báo realtime và scheduler. |
-| Bùi Hà Bảo Ngọc | Giao diện frontend | Xây dựng giao diện JavaFX, thiết kế FXML, CSS và trải nghiệm người dùng. |
+| Phạm Yến Nhi | Hạ tầng hệ thống, đa luồng, kiểm thử | Xây dựng cơ chế xử lý đa luồng của server, hỗ trợ tối ưu hiệu năng hệ thống và thực hiện kiểm thử chức năng, đảm bảo tính ổn định của chương trình |
+| Đinh Hà Ngân | Network, server core, xử lý nghiệp vụ chính | Xây dựng hệ thống giao tiếp client-server, xử lý request/response, quản lý hoạt động server và triển khai các service nghiệp vụ chính của hệ thống đấu giá. |
+| Nguyễn Thị Thu | Dữ liệu, lưu trữ, sự kiện hệ thống | Thiết kế mô hình dữ liệu, quản lý lưu trữ và repository, xây dựng cơ chế observer/event và xử lý exception phía server. |
+| Bùi Hà Bảo Ngọc | Giao diện người dùng, controller, client logic, tiện ích hỗ trợ | Xây dựng giao diện JavaFX, xử lý logic phía client, quản lý điều hướng màn hình, hỗ trợ util dùng chung và đảm bảo trải nghiệm người dùng. |
 
-## 14. Tác Giả
+## 13. Tác Giả
 
-Bài tập lớn môn Lập trình nâng cao.
 
-Đề tài: **Hệ thống đấu giá trực tuyến - Auction System**
+
+Phạm Yến Nhi
+
+Đinh Hà Ngân
+
+Nguyễn Thị Thu
+
+Bùi Hà Bảo Ngọc
+
+
