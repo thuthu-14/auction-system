@@ -266,11 +266,21 @@ java -jar target\auction-system-1.0-SNAPSHOT-client.jar
 
 Cách 3: Chạy trực tiếp trong IDE:
 
+Lưu Ý Khi Chạy Trong IDE
+Không nên chạy trực tiếp:
+client.ClientMain
+vì có thể gặp lỗi:
+JavaFX runtime components are missing.
+Lỗi này do IDE chưa nạp JavaFX runtime khi chạy trực tiếp JavaFX application.
+Nên chạy: 
 ```text
-src/main/java/client/ClientMain.java
+src/main/java/client/ClientLauncher.java
+```
+hoặc dùng Maven:
+```text
+.\mvnw.cmd javafx:run
 ```
 
-Sau đó chọn **Run ClientMain**.
 
 ## 8. Tài Khoản Và Dữ Liệu Ban Đầu
 
