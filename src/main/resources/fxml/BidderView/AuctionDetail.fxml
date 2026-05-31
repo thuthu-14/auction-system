@@ -48,8 +48,9 @@
                                 <Region HBox.hgrow="ALWAYS"/>
                                 <VBox maxWidth="560.0" minWidth="420.0" prefWidth="520.0" spacing="20.0">
                                     <children>
-                                        <Label fx:id="productNameLabel" managed="false" text="Tên sản phẩm đang tải..."
-                                               visible="false" wrapText="true">
+                                        <Label fx:id="productNameLabel" maxWidth="1.7976931348623157E308"
+                                               style="-fx-text-fill: #111827;" text="Tên sản phẩm đang tải..."
+                                               wrapText="true">
                                             <font>
                                                 <Font name="System Bold" size="24.0"/>
                                             </font>

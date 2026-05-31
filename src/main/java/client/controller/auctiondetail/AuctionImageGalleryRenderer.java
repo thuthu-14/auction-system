@@ -1,5 +1,6 @@
 package client.controller.auctiondetail;
 
+import client.logic.AuctionImageGalleryLogic;
 import client.network.ClientSocket;
 import client.network.ConnectionManager;
 import client.service.ImageDownloadService;
@@ -13,27 +14,37 @@ import navigation.NavigationManager;
 import server.model.Item;
 import util.LoggerUtil;
 
-import java.util.ArrayList;
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public class AuctionImageGalleryRenderer {
     private final ImageView mainImageView;
     private final HBox thumbnailBox;
+    private final AuctionImageGalleryLogic galleryLogic;
 
     public AuctionImageGalleryRenderer(ImageView mainImageView, HBox thumbnailBox) {
+        this(mainImageView, thumbnailBox, new AuctionImageGalleryLogic());
+    }
+
+    AuctionImageGalleryRenderer(ImageView mainImageView, HBox thumbnailBox, AuctionImageGalleryLogic galleryLogic) {
         this.mainImageView = mainImageView;
         this.thumbnailBox = thumbnailBox;
+        this.galleryLogic = galleryLogic;
     }
 
     public void loadMainImage(Item item) {
-        if (mainImageView == null || item == null || item.getImages() == null || item.getImages().isEmpty()) {
+        List<String> imageIds = galleryLogic.imageIdsFor(item);
+        if (mainImageView == null || imageIds.isEmpty()) {
+            if (mainImageView != null) {
+                mainImageView.setImage(null);
+            }
             if (thumbnailBox != null) {
                 thumbnailBox.getChildren().clear();
             }
             return;
         }
 
-        renderImageGallery(item.getImages());
+        renderImageGallery(imageIds);
     }
 
     private void renderImageGallery(List<String> imageIds) {
@@ -46,21 +57,19 @@ public class AuctionImageGalleryRenderer {
             thumbnailBox.setAlignment(Pos.CENTER_LEFT);
         }
 
-        List<StackPane> thumbnailFrames = new ArrayList<>();
-        loadAndDisplayImage(imageIds.get(0), mainImageView);
+        loadAndDisplayImage(galleryLogic.firstImageId(imageIds), mainImageView);
 
         if (thumbnailBox == null) {
             return;
         }
 
-        for (int i = 0; i < imageIds.size(); i++) {
-            StackPane thumbnailFrame = createThumbnailFrame(imageIds.get(i), i);
-            thumbnailFrames.add(thumbnailFrame);
+        for (String imageId : imageIds) {
+            StackPane thumbnailFrame = createThumbnailFrame(imageId);
             thumbnailBox.getChildren().add(thumbnailFrame);
         }
     }
 
-    private StackPane createThumbnailFrame(String imageId, int index) {
+    private StackPane createThumbnailFrame(String imageId) {
         ImageView thumbnailView = new ImageView();
         thumbnailView.setFitWidth(78);
         thumbnailView.setFitHeight(78);
@@ -71,7 +80,7 @@ public class AuctionImageGalleryRenderer {
         thumbnailFrame.setPrefSize(88, 88);
         thumbnailFrame.setMinSize(88, 88);
         thumbnailFrame.setMaxSize(88, 88);
-        thumbnailFrame.setStyle(getThumbnailStyle(index == 0));
+        thumbnailFrame.setStyle(getThumbnailStyle());
 
         client.util.ClientTaskRunner.run(() -> {
             try {
@@ -81,14 +90,13 @@ public class AuctionImageGalleryRenderer {
                 }
 
                 byte[] imageBytes = ImageDownloadService.downloadImage(socket, imageId);
-                Image thumbnailImage = new Image(new java.io.ByteArrayInputStream(imageBytes), 90, 90, true, true);
+                Image thumbnailImage = new Image(new ByteArrayInputStream(imageBytes), 90, 90, true, true);
+                Image fullImage = new Image(new ByteArrayInputStream(imageBytes));
 
                 Platform.runLater(() -> {
                     thumbnailView.setImage(thumbnailImage);
-                    thumbnailFrame.setOnMouseEntered(event -> {
-                        loadAndDisplayImage(imageId, mainImageView);
-                        thumbnailFrame.setStyle(getThumbnailStyle(true));
-                    });
+                    thumbnailFrame.setOnMouseEntered(event -> mainImageView.setImage(fullImage));
+                    thumbnailFrame.setOnMouseClicked(event -> mainImageView.setImage(fullImage));
                 });
             } catch (Exception e) {
                 LoggerUtil.error("Failed to load thumbnail " + imageId + ": " + e.getMessage());
@@ -128,12 +136,10 @@ public class AuctionImageGalleryRenderer {
         return null;
     }
 
-    private String getThumbnailStyle(boolean selected) {
-        String borderColor = selected ? "#ef4444" : "#e5e7eb";
-        int borderWidth = selected ? 3 : 1;
+    private String getThumbnailStyle() {
         return "-fx-background-color: white;"
-                + "-fx-border-color: " + borderColor + ";"
-                + "-fx-border-width: " + borderWidth + ";"
+                + "-fx-border-color: #e5e7eb;"
+                + "-fx-border-width: 1;"
                 + "-fx-border-radius: 4;"
                 + "-fx-background-radius: 4;"
                 + "-fx-padding: 4;"
