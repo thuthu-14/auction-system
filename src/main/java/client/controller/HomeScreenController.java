@@ -20,11 +20,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import util.LoggerUtil;
+import navigation.NavigationContextAware;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class HomeScreenController {
+public class HomeScreenController implements NavigationContextAware {
 
     @FXML private HBox menuHome, menuAI, menuRecent, menuFlash, menuMsg, menuPay, menuUpgrade, menuSettings;
     private List<HBox> allMenus;
@@ -73,6 +74,7 @@ public class HomeScreenController {
 
     // ================= DATA INJECTION =================
 
+    @Override
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;

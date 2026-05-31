@@ -10,13 +10,14 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import navigation.NavigationContextAware;
 import navigation.NavigationManager;
 import server.model.User;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class AdminHomeController {
+public class AdminHomeController implements NavigationContextAware {
 
     @FXML
     private HBox menuRecent, menuMsg, menuUpgrade;
@@ -39,6 +40,7 @@ public class AdminHomeController {
     private ClientSocket clientSocket;
     private Runnable onLogout;
 
+    @Override
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;

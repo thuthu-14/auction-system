@@ -2,13 +2,6 @@ package navigation;
 
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
-import client.controller.DashboardController;
-import client.controller.HomeScreenController;
-import client.controller.AdminHomeController;
-import client.controller.ProfileController;
-import client.controller.SellerDashboardController;
-import client.controller.SellerHomeController;
-import client.controller.WalletController;
 import client.network.ClientSocket;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -24,6 +17,7 @@ import server.model.User;
 import util.LoggerUtil;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.function.Consumer;
 
 public class NavigationManager {
@@ -73,23 +67,8 @@ public class NavigationManager {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent root = loader.load();
-            Object controller = loader.getController();
-            configureController(controller);
-            if (controllerSetup != null) {
-                controllerSetup.accept(controller);
-            }
-
-            Scene currentScene = mainStage.getScene();
-            Scene scene = currentScene != null
-                    ? new Scene(root, currentScene.getWidth(), currentScene.getHeight())
-                    : new Scene(root, 1300, 800);
-            mainStage.setScene(scene);
-            mainStage.setFullScreenExitHint("");
-            mainStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
-            mainStage.setMaximized(true);
-            mainStage.show();
+            LoadedView loadedView = loadView(fxmlPath, controllerSetup);
+            showRoot(loadedView.root());
         } catch (IOException e) {
             ClientExceptionHandler.showError(ClientErrorType.NAVIGATION, "Navigation error [" + fxmlPath + "]", e);
         }
@@ -106,39 +85,51 @@ public class NavigationManager {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent node = loader.load();
-            Object controller = loader.getController();
-            configureController(controller);
-            if (controllerSetup != null) {
-                controllerSetup.accept(controller);
-            }
-
-            prepareContentNode(node);
-            contentArea.getChildren().setAll(node);
-            return controller;
+            LoadedView loadedView = loadView(fxmlPath, controllerSetup);
+            prepareContentNode(loadedView.root());
+            contentArea.getChildren().setAll(loadedView.root());
+            return loadedView.controller();
         } catch (IOException e) {
             ClientExceptionHandler.showError(ClientErrorType.NAVIGATION, "Navigation content error [" + fxmlPath + "]", e);
             return null;
         }
     }
 
-    private void configureController(Object controller) {
-        if (controller instanceof HomeScreenController hsc) {
-            hsc.setUserData(currentUser, clientSocket);
-        } else if (controller instanceof AdminHomeController ahc) {
-            ahc.setUserData(currentUser, clientSocket);
-        } else if (controller instanceof DashboardController dc) {
-            dc.setUserData(currentUser, clientSocket);
-        } else if (controller instanceof WalletController wc) {
-            wc.setUserData(currentUser, clientSocket);
-        } else if (controller instanceof ProfileController pc) {
-            pc.setUserData(currentUser);
-        } else if (controller instanceof SellerHomeController shc) {
-            shc.setUserData(currentUser, clientSocket);
-        } else if (controller instanceof SellerDashboardController sdc) {
-            sdc.setUserData(currentUser, clientSocket);
+    private LoadedView loadView(String fxmlPath, Consumer<Object> controllerSetup) throws IOException {
+        URL fxmlUrl = getClass().getResource(fxmlPath);
+        if (fxmlUrl == null) {
+            throw new IOException("FXML resource not found: " + fxmlPath);
         }
+
+        FXMLLoader loader = new FXMLLoader(fxmlUrl);
+        Parent root = loader.load();
+        Object controller = loader.getController();
+        configureController(controller);
+        if (controllerSetup != null) {
+            controllerSetup.accept(controller);
+        }
+        return new LoadedView(root, controller);
+    }
+
+    private void configureController(Object controller) {
+        if (controller instanceof NavigationContextAware contextAware) {
+            contextAware.setUserData(currentUser, clientSocket);
+        }
+    }
+
+    private void showRoot(Parent root) {
+        mainStage.setScene(createScene(root));
+        mainStage.setFullScreenExitHint("");
+        mainStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        mainStage.setMaximized(true);
+        mainStage.show();
+    }
+
+    private Scene createScene(Parent root) {
+        Scene currentScene = mainStage.getScene();
+        return currentScene != null
+                ? new Scene(root, currentScene.getWidth(), currentScene.getHeight())
+                : new Scene(root, 1300, 800);
     }
 
     private void prepareContentNode(Node node) {
@@ -176,4 +167,6 @@ public class NavigationManager {
     public void goToWallet() {
         navigateTo("/fxml/WalletView.fxml");
     }
+
+    private record LoadedView(Parent root, Object controller) {}
 }

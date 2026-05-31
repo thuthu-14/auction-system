@@ -33,6 +33,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import navigation.NavigationContextAware;
 import navigation.NavigationManager;
 import server.model.User;
 import util.LoggerUtil;
@@ -40,7 +41,7 @@ import util.LoggerUtil;
 import java.net.URL;
 import java.util.*;
 
-public class WalletController implements Initializable {
+public class WalletController implements Initializable, NavigationContextAware {
 
     private static final String WALLET_OVERLAY_STYLE_CLASS = "wallet-modal-overlay";
 
@@ -263,6 +264,7 @@ public class WalletController implements Initializable {
         return value == null || value.isBlank() ? "--" : value;
     }
 
+    @Override
     public void setUserData(User user, ClientSocket socket) {
         // ← LUÔN lấy user mới nhất từ NavigationManager
         User navUser = NavigationManager.getInstance().getCurrentUser();

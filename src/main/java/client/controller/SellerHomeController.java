@@ -3,6 +3,7 @@ package client.controller;
 import client.exception.ClientErrorType;
 import client.exception.ClientExceptionHandler;
 import client.network.ClientSocket;
+import navigation.NavigationContextAware;
 import navigation.NavigationManager;
 import server.model.User;
 
@@ -28,7 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class SellerHomeController {
+public class SellerHomeController implements NavigationContextAware {
 
     @FXML private HBox menuHome, menuAI, menuCreateAuctions, menuManageAuctions,
             menuAuctionStatistic, menuMsg, menuPay, menuDowngrade, menuSettings;
@@ -76,6 +77,7 @@ public class SellerHomeController {
 
     // ================= DATA INJECTION =================
 
+    @Override
     public void setUserData(User user, ClientSocket socket) {
         this.currentUser = user;
         this.clientSocket = socket;
